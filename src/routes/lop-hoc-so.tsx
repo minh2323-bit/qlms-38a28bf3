@@ -15,6 +15,13 @@ import thumbHinhHoc from "@/assets/thumb-hinh-hoc.jpg";
 import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
 import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
 import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
+import thumbLop4A from "@/assets/thumb-lop-4a.jpg";
+import thumbLop3D from "@/assets/thumb-lop-3d.jpg";
+import thumbLop3A from "@/assets/thumb-lop-3a.jpg";
+import thumbLop3B from "@/assets/thumb-lop-3b.jpg";
+import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
+import thumbLop4B from "@/assets/thumb-lop-4b.jpg";
+import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
 export const Route = createFileRoute("/lop-hoc-so")({
   head: () => ({
