@@ -159,46 +159,103 @@ const MATERIALS_SEED: Record<string, { type: "slide" | "doc" | "ex" | "syllabus"
 // Chart data per class (and ALL = aggregate)
 const CHART_DATA_BY_CLASS: Record<"ALL" | ClassId, { name: string; done_ok: number; done_no: number; undone: number }[]> = {
   ALL: [
-    { name: "BT: Phân số", done_ok: 168, done_no: 84, undone: 36 },
-    { name: "BG: Số thập phân", done_ok: 142, done_no: 110, undone: 48 },
-    { name: "BT: Luyện đề 01", done_ok: 190, done_no: 72, undone: 38 },
+    { name: "BT: Phân số",          done_ok: 168, done_no: 84,  undone: 36 },
+    { name: "BT: So sánh PS",       done_ok: 152, done_no: 90,  undone: 44 },
+    { name: "BG: Số thập phân",     done_ok: 142, done_no: 110, undone: 48 },
+    { name: "BT: Cộng STP",         done_ok: 175, done_no: 78,  undone: 33 },
+    { name: "BT: Trừ STP",          done_ok: 161, done_no: 92,  undone: 41 },
+    { name: "BT: Làm tròn STP",     done_ok: 138, done_no: 105, undone: 51 },
+    { name: "BT: Tỉ số %",          done_ok: 149, done_no: 96,  undone: 49 },
+    { name: "BT: Luyện đề 01",      done_ok: 190, done_no: 72,  undone: 38 },
+    { name: "BT: Luyện đề 02",      done_ok: 182, done_no: 80,  undone: 38 },
+    { name: "KT: 15 phút Toán",     done_ok: 195, done_no: 70,  undone: 35 },
   ],
   "3A": [
-    { name: "BT: Phân số", done_ok: 28, done_no: 14, undone: 6 },
+    { name: "BT: Phân số",      done_ok: 28, done_no: 14, undone: 6 },
+    { name: "BT: So sánh PS",   done_ok: 25, done_no: 15, undone: 8 },
     { name: "BG: Số thập phân", done_ok: 22, done_no: 18, undone: 8 },
-    { name: "BT: Luyện đề 01", done_ok: 30, done_no: 12, undone: 6 },
+    { name: "BT: Cộng STP",     done_ok: 30, done_no: 12, undone: 6 },
+    { name: "BT: Trừ STP",      done_ok: 27, done_no: 14, undone: 7 },
+    { name: "BT: Làm tròn STP", done_ok: 24, done_no: 16, undone: 8 },
+    { name: "BT: Tỉ số %",      done_ok: 26, done_no: 15, undone: 7 },
+    { name: "BT: Luyện đề 01",  done_ok: 30, done_no: 12, undone: 6 },
+    { name: "BT: Luyện đề 02",  done_ok: 29, done_no: 13, undone: 6 },
+    { name: "KT: 15 phút Toán", done_ok: 31, done_no: 11, undone: 6 },
   ],
   "3B": [
-    { name: "BT: Phân số", done_ok: 24, done_no: 12, undone: 9 },
+    { name: "BT: Phân số",      done_ok: 24, done_no: 12, undone: 9 },
+    { name: "BT: So sánh PS",   done_ok: 22, done_no: 13, undone: 10 },
     { name: "BG: Số thập phân", done_ok: 20, done_no: 16, undone: 9 },
-    { name: "BT: Luyện đề 01", done_ok: 26, done_no: 10, undone: 9 },
+    { name: "BT: Cộng STP",     done_ok: 26, done_no: 10, undone: 9 },
+    { name: "BT: Trừ STP",      done_ok: 23, done_no: 13, undone: 9 },
+    { name: "BT: Làm tròn STP", done_ok: 21, done_no: 14, undone: 10 },
+    { name: "BT: Tỉ số %",      done_ok: 23, done_no: 13, undone: 9 },
+    { name: "BT: Luyện đề 01",  done_ok: 26, done_no: 10, undone: 9 },
+    { name: "BT: Luyện đề 02",  done_ok: 25, done_no: 11, undone: 9 },
+    { name: "KT: 15 phút Toán", done_ok: 27, done_no: 9,  undone: 9 },
   ],
   "3C": [
-    { name: "BT: Phân số", done_ok: 22, done_no: 13, undone: 7 },
+    { name: "BT: Phân số",      done_ok: 22, done_no: 13, undone: 7 },
+    { name: "BT: So sánh PS",   done_ok: 20, done_no: 14, undone: 8 },
     { name: "BG: Số thập phân", done_ok: 19, done_no: 15, undone: 8 },
-    { name: "BT: Luyện đề 01", done_ok: 25, done_no: 11, undone: 6 },
+    { name: "BT: Cộng STP",     done_ok: 25, done_no: 11, undone: 6 },
+    { name: "BT: Trừ STP",      done_ok: 22, done_no: 13, undone: 7 },
+    { name: "BT: Làm tròn STP", done_ok: 20, done_no: 14, undone: 8 },
+    { name: "BT: Tỉ số %",      done_ok: 21, done_no: 14, undone: 7 },
+    { name: "BT: Luyện đề 01",  done_ok: 25, done_no: 11, undone: 6 },
+    { name: "BT: Luyện đề 02",  done_ok: 24, done_no: 12, undone: 6 },
+    { name: "KT: 15 phút Toán", done_ok: 26, done_no: 10, undone: 6 },
   ],
   "3D": [
-    { name: "BT: Phân số", done_ok: 21, done_no: 11, undone: 5 },
+    { name: "BT: Phân số",      done_ok: 21, done_no: 11, undone: 5 },
+    { name: "BT: So sánh PS",   done_ok: 19, done_no: 12, undone: 6 },
     { name: "BG: Số thập phân", done_ok: 18, done_no: 14, undone: 6 },
-    { name: "BT: Luyện đề 01", done_ok: 24, done_no: 9,  undone: 5 },
+    { name: "BT: Cộng STP",     done_ok: 24, done_no: 9,  undone: 5 },
+    { name: "BT: Trừ STP",      done_ok: 21, done_no: 11, undone: 5 },
+    { name: "BT: Làm tròn STP", done_ok: 19, done_no: 13, undone: 6 },
+    { name: "BT: Tỉ số %",      done_ok: 20, done_no: 12, undone: 6 },
+    { name: "BT: Luyện đề 01",  done_ok: 24, done_no: 9,  undone: 5 },
+    { name: "BT: Luyện đề 02",  done_ok: 23, done_no: 10, undone: 5 },
+    { name: "KT: 15 phút Toán", done_ok: 25, done_no: 8,  undone: 5 },
   ],
   "4A": [
-    { name: "BT: Phân số", done_ok: 26, done_no: 11, undone: 4 },
+    { name: "BT: Phân số",      done_ok: 26, done_no: 11, undone: 4 },
+    { name: "BT: So sánh PS",   done_ok: 24, done_no: 13, undone: 5 },
     { name: "BG: Số thập phân", done_ok: 24, done_no: 13, undone: 6 },
-    { name: "BT: Luyện đề 01", done_ok: 28, done_no: 10, undone: 4 },
+    { name: "BT: Cộng STP",     done_ok: 28, done_no: 10, undone: 4 },
+    { name: "BT: Trừ STP",      done_ok: 26, done_no: 11, undone: 4 },
+    { name: "BT: Làm tròn STP", done_ok: 23, done_no: 14, undone: 5 },
+    { name: "BT: Tỉ số %",      done_ok: 25, done_no: 12, undone: 5 },
+    { name: "BT: Luyện đề 01",  done_ok: 28, done_no: 10, undone: 4 },
+    { name: "BT: Luyện đề 02",  done_ok: 27, done_no: 11, undone: 4 },
+    { name: "KT: 15 phút Toán", done_ok: 29, done_no: 9,  undone: 4 },
   ],
   "4B": [
-    { name: "BT: Phân số", done_ok: 25, done_no: 13, undone: 3 },
+    { name: "BT: Phân số",      done_ok: 25, done_no: 13, undone: 3 },
+    { name: "BT: So sánh PS",   done_ok: 23, done_no: 14, undone: 4 },
     { name: "BG: Số thập phân", done_ok: 21, done_no: 17, undone: 5 },
-    { name: "BT: Luyện đề 01", done_ok: 30, done_no: 11, undone: 4 },
+    { name: "BT: Cộng STP",     done_ok: 30, done_no: 11, undone: 4 },
+    { name: "BT: Trừ STP",      done_ok: 27, done_no: 12, undone: 4 },
+    { name: "BT: Làm tròn STP", done_ok: 24, done_no: 14, undone: 5 },
+    { name: "BT: Tỉ số %",      done_ok: 26, done_no: 13, undone: 4 },
+    { name: "BT: Luyện đề 01",  done_ok: 30, done_no: 11, undone: 4 },
+    { name: "BT: Luyện đề 02",  done_ok: 28, done_no: 12, undone: 4 },
+    { name: "KT: 15 phút Toán", done_ok: 31, done_no: 10, undone: 4 },
   ],
   "4C": [
-    { name: "BT: Phân số", done_ok: 22, done_no: 10, undone: 2 },
+    { name: "BT: Phân số",      done_ok: 22, done_no: 10, undone: 2 },
+    { name: "BT: So sánh PS",   done_ok: 20, done_no: 12, undone: 3 },
     { name: "BG: Số thập phân", done_ok: 18, done_no: 17, undone: 6 },
-    { name: "BT: Luyện đề 01", done_ok: 27, done_no: 9,  undone: 4 },
+    { name: "BT: Cộng STP",     done_ok: 27, done_no: 9,  undone: 4 },
+    { name: "BT: Trừ STP",      done_ok: 24, done_no: 11, undone: 4 },
+    { name: "BT: Làm tròn STP", done_ok: 21, done_no: 13, undone: 5 },
+    { name: "BT: Tỉ số %",      done_ok: 23, done_no: 12, undone: 4 },
+    { name: "BT: Luyện đề 01",  done_ok: 27, done_no: 9,  undone: 4 },
+    { name: "BT: Luyện đề 02",  done_ok: 26, done_no: 10, undone: 4 },
+    { name: "KT: 15 phút Toán", done_ok: 28, done_no: 8,  undone: 4 },
   ],
 };
+
 
 /* ---------------- Components ---------------- */
 
@@ -241,79 +298,72 @@ function TeacherHome() {
 
           {/* Schedule Section */}
           <section className="bg-white rounded-2xl border shadow-sm">
-            {/* Top toolbar: class filter + week nav + tree toggle */}
-            <div className="px-6 py-4 border-b space-y-3">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
-                  <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
-                    Môn Toán · Khối 3 & 4
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={showTree ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setShowTree((v) => !v);
-                      setActiveLessonId(null);
-                    }}
-                    className="gap-2"
+            {/* Row 1: Class filter (above title) */}
+            <div className="px-6 pt-4 pb-3 flex items-center gap-2 flex-wrap border-b">
+              <span className="text-xs font-semibold text-slate-500 uppercase mr-1">Lớp:</span>
+              <button
+                onClick={() => setClassFilter("ALL")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
+                  classFilter === "ALL"
+                    ? "bg-indigo-700 text-white border-indigo-700 shadow"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
+                }`}
+              >
+                Tất cả các lớp
+              </button>
+              {CLASSES.map((c) => {
+                const active = classFilter === c;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setClassFilter(c)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition flex items-center gap-1.5 ${
+                      active
+                        ? "bg-indigo-700 text-white border-indigo-700 shadow"
+                        : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
+                    }`}
                   >
-                    <BookMarked className="h-4 w-4" />
-                    Cây kiến thức
-                  </Button>
-                  <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7"
-                      onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <CalendarClock className="h-4 w-4 text-slate-500" />
-                    <span className="text-sm font-medium px-2">{week.label} · {week.range}</span>
-                    <Button variant="ghost" size="icon" className="h-7 w-7"
-                      onClick={() => setWeekIdx(Math.min(WEEKS.length, weekIdx + 1))}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                    <span className={`h-2 w-2 rounded-full ${
+                      active ? "bg-white" :
+                        c.startsWith("3") ? "bg-blue-500" : "bg-violet-500"
+                    }`} />
+                    Lớp {c}
+                  </button>
+                );
+              })}
+            </div>
 
-              {/* Class filter — applies to schedule AND chart below */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-semibold text-slate-500 uppercase mr-1">Lớp:</span>
-                <button
-                  onClick={() => setClassFilter("ALL")}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
-                    classFilter === "ALL"
-                      ? "bg-indigo-700 text-white border-indigo-700 shadow"
-                      : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
-                  }`}
-                >
-                  Tất cả các lớp
-                </button>
-                {CLASSES.map((c) => {
-                  const active = classFilter === c;
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => setClassFilter(c)}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition flex items-center gap-1.5 ${
-                        active
-                          ? "bg-indigo-700 text-white border-indigo-700 shadow"
-                          : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
-                      }`}
-                    >
-                      <span className={`h-2 w-2 rounded-full ${
-                        active ? "bg-white" :
-                          c.startsWith("3") ? "bg-blue-500" : "bg-violet-500"
-                      }`} />
-                      Lớp {c}
-                    </button>
-                  );
-                })}
-                <span className="ml-auto text-xs text-slate-500 italic">
-                  Bộ lọc áp dụng cho cả Lịch báo giảng và Biểu đồ bên dưới
-                </span>
+            {/* Row 2: Knowledge tree toggle (left) · Title (center) · Week nav (right) */}
+            <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
+              <Button
+                variant={showTree ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setShowTree((v) => !v);
+                  setActiveLessonId(null);
+                }}
+                className="gap-2"
+              >
+                <BookMarked className="h-4 w-4" />
+                Cây kiến thức
+              </Button>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
+                <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
+                  Môn Toán · Khối 3 &amp; 4
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
+                <Button variant="ghost" size="icon" className="h-7 w-7"
+                  onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <CalendarClock className="h-4 w-4 text-slate-500" />
+                <span className="text-sm font-medium px-2">{week.label} · {week.range}</span>
+                <Button variant="ghost" size="icon" className="h-7 w-7"
+                  onClick={() => setWeekIdx(Math.min(WEEKS.length, weekIdx + 1))}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -350,6 +400,7 @@ function TeacherHome() {
               )}
             </div>
           </section>
+
 
           {/* Chart Section — driven by same classFilter */}
           <ChartSection classFilter={classFilter} />
@@ -432,20 +483,13 @@ function DashboardSection() {
   ];
 
   const reminders = [
-    { count: 3, label: "Bài tập cần chấm",     tone: "rose",    icon: ClipboardCheck },
-    { count: 3, label: "Bài tập sắp hết hạn",  tone: "rose",    icon: AlarmClock },
-    { count: 2, label: "Phản hồi học sinh",    tone: "rose",    icon: MessageSquareWarning },
-    { count: 3, label: "Kỳ thi sắp diễn ra",   tone: "amber",   icon: CalendarClock },
-    { count: 3, label: "Kỳ thi đang diễn ra",  tone: "emerald", icon: CalendarCheck },
-    { count: 5, label: "Tiết dạy hôm nay",     tone: "indigo",  icon: Clock },
+    { count: 3, label: "Bài tập cần chấm",     icon: ClipboardCheck,       accent: "text-rose-600",    bar: "bg-rose-500" },
+    { count: 3, label: "Bài tập sắp hết hạn",  icon: AlarmClock,           accent: "text-orange-600",  bar: "bg-orange-500" },
+    { count: 2, label: "Phản hồi học sinh",    icon: MessageSquareWarning, accent: "text-amber-600",   bar: "bg-amber-500" },
+    { count: 3, label: "Kỳ thi sắp diễn ra",   icon: CalendarClock,        accent: "text-indigo-600",  bar: "bg-indigo-500" },
+    { count: 3, label: "Kỳ thi đang diễn ra",  icon: CalendarCheck,        accent: "text-emerald-600", bar: "bg-emerald-500" },
+    { count: 5, label: "Tiết dạy hôm nay",     icon: Clock,                accent: "text-sky-600",     bar: "bg-sky-500" },
   ];
-
-  const toneMap: Record<string, string> = {
-    rose: "bg-rose-500",
-    amber: "bg-amber-500",
-    emerald: "bg-emerald-500",
-    indigo: "bg-indigo-600",
-  };
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6">
@@ -475,19 +519,20 @@ function DashboardSection() {
         ))}
       </div>
 
-      {/* Reminders */}
+      {/* Reminders — unified white card style, color only on accent */}
       <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Nhắc việc</h3>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {reminders.map((r) => (
           <button
             key={r.label}
-            className={`${toneMap[r.tone]} text-white rounded-xl p-3 text-left flex items-start gap-2 hover:opacity-95 hover:-translate-y-0.5 transition shadow-sm`}
+            className="relative bg-white rounded-xl border border-slate-200 p-4 text-left hover:shadow-md hover:-translate-y-0.5 transition overflow-hidden group"
           >
-            <r.icon className="h-5 w-5 mt-0.5 shrink-0" />
-            <div>
-              <div className="text-2xl font-black leading-none">{r.count}</div>
-              <div className="text-xs font-semibold mt-1 leading-tight">{r.label}</div>
+            <span className={`absolute left-0 top-0 h-full w-1 ${r.bar}`} />
+            <div className="flex items-start justify-between">
+              <div className={`text-3xl font-black leading-none ${r.accent}`}>{r.count}</div>
+              <r.icon className={`h-5 w-5 ${r.accent} opacity-80 group-hover:scale-110 transition`} />
             </div>
+            <div className="text-sm font-semibold text-slate-700 mt-2 leading-tight">{r.label}</div>
           </button>
         ))}
       </div>
@@ -625,7 +670,7 @@ function ScheduleGrid({
                   const isFocus = l && focusUnit && l.unitId === focusUnit;
                   const isActive = l && activeLessonId === l.id;
                   return (
-                    <td key={d} className="border border-slate-200 p-1 align-top h-16">
+                    <td key={d} className="border border-slate-200 p-1 align-top h-10">
                       {l && (
                         <button
                           onClick={() => onPickLesson(l.id)}
@@ -858,7 +903,7 @@ function ChartSection({ classFilter }: { classFilter: "ALL" | ClassId }) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+            <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
             <YAxis label={{ value: "Số học sinh", angle: -90, position: "insideLeft", style: { fontSize: 12 } }} />
             <Legend />
             <Bar dataKey="done_ok" name="Đã hoàn thành & Đạt yêu cầu" fill="#22c55e" radius={[4,4,0,0]} />
