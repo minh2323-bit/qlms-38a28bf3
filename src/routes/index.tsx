@@ -539,25 +539,23 @@ function Legend2() {
   );
 }
 
-/* ----- Lesson Drawer ----- */
-function LessonDrawer({
+/* ----- Lesson Panel (inline, pushes schedule) ----- */
+function LessonPanel({
   lesson, onClose, grid, setGrid, weekIdx,
 }: {
-  lesson: Lesson | null; onClose: () => void;
+  lesson: Lesson; onClose: () => void;
   grid: WeekGrid; setGrid: (g: WeekGrid) => void; weekIdx: number;
 }) {
   const [editMode, setEditMode] = useState(false);
+  useEffect(() => { setEditMode(false); }, [lesson.id]);
 
-  useEffect(() => { if (!lesson) setEditMode(false); }, [lesson]);
-
-  const materials = lesson ? (MATERIALS_SEED[lesson.unitId] ?? []) : [];
+  const materials = MATERIALS_SEED[lesson.unitId] ?? [];
 
   const onDragStart = (e: React.DragEvent, mIdx: number) => {
     e.dataTransfer.setData("mIdx", String(mIdx));
   };
   const onDropToSlot = (e: React.DragEvent, day: number, period: number) => {
     e.preventDefault();
-    if (!lesson) return;
     const idx = Number(e.dataTransfer.getData("mIdx"));
     const newId = `${lesson.id}-mv-${idx}-${day}-${period}`;
     const next: WeekGrid = JSON.parse(JSON.stringify(grid));
@@ -569,70 +567,114 @@ function LessonDrawer({
     }
   };
 
+  const groups: { title: string; icon: typeof Presentation; filter: (m: { type: string }) => boolean }[] = [
+    { title: "Bài giảng", icon: Presentation, filter: (m) => m.type === "slide" || m.type === "syllabus" },
+    { title: "Học liệu", icon: BookOpenCheck, filter: (m) => m.type === "doc" },
+    { title: "Bài tập về nhà", icon: FileText, filter: (m) => m.type === "ex" },
+  ];
+
   return (
-    <Sheet open={!!lesson} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
-        {lesson && (
-          <>
-            <SheetHeader>
-              <SheetTitle className="flex items-center justify-between">
-                <span>Học liệu của tiết</span>
-                <Badge variant="outline">{lesson.class} · {lesson.subject}</Badge>
-              </SheetTitle>
-              <p className="text-sm text-slate-500">{lesson.topic}</p>
-            </SheetHeader>
+    <aside className="w-[340px] shrink-0 border-l bg-slate-50/60 flex flex-col animate-in slide-in-from-right-4 duration-200">
+      {/* Header */}
+      <div className="px-4 py-3 border-b bg-white flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-800">Học liệu của tiết</h3>
+            <Badge variant="outline" className="text-[10px]">{lesson.class} · {lesson.subject}</Badge>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5 truncate">{lesson.topic}</p>
+        </div>
+        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
 
-            <div className="mt-4 flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="sm" className="gap-1 bg-blue-600 hover:bg-blue-700">
-                    <Plus className="h-4 w-4" /> Thêm nội dung mới
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem><Presentation className="h-4 w-4 mr-2" />Bài giảng</DropdownMenuItem>
-                  <DropdownMenuItem><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
-                  <DropdownMenuItem><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
-                  <DropdownMenuItem><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                size="sm"
-                variant={editMode ? "default" : "outline"}
-                className="gap-1"
-                onClick={() => setEditMode((v) => !v)}
-              >
-                <Pencil className="h-4 w-4" /> {editMode ? "Xong" : "Sửa"}
-              </Button>
-            </div>
+      {/* Actions */}
+      <div className="px-4 py-3 border-b bg-white flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" className="gap-1 bg-blue-600 hover:bg-blue-700 flex-1">
+              <Plus className="h-4 w-4" /> Thêm nội dung mới
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem><Presentation className="h-4 w-4 mr-2" />Bài giảng</DropdownMenuItem>
+            <DropdownMenuItem><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
+            <DropdownMenuItem><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
+            <DropdownMenuItem><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button
+          size="sm"
+          variant={editMode ? "default" : "outline"}
+          className="gap-1"
+          onClick={() => setEditMode((v) => !v)}
+        >
+          <Pencil className="h-4 w-4" /> {editMode ? "Xong" : "Sửa"}
+        </Button>
+      </div>
 
-            <div className="mt-4 space-y-4">
-              <MaterialGroup title="Bài giảng" items={materials.filter((m) => m.type === "slide" || m.type === "syllabus")}
-                editMode={editMode} onDragStart={onDragStart} />
-              <MaterialGroup title="Học liệu" items={materials.filter((m) => m.type === "doc")}
-                editMode={editMode} onDragStart={onDragStart} />
-              <MaterialGroup title="Bài tập về nhà" items={materials.filter((m) => m.type === "ex")}
-                editMode={editMode} onDragStart={onDragStart} />
-            </div>
-
-            {editMode && (
-              <div className="mt-6 border-t pt-4">
-                <p className="text-xs text-slate-500 mb-2">
-                  Kéo học liệu vào ô trống bên dưới để gắn sang tiết khác trong tuần này.
-                </p>
-                <MiniWeek
-                  weekIdx={weekIdx} grid={grid}
-                  classFilter={lesson.class}
-                  onDropToSlot={onDropToSlot}
-                />
+      {/* Material groups — Tạo đề nhanh style */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {groups.map((g) => {
+          const items = materials.filter(g.filter);
+          return (
+            <div key={g.title} className="bg-white rounded-xl border overflow-hidden">
+              <div className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-50 border-b">
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <g.icon className="h-4 w-4 text-blue-600" />
+                  {g.title}
+                </div>
+                <button className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition">
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
               </div>
-            )}
-          </>
+              {items.length === 0 ? (
+                <p className="text-xs text-slate-400 italic px-3 py-3">Chưa có nội dung</p>
+              ) : (
+                <ul>
+                  {items.map((m, i) => (
+                    <li
+                      key={m.title}
+                      draggable={editMode}
+                      onDragStart={(e) => onDragStart(e, materials.indexOf(m))}
+                      className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border-t first:border-t-0 transition hover:bg-blue-50 ${
+                        editMode ? "cursor-grab active:cursor-grabbing bg-blue-50/40" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {editMode && <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />}
+                        <FileText className="h-4 w-4 text-blue-600 shrink-0" />
+                        <span className="text-blue-700 truncate">{m.title}</span>
+                      </div>
+                      <button className="h-5 w-5 rounded-full border border-blue-300 text-blue-600 flex items-center justify-center hover:bg-blue-100 shrink-0">
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+
+        {editMode && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+            <p className="text-xs text-amber-800 font-medium mb-2">
+              Kéo học liệu vào ô trống để gắn sang tiết khác trong tuần này:
+            </p>
+            <MiniWeek
+              weekIdx={weekIdx} grid={grid}
+              classFilter={lesson.class}
+              onDropToSlot={onDropToSlot}
+            />
+          </div>
         )}
-      </SheetContent>
-    </Sheet>
+      </div>
+    </aside>
   );
 }
+
 
 function MaterialGroup({
   title, items, editMode, onDragStart,
