@@ -409,9 +409,9 @@ function TeacherHome() {
 
           {/* Chart Section — driven by same classFilter */}
           <ChartSection classFilter={classFilter} />
-        </main>
-      </div>
-    </div>
+      </>
+    </AppShell>
+
   );
 }
 
