@@ -55,17 +55,27 @@ type LessonCard = {
   author: string; classes: string;
   approved: boolean; shared: "noi-bo" | "hanoi" | "none";
   thumb: string;
+  chapters: string[];
+  loai: string;
 };
 
+const CHAPTERS: Record<string, string[]> = {
+  "Lớp 3|Toán": ["Số tự nhiên", "Phân số", "Hình học", "Đo lường"],
+  "Lớp 4|Toán": ["Số thập phân", "Phân số", "Tỉ số phần trăm", "Đo lường"],
+};
+
+const LESSON_TYPES = ["Bài giảng điện tử", "Video", "Tài liệu"];
+const LESSON_STATUSES = ["Đã duyệt", "Chờ duyệt"];
+
 const LESSONS: LessonCard[] = [
-  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo },
-  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan },
-  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc },
-  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong },
-  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram },
-  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien },
-  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan },
-  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo },
+  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, chapters: ["Phân số"], loai: "Bài giảng điện tử" },
+  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, chapters: ["Số tự nhiên"], loai: "Bài giảng điện tử" },
+  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, chapters: ["Hình học", "Đo lường"], loai: "Video" },
+  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, chapters: ["Đo lường"], loai: "Tài liệu" },
+  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, chapters: ["Tỉ số phần trăm"], loai: "Bài giảng điện tử" },
+  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, chapters: ["Số tự nhiên"], loai: "Bài giảng điện tử" },
+  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, chapters: ["Số thập phân"], loai: "Video" },
+  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, chapters: ["Phân số"], loai: "Bài giảng điện tử" },
 ];
 
 function DigitalClassesPage() {
@@ -78,6 +88,9 @@ function DigitalClassesPage() {
   const [lessonSearch, setLessonSearch] = useState("");
   const [lessonKhoi, setLessonKhoi] = useState("");
   const [lessonMon, setLessonMon] = useState("");
+  const [lessonChuong, setLessonChuong] = useState("");
+  const [lessonLoai, setLessonLoai] = useState("");
+  const [lessonTrangThai, setLessonTrangThai] = useState("");
 
   const filteredClasses = CLASSES.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
@@ -86,11 +99,16 @@ function DigitalClassesPage() {
     return matchSearch && matchKhoi && matchMon;
   });
 
+  const chapterOptions = lessonKhoi && lessonMon ? (CHAPTERS[`${lessonKhoi}|${lessonMon}`] ?? []) : [];
+
   const filteredLessons = LESSONS.filter((l) => {
     const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
     const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
     const matchMon = !lessonMon || l.subject === lessonMon;
-    return matchSearch && matchKhoi && matchMon;
+    const matchChuong = !lessonChuong || l.chapters.includes(lessonChuong);
+    const matchLoai = !lessonLoai || l.loai === lessonLoai;
+    const matchTrang = !lessonTrangThai || (lessonTrangThai === "Đã duyệt" ? l.approved : !l.approved);
+    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang;
   });
 
   return (
@@ -166,19 +184,28 @@ function DigitalClassesPage() {
         {tab === "lessons" && (
           <section>
             {/* Filter bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="relative">
-                  <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    value={lessonSearch}
-                    onChange={(e) => setLessonSearch(e.target.value)}
-                    placeholder="Tìm tên bài giảng"
-                    className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  />
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+              <div className="flex flex-col gap-2 flex-1 min-w-[300px]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative">
+                    <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      value={lessonSearch}
+                      onChange={(e) => setLessonSearch(e.target.value)}
+                      placeholder="Tìm tên bài giảng"
+                      className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    />
+                  </div>
+                  <FilterSelect value={lessonKhoi} onChange={(v) => { setLessonKhoi(v); setLessonChuong(""); }} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
+                  <FilterSelect value={lessonMon} onChange={(v) => { setLessonMon(v); setLessonChuong(""); }} placeholder="Môn" options={["Toán"]} />
+                  {chapterOptions.length > 0 && (
+                    <FilterSelect value={lessonChuong} onChange={setLessonChuong} placeholder="Chương/Chủ đề" options={chapterOptions} />
+                  )}
                 </div>
-                <FilterSelect value={lessonKhoi} onChange={setLessonKhoi} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
-                <FilterSelect value={lessonMon} onChange={setLessonMon} placeholder="Môn" options={["Toán"]} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <FilterSelect value={lessonLoai} onChange={setLessonLoai} placeholder="Loại học liệu" options={LESSON_TYPES} />
+                  <FilterSelect value={lessonTrangThai} onChange={setLessonTrangThai} placeholder="Trạng thái" options={LESSON_STATUSES} />
+                </div>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
@@ -201,13 +228,17 @@ function DigitalClassesPage() {
               </div>
             </div>
 
-            <div className={lessonView === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" : "space-y-3"}>
-              <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
-                <Plus className="h-8 w-8" />
-                <span className="font-medium">Thêm bài giảng mới</span>
-              </button>
-              {filteredLessons.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
-            </div>
+            {lessonView === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
+                  <Plus className="h-8 w-8" />
+                  <span className="font-medium">Thêm bài giảng mới</span>
+                </button>
+                {filteredLessons.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
+              </div>
+            ) : (
+              <LessonsTable lessons={filteredLessons} />
+            )}
           </section>
         )}
       </>
@@ -333,6 +364,60 @@ function LessonCardView({ l }: { l: LessonCard }) {
           Chia sẻ lên Hanoi Study
         </button>
       </div>
+    </div>
+  );
+}
+
+function LessonsTable({ lessons }: { lessons: LessonCard[] }) {
+  return (
+    <div className="bg-white rounded-2xl border shadow-sm overflow-x-auto">
+      <table className="w-full text-base">
+        <thead>
+          <tr className="bg-indigo-700 text-white text-left">
+            <th className="px-4 py-3 font-semibold w-14 text-center">STT</th>
+            <th className="px-4 py-3 font-semibold">Tên bài giảng</th>
+            <th className="px-4 py-3 font-semibold">Tác giả</th>
+            <th className="px-4 py-3 font-semibold">Chương/Chủ đề</th>
+            <th className="px-4 py-3 font-semibold text-center w-56">Chia sẻ lên HanoiStudy</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lessons.map((l, i) => (
+            <tr key={l.title + l.author} className={`border-t border-slate-200 ${i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
+              <td className="px-4 py-4 text-center text-slate-700 font-semibold">{i + 1}</td>
+              <td className="px-4 py-4">
+                <div className="font-semibold text-slate-800">{l.title}</div>
+                <div className="mt-1">
+                  <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                    {l.approved ? "Đã duyệt" : "Chờ duyệt"}
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-600">{l.khoi}; {l.subject}</div>
+              </td>
+              <td className="px-4 py-4 text-slate-700">{l.author}</td>
+              <td className="px-4 py-4">
+                <div className="flex flex-wrap gap-1.5">
+                  {l.chapters.map((c) => (
+                    <span key={c} className="text-sm bg-slate-100 text-slate-700 px-2 py-1 rounded-md">{c}</span>
+                  ))}
+                </div>
+              </td>
+              <td className="px-4 py-4 text-center">
+                {l.shared === "hanoi" ? (
+                  <span className="text-emerald-600 font-semibold">Sở Đã Duyệt</span>
+                ) : (
+                  <button
+                    disabled={!l.approved}
+                    className={`px-5 py-2 rounded-lg text-sm font-semibold ${l.approved ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`}
+                  >
+                    Chia sẻ
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
