@@ -15,6 +15,13 @@ import thumbHinhHoc from "@/assets/thumb-hinh-hoc.jpg";
 import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
 import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
 import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
+import thumbLop4A from "@/assets/thumb-lop-4a.jpg";
+import thumbLop3D from "@/assets/thumb-lop-3d.jpg";
+import thumbLop3A from "@/assets/thumb-lop-3a.jpg";
+import thumbLop3B from "@/assets/thumb-lop-3b.jpg";
+import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
+import thumbLop4B from "@/assets/thumb-lop-4b.jpg";
+import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
 export const Route = createFileRoute("/lop-hoc-so")({
   head: () => ({
@@ -29,16 +36,17 @@ export const Route = createFileRoute("/lop-hoc-so")({
 type ClassRow = {
   name: string; lop: string; subject: string;
   baiGiang: number; hocLieu: number; hocSinh: number;
+  thumb: string;
 };
 
 const CLASSES: ClassRow[] = [
-  { name: "Lớp 4A năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40 },
-  { name: "Lớp 3D năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40 },
-  { name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38 },
-  { name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42 },
-  { name: "Lớp 3C năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39 },
-  { name: "Lớp 4B năm học 2025 - 2026", lop: "4B", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41 },
-  { name: "Lớp 4C năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40 },
+  { name: "Lớp 4A năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A },
+  { name: "Lớp 3D năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D },
+  { name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A },
+  { name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B },
+  { name: "Lớp 3C năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C },
+  { name: "Lớp 4B năm học 2025 - 2026", lop: "4B", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4B },
+  { name: "Lớp 4C năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C },
 ];
 
 type LessonCard = {
@@ -134,8 +142,8 @@ function StatCard({ color, label, value, icon }: { color: "emerald" | "indigo" |
 function ClassCard({ c }: { c: ClassRow }) {
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition">
-      <div className="h-28 bg-gradient-to-br from-indigo-100 via-violet-100 to-rose-100 flex items-center justify-center">
-        <GraduationCap className="h-14 w-14 text-white/80 drop-shadow" />
+      <div className="h-28 bg-slate-100 overflow-hidden">
+        <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between">
