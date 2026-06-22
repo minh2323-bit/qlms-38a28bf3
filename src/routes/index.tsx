@@ -241,79 +241,72 @@ function TeacherHome() {
 
           {/* Schedule Section */}
           <section className="bg-white rounded-2xl border shadow-sm">
-            {/* Top toolbar: class filter + week nav + tree toggle */}
-            <div className="px-6 py-4 border-b space-y-3">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
-                  <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
-                    Môn Toán · Khối 3 & 4
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={showTree ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setShowTree((v) => !v);
-                      setActiveLessonId(null);
-                    }}
-                    className="gap-2"
+            {/* Row 1: Class filter (above title) */}
+            <div className="px-6 pt-4 pb-3 flex items-center gap-2 flex-wrap border-b">
+              <span className="text-xs font-semibold text-slate-500 uppercase mr-1">Lớp:</span>
+              <button
+                onClick={() => setClassFilter("ALL")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
+                  classFilter === "ALL"
+                    ? "bg-indigo-700 text-white border-indigo-700 shadow"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
+                }`}
+              >
+                Tất cả các lớp
+              </button>
+              {CLASSES.map((c) => {
+                const active = classFilter === c;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setClassFilter(c)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition flex items-center gap-1.5 ${
+                      active
+                        ? "bg-indigo-700 text-white border-indigo-700 shadow"
+                        : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
+                    }`}
                   >
-                    <BookMarked className="h-4 w-4" />
-                    Cây kiến thức
-                  </Button>
-                  <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7"
-                      onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <CalendarClock className="h-4 w-4 text-slate-500" />
-                    <span className="text-sm font-medium px-2">{week.label} · {week.range}</span>
-                    <Button variant="ghost" size="icon" className="h-7 w-7"
-                      onClick={() => setWeekIdx(Math.min(WEEKS.length, weekIdx + 1))}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                    <span className={`h-2 w-2 rounded-full ${
+                      active ? "bg-white" :
+                        c.startsWith("3") ? "bg-blue-500" : "bg-violet-500"
+                    }`} />
+                    Lớp {c}
+                  </button>
+                );
+              })}
+            </div>
 
-              {/* Class filter — applies to schedule AND chart below */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-semibold text-slate-500 uppercase mr-1">Lớp:</span>
-                <button
-                  onClick={() => setClassFilter("ALL")}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
-                    classFilter === "ALL"
-                      ? "bg-indigo-700 text-white border-indigo-700 shadow"
-                      : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
-                  }`}
-                >
-                  Tất cả các lớp
-                </button>
-                {CLASSES.map((c) => {
-                  const active = classFilter === c;
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => setClassFilter(c)}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition flex items-center gap-1.5 ${
-                        active
-                          ? "bg-indigo-700 text-white border-indigo-700 shadow"
-                          : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
-                      }`}
-                    >
-                      <span className={`h-2 w-2 rounded-full ${
-                        active ? "bg-white" :
-                          c.startsWith("3") ? "bg-blue-500" : "bg-violet-500"
-                      }`} />
-                      Lớp {c}
-                    </button>
-                  );
-                })}
-                <span className="ml-auto text-xs text-slate-500 italic">
-                  Bộ lọc áp dụng cho cả Lịch báo giảng và Biểu đồ bên dưới
-                </span>
+            {/* Row 2: Knowledge tree toggle (left) · Title (center) · Week nav (right) */}
+            <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
+              <Button
+                variant={showTree ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setShowTree((v) => !v);
+                  setActiveLessonId(null);
+                }}
+                className="gap-2"
+              >
+                <BookMarked className="h-4 w-4" />
+                Cây kiến thức
+              </Button>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
+                <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
+                  Môn Toán · Khối 3 &amp; 4
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
+                <Button variant="ghost" size="icon" className="h-7 w-7"
+                  onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <CalendarClock className="h-4 w-4 text-slate-500" />
+                <span className="text-sm font-medium px-2">{week.label} · {week.range}</span>
+                <Button variant="ghost" size="icon" className="h-7 w-7"
+                  onClick={() => setWeekIdx(Math.min(WEEKS.length, weekIdx + 1))}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -350,6 +343,7 @@ function TeacherHome() {
               )}
             </div>
           </section>
+
 
           {/* Chart Section — driven by same classFilter */}
           <ChartSection classFilter={classFilter} />
