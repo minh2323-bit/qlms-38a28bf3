@@ -69,16 +69,27 @@ const LESSONS: LessonCard[] = [
 ];
 
 function DigitalClassesPage() {
-  const [view, setView] = useState<"grid" | "list">("grid");
+  const [classView, setClassView] = useState<"grid" | "list">("grid");
+  const [lessonView, setLessonView] = useState<"grid" | "list">("grid");
   const [tab, setTab] = useState<"classes" | "lessons">("classes");
   const [search, setSearch] = useState("");
   const [khoi, setKhoi] = useState("");
   const [mon, setMon] = useState("");
+  const [lessonSearch, setLessonSearch] = useState("");
+  const [lessonKhoi, setLessonKhoi] = useState("");
+  const [lessonMon, setLessonMon] = useState("");
 
   const filteredClasses = CLASSES.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
     const matchKhoi = !khoi || c.lop.includes(khoi);
     const matchMon = !mon || c.subject === mon;
+    return matchSearch && matchKhoi && matchMon;
+  });
+
+  const filteredLessons = LESSONS.filter((l) => {
+    const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
+    const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
+    const matchMon = !lessonMon || l.subject === lessonMon;
     return matchSearch && matchKhoi && matchMon;
   });
 
@@ -131,14 +142,14 @@ function DigitalClassesPage() {
                 </button>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setView("list")}
-                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                    onClick={() => setClassView("list")}
+                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${classView === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
                   >
                     <ListIcon className="h-3.5 w-3.5" /> List view
                   </button>
                   <button
-                    onClick={() => setView("grid")}
-                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                    onClick={() => setClassView("grid")}
+                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${classView === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
                   >
                     <LayoutGrid className="h-3.5 w-3.5" /> Grid
                   </button>
@@ -146,7 +157,7 @@ function DigitalClassesPage() {
               </div>
             </div>
 
-            <div className={view === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
+            <div className={classView === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
               {filteredClasses.map((c) => <ClassCard key={c.name} c={c} />)}
             </div>
           </section>
@@ -154,12 +165,48 @@ function DigitalClassesPage() {
 
         {tab === "lessons" && (
           <section>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {/* Filter bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={lessonSearch}
+                    onChange={(e) => setLessonSearch(e.target.value)}
+                    placeholder="Tìm tên bài giảng"
+                    className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  />
+                </div>
+                <FilterSelect value={lessonKhoi} onChange={setLessonKhoi} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
+                <FilterSelect value={lessonMon} onChange={setLessonMon} placeholder="Môn" options={["Toán"]} />
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
+                  <Plus className="h-5 w-5" /> Thêm bài giảng mới
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setLessonView("list")}
+                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${lessonView === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                  >
+                    <ListIcon className="h-3.5 w-3.5" /> List view
+                  </button>
+                  <button
+                    onClick={() => setLessonView("grid")}
+                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${lessonView === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" /> Grid
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className={lessonView === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" : "space-y-3"}>
               <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
                 <Plus className="h-8 w-8" />
                 <span className="font-medium">Thêm bài giảng mới</span>
               </button>
-              {LESSONS.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
+              {filteredLessons.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
             </div>
           </section>
         )}
