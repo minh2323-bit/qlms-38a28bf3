@@ -88,6 +88,9 @@ function DigitalClassesPage() {
   const [lessonSearch, setLessonSearch] = useState("");
   const [lessonKhoi, setLessonKhoi] = useState("");
   const [lessonMon, setLessonMon] = useState("");
+  const [lessonChuong, setLessonChuong] = useState("");
+  const [lessonLoai, setLessonLoai] = useState("");
+  const [lessonTrangThai, setLessonTrangThai] = useState("");
 
   const filteredClasses = CLASSES.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
@@ -96,11 +99,16 @@ function DigitalClassesPage() {
     return matchSearch && matchKhoi && matchMon;
   });
 
+  const chapterOptions = lessonKhoi && lessonMon ? (CHAPTERS[`${lessonKhoi}|${lessonMon}`] ?? []) : [];
+
   const filteredLessons = LESSONS.filter((l) => {
     const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
     const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
     const matchMon = !lessonMon || l.subject === lessonMon;
-    return matchSearch && matchKhoi && matchMon;
+    const matchChuong = !lessonChuong || l.chapters.includes(lessonChuong);
+    const matchLoai = !lessonLoai || l.loai === lessonLoai;
+    const matchTrang = !lessonTrangThai || (lessonTrangThai === "Đã duyệt" ? l.approved : !l.approved);
+    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang;
   });
 
   return (
