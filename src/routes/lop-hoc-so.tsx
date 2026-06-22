@@ -36,6 +36,7 @@ export const Route = createFileRoute("/lop-hoc-so")({
 type ClassRow = {
   name: string; lop: string; subject: string;
   baiGiang: number; hocLieu: number; hocSinh: number;
+  thumb: string;
 };
 
 const CLASSES: ClassRow[] = [
