@@ -432,20 +432,13 @@ function DashboardSection() {
   ];
 
   const reminders = [
-    { count: 3, label: "Bài tập cần chấm",     tone: "rose",    icon: ClipboardCheck },
-    { count: 3, label: "Bài tập sắp hết hạn",  tone: "rose",    icon: AlarmClock },
-    { count: 2, label: "Phản hồi học sinh",    tone: "rose",    icon: MessageSquareWarning },
-    { count: 3, label: "Kỳ thi sắp diễn ra",   tone: "amber",   icon: CalendarClock },
-    { count: 3, label: "Kỳ thi đang diễn ra",  tone: "emerald", icon: CalendarCheck },
-    { count: 5, label: "Tiết dạy hôm nay",     tone: "indigo",  icon: Clock },
+    { count: 3, label: "Bài tập cần chấm",     icon: ClipboardCheck,       accent: "text-rose-600",    bar: "bg-rose-500" },
+    { count: 3, label: "Bài tập sắp hết hạn",  icon: AlarmClock,           accent: "text-orange-600",  bar: "bg-orange-500" },
+    { count: 2, label: "Phản hồi học sinh",    icon: MessageSquareWarning, accent: "text-amber-600",   bar: "bg-amber-500" },
+    { count: 3, label: "Kỳ thi sắp diễn ra",   icon: CalendarClock,        accent: "text-indigo-600",  bar: "bg-indigo-500" },
+    { count: 3, label: "Kỳ thi đang diễn ra",  icon: CalendarCheck,        accent: "text-emerald-600", bar: "bg-emerald-500" },
+    { count: 5, label: "Tiết dạy hôm nay",     icon: Clock,                accent: "text-sky-600",     bar: "bg-sky-500" },
   ];
-
-  const toneMap: Record<string, string> = {
-    rose: "bg-rose-500",
-    amber: "bg-amber-500",
-    emerald: "bg-emerald-500",
-    indigo: "bg-indigo-600",
-  };
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6">
@@ -475,19 +468,20 @@ function DashboardSection() {
         ))}
       </div>
 
-      {/* Reminders */}
+      {/* Reminders — unified white card style, color only on accent */}
       <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Nhắc việc</h3>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {reminders.map((r) => (
           <button
             key={r.label}
-            className={`${toneMap[r.tone]} text-white rounded-xl p-3 text-left flex items-start gap-2 hover:opacity-95 hover:-translate-y-0.5 transition shadow-sm`}
+            className="relative bg-white rounded-xl border border-slate-200 p-4 text-left hover:shadow-md hover:-translate-y-0.5 transition overflow-hidden group"
           >
-            <r.icon className="h-5 w-5 mt-0.5 shrink-0" />
-            <div>
-              <div className="text-2xl font-black leading-none">{r.count}</div>
-              <div className="text-xs font-semibold mt-1 leading-tight">{r.label}</div>
+            <span className={`absolute left-0 top-0 h-full w-1 ${r.bar}`} />
+            <div className="flex items-start justify-between">
+              <div className={`text-3xl font-black leading-none ${r.accent}`}>{r.count}</div>
+              <r.icon className={`h-5 w-5 ${r.accent} opacity-80 group-hover:scale-110 transition`} />
             </div>
+            <div className="text-sm font-semibold text-slate-700 mt-2 leading-tight">{r.label}</div>
           </button>
         ))}
       </div>
