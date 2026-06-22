@@ -20,6 +20,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer,
 } from "recharts";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
+import qlmsLogo from "@/assets/qlms-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -349,9 +350,6 @@ function TeacherHome() {
               </Button>
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
-                <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
-                  Môn Toán · Khối 3 &amp; 4
-                </Badge>
               </div>
               <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
                 <Button variant="ghost" size="icon" className="h-7 w-7"
@@ -411,32 +409,71 @@ function TeacherHome() {
 }
 
 /* ----- Sidebar ----- */
+type NavItem = {
+  icon: typeof Home;
+  label: string;
+  active?: boolean;
+  submenu?: { icon: typeof Home; label: string }[];
+};
+
 function SidebarNav() {
-  const items = [
+  const items: NavItem[] = [
     { icon: Home, label: "Trang chủ", active: true },
     { icon: GraduationCap, label: "Lớp học số" },
-    { icon: BookOpen, label: "Học liệu\n& Bài kiểm tra" },
-    { icon: BarChart3, label: "Thống kê\n& Báo cáo" },
+    {
+      icon: BookOpen,
+      label: "Học liệu\n& Bài kiểm tra",
+      submenu: [
+        { icon: Library, label: "Kho học liệu" },
+        { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
+        { icon: ListChecks, label: "Đề kiểm tra" },
+      ],
+    },
+    {
+      icon: BarChart3,
+      label: "Thống kê\n& Báo cáo",
+      submenu: [
+        { icon: TrendingUp, label: "Thống kê hoạt động sử dụng" },
+        { icon: Users, label: "Thống kê hoạt động của lớp" },
+        { icon: Trophy, label: "Thống kê kết quả thi" },
+      ],
+    },
     { icon: FolderKanban, label: "Kỳ thi" },
     { icon: Settings, label: "Thiết lập" },
   ];
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
-      <div className="w-12 h-12 rounded-xl bg-indigo-700 text-white flex items-center justify-center font-black text-sm mb-2">
-        QLMS
+      <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2 p-1.5">
+        <img src={qlmsLogo} alt="QLMS" width={48} height={48} className="h-full w-full object-contain" />
       </div>
       {items.map((it) => (
-        <button
-          key={it.label}
-          className={`w-20 py-3 rounded-xl flex flex-col items-center gap-1 text-[11px] font-medium leading-tight whitespace-pre-line text-center transition ${
-            it.active
-              ? "bg-indigo-700 text-white shadow"
-              : "text-slate-600 hover:bg-white"
-          }`}
-        >
-          <it.icon className="h-5 w-5" />
-          {it.label}
-        </button>
+        <div key={it.label} className="relative group w-20">
+          <button
+            className={`w-20 py-3 rounded-xl flex flex-col items-center gap-1 text-[11px] font-medium leading-tight whitespace-pre-line text-center transition ${
+              it.active
+                ? "bg-indigo-700 text-white shadow"
+                : "text-slate-600 hover:bg-white"
+            }`}
+          >
+            <it.icon className="h-5 w-5" />
+            {it.label}
+          </button>
+          {it.submenu && (
+            <div className="absolute left-full top-0 ml-1 hidden group-hover:block z-50 pl-1">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-lg py-2 w-56 animate-in fade-in slide-in-from-left-2 duration-150">
+                {it.submenu.map((s) => (
+                  <button
+                    key={s.label}
+                    className="w-full px-3 py-2 flex items-center gap-2 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
+                  >
+                    <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
+                    <span>{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       ))}
     </aside>
   );
@@ -632,11 +669,8 @@ function ScheduleGrid({
       <table className="w-full border-collapse text-xs">
         <thead>
           <tr>
-            <th className="w-16 bg-indigo-700 text-white border border-indigo-800 p-2 font-bold rounded-tl-lg">
-              Buổi
-            </th>
-            <th className="w-20 bg-indigo-700 text-white border border-indigo-800 p-2 font-bold">
-              Tiết
+            <th className="w-28 bg-indigo-700 text-white border border-indigo-800 p-2 font-bold rounded-tl-lg">
+              Tiết học
             </th>
             {DAYS.map((d, i) => (
               <th key={d} className="bg-indigo-700 text-white border border-indigo-800 p-3 font-bold text-sm">
@@ -648,29 +682,25 @@ function ScheduleGrid({
         </thead>
         <tbody>
           {[...morning, ...afternoon].map((p) => {
-            const isFirstMorning = p === 1;
-            const isFirstAfternoon = p === 6;
+            const isAfternoon = p >= 6;
+            const sessionBg = isAfternoon ? "bg-purple-50" : "bg-amber-50";
+            const sessionText = isAfternoon ? "text-purple-700" : "text-amber-700";
+            const SessionIcon = isAfternoon ? Sunset : Sun;
+            const sessionIconColor = isAfternoon ? "text-purple-500" : "text-amber-500";
             return (
               <tr key={p}>
-                {isFirstMorning && (
-                  <td rowSpan={5} className="border bg-amber-50 text-center align-middle">
-                    <Sun className="h-5 w-5 mx-auto text-amber-500" />
-                    <div className="text-[11px] font-semibold mt-1 text-amber-700">Buổi<br/>sáng</div>
-                  </td>
-                )}
-                {isFirstAfternoon && (
-                  <td rowSpan={5} className="border bg-orange-50 text-center align-middle">
-                    <Sunset className="h-5 w-5 mx-auto text-orange-500" />
-                    <div className="text-[11px] font-semibold mt-1 text-orange-700">Buổi<br/>chiều</div>
-                  </td>
-                )}
-                <td className="border bg-slate-50 text-center font-semibold p-2 text-slate-700">Tiết {p}</td>
+                <td className={`border ${sessionBg} text-center font-semibold p-2`}>
+                  <div className={`flex items-center justify-center gap-1.5 ${sessionText}`}>
+                    <SessionIcon className={`h-3.5 w-3.5 ${sessionIconColor}`} />
+                    <span className="text-[11px]">{isAfternoon ? "Chiều" : "Sáng"} · Tiết {p}</span>
+                  </div>
+                </td>
                 {DAYS.map((_, d) => {
                   const l = cellFor(d, p);
                   const isFocus = l && focusUnit && l.unitId === focusUnit;
                   const isActive = l && activeLessonId === l.id;
                   return (
-                    <td key={d} className="border border-slate-200 p-1 align-top h-10">
+                    <td key={d} className={`border border-slate-200 p-1 align-top h-10 ${isAfternoon ? "bg-purple-50/30" : ""}`}>
                       {l && (
                         <button
                           onClick={() => onPickLesson(l.id)}
