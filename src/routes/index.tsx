@@ -265,10 +265,6 @@ function TeacherHome() {
           <ChartSection />
         </main>
       </div>
-      {/* lesson panel rendered inline above */}
-      <div style={{ display: "none" }} data-placeholder-cleanup="true" data-weekidx={weekIdx}
-        data-grid={JSON.stringify(Object.keys(grid)).length}
-      />
     </div>
   );
 }
