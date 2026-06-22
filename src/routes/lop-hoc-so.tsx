@@ -21,6 +21,7 @@ import thumbLop3A from "@/assets/thumb-lop-3a.jpg";
 import thumbLop3B from "@/assets/thumb-lop-3b.jpg";
 import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
 import thumbLop4B from "@/assets/thumb-lop-4b.jpg";
+import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
 import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
 export const Route = createFileRoute("/lop-hoc-so")({
