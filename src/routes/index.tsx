@@ -520,10 +520,10 @@ function TopBar() {
 /* ----- Dashboard (compact) ----- */
 function DashboardSection() {
   const stats = [
-    { value: "6",   label: "Bài giảng",       sub: "Đang dạy 4 · Nháp 2",   icon: Presentation, accent: "text-emerald-600", bar: "bg-emerald-500" },
-    { value: "109", label: "Bài tập đã giao", sub: "Mở 72 · Đóng 37",       icon: ClipboardCheck, accent: "text-blue-600",   bar: "bg-blue-500" },
-    { value: "248", label: "Học liệu cá nhân",sub: "Slide 92 · Đề 156",     icon: Library,        accent: "text-violet-600", bar: "bg-violet-500" },
-    { value: "186", label: "Học sinh đang dạy", sub: "Tại 7 lớp",          icon: Users,          accent: "text-cyan-600",   bar: "bg-cyan-500" },
+    { value: "6",   label: "Bài giảng",       sub: "Đang dạy 4 · Nháp 2",   icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
+    { value: "109", label: "Bài tập đã giao", sub: "Mở 72 · Đóng 37",       icon: ClipboardCheck, accent: "text-blue-600",   bg: "bg-blue-50",   bar: "bg-blue-500" },
+    { value: "248", label: "Học liệu cá nhân",sub: "Slide 92 · Đề 156",     icon: Library,        accent: "text-violet-600", bg: "bg-violet-50",  bar: "bg-violet-500" },
+    { value: "186", label: "Học sinh đang dạy", sub: "Tại 7 lớp",          icon: Users,          accent: "text-cyan-600",   bg: "bg-cyan-50",    bar: "bg-cyan-500" },
   ];
 
   return (
@@ -532,15 +532,17 @@ function DashboardSection() {
         {stats.map((s) => (
           <div
             key={s.label}
-            className="relative bg-white rounded-lg border border-slate-200 p-2.5 hover:shadow-sm transition overflow-hidden group"
+            className="relative flex items-center gap-3 rounded-lg border border-slate-200 p-2.5 hover:shadow-sm transition overflow-hidden group"
           >
             <span className={`absolute left-0 top-0 h-full w-1 ${s.bar}`} />
-            <div className="flex items-start justify-between">
-              <div className="text-xl font-black text-slate-800 leading-none">{s.value}</div>
-              <s.icon className={`h-4 w-4 ${s.accent} opacity-80 group-hover:scale-110 transition`} />
+            <span className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
+              <s.icon className={`h-4 w-4 ${s.accent}`} />
+            </span>
+            <div className="min-w-0">
+              <div className="text-lg font-black text-slate-800 leading-none">{s.value}</div>
+              <div className="text-[11px] font-semibold text-slate-700 mt-0.5 truncate">{s.label}</div>
+              <div className="text-[10px] text-slate-500 truncate">{s.sub}</div>
             </div>
-            <div className="text-xs font-semibold text-slate-700 mt-1">{s.label}</div>
-            <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">{s.sub}</div>
           </div>
         ))}
       </div>
