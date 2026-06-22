@@ -4,8 +4,9 @@ import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   ClipboardCheck, AlarmClock, MessageSquareWarning, CalendarClock, CalendarCheck,
   ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X, Sun, Sunset,
-  FileText, Presentation, ListChecks, BookOpenCheck, Pencil, GripVertical,
+  FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
   Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp, Clock,
+  Video, FileType2, Move,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
