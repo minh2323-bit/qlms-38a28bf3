@@ -832,12 +832,12 @@ function LessonPanel({
         </Button>
       </div>
 
-      <div className="px-4 py-3 border-b bg-white flex items-center gap-2">
+      <div className="px-4 py-3 border-b bg-white space-y-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" className="gap-1 bg-indigo-700 hover:bg-indigo-800 flex-1">
-              <Plus className="h-4 w-4" /> Thêm nội dung mới
-            </Button>
+            <button className="w-full flex items-center justify-center gap-2 rounded-lg py-3 text-[15px] font-semibold text-white shadow-md hover:shadow-lg transition bg-gradient-to-r from-indigo-700 via-purple-600 to-fuchsia-500">
+              <Plus className="h-5 w-5" /> Thêm nội dung mới
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem><Presentation className="h-4 w-4 mr-2" />Bài giảng</DropdownMenuItem>
@@ -849,14 +849,23 @@ function LessonPanel({
         <Button
           size="sm"
           variant={editMode ? "default" : "outline"}
-          className="gap-1"
+          className="gap-1 w-full"
           onClick={() => setEditMode((v) => !v)}
         >
-          <Pencil className="h-4 w-4" /> {editMode ? "Xong" : "Sửa"}
+          <Pencil className="h-4 w-4" /> {editMode ? "Xong sắp xếp" : "Sửa / Sắp xếp lại"}
         </Button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {editMode && (
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-2.5 flex items-start gap-2">
+            <Move className="h-4 w-4 text-indigo-700 mt-0.5 shrink-0" />
+            <p className="text-xs text-indigo-800 leading-snug">
+              <b>Chế độ sắp xếp:</b> Kéo các học liệu bên dưới và <b>thả vào ô trống</b> trên lịch báo giảng để gắn sang ngày/tiết khác.
+            </p>
+          </div>
+        )}
+
         {groups.map((g) => {
           const items = materials.filter(g.filter);
           return (
@@ -874,25 +883,29 @@ function LessonPanel({
                 <p className="text-xs text-slate-400 italic px-3 py-3">Chưa có nội dung</p>
               ) : (
                 <ul>
-                  {items.map((m) => (
-                    <li
-                      key={m.title}
-                      draggable={editMode}
-                      onDragStart={(e) => onDragStart(e, materials.indexOf(m))}
-                      className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border-t first:border-t-0 transition hover:bg-indigo-50 ${
-                        editMode ? "cursor-grab active:cursor-grabbing bg-indigo-50/40" : ""
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {editMode && <GripVertical className="h-4 w-4 text-slate-400 shrink-0" />}
-                        <FileText className="h-4 w-4 text-indigo-700 shrink-0" />
-                        <span className="text-indigo-700 truncate">{m.title}</span>
-                      </div>
-                      <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
-                        <FileCheck2 className="h-3 w-3" />
-                      </button>
-                    </li>
-                  ))}
+                  {items.map((m) => {
+                    const meta = MATERIAL_META[m.type];
+                    return (
+                      <li
+                        key={m.title}
+                        draggable={editMode}
+                        onDragStart={(e) => onDragStart(e, materials.indexOf(m))}
+                        className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border-t first:border-t-0 transition hover:bg-indigo-50 ${
+                          editMode ? "cursor-grab active:cursor-grabbing bg-indigo-50/40 ring-1 ring-inset ring-indigo-100" : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 ${meta.bg}`}>
+                            <meta.icon className={`h-4 w-4 ${meta.fg}`} />
+                          </span>
+                          <span className="text-slate-700 truncate">{m.title}</span>
+                        </div>
+                        <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
+                          <FileCheck2 className="h-3 w-3" />
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
@@ -902,7 +915,7 @@ function LessonPanel({
         {editMode && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
             <p className="text-xs text-amber-800 font-medium mb-2">
-              Kéo học liệu vào ô trống để gắn sang tiết khác trong tuần này:
+              Lịch tuần này — thả vào ô trống để chuyển tiết:
             </p>
             <MiniWeek
               weekIdx={weekIdx} grid={grid}
@@ -912,6 +925,7 @@ function LessonPanel({
           </div>
         )}
       </div>
+
     </aside>
   );
 }
