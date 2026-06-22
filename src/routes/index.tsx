@@ -613,7 +613,7 @@ function ScheduleGrid({
                   const isFocus = l && focusUnit && l.unitId === focusUnit;
                   const isActive = l && activeLessonId === l.id;
                   return (
-                    <td key={d} className="border border-slate-200 p-1 align-top h-16">
+                    <td key={d} className="border border-slate-200 p-1 align-top h-10">
                       {l && (
                         <button
                           onClick={() => onPickLesson(l.id)}
