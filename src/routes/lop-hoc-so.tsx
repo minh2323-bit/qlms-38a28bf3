@@ -70,6 +70,17 @@ const LESSONS: LessonCard[] = [
 
 function DigitalClassesPage() {
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [tab, setTab] = useState<"classes" | "lessons">("classes");
+  const [search, setSearch] = useState("");
+  const [khoi, setKhoi] = useState("");
+  const [mon, setMon] = useState("");
+
+  const filteredClasses = CLASSES.filter((c) => {
+    const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
+    const matchKhoi = !khoi || c.lop.includes(khoi);
+    const matchMon = !mon || c.subject === mon;
+    return matchSearch && matchKhoi && matchMon;
+  });
 
   return (
     <AppShell>
@@ -81,43 +92,93 @@ function DigitalClassesPage() {
           <StatCard color="slate" label="Tổng số học sinh tham dự" value={CLASSES.reduce((s, c) => s + c.hocSinh, 0)} icon={<Users className="h-7 w-7 text-slate-600" />} />
         </section>
 
-        {/* My classes */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-slate-800">Lớp học của tôi</h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setView("list")}
-                className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
-              >
-                <ListIcon className="h-3.5 w-3.5" /> List view
-              </button>
-              <button
-                onClick={() => setView("grid")}
-                className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
-              >
-                <LayoutGrid className="h-3.5 w-3.5" /> Grid
-              </button>
-            </div>
-          </div>
-          <div className={view === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
-            {CLASSES.map((c) => <ClassCard key={c.name} c={c} />)}
-          </div>
-        </section>
+        {/* Tabs */}
+        <div className="border-b border-slate-200 flex items-center gap-6">
+          <button
+            onClick={() => setTab("classes")}
+            className={`py-3 text-sm font-semibold border-b-2 transition ${tab === "classes" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+          >
+            Lớp học của tôi
+          </button>
+          <button
+            onClick={() => setTab("lessons")}
+            className={`py-3 text-sm font-semibold border-b-2 transition ${tab === "lessons" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+          >
+            Bài giảng
+          </button>
+        </div>
 
-        {/* Lessons */}
-        <section>
-          <h2 className="text-lg font-bold text-slate-800 mb-3">Bài giảng</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
-              <Plus className="h-8 w-8" />
-              <span className="font-medium">Thêm bài giảng mới</span>
-            </button>
-            {LESSONS.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
-          </div>
-        </section>
+        {tab === "classes" && (
+          <section>
+            {/* Filter bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Tìm tên học liệu"
+                    className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  />
+                </div>
+                <FilterSelect value={khoi} onChange={setKhoi} placeholder="Khối" options={["3", "4", "5"]} />
+                <FilterSelect value={mon} onChange={setMon} placeholder="Môn" options={["Toán", "Tiếng Việt", "Tiếng Anh"]} />
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setView("list")}
+                  className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                >
+                  <ListIcon className="h-3.5 w-3.5" /> List view
+                </button>
+                <button
+                  onClick={() => setView("grid")}
+                  className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" /> Grid
+                </button>
+                <button className="ml-1 inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-2 rounded-lg shadow-sm">
+                  <Plus className="h-4 w-4" /> Thêm lớp học mới
+                </button>
+              </div>
+            </div>
+
+            <div className={view === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
+              {filteredClasses.map((c) => <ClassCard key={c.name} c={c} />)}
+            </div>
+          </section>
+        )}
+
+        {tab === "lessons" && (
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
+                <Plus className="h-8 w-8" />
+                <span className="font-medium">Thêm bài giảng mới</span>
+              </button>
+              {LESSONS.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
+            </div>
+          </section>
+        )}
       </>
     </AppShell>
+  );
+}
+
+function FilterSelect({ value, onChange, placeholder, options }: { value: string; onChange: (v: string) => void; placeholder: string; options: string[] }) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="appearance-none pl-3 pr-8 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+      >
+        <option value="">{placeholder}</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+      <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+    </div>
   );
 }
 
