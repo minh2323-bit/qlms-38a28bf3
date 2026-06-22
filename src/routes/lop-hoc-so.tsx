@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
-  LayoutGrid, List as ListIcon, Plus, Copy, Trash2,
+  LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
