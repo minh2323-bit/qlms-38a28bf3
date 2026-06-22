@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
-  ClipboardCheck, AlarmClock, MessageSquareWarning, CalendarClock, CalendarCheck,
-  ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X, Sun, Sunset,
+  ClipboardCheck, CalendarClock, Sun, Sunset,
+  ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
-  Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp, Clock,
+  Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
   Video, FileType2, Move,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -303,7 +303,7 @@ function TeacherHome() {
       <SidebarNav />
       <div className="flex-1 min-w-0 flex flex-col">
         <TopBar />
-        <main className="flex-1 p-6 space-y-6">
+        <main className="flex-1 p-4 space-y-4 overflow-y-auto">
           <DashboardSection />
 
           {/* Schedule Section */}
@@ -517,69 +517,33 @@ function TopBar() {
   );
 }
 
-/* ----- Dashboard ----- */
+/* ----- Dashboard (compact) ----- */
 function DashboardSection() {
   const stats = [
-    { value: "6",   label: "Bài giảng",       sub: "Đang dạy 4 · Nháp 2",   icon: Presentation, accent: "text-emerald-600", bar: "bg-emerald-500" },
-    { value: "109", label: "Bài tập đã giao", sub: "Mở 72 · Đóng 37",       icon: ClipboardCheck, accent: "text-blue-600",   bar: "bg-blue-500" },
-    { value: "248", label: "Học liệu cá nhân",sub: "Slide 92 · Đề 156",     icon: Library,        accent: "text-violet-600", bar: "bg-violet-500" },
-    { value: "186", label: "Học sinh đang dạy", sub: "Tại 7 lớp",          icon: Users,          accent: "text-cyan-600",   bar: "bg-cyan-500" },
-    { value: "92%", label: "Tỉ lệ nộp bài",    sub: "Tăng 4% so với tuần trước", icon: TrendingUp, accent: "text-teal-600",   bar: "bg-teal-500" },
-    { value: "8.4", label: "Điểm TB lớp",      sub: "Trên thang điểm 10",   icon: Trophy,         accent: "text-amber-600",  bar: "bg-amber-500" },
-  ];
-
-  const reminders = [
-    { count: 3, label: "Bài tập cần chấm",     icon: ClipboardCheck,       accent: "text-rose-600",    bar: "bg-rose-500" },
-    { count: 3, label: "Bài tập sắp hết hạn",  icon: AlarmClock,           accent: "text-orange-600",  bar: "bg-orange-500" },
-    { count: 2, label: "Phản hồi học sinh",    icon: MessageSquareWarning, accent: "text-amber-600",   bar: "bg-amber-500" },
-    { count: 3, label: "Kỳ thi sắp diễn ra",   icon: CalendarClock,        accent: "text-indigo-600",  bar: "bg-indigo-500" },
-    { count: 3, label: "Kỳ thi đang diễn ra",  icon: CalendarCheck,        accent: "text-emerald-600", bar: "bg-emerald-500" },
-    { count: 5, label: "Tiết dạy hôm nay",     icon: Clock,                accent: "text-sky-600",     bar: "bg-sky-500" },
+    { value: "6",   label: "Bài giảng",       sub: "Đang dạy 4 · Nháp 2",   icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
+    { value: "109", label: "Bài tập đã giao", sub: "Mở 72 · Đóng 37",       icon: ClipboardCheck, accent: "text-blue-600",   bg: "bg-blue-50",   bar: "bg-blue-500" },
+    { value: "248", label: "Học liệu cá nhân",sub: "Slide 92 · Đề 156",     icon: Library,        accent: "text-violet-600", bg: "bg-violet-50",  bar: "bg-violet-500" },
+    { value: "186", label: "Học sinh đang dạy", sub: "Tại 7 lớp",          icon: Users,          accent: "text-cyan-600",   bg: "bg-cyan-50",    bar: "bg-cyan-500" },
   ];
 
   return (
-    <section className="bg-white rounded-2xl border shadow-sm p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">Dashboard</h2>
-          <p className="text-sm text-slate-500">Tổng quan hoạt động giảng dạy của bạn</p>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Thống kê chung</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+    <section className="bg-white rounded-xl border shadow-sm p-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="relative bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md hover:-translate-y-0.5 transition overflow-hidden group"
+            className="relative flex items-center gap-3 rounded-lg border border-slate-200 p-2.5 hover:shadow-sm transition overflow-hidden group"
           >
             <span className={`absolute left-0 top-0 h-full w-1 ${s.bar}`} />
-            <div className="flex items-start justify-between">
-              <div className="text-3xl font-black text-slate-800 leading-none">{s.value}</div>
-              <s.icon className={`h-5 w-5 ${s.accent} opacity-80 group-hover:scale-110 transition`} />
+            <span className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
+              <s.icon className={`h-4 w-4 ${s.accent}`} />
+            </span>
+            <div className="min-w-0">
+              <div className="text-lg font-black text-slate-800 leading-none">{s.value}</div>
+              <div className="text-[11px] font-semibold text-slate-700 mt-0.5 truncate">{s.label}</div>
+              <div className="text-[10px] text-slate-500 truncate">{s.sub}</div>
             </div>
-            <div className="text-sm font-semibold text-slate-700 mt-2">{s.label}</div>
-            <div className="text-[11px] text-slate-500 mt-1 leading-tight">{s.sub}</div>
           </div>
-        ))}
-      </div>
-
-      {/* Reminders — unified white card style, color only on accent */}
-      <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Nhắc việc</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {reminders.map((r) => (
-          <button
-            key={r.label}
-            className="relative bg-white rounded-xl border border-slate-200 p-4 text-left hover:shadow-md hover:-translate-y-0.5 transition overflow-hidden group"
-          >
-            <span className={`absolute left-0 top-0 h-full w-1 ${r.bar}`} />
-            <div className="flex items-start justify-between">
-              <div className={`text-3xl font-black leading-none ${r.accent}`}>{r.count}</div>
-              <r.icon className={`h-5 w-5 ${r.accent} opacity-80 group-hover:scale-110 transition`} />
-            </div>
-            <div className="text-sm font-semibold text-slate-700 mt-2 leading-tight">{r.label}</div>
-          </button>
         ))}
       </div>
     </section>
