@@ -2,10 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
-  ClipboardCheck, AlarmClock, MessageSquareWarning, CalendarClock, CalendarCheck,
-  ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X, Sun, Sunset,
+  ClipboardCheck, CalendarClock, Sun, Sunset,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
-  Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp, Clock,
+  Bell, BookMarked, Users, FileCheck2, Library, TrendingUp,
   Video, FileType2, Move,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
