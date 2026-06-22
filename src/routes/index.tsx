@@ -141,6 +141,14 @@ const buildGrid = (): WeekGrid => {
   return g;
 };
 
+const MATERIAL_META: Record<string, { icon: typeof FileText; bg: string; fg: string }> = {
+  syllabus: { icon: BookOpen,     bg: "bg-indigo-100",  fg: "text-indigo-700" },
+  slide:    { icon: Presentation, bg: "bg-purple-100",  fg: "text-purple-700" },
+  doc:      { icon: FileType2,    bg: "bg-sky-100",     fg: "text-sky-700" },
+  ex:       { icon: ClipboardCheck, bg: "bg-amber-100", fg: "text-amber-700" },
+  video:    { icon: Video,        bg: "bg-rose-100",    fg: "text-rose-700" },
+};
+
 const MATERIALS_SEED: Record<string, { type: "slide" | "doc" | "ex" | "syllabus"; title: string }[]> = {
   "u-ps": [
     { type: "syllabus", title: "Tổng quan kiến thức phân số" },
