@@ -676,37 +676,6 @@ function LessonPanel({
 }
 
 
-function MaterialGroup({
-  title, items, editMode, onDragStart,
-}: {
-  title: string;
-  items: { type: string; title: string }[];
-  editMode: boolean;
-  onDragStart: (e: React.DragEvent, mIdx: number) => void;
-}) {
-  if (items.length === 0) return null;
-  return (
-    <div>
-      <h4 className="text-sm font-bold text-slate-700 mb-2">{title}</h4>
-      <ul className="space-y-1.5">
-        {items.map((m, i) => (
-          <li
-            key={m.title}
-            draggable={editMode}
-            onDragStart={(e) => onDragStart(e, i)}
-            className={`flex items-center gap-2 text-sm p-2 rounded-lg border bg-white hover:bg-slate-50 transition ${
-              editMode ? "cursor-grab active:cursor-grabbing border-dashed border-blue-300" : ""
-            }`}
-          >
-            {editMode && <GripVertical className="h-4 w-4 text-slate-400" />}
-            <FileText className="h-4 w-4 text-blue-600 shrink-0" />
-            <span className="text-blue-700 hover:underline truncate">{m.title}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 function MiniWeek({
   weekIdx, grid, classFilter, onDropToSlot,
