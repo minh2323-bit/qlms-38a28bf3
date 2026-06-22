@@ -521,9 +521,9 @@ function TopBar() {
 function DashboardSection() {
   const stats = [
     { value: "6",   label: "Bài giảng",       sub: "Đang dạy 4 · Nháp 2",   icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
-    { value: "109", label: "Bài tập đã giao", sub: "Mở 72 · Đóng 37",       icon: ClipboardCheck, accent: "text-blue-600",   bg: "bg-blue-50",   bar: "bg-blue-500" },
+    { value: "109", label: "Bài tập", sub: <span className="inline-flex items-center gap-1"><Bell className="h-3 w-3 text-amber-500" />5 bài cần chấm</span>,       icon: ClipboardCheck, accent: "text-blue-600",   bg: "bg-blue-50",   bar: "bg-blue-500" },
     { value: "248", label: "Học liệu cá nhân",sub: "Slide 92 · Đề 156",     icon: Library,        accent: "text-violet-600", bg: "bg-violet-50",  bar: "bg-violet-500" },
-    { value: "186", label: "Học sinh đang dạy", sub: "Tại 7 lớp",          icon: Users,          accent: "text-cyan-600",   bg: "bg-cyan-50",    bar: "bg-cyan-500" },
+    { value: "186", label: "Học sinh đang dạy", sub: null,          icon: Users,          accent: "text-cyan-600",   bg: "bg-cyan-50",    bar: "bg-cyan-500" },
   ];
 
   return (
@@ -541,7 +541,7 @@ function DashboardSection() {
             <div className="min-w-0">
               <div className="text-lg font-black text-slate-800 leading-none">{s.value}</div>
               <div className="text-[11px] font-semibold text-slate-700 mt-0.5 truncate">{s.label}</div>
-              <div className="text-[10px] text-slate-500 truncate">{s.sub}</div>
+              {s.sub && <div className="text-[10px] text-slate-500 truncate">{s.sub}</div>}
             </div>
           </div>
         ))}
