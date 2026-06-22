@@ -446,10 +446,11 @@ function KnowledgeTree({
 
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
-  week, grid, classFilter, focusUnit, onPickLesson,
+  week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
+  activeLessonId: string | null;
 }) {
   const morning = [1, 2, 3, 4, 5];
   const afternoon = [6, 7, 8, 9, 10];
