@@ -669,7 +669,7 @@ function ScheduleGrid({
       <table className="w-full border-collapse text-xs">
         <thead>
           <tr>
-            <th className="w-28 bg-indigo-700 text-white border border-indigo-800 p-2 font-bold rounded-tl-lg">
+            <th colSpan={2} className="bg-indigo-700 text-white border border-indigo-800 p-2 font-bold rounded-tl-lg">
               Tiết học
             </th>
             {DAYS.map((d, i) => (
@@ -681,26 +681,68 @@ function ScheduleGrid({
           </tr>
         </thead>
         <tbody>
-          {[...morning, ...afternoon].map((p) => {
-            const isAfternoon = p >= 6;
-            const sessionBg = isAfternoon ? "bg-purple-50" : "bg-amber-50";
-            const sessionText = isAfternoon ? "text-purple-700" : "text-amber-700";
-            const SessionIcon = isAfternoon ? Sunset : Sun;
-            const sessionIconColor = isAfternoon ? "text-purple-500" : "text-amber-500";
+          {morning.map((p, idx) => {
             return (
               <tr key={p}>
-                <td className={`border ${sessionBg} text-center font-semibold p-2`}>
-                  <div className={`flex items-center justify-center gap-1.5 ${sessionText}`}>
-                    <SessionIcon className={`h-3.5 w-3.5 ${sessionIconColor}`} />
-                    <span className="text-[11px]">{isAfternoon ? "Chiều" : "Sáng"} · Tiết {p}</span>
-                  </div>
+                {idx === 0 && (
+                  <td rowSpan={5} className="border border-indigo-800 bg-amber-50 text-amber-700 text-center align-middle font-semibold p-2 w-20">
+                    <div className="flex flex-col items-center gap-2">
+                      <Sun className="h-5 w-5 text-amber-500" />
+                      <span>Buổi sáng</span>
+                    </div>
+                  </td>
+                )}
+                <td className="border border-indigo-800 text-center font-semibold p-1 w-16 bg-white text-indigo-700">
+                  Tiết {p}
                 </td>
                 {DAYS.map((_, d) => {
                   const l = cellFor(d, p);
                   const isFocus = l && focusUnit && l.unitId === focusUnit;
                   const isActive = l && activeLessonId === l.id;
                   return (
-                    <td key={d} className={`border border-slate-200 p-1 align-top h-10 ${isAfternoon ? "bg-purple-50/30" : ""}`}>
+                    <td key={d} className={`border border-slate-200 p-1 align-top h-10`}>
+                      {l && (
+                        <button
+                          onClick={() => onPickLesson(l.id)}
+                          className={`w-full h-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
+                            CLASS_COLORS[l.class]
+                          } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
+                            isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
+                          }`}
+                        >
+                          <div className="font-bold">{l.class}</div>
+                          <div className="text-[10px] opacity-80">Toán</div>
+                          <div className="truncate font-medium">
+                            <span className="opacity-70">Nội dung:</span> {l.topic}
+                          </div>
+                        </button>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+          {afternoon.map((p, idx) => {
+            return (
+              <tr key={p}>
+                {idx === 0 && (
+                  <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20 rounded-bl-lg">
+                    <div className="flex flex-col items-center gap-2">
+                      <Sunset className="h-5 w-5 text-purple-500" />
+                      <span>Buổi chiều</span>
+                    </div>
+                  </td>
+                )}
+                <td className="border border-indigo-800 text-center font-semibold p-1 w-16 bg-white text-indigo-700">
+                  Tiết {p}
+                </td>
+                {DAYS.map((_, d) => {
+                  const l = cellFor(d, p);
+                  const isFocus = l && focusUnit && l.unitId === focusUnit;
+                  const isActive = l && activeLessonId === l.id;
+                  return (
+                    <td key={d} className={`border border-slate-200 p-1 align-top h-10 bg-purple-50/30`}>
                       {l && (
                         <button
                           onClick={() => onPickLesson(l.id)}
