@@ -452,8 +452,8 @@ function SidebarNav() {
   ];
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
-      <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-2 p-1.5">
-        <img src={qlmsLogo} alt="QLMS" width={48} height={48} className="h-full w-full object-contain" />
+      <div className="w-16 h-16 flex items-center justify-center mb-2">
+        <img src={qlmsLogo} alt="QLMS" className="h-full w-full object-contain" />
       </div>
       {items.map((it) => (
         <div key={it.label} className="relative group w-20">
