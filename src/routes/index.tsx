@@ -499,6 +499,7 @@ function ScheduleGrid({
                 {DAYS.map((_, d) => {
                   const l = cellFor(d, p);
                   const isFocus = l && focusUnit && l.unitId === focusUnit;
+                  const isActive = l && activeLessonId === l.id;
                   return (
                     <td key={d} className="border p-1 align-top h-16">
                       {l && (
@@ -506,7 +507,9 @@ function ScheduleGrid({
                           onClick={() => onPickLesson(l.id)}
                           className={`w-full h-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
                             SUBJECT_COLORS[l.subject]
-                          } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : "hover:shadow"}`}
+                          } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
+                            isActive ? "ring-2 ring-blue-600 shadow-md" : "hover:shadow"
+                          }`}
                         >
                           <div className="font-bold">{l.class}</div>
                           <div className="text-[10px] opacity-80">{l.subject}</div>
