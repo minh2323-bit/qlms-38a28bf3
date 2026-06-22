@@ -527,20 +527,20 @@ function DashboardSection() {
   ];
 
   return (
-    <section className="bg-white rounded-xl border shadow-sm p-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <section className="bg-white rounded-xl border shadow-sm p-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="relative bg-white rounded-lg border border-slate-200 p-3 hover:shadow-sm transition overflow-hidden group"
+            className="relative bg-white rounded-lg border border-slate-200 p-2.5 hover:shadow-sm transition overflow-hidden group"
           >
             <span className={`absolute left-0 top-0 h-full w-1 ${s.bar}`} />
             <div className="flex items-start justify-between">
-              <div className="text-2xl font-black text-slate-800 leading-none">{s.value}</div>
+              <div className="text-xl font-black text-slate-800 leading-none">{s.value}</div>
               <s.icon className={`h-4 w-4 ${s.accent} opacity-80 group-hover:scale-110 transition`} />
             </div>
-            <div className="text-sm font-semibold text-slate-700 mt-1.5">{s.label}</div>
-            <div className="text-[11px] text-slate-500 mt-0.5 leading-tight">{s.sub}</div>
+            <div className="text-xs font-semibold text-slate-700 mt-1">{s.label}</div>
+            <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">{s.sub}</div>
           </div>
         ))}
       </div>
