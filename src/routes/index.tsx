@@ -769,6 +769,7 @@ function ScheduleGrid({
       </table>
     </div>
   );
+}
 
 function Legend2() {
   return (
