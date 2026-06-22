@@ -21,6 +21,7 @@ import thumbLop3A from "@/assets/thumb-lop-3a.jpg";
 import thumbLop3B from "@/assets/thumb-lop-3b.jpg";
 import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
 import thumbLop4B from "@/assets/thumb-lop-4b.jpg";
+import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
 import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
 export const Route = createFileRoute("/lop-hoc-so")({
@@ -45,7 +46,7 @@ const CLASSES: ClassRow[] = [
   { name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A },
   { name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B },
   { name: "Lớp 3C năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C },
-  { name: "Lớp 4B năm học 2025 - 2026", lop: "4B", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4B },
+  { name: "Các bạn học sinh cần ôn tập đặc biệt", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview },
   { name: "Lớp 4C năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C },
 ];
 
