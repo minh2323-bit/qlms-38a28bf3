@@ -3,8 +3,9 @@ import { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   ClipboardCheck, CalendarClock, Sun, Sunset,
+  ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
-  Bell, BookMarked, Users, FileCheck2, Library, TrendingUp,
+  Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
   Video, FileType2, Move,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
