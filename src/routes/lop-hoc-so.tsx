@@ -96,13 +96,13 @@ function DigitalClassesPage() {
         <div className="border-b border-slate-200 flex items-center gap-6">
           <button
             onClick={() => setTab("classes")}
-            className={`py-3 text-sm font-semibold border-b-2 transition ${tab === "classes" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+            className={`py-3 text-xl font-bold border-b-2 transition ${tab === "classes" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
           >
             Lớp học của tôi
           </button>
           <button
             onClick={() => setTab("lessons")}
-            className={`py-3 text-sm font-semibold border-b-2 transition ${tab === "lessons" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+            className={`py-3 text-xl font-bold border-b-2 transition ${tab === "lessons" ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
           >
             Bài giảng
           </button>
