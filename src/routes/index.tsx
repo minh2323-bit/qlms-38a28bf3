@@ -22,6 +22,8 @@ import {
 } from "recharts";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
+import { AppShell } from "@/components/AppShell";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
