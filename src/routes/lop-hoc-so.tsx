@@ -142,8 +142,8 @@ function StatCard({ color, label, value, icon }: { color: "emerald" | "indigo" |
 function ClassCard({ c }: { c: ClassRow }) {
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition">
-      <div className="h-28 bg-gradient-to-br from-indigo-100 via-violet-100 to-rose-100 flex items-center justify-center">
-        <GraduationCap className="h-14 w-14 text-white/80 drop-shadow" />
+      <div className="h-28 bg-slate-100 overflow-hidden">
+        <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between">
