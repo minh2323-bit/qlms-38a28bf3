@@ -228,7 +228,7 @@ function TeacherHome() {
             </div>
 
             <div className="flex">
-              {showTree && (
+              {showTree && !activeLesson && (
                 <KnowledgeTree
                   onPickUnit={handlePickUnit}
                   activeUnit={focusUnit}
@@ -241,10 +241,23 @@ function TeacherHome() {
                   grid={grid}
                   classFilter={classFilter}
                   focusUnit={focusUnit}
-                  onPickLesson={setActiveLessonId}
+                  onPickLesson={(id) => {
+                    setShowTree(false);
+                    setActiveLessonId(id);
+                  }}
+                  activeLessonId={activeLessonId}
                 />
                 <Legend2 />
               </div>
+              {activeLesson && (
+                <LessonPanel
+                  lesson={activeLesson}
+                  onClose={() => setActiveLessonId(null)}
+                  grid={grid}
+                  setGrid={setGrid}
+                  weekIdx={weekIdx}
+                />
+              )}
             </div>
           </section>
 
@@ -252,13 +265,9 @@ function TeacherHome() {
           <ChartSection />
         </main>
       </div>
-
-      <LessonDrawer
-        lesson={activeLesson}
-        onClose={() => setActiveLessonId(null)}
-        grid={grid}
-        setGrid={setGrid}
-        weekIdx={weekIdx}
+      {/* lesson panel rendered inline above */}
+      <div style={{ display: "none" }} data-placeholder-cleanup="true" data-weekidx={weekIdx}
+        data-grid={JSON.stringify(Object.keys(grid)).length}
       />
     </div>
   );
