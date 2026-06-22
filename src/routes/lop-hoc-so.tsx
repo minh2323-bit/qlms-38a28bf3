@@ -125,22 +125,24 @@ function DigitalClassesPage() {
                 <FilterSelect value={khoi} onChange={setKhoi} placeholder="Khối" options={["3", "4", "5"]} />
                 <FilterSelect value={mon} onChange={setMon} placeholder="Môn" options={["Toán", "Tiếng Việt", "Tiếng Anh"]} />
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setView("list")}
-                  className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
-                >
-                  <ListIcon className="h-3.5 w-3.5" /> List view
+              <div className="flex flex-col items-end gap-2">
+                <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
+                  <Plus className="h-5 w-5" /> Thêm lớp học mới
                 </button>
-                <button
-                  onClick={() => setView("grid")}
-                  className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
-                >
-                  <LayoutGrid className="h-3.5 w-3.5" /> Grid
-                </button>
-                <button className="ml-1 inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-2 rounded-lg shadow-sm">
-                  <Plus className="h-4 w-4" /> Thêm lớp học mới
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setView("list")}
+                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "list" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                  >
+                    <ListIcon className="h-3.5 w-3.5" /> List view
+                  </button>
+                  <button
+                    onClick={() => setView("grid")}
+                    className={`px-2 py-1.5 rounded-md border text-xs flex items-center gap-1 ${view === "grid" ? "bg-indigo-50 border-indigo-300 text-indigo-700" : "bg-white border-slate-200 text-slate-600"}`}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" /> Grid
+                  </button>
+                </div>
               </div>
             </div>
 
