@@ -367,3 +367,57 @@ function LessonCardView({ l }: { l: LessonCard }) {
     </div>
   );
 }
+
+function LessonsTable({ lessons }: { lessons: LessonCard[] }) {
+  return (
+    <div className="bg-white rounded-2xl border shadow-sm overflow-x-auto">
+      <table className="w-full text-base">
+        <thead>
+          <tr className="bg-indigo-700 text-white text-left">
+            <th className="px-4 py-3 font-semibold w-14 text-center">STT</th>
+            <th className="px-4 py-3 font-semibold">Tên bài giảng</th>
+            <th className="px-4 py-3 font-semibold">Tác giả</th>
+            <th className="px-4 py-3 font-semibold">Chương/Chủ đề</th>
+            <th className="px-4 py-3 font-semibold text-center w-56">Chia sẻ lên HanoiStudy</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lessons.map((l, i) => (
+            <tr key={l.title + l.author} className={`border-t border-slate-200 ${i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
+              <td className="px-4 py-4 text-center text-slate-700 font-semibold">{i + 1}</td>
+              <td className="px-4 py-4">
+                <div className="font-semibold text-slate-800">{l.title}</div>
+                <div className="mt-1">
+                  <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                    {l.approved ? "Đã duyệt" : "Chờ duyệt"}
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-600">{l.khoi}; {l.subject}</div>
+              </td>
+              <td className="px-4 py-4 text-slate-700">{l.author}</td>
+              <td className="px-4 py-4">
+                <div className="flex flex-wrap gap-1.5">
+                  {l.chapters.map((c) => (
+                    <span key={c} className="text-sm bg-slate-100 text-slate-700 px-2 py-1 rounded-md">{c}</span>
+                  ))}
+                </div>
+              </td>
+              <td className="px-4 py-4 text-center">
+                {l.shared === "hanoi" ? (
+                  <span className="text-emerald-600 font-semibold">Sở Đã Duyệt</span>
+                ) : (
+                  <button
+                    disabled={!l.approved}
+                    className={`px-5 py-2 rounded-lg text-sm font-semibold ${l.approved ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`}
+                  >
+                    Chia sẻ
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
