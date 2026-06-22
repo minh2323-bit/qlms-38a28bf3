@@ -903,7 +903,7 @@ function ChartSection({ classFilter }: { classFilter: "ALL" | ClassId }) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+            <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
             <YAxis label={{ value: "Số học sinh", angle: -90, position: "insideLeft", style: { fontSize: 12 } }} />
             <Legend />
             <Bar dataKey="done_ok" name="Đã hoàn thành & Đạt yêu cầu" fill="#22c55e" radius={[4,4,0,0]} />
