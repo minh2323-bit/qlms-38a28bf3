@@ -122,9 +122,10 @@ function DigitalClassesPage() {
     const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
     const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
     const matchMon = !lessonMon || l.subject === lessonMon;
+    const matchChuong = !lessonChuong || l.chapter === lessonChuong;
     const matchLoai = !lessonLoai || l.loai === lessonLoai;
     const matchTrang = !lessonTrangThai || (lessonTrangThai === "Đã duyệt" ? l.approved : !l.approved);
-    return matchSearch && matchKhoi && matchMon && matchLoai && matchTrang;
+    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang;
   });
 
   return (
