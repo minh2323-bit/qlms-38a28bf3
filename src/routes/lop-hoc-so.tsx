@@ -717,12 +717,12 @@ function LessonsTable({
                 <td className="px-4 py-4 text-slate-700">{l.author}</td>
                 <td className="px-4 py-4 text-slate-700 whitespace-nowrap">{l.releaseDate}</td>
                 <td className="px-4 py-4">
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {content.topics.map((t) => {
                       const key = id + "::" + t.name;
                       const open = expanded.has(key);
                       return (
-                        <li key={t.name}>
+                        <li key={t.name} className="list-none">
                           <button
                             onClick={() => toggleExpand(key)}
                             className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 hover:text-indigo-700"
@@ -731,20 +731,24 @@ function LessonsTable({
                             {t.name}
                           </button>
                           {open && (
-                            <ul className="ml-6 mt-1 mb-1 space-y-0.5 list-disc list-inside text-sm text-slate-600">
+                            <div className="ml-6 mt-1.5 mb-1 flex flex-wrap gap-1.5">
                               {t.items.map((it) => (
-                                <li key={it}>{it}</li>
+                                <MaterialItem key={it} item={it} />
                               ))}
-                            </ul>
+                            </div>
                           )}
                         </li>
                       );
                     })}
                     {content.materials.map((m) => (
-                      <li key={m} className="ml-5 text-sm text-slate-700">• {m}</li>
+                      <li key={m} className="ml-5 list-none flex flex-wrap gap-1.5">
+                        <MaterialItem item={m} />
+                      </li>
                     ))}
                     {content.quizzes.map((q) => (
-                      <li key={q} className="ml-5 text-sm text-slate-700">• {q}</li>
+                      <li key={q} className="ml-5 list-none flex flex-wrap gap-1.5">
+                        <MaterialItem item={q} />
+                      </li>
                     ))}
                   </ul>
                 </td>
