@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HocLieuBaiGiangRouteImport } from './routes/hoc-lieu.bai-giang'
 
 const LopHocSoRoute = LopHocSoRouteImport.update({
   id: '/lop-hoc-so',
@@ -22,31 +23,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HocLieuBaiGiangRoute = HocLieuBaiGiangRouteImport.update({
+  id: '/hoc-lieu/bai-giang',
+  path: '/hoc-lieu/bai-giang',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/lop-hoc-so': typeof LopHocSoRoute
+  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/lop-hoc-so': typeof LopHocSoRoute
+  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/lop-hoc-so': typeof LopHocSoRoute
+  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lop-hoc-so'
+  fullPaths: '/' | '/lop-hoc-so' | '/hoc-lieu/bai-giang'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lop-hoc-so'
-  id: '__root__' | '/' | '/lop-hoc-so'
+  to: '/' | '/lop-hoc-so' | '/hoc-lieu/bai-giang'
+  id: '__root__' | '/' | '/lop-hoc-so' | '/hoc-lieu/bai-giang'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LopHocSoRoute: typeof LopHocSoRoute
+  HocLieuBaiGiangRoute: typeof HocLieuBaiGiangRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hoc-lieu/bai-giang': {
+      id: '/hoc-lieu/bai-giang'
+      path: '/hoc-lieu/bai-giang'
+      fullPath: '/hoc-lieu/bai-giang'
+      preLoaderRoute: typeof HocLieuBaiGiangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LopHocSoRoute: LopHocSoRoute,
+  HocLieuBaiGiangRoute: HocLieuBaiGiangRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
