@@ -4,12 +4,15 @@ import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
-  SquarePen, ChevronRight,
+  SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
 import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
