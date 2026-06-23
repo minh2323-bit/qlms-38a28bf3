@@ -112,6 +112,19 @@ function DigitalClassesPage() {
   const [lessonFromDate, setLessonFromDate] = useState("");
   const [lessonToDate, setLessonToDate] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [lessonSelectMode, setLessonSelectMode] = useState(false);
+  const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set());
+  const [classSelectMode, setClassSelectMode] = useState(false);
+  const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
+
+  const toggleLessonSel = (id: string) => setSelectedLessons((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleClassSel = (id: string) => setSelectedClasses((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const exitLessonSelect = () => { setLessonSelectMode(false); setSelectedLessons(new Set()); };
+  const exitClassSelect = () => { setClassSelectMode(false); setSelectedClasses(new Set()); };
 
   
 
