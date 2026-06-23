@@ -631,8 +631,9 @@ function MaterialItem({ item }: { item: string }) {
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${bg} ${color} hover:brightness-95 cursor-help transition`}>
-            <Icon className="h-4 w-4" />
+          <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg ${bg} ${color} hover:brightness-95 cursor-help transition text-sm`}>
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="text-slate-700">{item}</span>
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">
