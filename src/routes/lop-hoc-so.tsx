@@ -208,6 +208,12 @@ function DigitalClassesPage() {
                 <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
                   <Plus className="h-5 w-5" /> Thêm lớp học mới
                 </button>
+                {classSelectMode && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-600">Đã chọn <b className="text-indigo-700">{selectedClasses.size}</b></span>
+                    <button onClick={exitClassSelect} className="px-3 py-1.5 text-xs font-semibold rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">Thoát chọn</button>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setClassView("list")}
