@@ -511,19 +511,39 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect }: {
   );
 }
 
-function LessonCardView({ l }: { l: LessonCard }) {
+function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect }: { l: LessonCard } & SelectProps) {
   const canShare = l.approved && l.shared !== "hanoi";
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
+    <div
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""}`}
+      onClick={selectMode ? onToggleSelect : undefined}
+      role={selectMode ? "button" : undefined}
+    >
+      {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
       <div className="h-36 bg-slate-100 overflow-hidden">
         <img src={l.thumb} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
       </div>
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-slate-800">{l.title}</h3>
-          <button className="p-1 rounded hover:bg-slate-100 text-slate-500 shrink-0">
-            <MoreVertical className="h-4 w-4" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500 shrink-0">
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
+                <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer text-rose-600">
+                <Trash2 className="h-4 w-4 mr-2" /> Xóa bài giảng
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-y-1 text-xs text-slate-600">
           <div><span className="text-slate-500">Khối:</span> {l.khoi}</div>
