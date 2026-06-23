@@ -55,28 +55,25 @@ type LessonCard = {
   author: string; classes: string;
   approved: boolean; shared: "noi-bo" | "hanoi" | "none";
   thumb: string;
-  chapters: string[];
+  releaseDate: string;
   loai: string;
-};
-
-const CHAPTERS: Record<string, string[]> = {
-  "Lớp 3|Toán": ["Số tự nhiên", "Phân số", "Hình học", "Đo lường"],
-  "Lớp 4|Toán": ["Số thập phân", "Phân số", "Tỉ số phần trăm", "Đo lường"],
 };
 
 const LESSON_TYPES = ["Bài giảng điện tử", "Video", "Tài liệu"];
 const LESSON_STATUSES = ["Đã duyệt", "Chờ duyệt"];
 
+
 const LESSONS: LessonCard[] = [
-  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, chapters: ["Phân số"], loai: "Bài giảng điện tử" },
-  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, chapters: ["Số tự nhiên"], loai: "Bài giảng điện tử" },
-  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, chapters: ["Hình học", "Đo lường"], loai: "Video" },
-  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, chapters: ["Đo lường"], loai: "Tài liệu" },
-  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, chapters: ["Tỉ số phần trăm"], loai: "Bài giảng điện tử" },
-  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, chapters: ["Số tự nhiên"], loai: "Bài giảng điện tử" },
-  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, chapters: ["Số thập phân"], loai: "Video" },
-  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, chapters: ["Phân số"], loai: "Bài giảng điện tử" },
+  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, releaseDate: "15/09/2025", loai: "Bài giảng điện tử" },
+  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, releaseDate: "22/09/2025", loai: "Bài giảng điện tử" },
+  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, releaseDate: "05/10/2025", loai: "Video" },
+  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, releaseDate: "12/10/2025", loai: "Tài liệu" },
+  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, releaseDate: "19/10/2025", loai: "Bài giảng điện tử" },
+  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, releaseDate: "28/10/2025", loai: "Bài giảng điện tử" },
+  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, releaseDate: "03/11/2025", loai: "Video" },
+  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, releaseDate: "10/11/2025", loai: "Bài giảng điện tử" },
 ];
+
 
 function DigitalClassesPage() {
   const [classView, setClassView] = useState<"grid" | "list">("grid");
