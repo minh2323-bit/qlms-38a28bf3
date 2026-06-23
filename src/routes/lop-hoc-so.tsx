@@ -4,6 +4,7 @@ import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
+  SquarePen, ChevronRight,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
