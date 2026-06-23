@@ -33,7 +33,7 @@ const NAV: NavItem[] = [
     submenu: [
       { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
       { icon: Tag, label: "Học liệu bản quyền" },
-      { icon: Library, label: "Kho học liệu" },
+      { icon: Library, label: "Kho học liệu", to: "/hoc-lieu/kho-hoc-lieu" },
       { icon: Video, label: "Video tương tác" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
       { icon: ListChecks, label: "Đề kiểm tra" },
