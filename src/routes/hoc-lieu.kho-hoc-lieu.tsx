@@ -106,79 +106,80 @@ function KhoHocLieuPage() {
   return (
     <AppShell>
       <>
-        {/* Top action buttons */}
-        <section className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
-            <Building2 className="h-4 w-4" /> Thêm từ Kho học liệu trường
-          </button>
-          <button className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
-            <Globe2 className="h-4 w-4" /> Thêm từ Hanoi Study
-          </button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
-                <Plus className="h-4 w-4" /> Thêm học liệu mới
-                <ChevronDown className="h-4 w-4" />
+        {/* Filter row + action buttons on same row */}
+        <section className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Tìm kiếm theo tên học liệu"
+                className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-72 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
+            <FilterSelect value={loai} onChange={setLoai} placeholder="Loại học liệu" options={[...MATERIAL_TYPES]} />
+            <FilterSelect
+              value={khoi}
+              onChange={(v) => { setKhoi(v); setMon(""); setChuDe(""); }}
+              placeholder="Khối"
+              options={KHOI_LIST}
+            />
+            {khoi && (
+              <FilterSelect
+                value={mon}
+                onChange={(v) => { setMon(v); setChuDe(""); }}
+                placeholder="Môn"
+                options={monOptions}
+              />
+            )}
+            {khoi && mon && (
+              <FilterSelect
+                value={chuDe}
+                onChange={setChuDe}
+                placeholder="Chương/Chủ đề"
+                options={chuongOptions}
+              />
+            )}
+            {(loai || khoi || mon || chuDe || search) && (
+              <button
+                onClick={() => { setSearch(""); setLoai(""); setKhoi(""); setMon(""); setChuDe(""); }}
+                className="text-xs text-indigo-600 hover:text-indigo-800 font-medium ml-1"
+              >
+                Xóa lọc
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              {MATERIAL_TYPES.map((t, i) => {
-                const meta = TYPE_META[t];
-                const Icon = meta.icon;
-                return (
-                  <DropdownMenuItem key={t} className="cursor-pointer gap-2">
-                    <span className="text-slate-400 text-xs w-4">{i + 1}.</span>
-                    <Icon className={`h-4 w-4 ${meta.color}`} />
-                    <span>{t}</span>
-                  </DropdownMenuItem>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </section>
-
-        {/* Filter row */}
-        <section className="flex flex-wrap items-center gap-2 mt-4">
-          <div className="relative">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm kiếm theo tên học liệu"
-              className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-72 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
+            )}
           </div>
-          <FilterSelect value={loai} onChange={setLoai} placeholder="Loại học liệu" options={[...MATERIAL_TYPES]} />
-          <FilterSelect
-            value={khoi}
-            onChange={(v) => { setKhoi(v); setMon(""); setChuDe(""); }}
-            placeholder="Khối"
-            options={KHOI_LIST}
-          />
-          {khoi && (
-            <FilterSelect
-              value={mon}
-              onChange={(v) => { setMon(v); setChuDe(""); }}
-              placeholder="Môn"
-              options={monOptions}
-            />
-          )}
-          {mon && chuongOptions.length > 0 && (
-            <FilterSelect
-              value={chuDe}
-              onChange={setChuDe}
-              placeholder="Chương/Chủ đề"
-              options={chuongOptions}
-            />
-          )}
-          {(loai || khoi || mon || chuDe || search) && (
-            <button
-              onClick={() => { setSearch(""); setLoai(""); setKhoi(""); setMon(""); setChuDe(""); }}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-medium ml-1"
-            >
-              Xóa lọc
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
+              <Building2 className="h-4 w-4" /> Thêm từ Kho học liệu trường
             </button>
-          )}
+            <button className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
+              <Globe2 className="h-4 w-4" /> Thêm từ Hanoi Study
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
+                  <Plus className="h-4 w-4" /> Thêm học liệu mới
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {MATERIAL_TYPES.map((t, i) => {
+                  const meta = TYPE_META[t];
+                  const Icon = meta.icon;
+                  return (
+                    <DropdownMenuItem key={t} className="cursor-pointer gap-2">
+                      <span className="text-slate-400 text-xs w-4">{i + 1}.</span>
+                      <Icon className={`h-4 w-4 ${meta.color}`} />
+                      <span>{t}</span>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </section>
 
         {/* Table */}
