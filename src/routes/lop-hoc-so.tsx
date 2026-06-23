@@ -256,9 +256,23 @@ function DigitalClassesPage() {
                 </button>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
-                  <Plus className="h-5 w-5" /> Thêm bài giảng mới
-                </button>
+                <div className="flex items-center gap-2">
+                  {lessonSelectMode && (
+                    <>
+                      <span className="text-sm text-slate-600 mr-1">Đã chọn <b className="text-indigo-700">{selectedLessons.size}</b></span>
+                      <button onClick={exitLessonSelect} className="px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">Hủy</button>
+                    </>
+                  )}
+                  <button className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm disabled:opacity-50" disabled={lessonSelectMode && selectedLessons.size === 0}>
+                    <Share2 className="h-4 w-4" /> Chia sẻ
+                  </button>
+                  <button className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm disabled:opacity-50" disabled={lessonSelectMode && selectedLessons.size === 0}>
+                    <Trash2 className="h-4 w-4" /> Xóa bài giảng
+                  </button>
+                  <button className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
+                    <FileSpreadsheet className="h-4 w-4" /> Xuất excel
+                  </button>
+                </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setLessonView("list")}
