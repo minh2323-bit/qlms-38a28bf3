@@ -105,8 +105,11 @@ function DigitalClassesPage() {
   const [lessonSearch, setLessonSearch] = useState("");
   const [lessonKhoi, setLessonKhoi] = useState("");
   const [lessonMon, setLessonMon] = useState("");
+  const [lessonChuong, setLessonChuong] = useState("");
   const [lessonLoai, setLessonLoai] = useState("");
   const [lessonTrangThai, setLessonTrangThai] = useState("");
+
+  const chapterOptions = (lessonKhoi && lessonMon) ? CHAPTERS[`${lessonKhoi}-${lessonMon}`] || [] : [];
 
   const filteredClasses = CLASSES.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
