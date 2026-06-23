@@ -347,11 +347,16 @@ function DigitalClassesPage() {
               <div className="flex-1 min-w-0">
                 {lessonView === "grid" ? (
                   <div className={`grid grid-cols-1 md:grid-cols-2 ${filterOpen ? "lg:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"} gap-4`}>
-                    <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
-                      <Plus className="h-8 w-8" />
-                      <span className="font-medium">Thêm bài giảng mới</span>
-                    </button>
-                    {filteredLessons.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
+                    {filteredLessons.map((l) => (
+                      <LessonCardView
+                        key={l.title + l.author}
+                        l={l}
+                        selectMode={lessonSelectMode}
+                        selected={selectedLessons.has(l.title + l.author)}
+                        onToggleSelect={() => toggleLessonSel(l.title + l.author)}
+                        onEnterSelect={() => { setLessonSelectMode(true); toggleLessonSel(l.title + l.author); }}
+                      />
+                    ))}
                   </div>
                 ) : (
                   <LessonsTable lessons={filteredLessons} />
