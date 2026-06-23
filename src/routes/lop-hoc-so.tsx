@@ -369,7 +369,7 @@ function PanelSelect({ value, onChange, placeholder, options }: { value: string;
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none pl-3 pr-9 py-2.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        className="w-full appearance-none pl-3 pr-9 py-2.5 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-indigo-50/60 hover:border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition"
       >
         <option value="">{placeholder}</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
