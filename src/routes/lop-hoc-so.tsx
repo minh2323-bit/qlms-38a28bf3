@@ -4,12 +4,15 @@ import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
-  SquarePen, ChevronRight,
+  SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
 import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
@@ -613,6 +616,33 @@ function buildLessonContent(l: LessonCard): LessonContent {
   };
 }
 
+function getMaterialMeta(item: string) {
+  const lower = item.toLowerCase();
+  if (lower.includes("video")) return { icon: Video, label: "Video", bg: "bg-rose-100", color: "text-rose-600" };
+  if (lower.includes("slide") || lower.includes("bài giảng chính")) return { icon: PresentationIcon, label: "Slide / Bài giảng", bg: "bg-indigo-100", color: "text-indigo-600" };
+  if (lower.includes("bài kiểm tra") || lower.includes("kiểm tra")) return { icon: ClipboardList, label: "Bài kiểm tra", bg: "bg-amber-100", color: "text-amber-600" };
+  if (lower.includes("trò chơi") || lower.includes("game")) return { icon: Gamepad2, label: "Trò chơi tương tác", bg: "bg-violet-100", color: "text-violet-600" };
+  return { icon: FileText, label: "Tài liệu", bg: "bg-sky-100", color: "text-sky-600" };
+}
+
+function MaterialItem({ item }: { item: string }) {
+  const { icon: Icon, label, bg, color } = getMaterialMeta(item);
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${bg} ${color} hover:brightness-95 cursor-help transition`}>
+            <Icon className="h-4 w-4" />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs">
+          <p><span className="font-semibold">{label}:</span> {item}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function LessonsTable({
   lessons, selectMode, selected, onToggle, onToggleAll,
 }: {
@@ -687,12 +717,12 @@ function LessonsTable({
                 <td className="px-4 py-4 text-slate-700">{l.author}</td>
                 <td className="px-4 py-4 text-slate-700 whitespace-nowrap">{l.releaseDate}</td>
                 <td className="px-4 py-4">
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {content.topics.map((t) => {
                       const key = id + "::" + t.name;
                       const open = expanded.has(key);
                       return (
-                        <li key={t.name}>
+                        <li key={t.name} className="list-none">
                           <button
                             onClick={() => toggleExpand(key)}
                             className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 hover:text-indigo-700"
@@ -701,20 +731,24 @@ function LessonsTable({
                             {t.name}
                           </button>
                           {open && (
-                            <ul className="ml-6 mt-1 mb-1 space-y-0.5 list-disc list-inside text-sm text-slate-600">
+                            <div className="ml-6 mt-1.5 mb-1 flex flex-wrap gap-1.5">
                               {t.items.map((it) => (
-                                <li key={it}>{it}</li>
+                                <MaterialItem key={it} item={it} />
                               ))}
-                            </ul>
+                            </div>
                           )}
                         </li>
                       );
                     })}
                     {content.materials.map((m) => (
-                      <li key={m} className="ml-5 text-sm text-slate-700">• {m}</li>
+                      <li key={m} className="ml-5 list-none flex flex-wrap gap-1.5">
+                        <MaterialItem item={m} />
+                      </li>
                     ))}
                     {content.quizzes.map((q) => (
-                      <li key={q} className="ml-5 text-sm text-slate-700">• {q}</li>
+                      <li key={q} className="ml-5 list-none flex flex-wrap gap-1.5">
+                        <MaterialItem item={q} />
+                      </li>
                     ))}
                   </ul>
                 </td>
