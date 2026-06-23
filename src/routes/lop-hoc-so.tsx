@@ -57,10 +57,30 @@ type LessonCard = {
   thumb: string;
   releaseDate: string;
   loai: string;
+  chapter: string;
 };
 
 const LESSON_TYPES = ["Bài giảng điện tử", "Video", "Tài liệu"];
 const LESSON_STATUSES = ["Đã duyệt", "Chờ duyệt"];
+
+const CHAPTERS: Record<string, string[]> = {
+  "Lớp 3-Toán": [
+    "Chương 1: Số tự nhiên",
+    "Chương 2: Các phép tính với số tự nhiên",
+    "Chương 3: Phân số",
+    "Chương 4: Các phép tính với phân số",
+    "Chương 5: Hình học",
+    "Chương 6: Đo lường",
+  ],
+  "Lớp 4-Toán": [
+    "Chương 1: Số tự nhiên",
+    "Chương 2: Bốn phép tính với số tự nhiên",
+    "Chương 3: Số thập phân",
+    "Chương 4: Các phép tính với số thập phân",
+    "Chương 5: Tỉ số phần trăm",
+    "Chương 6: Hình học",
+  ],
+};
 
 
 const LESSONS: LessonCard[] = [
