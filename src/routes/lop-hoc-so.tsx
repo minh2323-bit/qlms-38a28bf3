@@ -84,14 +84,14 @@ const CHAPTERS: Record<string, string[]> = {
 
 
 const LESSONS: LessonCard[] = [
-  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, releaseDate: "15/09/2025", loai: "Bài giảng điện tử" },
-  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, releaseDate: "22/09/2025", loai: "Bài giảng điện tử" },
-  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, releaseDate: "05/10/2025", loai: "Video" },
-  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, releaseDate: "12/10/2025", loai: "Tài liệu" },
-  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, releaseDate: "19/10/2025", loai: "Bài giảng điện tử" },
-  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, releaseDate: "28/10/2025", loai: "Bài giảng điện tử" },
-  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, releaseDate: "03/11/2025", loai: "Video" },
-  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, releaseDate: "10/11/2025", loai: "Bài giảng điện tử" },
+  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, releaseDate: "15/09/2025", loai: "Bài giảng điện tử", chapter: "Chương 3: Phân số" },
+  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, releaseDate: "22/09/2025", loai: "Bài giảng điện tử", chapter: "Chương 4: Các phép tính với phân số" },
+  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, releaseDate: "05/10/2025", loai: "Video", chapter: "Chương 5: Hình học" },
+  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, releaseDate: "12/10/2025", loai: "Tài liệu", chapter: "Chương 6: Đo lường" },
+  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, releaseDate: "19/10/2025", loai: "Bài giảng điện tử", chapter: "Chương 5: Tỉ số phần trăm" },
+  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, releaseDate: "28/10/2025", loai: "Bài giảng điện tử", chapter: "Chương 1: Số tự nhiên" },
+  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, releaseDate: "03/11/2025", loai: "Video", chapter: "Chương 3: Số thập phân" },
+  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, releaseDate: "10/11/2025", loai: "Bài giảng điện tử", chapter: "Chương 4: Các phép tính với phân số" },
 ];
 
 
