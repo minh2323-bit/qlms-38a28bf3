@@ -2,40 +2,75 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
+  ClipboardList, Video, Building2, School, Landmark,
+  Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 
+type SubItem = { icon: typeof Home; label: string; to?: string };
 type NavItem = {
   icon: typeof Home;
   label: string;
   to?: string;
-  submenu?: { icon: typeof Home; label: string }[];
+  submenu?: SubItem[];
 };
 
 const NAV: NavItem[] = [
   { icon: Home, label: "Trang chủ", to: "/" },
-  { icon: GraduationCap, label: "Lớp học số", to: "/lop-hoc-so" },
+  {
+    icon: GraduationCap,
+    label: "Hoạt động\ngiảng dạy",
+    to: "/lop-hoc-so",
+    submenu: [
+      { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
+      { icon: ClipboardList, label: "Giao bài tập, nhiệm vụ" },
+    ],
+  },
   {
     icon: BookOpen,
     label: "Học liệu\n& Bài kiểm tra",
     submenu: [
+      { icon: BookMarked, label: "Bài giảng" },
+      { icon: Tag, label: "Học liệu bản quyền" },
       { icon: Library, label: "Kho học liệu" },
+      { icon: Video, label: "Video tương tác" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
       { icon: ListChecks, label: "Đề kiểm tra" },
+    ],
+  },
+  {
+    icon: FolderKanban,
+    label: "Kỳ thi",
+    submenu: [
+      { icon: Landmark, label: "Kỳ thi cấp Sở" },
+      { icon: Building2, label: "Kỳ thi cấp Xã/Phường" },
+      { icon: School, label: "Kỳ thi cấp Trường" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
+      { icon: Grid3x3, label: "Khung ma trận đề" },
+      { icon: FileCheck2, label: "Ngân hàng đề thi" },
     ],
   },
   {
     icon: BarChart3,
     label: "Thống kê\n& Báo cáo",
     submenu: [
-      { icon: TrendingUp, label: "Thống kê hoạt động sử dụng" },
-      { icon: Users, label: "Thống kê hoạt động của lớp" },
-      { icon: Trophy, label: "Thống kê kết quả thi" },
+      { icon: TrendingUp, label: "Hoạt động giảng dạy" },
+      { icon: Users, label: "Hoạt động cá nhân" },
     ],
   },
-  { icon: FolderKanban, label: "Kỳ thi" },
-  { icon: Settings, label: "Thiết lập" },
+  {
+    icon: Settings,
+    label: "Hệ thống",
+    submenu: [
+      { icon: BookOpen, label: "Môn học" },
+      { icon: Brain, label: "Định danh kiến thức" },
+      { icon: UserCog, label: "Tài khoản Người dùng" },
+      { icon: UsersRound, label: "Tài khoản học sinh" },
+      { icon: SlidersHorizontal, label: "Cấu hình hệ thống" },
+      { icon: Trophy, label: "Mức độ nhận thức" },
+    ],
+  },
 ];
 
 export function SidebarNav() {
