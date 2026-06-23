@@ -85,7 +85,6 @@ function DigitalClassesPage() {
   const [lessonSearch, setLessonSearch] = useState("");
   const [lessonKhoi, setLessonKhoi] = useState("");
   const [lessonMon, setLessonMon] = useState("");
-  const [lessonChuong, setLessonChuong] = useState("");
   const [lessonLoai, setLessonLoai] = useState("");
   const [lessonTrangThai, setLessonTrangThai] = useState("");
 
@@ -96,16 +95,13 @@ function DigitalClassesPage() {
     return matchSearch && matchKhoi && matchMon;
   });
 
-  const chapterOptions = lessonKhoi && lessonMon ? (CHAPTERS[`${lessonKhoi}|${lessonMon}`] ?? []) : [];
-
   const filteredLessons = LESSONS.filter((l) => {
     const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
     const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
     const matchMon = !lessonMon || l.subject === lessonMon;
-    const matchChuong = !lessonChuong || l.chapters.includes(lessonChuong);
     const matchLoai = !lessonLoai || l.loai === lessonLoai;
     const matchTrang = !lessonTrangThai || (lessonTrangThai === "Đã duyệt" ? l.approved : !l.approved);
-    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang;
+    return matchSearch && matchKhoi && matchMon && matchLoai && matchTrang;
   });
 
   return (
@@ -193,11 +189,8 @@ function DigitalClassesPage() {
                       className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
                   </div>
-                  <FilterSelect value={lessonKhoi} onChange={(v) => { setLessonKhoi(v); setLessonChuong(""); }} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
-                  <FilterSelect value={lessonMon} onChange={(v) => { setLessonMon(v); setLessonChuong(""); }} placeholder="Môn" options={["Toán"]} />
-                  {chapterOptions.length > 0 && (
-                    <FilterSelect value={lessonChuong} onChange={setLessonChuong} placeholder="Chương/Chủ đề" options={chapterOptions} />
-                  )}
+                  <FilterSelect value={lessonKhoi} onChange={setLessonKhoi} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
+                  <FilterSelect value={lessonMon} onChange={setLessonMon} placeholder="Môn" options={["Toán"]} />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <FilterSelect value={lessonLoai} onChange={setLessonLoai} placeholder="Loại học liệu" options={LESSON_TYPES} />
@@ -337,8 +330,7 @@ function LessonCardView({ l }: { l: LessonCard }) {
         </div>
         <p className="mt-1 text-xs text-slate-600"><span className="text-slate-500">Tác giả:</span> {l.author}</p>
         <p className="text-xs text-slate-600"><span className="text-slate-500">Danh sách lớp gán:</span> {l.classes}</p>
-        <p className="text-xs text-slate-600"><span className="text-slate-500">Chương/Chủ đề:</span></p>
-        <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+        <p className="text-xs text-slate-600"><span className="text-slate-500">Ngày phát hành:</span> {l.releaseDate}</p>
           <span className="text-xs text-slate-500">Trạng thái:</span>
           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
             {l.approved ? "Đã duyệt" : "Chờ duyệt"}
@@ -374,7 +366,7 @@ function LessonsTable({ lessons }: { lessons: LessonCard[] }) {
             <th className="px-4 py-3 font-semibold w-14 text-center">STT</th>
             <th className="px-4 py-3 font-semibold">Tên bài giảng</th>
             <th className="px-4 py-3 font-semibold">Tác giả</th>
-            <th className="px-4 py-3 font-semibold">Chương/Chủ đề</th>
+            <th className="px-4 py-3 font-semibold">Ngày phát hành</th>
             <th className="px-4 py-3 font-semibold text-center w-56">Chia sẻ lên HanoiStudy</th>
           </tr>
         </thead>
@@ -392,13 +384,7 @@ function LessonsTable({ lessons }: { lessons: LessonCard[] }) {
                 <div className="mt-1 text-sm text-slate-600">{l.khoi}; {l.subject}</div>
               </td>
               <td className="px-4 py-4 text-slate-700">{l.author}</td>
-              <td className="px-4 py-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {l.chapters.map((c) => (
-                    <span key={c} className="text-sm bg-slate-100 text-slate-700 px-2 py-1 rounded-md">{c}</span>
-                  ))}
-                </div>
-              </td>
+              <td className="px-4 py-4 text-slate-700">{l.releaseDate}</td>
               <td className="px-4 py-4 text-center">
                 {l.shared === "hanoi" ? (
                   <span className="text-emerald-600 font-semibold">Sở Đã Duyệt</span>
