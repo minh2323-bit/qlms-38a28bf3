@@ -35,7 +35,8 @@ type ClassRow = {
 };
 
 const CLASSES: ClassRow[] = [
-  { name: "Lớp 4A năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A },
+  { name: "Lớp 4A - Toán năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A },
+  { name: "Lớp 4A - Tiếng Việt năm học 2025 - 2026", lop: "4A", subject: "Tiếng Việt", baiGiang: 12, hocLieu: 14, hocSinh: 40, thumb: thumbLop4A },
   { name: "Lớp 3D năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D },
   { name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A },
   { name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B },
