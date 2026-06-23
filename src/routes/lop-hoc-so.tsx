@@ -213,10 +213,13 @@ function DigitalClassesPage() {
                       className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
                   </div>
-                  <FilterSelect value={lessonKhoi} onChange={setLessonKhoi} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
-                  <FilterSelect value={lessonMon} onChange={setLessonMon} placeholder="Môn" options={["Toán"]} />
+                  <FilterSelect value={lessonKhoi} onChange={(v) => { setLessonKhoi(v); setLessonChuong(""); }} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
+                  <FilterSelect value={lessonMon} onChange={(v) => { setLessonMon(v); setLessonChuong(""); }} placeholder="Môn" options={["Toán"]} />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  {chapterOptions.length > 0 && (
+                    <FilterSelect value={lessonChuong} onChange={setLessonChuong} placeholder="Chương/Chủ đề" options={chapterOptions} />
+                  )}
                   <FilterSelect value={lessonLoai} onChange={setLessonLoai} placeholder="Loại học liệu" options={LESSON_TYPES} />
                   <FilterSelect value={lessonTrangThai} onChange={setLessonTrangThai} placeholder="Trạng thái" options={LESSON_STATUSES} />
                 </div>
