@@ -109,6 +109,9 @@ function DigitalClassesPage() {
   const [lessonChuong, setLessonChuong] = useState("");
   const [lessonLoai, setLessonLoai] = useState("");
   const [lessonTrangThai, setLessonTrangThai] = useState("");
+  const [lessonFromDate, setLessonFromDate] = useState("");
+  const [lessonToDate, setLessonToDate] = useState("");
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   const chapterOptions = (lessonKhoi && lessonMon) ? CHAPTERS[`${lessonKhoi}-${lessonMon}`] || [] : [];
 
@@ -119,6 +122,10 @@ function DigitalClassesPage() {
     return matchSearch && matchKhoi && matchMon;
   });
 
+  const parseDmy = (s: string) => {
+    const [d, m, y] = s.split("/").map(Number);
+    return new Date(y, m - 1, d).getTime();
+  };
   const filteredLessons = LESSONS.filter((l) => {
     const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
     const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
@@ -126,8 +133,18 @@ function DigitalClassesPage() {
     const matchChuong = !lessonChuong || l.chapter === lessonChuong;
     const matchLoai = !lessonLoai || l.loai === lessonLoai;
     const matchTrang = !lessonTrangThai || (lessonTrangThai === "Đã duyệt" ? l.approved : !l.approved);
-    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang;
+    const lessonTs = parseDmy(l.releaseDate);
+    const matchFrom = !lessonFromDate || lessonTs >= new Date(lessonFromDate).getTime();
+    const matchTo = !lessonToDate || lessonTs <= new Date(lessonToDate).getTime();
+    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang && matchFrom && matchTo;
   });
+
+  const activeFilterCount = [lessonKhoi, lessonMon, lessonLoai, lessonTrangThai, lessonFromDate || lessonToDate ? "1" : ""].filter(Boolean).length;
+  const resetLessonFilters = () => {
+    setLessonKhoi(""); setLessonMon(""); setLessonChuong("");
+    setLessonLoai(""); setLessonTrangThai("");
+    setLessonFromDate(""); setLessonToDate("");
+  };
 
   return (
     <AppShell>
