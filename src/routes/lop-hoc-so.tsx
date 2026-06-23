@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
-  Calendar as CalendarIcon, SlidersHorizontal,
+  Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -112,6 +112,19 @@ function DigitalClassesPage() {
   const [lessonFromDate, setLessonFromDate] = useState("");
   const [lessonToDate, setLessonToDate] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [lessonSelectMode, setLessonSelectMode] = useState(false);
+  const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set());
+  const [classSelectMode, setClassSelectMode] = useState(false);
+  const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
+
+  const toggleLessonSel = (id: string) => setSelectedLessons((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const toggleClassSel = (id: string) => setSelectedClasses((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+  const exitLessonSelect = () => { setLessonSelectMode(false); setSelectedLessons(new Set()); };
+  const exitClassSelect = () => { setClassSelectMode(false); setSelectedClasses(new Set()); };
 
   
 
@@ -195,6 +208,12 @@ function DigitalClassesPage() {
                 <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
                   <Plus className="h-5 w-5" /> Thêm lớp học mới
                 </button>
+                {classSelectMode && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-slate-600">Đã chọn <b className="text-indigo-700">{selectedClasses.size}</b></span>
+                    <button onClick={exitClassSelect} className="px-3 py-1.5 text-xs font-semibold rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">Thoát chọn</button>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setClassView("list")}
@@ -213,7 +232,16 @@ function DigitalClassesPage() {
             </div>
 
             <div className={classView === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
-              {filteredClasses.map((c) => <ClassCard key={c.name} c={c} />)}
+              {filteredClasses.map((c) => (
+                <ClassCard
+                  key={c.name}
+                  c={c}
+                  selectMode={classSelectMode}
+                  selected={selectedClasses.has(c.name)}
+                  onToggleSelect={() => toggleClassSel(c.name)}
+                  onEnterSelect={() => { setClassSelectMode(true); toggleClassSel(c.name); }}
+                />
+              ))}
             </div>
           </section>
         )}
@@ -243,9 +271,23 @@ function DigitalClassesPage() {
                 </button>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
-                  <Plus className="h-5 w-5" /> Thêm bài giảng mới
-                </button>
+                <div className="flex items-center gap-2">
+                  {lessonSelectMode && (
+                    <>
+                      <span className="text-sm text-slate-600 mr-1">Đã chọn <b className="text-indigo-700">{selectedLessons.size}</b></span>
+                      <button onClick={exitLessonSelect} className="px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">Hủy</button>
+                    </>
+                  )}
+                  <button className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm disabled:opacity-50" disabled={lessonSelectMode && selectedLessons.size === 0}>
+                    <Share2 className="h-4 w-4" /> Chia sẻ
+                  </button>
+                  <button className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm disabled:opacity-50" disabled={lessonSelectMode && selectedLessons.size === 0}>
+                    <Trash2 className="h-4 w-4" /> Xóa bài giảng
+                  </button>
+                  <button className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm">
+                    <FileSpreadsheet className="h-4 w-4" /> Xuất excel
+                  </button>
+                </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setLessonView("list")}
@@ -320,11 +362,16 @@ function DigitalClassesPage() {
               <div className="flex-1 min-w-0">
                 {lessonView === "grid" ? (
                   <div className={`grid grid-cols-1 md:grid-cols-2 ${filterOpen ? "lg:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"} gap-4`}>
-                    <button className="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center gap-2 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 min-h-[280px] transition">
-                      <Plus className="h-8 w-8" />
-                      <span className="font-medium">Thêm bài giảng mới</span>
-                    </button>
-                    {filteredLessons.map((l) => <LessonCardView key={l.title + l.author} l={l} />)}
+                    {filteredLessons.map((l) => (
+                      <LessonCardView
+                        key={l.title + l.author}
+                        l={l}
+                        selectMode={lessonSelectMode}
+                        selected={selectedLessons.has(l.title + l.author)}
+                        onToggleSelect={() => toggleLessonSel(l.title + l.author)}
+                        onEnterSelect={() => { setLessonSelectMode(true); toggleLessonSel(l.title + l.author); }}
+                      />
+                    ))}
                   </div>
                 ) : (
                   <LessonsTable lessons={filteredLessons} />
@@ -398,9 +445,33 @@ function StatCard({ color, label, value, icon }: { color: "emerald" | "indigo" |
   );
 }
 
-function ClassCard({ c }: { c: ClassRow }) {
+type SelectProps = {
+  selectMode: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
+  onEnterSelect: () => void;
+};
+
+function SelectCircle({ selected, onClick }: { selected: boolean; onClick: () => void }) {
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition">
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      aria-label={selected ? "Bỏ chọn" : "Chọn"}
+      className={`absolute top-2 left-2 z-10 h-7 w-7 rounded-full border-2 flex items-center justify-center transition shadow ${selected ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white/90 border-slate-300 text-transparent hover:border-indigo-400"}`}
+    >
+      <Check className="h-4 w-4" strokeWidth={3} />
+    </button>
+  );
+}
+
+function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect }: { c: ClassRow } & SelectProps) {
+  return (
+    <div
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""}`}
+      onClick={selectMode ? onToggleSelect : undefined}
+      role={selectMode ? "button" : undefined}
+    >
+      {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
       <div className="h-28 bg-slate-100 overflow-hidden">
         <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
       </div>
@@ -409,11 +480,14 @@ function ClassCard({ c }: { c: ClassRow }) {
           <h3 className="font-semibold text-slate-800">{c.name}</h3>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="p-1 rounded hover:bg-slate-100 text-slate-500">
+              <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500">
                 <MoreVertical className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
+                <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
+              </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
               </DropdownMenuItem>
@@ -437,19 +511,39 @@ function ClassCard({ c }: { c: ClassRow }) {
   );
 }
 
-function LessonCardView({ l }: { l: LessonCard }) {
+function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect }: { l: LessonCard } & SelectProps) {
   const canShare = l.approved && l.shared !== "hanoi";
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
+    <div
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""}`}
+      onClick={selectMode ? onToggleSelect : undefined}
+      role={selectMode ? "button" : undefined}
+    >
+      {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
       <div className="h-36 bg-slate-100 overflow-hidden">
         <img src={l.thumb} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
       </div>
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-slate-800">{l.title}</h3>
-          <button className="p-1 rounded hover:bg-slate-100 text-slate-500 shrink-0">
-            <MoreVertical className="h-4 w-4" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500 shrink-0">
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
+                <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer text-rose-600">
+                <Trash2 className="h-4 w-4 mr-2" /> Xóa bài giảng
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-y-1 text-xs text-slate-600">
           <div><span className="text-slate-500">Khối:</span> {l.khoi}</div>
