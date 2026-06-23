@@ -57,21 +57,41 @@ type LessonCard = {
   thumb: string;
   releaseDate: string;
   loai: string;
+  chapter: string;
 };
 
 const LESSON_TYPES = ["Bài giảng điện tử", "Video", "Tài liệu"];
 const LESSON_STATUSES = ["Đã duyệt", "Chờ duyệt"];
 
+const CHAPTERS: Record<string, string[]> = {
+  "Lớp 3-Toán": [
+    "Chương 1: Số tự nhiên",
+    "Chương 2: Các phép tính với số tự nhiên",
+    "Chương 3: Phân số",
+    "Chương 4: Các phép tính với phân số",
+    "Chương 5: Hình học",
+    "Chương 6: Đo lường",
+  ],
+  "Lớp 4-Toán": [
+    "Chương 1: Số tự nhiên",
+    "Chương 2: Bốn phép tính với số tự nhiên",
+    "Chương 3: Số thập phân",
+    "Chương 4: Các phép tính với số thập phân",
+    "Chương 5: Tỉ số phần trăm",
+    "Chương 6: Hình học",
+  ],
+};
+
 
 const LESSONS: LessonCard[] = [
-  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, releaseDate: "15/09/2025", loai: "Bài giảng điện tử" },
-  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, releaseDate: "22/09/2025", loai: "Bài giảng điện tử" },
-  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, releaseDate: "05/10/2025", loai: "Video" },
-  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, releaseDate: "12/10/2025", loai: "Tài liệu" },
-  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, releaseDate: "19/10/2025", loai: "Bài giảng điện tử" },
-  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, releaseDate: "28/10/2025", loai: "Bài giảng điện tử" },
-  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, releaseDate: "03/11/2025", loai: "Video" },
-  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, releaseDate: "10/11/2025", loai: "Bài giảng điện tử" },
+  { title: "Học về phân số", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbPhanSo, releaseDate: "15/09/2025", loai: "Bài giảng điện tử", chapter: "Chương 3: Phân số" },
+  { title: "Số thập phân và phép so sánh", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B; 4C", approved: false, shared: "none", thumb: thumbSoThapPhan, releaseDate: "22/09/2025", loai: "Bài giảng điện tử", chapter: "Chương 4: Các phép tính với phân số" },
+  { title: "Hình học trực quan", khoi: "Lớp 3", subject: "Toán", author: "Hanoi Study (Nguyễn Văn A)", classes: "4A; 4B; 4C", approved: true, shared: "noi-bo", thumb: thumbHinhHoc, releaseDate: "05/10/2025", loai: "Video", chapter: "Chương 5: Hình học" },
+  { title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C", approved: true, shared: "hanoi", thumb: thumbDoLuong, releaseDate: "12/10/2025", loai: "Tài liệu", chapter: "Chương 6: Đo lường" },
+  { title: "Tỉ số phần trăm", khoi: "Lớp 4", subject: "Toán", author: "Trần Minh Khôi", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbPhanTram, releaseDate: "19/10/2025", loai: "Bài giảng điện tử", chapter: "Chương 5: Tỉ số phần trăm" },
+  { title: "Số tự nhiên và phép tính", khoi: "Lớp 3", subject: "Toán", author: "Phùng Thúy Hằng", classes: "3A; 3B; 3C; 3D", approved: false, shared: "none", thumb: thumbSoTuNhien, releaseDate: "28/10/2025", loai: "Bài giảng điện tử", chapter: "Chương 1: Số tự nhiên" },
+  { title: "Làm tròn số thập phân", khoi: "Lớp 4", subject: "Toán", author: "Phùng Thúy Hằng", classes: "4A; 4B", approved: true, shared: "noi-bo", thumb: thumbSoThapPhan, releaseDate: "03/11/2025", loai: "Video", chapter: "Chương 3: Số thập phân" },
+  { title: "Các phép tính với phân số", khoi: "Lớp 3", subject: "Toán", author: "Lê Thị Hoa", classes: "3A; 3D", approved: true, shared: "hanoi", thumb: thumbPhanSo, releaseDate: "10/11/2025", loai: "Bài giảng điện tử", chapter: "Chương 4: Các phép tính với phân số" },
 ];
 
 
@@ -85,8 +105,11 @@ function DigitalClassesPage() {
   const [lessonSearch, setLessonSearch] = useState("");
   const [lessonKhoi, setLessonKhoi] = useState("");
   const [lessonMon, setLessonMon] = useState("");
+  const [lessonChuong, setLessonChuong] = useState("");
   const [lessonLoai, setLessonLoai] = useState("");
   const [lessonTrangThai, setLessonTrangThai] = useState("");
+
+  const chapterOptions = (lessonKhoi && lessonMon) ? CHAPTERS[`${lessonKhoi}-${lessonMon}`] || [] : [];
 
   const filteredClasses = CLASSES.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
@@ -99,9 +122,10 @@ function DigitalClassesPage() {
     const matchSearch = !lessonSearch || l.title.toLowerCase().includes(lessonSearch.toLowerCase());
     const matchKhoi = !lessonKhoi || l.khoi === lessonKhoi;
     const matchMon = !lessonMon || l.subject === lessonMon;
+    const matchChuong = !lessonChuong || l.chapter === lessonChuong;
     const matchLoai = !lessonLoai || l.loai === lessonLoai;
     const matchTrang = !lessonTrangThai || (lessonTrangThai === "Đã duyệt" ? l.approved : !l.approved);
-    return matchSearch && matchKhoi && matchMon && matchLoai && matchTrang;
+    return matchSearch && matchKhoi && matchMon && matchChuong && matchLoai && matchTrang;
   });
 
   return (
@@ -189,10 +213,13 @@ function DigitalClassesPage() {
                       className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
                   </div>
-                  <FilterSelect value={lessonKhoi} onChange={setLessonKhoi} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
-                  <FilterSelect value={lessonMon} onChange={setLessonMon} placeholder="Môn" options={["Toán"]} />
+                  <FilterSelect value={lessonKhoi} onChange={(v) => { setLessonKhoi(v); setLessonChuong(""); }} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
+                  <FilterSelect value={lessonMon} onChange={(v) => { setLessonMon(v); setLessonChuong(""); }} placeholder="Môn" options={["Toán"]} />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  {chapterOptions.length > 0 && (
+                    <FilterSelect value={lessonChuong} onChange={setLessonChuong} placeholder="Chương/Chủ đề" options={chapterOptions} />
+                  )}
                   <FilterSelect value={lessonLoai} onChange={setLessonLoai} placeholder="Loại học liệu" options={LESSON_TYPES} />
                   <FilterSelect value={lessonTrangThai} onChange={setLessonTrangThai} placeholder="Trạng thái" options={LESSON_STATUSES} />
                 </div>
