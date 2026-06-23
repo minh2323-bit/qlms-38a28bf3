@@ -111,6 +111,8 @@ function DigitalClassesPage() {
   const [lessonTrangThai, setLessonTrangThai] = useState("");
   const [lessonFromDate, setLessonFromDate] = useState("");
   const [lessonToDate, setLessonToDate] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+
   
 
   const chapterOptions = (lessonKhoi && lessonMon) ? CHAPTERS[`${lessonKhoi}-${lessonMon}`] || [] : [];
