@@ -618,22 +618,22 @@ function buildLessonContent(l: LessonCard): LessonContent {
 
 function getMaterialMeta(item: string) {
   const lower = item.toLowerCase();
-  if (lower.includes("video")) return { icon: Video, label: "Video", bg: "bg-rose-100", color: "text-rose-600" };
-  if (lower.includes("slide") || lower.includes("bài giảng chính")) return { icon: PresentationIcon, label: "Slide / Bài giảng", bg: "bg-indigo-100", color: "text-indigo-600" };
-  if (lower.includes("bài kiểm tra") || lower.includes("kiểm tra")) return { icon: ClipboardList, label: "Bài kiểm tra", bg: "bg-amber-100", color: "text-amber-600" };
-  if (lower.includes("trò chơi") || lower.includes("game")) return { icon: Gamepad2, label: "Trò chơi tương tác", bg: "bg-violet-100", color: "text-violet-600" };
-  return { icon: FileText, label: "Tài liệu", bg: "bg-sky-100", color: "text-sky-600" };
+  if (lower.includes("video")) return { icon: Video, label: "Video", color: "text-rose-600" };
+  if (lower.includes("slide") || lower.includes("bài giảng chính")) return { icon: PresentationIcon, label: "Slide / Bài giảng", color: "text-indigo-600" };
+  if (lower.includes("bài kiểm tra") || lower.includes("kiểm tra")) return { icon: ClipboardList, label: "Bài kiểm tra", color: "text-amber-600" };
+  if (lower.includes("trò chơi") || lower.includes("game")) return { icon: Gamepad2, label: "Trò chơi tương tác", color: "text-violet-600" };
+  return { icon: FileText, label: "Tài liệu", color: "text-sky-600" };
 }
 
 function MaterialItem({ item }: { item: string }) {
-  const { icon: Icon, label, bg, color } = getMaterialMeta(item);
+  const { icon: Icon, label, color } = getMaterialMeta(item);
   return (
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg ${bg} ${color} hover:brightness-95 cursor-help transition text-sm`}>
-            <Icon className="h-4 w-4 shrink-0" />
-            <span className="text-slate-700">{item}</span>
+          <span className="inline-flex items-center gap-1.5 text-sm text-slate-700 hover:text-slate-900 cursor-help">
+            <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+            {item}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">
