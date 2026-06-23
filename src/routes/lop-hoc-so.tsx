@@ -616,6 +616,33 @@ function buildLessonContent(l: LessonCard): LessonContent {
   };
 }
 
+function getMaterialMeta(item: string) {
+  const lower = item.toLowerCase();
+  if (lower.includes("video")) return { icon: Video, label: "Video", bg: "bg-rose-100", color: "text-rose-600" };
+  if (lower.includes("slide") || lower.includes("bài giảng chính")) return { icon: PresentationIcon, label: "Slide / Bài giảng", bg: "bg-indigo-100", color: "text-indigo-600" };
+  if (lower.includes("bài kiểm tra") || lower.includes("kiểm tra")) return { icon: ClipboardList, label: "Bài kiểm tra", bg: "bg-amber-100", color: "text-amber-600" };
+  if (lower.includes("trò chơi") || lower.includes("game")) return { icon: Gamepad2, label: "Trò chơi tương tác", bg: "bg-violet-100", color: "text-violet-600" };
+  return { icon: FileText, label: "Tài liệu", bg: "bg-sky-100", color: "text-sky-600" };
+}
+
+function MaterialItem({ item }: { item: string }) {
+  const { icon: Icon, label, bg, color } = getMaterialMeta(item);
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${bg} ${color} hover:brightness-95 cursor-help transition`}>
+            <Icon className="h-4 w-4" />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs">
+          <p><span className="font-semibold">{label}:</span> {item}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function LessonsTable({
   lessons, selectMode, selected, onToggle, onToggleAll,
 }: {
