@@ -2,40 +2,75 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
+  ClipboardList, Video, Building2, School, Landmark,
+  Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 
+type SubItem = { icon: typeof Home; label: string; to?: string };
 type NavItem = {
   icon: typeof Home;
   label: string;
   to?: string;
-  submenu?: { icon: typeof Home; label: string }[];
+  submenu?: SubItem[];
 };
 
 const NAV: NavItem[] = [
   { icon: Home, label: "Trang chủ", to: "/" },
-  { icon: GraduationCap, label: "Lớp học số", to: "/lop-hoc-so" },
+  {
+    icon: GraduationCap,
+    label: "Hoạt động\ngiảng dạy",
+    to: "/lop-hoc-so",
+    submenu: [
+      { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
+      { icon: ClipboardList, label: "Giao bài tập, nhiệm vụ" },
+    ],
+  },
   {
     icon: BookOpen,
     label: "Học liệu\n& Bài kiểm tra",
     submenu: [
+      { icon: BookMarked, label: "Bài giảng" },
+      { icon: Tag, label: "Học liệu bản quyền" },
       { icon: Library, label: "Kho học liệu" },
+      { icon: Video, label: "Video tương tác" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
       { icon: ListChecks, label: "Đề kiểm tra" },
+    ],
+  },
+  {
+    icon: FolderKanban,
+    label: "Kỳ thi",
+    submenu: [
+      { icon: Landmark, label: "Kỳ thi cấp Sở" },
+      { icon: Building2, label: "Kỳ thi cấp Xã/Phường" },
+      { icon: School, label: "Kỳ thi cấp Trường" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
+      { icon: Grid3x3, label: "Khung ma trận đề" },
+      { icon: FileCheck2, label: "Ngân hàng đề thi" },
     ],
   },
   {
     icon: BarChart3,
     label: "Thống kê\n& Báo cáo",
     submenu: [
-      { icon: TrendingUp, label: "Thống kê hoạt động sử dụng" },
-      { icon: Users, label: "Thống kê hoạt động của lớp" },
-      { icon: Trophy, label: "Thống kê kết quả thi" },
+      { icon: TrendingUp, label: "Hoạt động giảng dạy" },
+      { icon: Users, label: "Hoạt động cá nhân" },
     ],
   },
-  { icon: FolderKanban, label: "Kỳ thi" },
-  { icon: Settings, label: "Thiết lập" },
+  {
+    icon: Settings,
+    label: "Hệ thống",
+    submenu: [
+      { icon: BookOpen, label: "Môn học" },
+      { icon: Brain, label: "Định danh kiến thức" },
+      { icon: UserCog, label: "Tài khoản Người dùng" },
+      { icon: UsersRound, label: "Tài khoản học sinh" },
+      { icon: SlidersHorizontal, label: "Cấu hình hệ thống" },
+      { icon: Trophy, label: "Mức độ nhận thức" },
+    ],
+  },
 ];
 
 export function SidebarNav() {
@@ -66,15 +101,20 @@ export function SidebarNav() {
             {it.submenu && (
               <div className="absolute left-full top-0 ml-1 hidden group-hover:block z-50 pl-1">
                 <div className="bg-white border border-slate-200 rounded-xl shadow-lg py-2 w-56 animate-in fade-in slide-in-from-left-2 duration-150">
-                  {it.submenu.map((s) => (
-                    <button
-                      key={s.label}
-                      className="w-full px-3 py-2 flex items-center gap-2 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition"
-                    >
-                      <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
-                      <span>{s.label}</span>
-                    </button>
-                  ))}
+                  {it.submenu.map((s) => {
+                    const subCls = "w-full px-3 py-2 flex items-center gap-2 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition";
+                    return s.to ? (
+                      <Link key={s.label} to={s.to} className={subCls}>
+                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
+                        <span>{s.label}</span>
+                      </Link>
+                    ) : (
+                      <button key={s.label} className={subCls}>
+                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
+                        <span>{s.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
