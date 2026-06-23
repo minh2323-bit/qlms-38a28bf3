@@ -4,6 +4,7 @@ import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
+  SquarePen, ChevronRight,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -380,7 +381,18 @@ function DigitalClassesPage() {
                     ))}
                   </div>
                 ) : (
-                  <LessonsTable lessons={filteredLessons} />
+                  <LessonsTable
+                    lessons={filteredLessons}
+                    selectMode={lessonSelectMode}
+                    selected={selectedLessons}
+                    onToggle={(id) => toggleLessonSel(id)}
+                    onToggleAll={() => {
+                      const ids = filteredLessons.map((l) => l.title + l.author);
+                      const allSelected = ids.every((id) => selectedLessons.has(id));
+                      setLessonSelectMode(true);
+                      setSelectedLessons(allSelected ? new Set() : new Set(ids));
+                    }}
+                  />
                 )}
               </div>
             </div>
@@ -585,48 +597,142 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
   );
 }
 
-function LessonsTable({ lessons }: { lessons: LessonCard[] }) {
+type LessonTopic = { name: string; items: string[] };
+type LessonContent = { topics: LessonTopic[]; materials: string[]; quizzes: string[] };
+
+function buildLessonContent(l: LessonCard): LessonContent {
+  // Deterministic mock content per lesson
+  return {
+    topics: [
+      { name: "Khởi động", items: [`Video mở đầu - ${l.title}`, `Slide dẫn nhập - ${l.title}`] },
+      { name: "Hình thành kiến thức", items: [`Bài giảng chính - ${l.title}`, `Tài liệu lý thuyết - ${l.title}`, `Video minh họa - ${l.title}`] },
+      { name: "Luyện tập", items: [`Phiếu bài tập - ${l.title}`, `Trò chơi tương tác - ${l.title}`] },
+    ],
+    materials: [`Tài liệu tham khảo - ${l.title}`, `Slide tổng kết - ${l.title}`],
+    quizzes: [`Bài kiểm tra 15 phút - ${l.title}`],
+  };
+}
+
+function LessonsTable({
+  lessons, selectMode, selected, onToggle, onToggleAll,
+}: {
+  lessons: LessonCard[];
+  selectMode: boolean;
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+  onToggleAll: () => void;
+}) {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const toggleExpand = (key: string) => setExpanded((s) => {
+    const n = new Set(s); n.has(key) ? n.delete(key) : n.add(key); return n;
+  });
+
+  const allIds = lessons.map((l) => l.title + l.author);
+  const allSelected = allIds.length > 0 && allIds.every((id) => selected.has(id));
+
   return (
     <div className="bg-white rounded-2xl border shadow-sm overflow-x-auto">
       <table className="w-full text-base">
         <thead>
           <tr className="bg-indigo-700 text-white text-left">
-            <th className="px-4 py-3 font-semibold w-14 text-center">STT</th>
+            <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
+            <th className="px-3 py-3 font-semibold w-12 text-center">
+              <button
+                onClick={onToggleAll}
+                className={`h-5 w-5 rounded border-2 flex items-center justify-center mx-auto ${allSelected ? "bg-white border-white" : "border-white/80 bg-transparent"}`}
+                aria-label="Chọn tất cả"
+              >
+                {allSelected && <Check className="h-3.5 w-3.5 text-indigo-700" />}
+              </button>
+            </th>
+            <th className="px-3 py-3 font-semibold w-14 text-center">Sửa</th>
             <th className="px-4 py-3 font-semibold">Tên bài giảng</th>
             <th className="px-4 py-3 font-semibold">Tác giả</th>
-            <th className="px-4 py-3 font-semibold">Ngày phát hành</th>
+            <th className="px-4 py-3 font-semibold whitespace-nowrap">Ngày phát hành</th>
+            <th className="px-4 py-3 font-semibold min-w-[280px]">Học liệu</th>
             <th className="px-4 py-3 font-semibold text-center w-56">Chia sẻ lên HanoiStudy</th>
           </tr>
         </thead>
         <tbody>
-          {lessons.map((l, i) => (
-            <tr key={l.title + l.author} className={`border-t border-slate-200 ${i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
-              <td className="px-4 py-4 text-center text-slate-700 font-semibold">{i + 1}</td>
-              <td className="px-4 py-4">
-                <div className="font-semibold text-slate-800">{l.title}</div>
-                <div className="mt-1">
-                  <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                    {l.approved ? "Đã duyệt" : "Chờ duyệt"}
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-600">{l.khoi}; {l.subject}</div>
-              </td>
-              <td className="px-4 py-4 text-slate-700">{l.author}</td>
-              <td className="px-4 py-4 text-slate-700">{l.releaseDate}</td>
-              <td className="px-4 py-4 text-center">
-                {l.shared === "hanoi" ? (
-                  <span className="text-emerald-600 font-semibold">Sở Đã Duyệt</span>
-                ) : (
+          {lessons.map((l, i) => {
+            const id = l.title + l.author;
+            const isSel = selected.has(id);
+            const content = buildLessonContent(l);
+            return (
+              <tr key={id} className={`border-t border-slate-200 align-top ${isSel ? "bg-indigo-50" : i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
+                <td className="px-3 py-4 text-center text-slate-700 font-semibold">{i + 1}</td>
+                <td className="px-3 py-4 text-center">
                   <button
-                    disabled={!l.approved}
-                    className={`px-5 py-2 rounded-lg text-sm font-semibold ${l.approved ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`}
+                    onClick={() => onToggle(id)}
+                    className={`h-5 w-5 rounded border-2 flex items-center justify-center mx-auto transition ${isSel ? "bg-indigo-600 border-indigo-600" : "border-slate-300 bg-white hover:border-indigo-400"}`}
+                    aria-label="Chọn"
                   >
-                    Chia sẻ
+                    {isSel && <Check className="h-3.5 w-3.5 text-white" />}
                   </button>
-                )}
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td className="px-3 py-4 text-center">
+                  <button className="h-8 w-8 rounded-md border border-slate-200 bg-white text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 inline-flex items-center justify-center" aria-label="Sửa">
+                    <SquarePen className="h-4 w-4" />
+                  </button>
+                </td>
+                <td className="px-4 py-4">
+                  <div className="font-semibold text-slate-800">{l.title}</div>
+                  <div className="mt-1">
+                    <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                      {l.approved ? "Đã duyệt" : "Chờ duyệt"}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-sm text-slate-600">{l.khoi}; {l.subject}</div>
+                </td>
+                <td className="px-4 py-4 text-slate-700">{l.author}</td>
+                <td className="px-4 py-4 text-slate-700 whitespace-nowrap">{l.releaseDate}</td>
+                <td className="px-4 py-4">
+                  <ul className="space-y-1">
+                    {content.topics.map((t) => {
+                      const key = id + "::" + t.name;
+                      const open = expanded.has(key);
+                      return (
+                        <li key={t.name}>
+                          <button
+                            onClick={() => toggleExpand(key)}
+                            className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 hover:text-indigo-700"
+                          >
+                            <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
+                            {t.name}
+                          </button>
+                          {open && (
+                            <ul className="ml-6 mt-1 mb-1 space-y-0.5 list-disc list-inside text-sm text-slate-600">
+                              {t.items.map((it) => (
+                                <li key={it}>{it}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      );
+                    })}
+                    {content.materials.map((m) => (
+                      <li key={m} className="ml-5 text-sm text-slate-700">• {m}</li>
+                    ))}
+                    {content.quizzes.map((q) => (
+                      <li key={q} className="ml-5 text-sm text-slate-700">• {q}</li>
+                    ))}
+                  </ul>
+                </td>
+                <td className="px-4 py-4 text-center">
+                  {l.shared === "hanoi" ? (
+                    <span className="text-emerald-600 font-semibold">Sở Đã Duyệt</span>
+                  ) : (
+                    <button
+                      disabled={!l.approved}
+                      className={`px-5 py-2 rounded-lg text-sm font-semibold ${l.approved ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-500 cursor-not-allowed"}`}
+                    >
+                      Chia sẻ
+                    </button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
