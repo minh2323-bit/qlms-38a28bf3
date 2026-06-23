@@ -232,7 +232,16 @@ function DigitalClassesPage() {
             </div>
 
             <div className={classView === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
-              {filteredClasses.map((c) => <ClassCard key={c.name} c={c} />)}
+              {filteredClasses.map((c) => (
+                <ClassCard
+                  key={c.name}
+                  c={c}
+                  selectMode={classSelectMode}
+                  selected={selectedClasses.has(c.name)}
+                  onToggleSelect={() => toggleClassSel(c.name)}
+                  onEnterSelect={() => { setClassSelectMode(true); toggleClassSel(c.name); }}
+                />
+              ))}
             </div>
           </section>
         )}
