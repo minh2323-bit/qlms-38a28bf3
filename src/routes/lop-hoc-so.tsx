@@ -331,6 +331,7 @@ function LessonCardView({ l }: { l: LessonCard }) {
         <p className="mt-1 text-xs text-slate-600"><span className="text-slate-500">Tác giả:</span> {l.author}</p>
         <p className="text-xs text-slate-600"><span className="text-slate-500">Danh sách lớp gán:</span> {l.classes}</p>
         <p className="text-xs text-slate-600"><span className="text-slate-500">Ngày phát hành:</span> {l.releaseDate}</p>
+        <div className="mt-2 flex items-center gap-1.5 flex-wrap">
           <span className="text-xs text-slate-500">Trạng thái:</span>
           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
             {l.approved ? "Đã duyệt" : "Chờ duyệt"}
