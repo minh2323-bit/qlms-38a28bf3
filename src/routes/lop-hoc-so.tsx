@@ -220,27 +220,25 @@ function DigitalClassesPage() {
           <section>
             {/* Filter bar */}
             <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-              <div className="flex flex-col gap-2 flex-1 min-w-[300px]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="relative">
-                    <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      value={lessonSearch}
-                      onChange={(e) => setLessonSearch(e.target.value)}
-                      placeholder="Tìm tên bài giảng"
-                      className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                    />
-                  </div>
-                  <FilterSelect value={lessonKhoi} onChange={(v) => { setLessonKhoi(v); setLessonChuong(""); }} placeholder="Khối" options={["Lớp 3", "Lớp 4"]} />
-                  <FilterSelect value={lessonMon} onChange={(v) => { setLessonMon(v); setLessonChuong(""); }} placeholder="Môn" options={["Toán"]} />
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={lessonSearch}
+                    onChange={(e) => setLessonSearch(e.target.value)}
+                    placeholder="Tìm tên bài giảng"
+                    className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  />
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {chapterOptions.length > 0 && (
-                    <FilterSelect value={lessonChuong} onChange={setLessonChuong} placeholder="Chương/Chủ đề" options={chapterOptions} />
+                <button
+                  onClick={() => setFilterPanelOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50"
+                >
+                  <SlidersHorizontal className="h-4 w-4" /> Bộ lọc
+                  {activeFilterCount > 0 && (
+                    <span className="ml-1 inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-indigo-600 text-white text-xs">{activeFilterCount}</span>
                   )}
-                  <FilterSelect value={lessonLoai} onChange={setLessonLoai} placeholder="Loại học liệu" options={LESSON_TYPES} />
-                  <FilterSelect value={lessonTrangThai} onChange={setLessonTrangThai} placeholder="Trạng thái" options={LESSON_STATUSES} />
-                </div>
+                </button>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-semibold px-5 py-3 rounded-xl shadow-md">
@@ -273,6 +271,81 @@ function DigitalClassesPage() {
               </div>
             ) : (
               <LessonsTable lessons={filteredLessons} />
+            )}
+
+            {/* Filter side panel */}
+            {filterPanelOpen && (
+              <div className="fixed inset-0 z-50 flex">
+                <div
+                  className="absolute inset-0 bg-slate-900/40"
+                  onClick={() => setFilterPanelOpen(false)}
+                />
+                <aside className="relative w-[340px] max-w-[90vw] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-indigo-50">
+                    <h3 className="text-lg font-bold text-indigo-800">Bộ lọc</h3>
+                    <button
+                      onClick={() => setFilterPanelOpen(false)}
+                      className="p-1.5 rounded-md hover:bg-white text-slate-600"
+                      aria-label="Đóng"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+                    <PanelField label="Khối">
+                      <PanelSelect value={lessonKhoi} onChange={(v) => { setLessonKhoi(v); setLessonChuong(""); }} placeholder="Tất cả" options={["Lớp 3", "Lớp 4"]} />
+                    </PanelField>
+                    <PanelField label="Môn">
+                      <PanelSelect value={lessonMon} onChange={(v) => { setLessonMon(v); setLessonChuong(""); }} placeholder="Tất cả" options={["Toán"]} />
+                    </PanelField>
+                    {chapterOptions.length > 0 && (
+                      <PanelField label="Chương/Chủ đề">
+                        <PanelSelect value={lessonChuong} onChange={setLessonChuong} placeholder="Tất cả" options={chapterOptions} />
+                      </PanelField>
+                    )}
+                    <PanelField label="Loại học liệu">
+                      <PanelSelect value={lessonLoai} onChange={setLessonLoai} placeholder="Tất cả" options={LESSON_TYPES} />
+                    </PanelField>
+                    <PanelField label="Trạng thái">
+                      <PanelSelect value={lessonTrangThai} onChange={setLessonTrangThai} placeholder="Tất cả" options={LESSON_STATUSES} />
+                    </PanelField>
+                    <PanelField label="Ngày phát hành">
+                      <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 flex items-center gap-2">
+                        <input
+                          type="date"
+                          value={lessonFromDate}
+                          onChange={(e) => setLessonFromDate(e.target.value)}
+                          className="flex-1 min-w-0 text-sm text-slate-700 focus:outline-none bg-transparent"
+                          placeholder="Từ ngày"
+                        />
+                        <span className="text-slate-400">-</span>
+                        <input
+                          type="date"
+                          value={lessonToDate}
+                          onChange={(e) => setLessonToDate(e.target.value)}
+                          className="flex-1 min-w-0 text-sm text-slate-700 focus:outline-none bg-transparent"
+                          placeholder="Đến ngày"
+                        />
+                        <CalendarIcon className="h-4 w-4 text-slate-400 shrink-0" />
+                      </div>
+                    </PanelField>
+                  </div>
+                  <div className="border-t border-slate-200 px-5 py-4 flex items-center justify-between gap-2">
+                    <button
+                      onClick={resetLessonFilters}
+                      className="text-sm text-slate-600 hover:text-slate-800 font-medium"
+                    >
+                      Xóa bộ lọc
+                    </button>
+                    <button
+                      onClick={() => setFilterPanelOpen(false)}
+                      className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+                    >
+                      Áp dụng
+                    </button>
+                  </div>
+                </aside>
+              </div>
             )}
           </section>
         )}
