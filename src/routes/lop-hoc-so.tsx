@@ -381,7 +381,18 @@ function DigitalClassesPage() {
                     ))}
                   </div>
                 ) : (
-                  <LessonsTable lessons={filteredLessons} />
+                  <LessonsTable
+                    lessons={filteredLessons}
+                    selectMode={lessonSelectMode}
+                    selected={selectedLessons}
+                    onToggle={(id) => toggleLessonSel(id)}
+                    onToggleAll={() => {
+                      const ids = filteredLessons.map((l) => l.title + l.author);
+                      const allSelected = ids.every((id) => selectedLessons.has(id));
+                      setLessonSelectMode(true);
+                      setSelectedLessons(allSelected ? new Set() : new Set(ids));
+                    }}
+                  />
                 )}
               </div>
             </div>
