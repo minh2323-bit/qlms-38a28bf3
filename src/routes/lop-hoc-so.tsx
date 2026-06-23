@@ -445,9 +445,33 @@ function StatCard({ color, label, value, icon }: { color: "emerald" | "indigo" |
   );
 }
 
-function ClassCard({ c }: { c: ClassRow }) {
+type SelectProps = {
+  selectMode: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
+  onEnterSelect: () => void;
+};
+
+function SelectCircle({ selected, onClick }: { selected: boolean; onClick: () => void }) {
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition">
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      aria-label={selected ? "Bỏ chọn" : "Chọn"}
+      className={`absolute top-2 left-2 z-10 h-7 w-7 rounded-full border-2 flex items-center justify-center transition shadow ${selected ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white/90 border-slate-300 text-transparent hover:border-indigo-400"}`}
+    >
+      <Check className="h-4 w-4" strokeWidth={3} />
+    </button>
+  );
+}
+
+function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect }: { c: ClassRow } & SelectProps) {
+  return (
+    <div
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""}`}
+      onClick={selectMode ? onToggleSelect : undefined}
+      role={selectMode ? "button" : undefined}
+    >
+      {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
       <div className="h-28 bg-slate-100 overflow-hidden">
         <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
       </div>
@@ -456,11 +480,14 @@ function ClassCard({ c }: { c: ClassRow }) {
           <h3 className="font-semibold text-slate-800">{c.name}</h3>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="p-1 rounded hover:bg-slate-100 text-slate-500">
+              <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500">
                 <MoreVertical className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
+                <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
+              </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
               </DropdownMenuItem>
