@@ -77,27 +77,7 @@ const DAY_DATES: Record<number, string[]> = {
   3: ["14/4", "15/4", "16/4", "17/4", "18/4", "19/4", "20/4"],
 };
 
-const KNOWLEDGE_TREE = [
-  {
-    id: "ch1", title: "Chương 1 – Số và phép tính",
-    units: [
-      { id: "u-tn", title: "Số tự nhiên & các phép tính với số tự nhiên", week: 1 },
-      { id: "u-ps", title: "Phân số", week: 1 },
-      { id: "u-stp", title: "Số thập phân", week: 2 },
-      { id: "u-sstp", title: "So sánh các số thập phân", week: 2 },
-      { id: "u-lt", title: "Làm tròn số thập phân", week: 2 },
-      { id: "u-pct", title: "Các phép tính với số thập phân", week: 3 },
-      { id: "u-tsl", title: "Tỉ số. Tỉ số phần trăm", week: 3 },
-    ],
-  },
-  {
-    id: "ch2", title: "Chương 2 – Hình học & Đo lường",
-    units: [
-      { id: "u-hh", title: "Hình học trực quan", week: 3 },
-      { id: "u-dl", title: "Đo lường", week: 3 },
-    ],
-  },
-];
+// KNOWLEDGE_TREE moved to src/lib/knowledge-tree.ts
 
 const buildGrid = (): WeekGrid => {
   const empty = (): WeekGrid => {
