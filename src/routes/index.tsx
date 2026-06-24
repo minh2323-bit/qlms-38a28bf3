@@ -638,7 +638,17 @@ function LessonPanel({
   const [editMode, setEditMode] = useState(false);
   useEffect(() => { setEditMode(false); }, [lesson.id]);
 
-  const materials = MATERIALS_SEED[lesson.unitId] ?? [];
+  const allMaterials = useMaterials();
+  const materials = useMemo(
+    () => allMaterials.filter(
+      (m) => m.classRealId === lesson.class
+          && m.subject === lesson.subject
+          && m.unitId === lesson.unitId,
+    ),
+    [allMaterials, lesson.class, lesson.subject, lesson.unitId],
+  );
+
+  const [adding, setAdding] = useState<null | { kind: MaterialKind; label: string }>(null);
 
   const onDragStart = (e: React.DragEvent, mIdx: number) => {
     e.dataTransfer.setData("mIdx", String(mIdx));
@@ -656,11 +666,22 @@ function LessonPanel({
     }
   };
 
-  const groups: { title: string; icon: typeof Presentation; filter: (m: { type: string }) => boolean }[] = [
-    { title: "Bài giảng", icon: Presentation, filter: (m) => m.type === "slide" || m.type === "syllabus" },
-    { title: "Học liệu", icon: BookOpenCheck, filter: (m) => m.type === "doc" },
-    { title: "Bài tập về nhà", icon: FileText, filter: (m) => m.type === "ex" },
+  const groups: { title: string; icon: typeof Presentation; defaultKind: MaterialKind; filter: (m: Material) => boolean }[] = [
+    { title: "Bài giảng",       icon: Presentation,   defaultKind: "slide",    filter: (m) => m.kind === "slide" || m.kind === "syllabus" || m.kind === "video" },
+    { title: "Học liệu",        icon: BookOpenCheck,  defaultKind: "doc",      filter: (m) => m.kind === "doc" || m.kind === "image" },
+    { title: "Bài tập về nhà",  icon: FileText,       defaultKind: "exercise", filter: (m) => m.kind === "exercise" },
   ];
+
+  const quickAdd = (kind: MaterialKind, label: string) => setAdding({ kind, label });
+  const submitAdd = (title: string, meta: string) => {
+    if (!adding) return;
+    addMaterial({
+      classRealId: lesson.class, subject: lesson.subject, unitId: lesson.unitId,
+      kind: adding.kind, title, meta: meta || undefined, origin: "schedule",
+    });
+    setAdding(null);
+    toast.success(`Đã thêm vào lớp ${lesson.class} – đồng bộ Lớp học số`);
+  };
 
   return (
     <aside className="w-[340px] shrink-0 border-l bg-slate-50/60 flex flex-col animate-in slide-in-from-right-4 duration-200">
@@ -668,7 +689,7 @@ function LessonPanel({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="text-base font-bold text-slate-800">Học liệu của tiết</h3>
-            <Badge variant="outline" className="text-[10px]">{lesson.class} · Toán</Badge>
+            <Badge variant="outline" className="text-[10px]">{lesson.class} · {lesson.subject}</Badge>
           </div>
           <p className="text-xs text-slate-500 mt-0.5 truncate">{lesson.topic}</p>
         </div>
@@ -685,10 +706,10 @@ function LessonPanel({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem><Presentation className="h-4 w-4 mr-2" />Bài giảng</DropdownMenuItem>
-            <DropdownMenuItem><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
-            <DropdownMenuItem><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
-            <DropdownMenuItem><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => quickAdd("slide", "Bài giảng")}><Presentation className="h-4 w-4 mr-2" />Bài giảng</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => quickAdd("doc", "Học liệu")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài kiểm tra")}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài tập")}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Button
@@ -720,7 +741,11 @@ function LessonPanel({
                   <g.icon className="h-4 w-4 text-indigo-700" />
                   {g.title}
                 </div>
-                <button className="h-6 w-6 rounded-full bg-indigo-700 text-white flex items-center justify-center hover:bg-indigo-800 transition">
+                <button
+                  onClick={() => quickAdd(g.defaultKind, g.title)}
+                  className="h-6 w-6 rounded-full bg-indigo-700 text-white flex items-center justify-center hover:bg-indigo-800 transition"
+                  title={`Thêm ${g.title.toLowerCase()}`}
+                >
                   <Plus className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -729,10 +754,10 @@ function LessonPanel({
               ) : (
                 <ul>
                   {items.map((m) => {
-                    const meta = MATERIAL_META[m.type];
+                    const meta = MATERIAL_META[m.kind];
                     return (
                       <li
-                        key={m.title}
+                        key={m.id}
                         draggable={editMode}
                         onDragStart={(e) => onDragStart(e, materials.indexOf(m))}
                         className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border-t first:border-t-0 transition hover:bg-indigo-50 ${
@@ -743,7 +768,10 @@ function LessonPanel({
                           <span className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 ${meta.bg}`}>
                             <meta.icon className={`h-4 w-4 ${meta.fg}`} />
                           </span>
-                          <span className="text-slate-700 truncate">{m.title}</span>
+                          <div className="min-w-0">
+                            <div className="text-slate-700 truncate">{m.title}</div>
+                            {m.meta && <div className="text-[10px] text-slate-400">{m.meta}</div>}
+                          </div>
                         </div>
                         <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
                           <FileCheck2 className="h-3 w-3" />
@@ -771,7 +799,52 @@ function LessonPanel({
         )}
       </div>
 
+      {adding && (
+        <QuickAddModal
+          label={adding.label}
+          onCancel={() => setAdding(null)}
+          onSubmit={submitAdd}
+        />
+      )}
     </aside>
+  );
+}
+
+function QuickAddModal({
+  label, onCancel, onSubmit,
+}: { label: string; onCancel: () => void; onSubmit: (title: string, meta: string) => void }) {
+  const [title, setTitle] = useState("");
+  const [meta, setMeta] = useState("");
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b">
+          <h3 className="text-base font-bold text-slate-800">Thêm {label.toLowerCase()}</h3>
+          <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-3">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Tiêu đề</label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={`VD: ${label} – ...`} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Thời lượng / Số trang</label>
+            <Input value={meta} onChange={(e) => setMeta(e.target.value)} placeholder="VD: 12 slide, 8 trang, 12:35" />
+          </div>
+          <p className="text-xs text-slate-500">
+            Sẽ tự động xuất hiện trong <b>Lớp học số</b> của lớp này.
+          </p>
+        </div>
+        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
+          <Button size="sm" disabled={!title.trim()} onClick={() => onSubmit(title.trim(), meta.trim())}>
+            Thêm & đồng bộ
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
