@@ -391,13 +391,20 @@ function ItemIcon({ kind }: { kind: MaterialKind }) {
 
 /* ============================ Add modal ============================ */
 
-const KIND_OPTIONS: { kind: MaterialKind; label: string; metaHint: string }[] = [
-  { kind: "slide",    label: "Slide bài giảng", metaHint: "ví dụ: 24 slide" },
-  { kind: "video",    label: "Video bài giảng", metaHint: "ví dụ: 12:35" },
-  { kind: "doc",      label: "Tài liệu",        metaHint: "ví dụ: 8 trang" },
-  { kind: "image",    label: "Hình ảnh",        metaHint: "ví dụ: 1 trang" },
-  { kind: "exercise", label: "Bài tập",         metaHint: "ví dụ: 10 câu" },
-  { kind: "syllabus", label: "Tổng quan/Mục lục", metaHint: "ví dụ: 1 trang" },
+const KIND_OPTIONS: { kind: MaterialKind; label: string; metaHint: string; Icon: typeof Video }[] = [
+  { kind: "slide",    label: "Slide bài giảng",   metaHint: "ví dụ: 24 slide", Icon: Presentation },
+  { kind: "video",    label: "Video bài giảng",   metaHint: "ví dụ: 12:35",    Icon: Video },
+  { kind: "doc",      label: "Tài liệu",          metaHint: "ví dụ: 8 trang",  Icon: FileText },
+  { kind: "image",    label: "Hình ảnh",          metaHint: "ví dụ: 1 trang",  Icon: ImageIcon },
+  { kind: "exercise", label: "Bài tập",           metaHint: "ví dụ: 10 câu",   Icon: ClipboardList },
+  { kind: "syllabus", label: "Tổng quan/Mục lục", metaHint: "ví dụ: 1 trang",  Icon: BookOpen },
+];
+
+const COMPLETION_OPTIONS = [
+  { value: "content",  label: "Sau khi đạt mức nội dung" },
+  { value: "question", label: "Sau khi trả lời câu hỏi" },
+  { value: "time",     label: "Sau khoảng thời gian" },
+  { value: "manual",   label: "Học sinh tự click Hoàn thành" },
 ];
 
 function AddMaterialModal({
@@ -408,134 +415,284 @@ function AddMaterialModal({
   onSubmit: (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => void;
 }) {
   const defaultKind: MaterialKind =
-    mode === "lesson" ? "slide" : mode === "exercise" ? "exercise" : "doc";
+    mode === "lesson" ? "slide" : mode === "exercise" ? "exercise" : "video";
 
-  const [chapterId, setChapterId] = useState<string>(KNOWLEDGE_TREE[0].id);
-  const [unitId, setUnitId] = useState<string>("");
+  // 2-step: chỉ áp dụng cho mode "material" (Thêm học liệu).
+  const useSteps = mode === "material";
+  const [step, setStep] = useState<1 | 2>(useSteps ? 1 : 2);
   const [kind, setKind] = useState<MaterialKind>(defaultKind);
+
+  const [unitId, setUnitId] = useState<string>("");
   const [title, setTitle] = useState("");
   const [meta, setMeta] = useState("");
 
-  const chapter = KNOWLEDGE_TREE.find((c) => c.id === chapterId) ?? KNOWLEDGE_TREE[0];
+  // Trường mở rộng cho Video / Tài liệu
+  const [subject] = useState("Toán");
+  const [uploadMode, setUploadMode] = useState<"link" | "file">("link");
+  const [link, setLink] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [description, setDescription] = useState("");
+  const [completion, setCompletion] = useState("content");
+
+  const isExtended = kind === "video" || kind === "doc";
 
   const titleLabel =
     mode === "lesson" ? "Thêm bài giảng" :
     mode === "exercise" ? "Thêm bài tập" : "Thêm học liệu";
 
-  const canSubmit = !!chapterId && !!unitId && title.trim().length > 0;
+  const canSubmit =
+    !!unitId &&
+    title.trim().length > 0 &&
+    (!isExtended || (uploadMode === "link" ? link.trim().length > 0 : fileName.trim().length > 0));
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    const finalMeta = isExtended
+      ? (uploadMode === "link" ? "Liên kết" : fileName) + (meta.trim() ? ` · ${meta.trim()}` : "")
+      : (meta.trim() || undefined);
+    onSubmit({ unitId, kind, title: title.trim(), meta: finalMeta });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden max-h-[92vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-bold text-slate-800">{titleLabel}</h2>
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">{titleLabel}</h2>
+            {useSteps && (
+              <p className="text-xs text-slate-500 mt-0.5">
+                Bước {step}/2 · {step === 1 ? "Chọn loại học liệu" : "Thông tin chi tiết"}
+              </p>
+            )}
+          </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                Chương <span className="text-rose-500">*</span>
-              </label>
-              <select
-                value={chapterId}
-                onChange={(e) => {
-                  const ch = KNOWLEDGE_TREE.find((c) => c.id === e.target.value);
-                  setChapterId(e.target.value);
-                  setUnitId(ch?.units[0]?.id ?? "");
-                }}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              >
-                {KNOWLEDGE_TREE.map((ch) => (
-                  <option key={ch.id} value={ch.id}>{ch.title}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                Bài <span className="text-rose-500">*</span>
-              </label>
-              <select
-                value={unitId}
-                onChange={(e) => setUnitId(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              >
-                <option value="">— Chọn bài —</option>
-                {chapter.units.map((u) => (
-                  <option key={u.id} value={u.id}>{u.title}</option>
-                ))}
-              </select>
+        {/* STEP 1 — chọn loại học liệu */}
+        {useSteps && step === 1 && (
+          <div className="px-6 py-5 space-y-3 overflow-y-auto">
+            <p className="text-sm text-slate-600">Bạn muốn thêm loại học liệu nào?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {KIND_OPTIONS.map((k) => {
+                const Icon = k.Icon;
+                const active = kind === k.kind;
+                return (
+                  <button
+                    key={k.kind}
+                    type="button"
+                    onClick={() => setKind(k.kind)}
+                    className={`px-3 py-3 rounded-xl border text-sm font-medium transition flex items-center gap-2 text-left ${
+                      active
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300"
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 ${active ? "text-white" : "text-indigo-500"}`} />
+                    {k.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <p className="text-xs text-slate-500 -mt-1">
-            Chương / Bài này dùng chung với Lịch báo giảng — học liệu sẽ tự động đồng bộ vào đúng tiết.
-          </p>
+        )}
 
-          {/* placeholder to keep diff scope; removed legacy hint paragraph */}
-          {false && <span>{getUnitTitle(unitId)}{getChapterOfUnit(unitId)?.id}</span>}
+        {/* STEP 2 — form chi tiết */}
+        {(!useSteps || step === 2) && (
+          <div className="px-6 py-5 space-y-4 overflow-y-auto">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Tiêu đề <span className="text-rose-500">*</span>
+              </label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="VD: Video bài giảng – Phép cộng phân số"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Loại nội dung</label>
-            <div className="grid grid-cols-3 gap-2">
-              {KIND_OPTIONS.map((k) => (
-                <button
-                  key={k.kind}
-                  type="button"
-                  onClick={() => setKind(k.kind)}
-                  className={`px-2 py-2 rounded-lg border text-xs font-medium transition flex items-center justify-center gap-1.5 ${
-                    kind === k.kind
-                      ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300"
-                  }`}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Môn</label>
+                <input
+                  value={subject}
+                  readOnly
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-700"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Đơn vị kiến thức <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={unitId}
+                  onChange={(e) => setUnitId(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                  <span className="truncate">{k.label}</span>
-                </button>
-              ))}
+                  <option value="">— Chọn đơn vị kiến thức —</option>
+                  {KNOWLEDGE_TREE.map((ch) => (
+                    <optgroup key={ch.id} label={ch.title}>
+                      {ch.units.map((u) => (
+                        <option key={u.id} value={u.id}>{u.title}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
+            <p className="text-xs text-slate-500 -mt-2">
+              Đơn vị kiến thức này dùng chung với Lịch báo giảng — học liệu sẽ tự đồng bộ vào đúng tiết.
+            </p>
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              Tiêu đề <span className="text-rose-500">*</span>
-            </label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="VD: Slide bài giảng – Phép cộng phân số"
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
-          </div>
+            {/* placeholder để giữ getChapterOfUnit khỏi unused */}
+            {false && <span>{getUnitTitle(unitId)}{getChapterOfUnit(unitId)?.id}</span>}
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              Thời lượng / Số trang
-            </label>
-            <input
-              value={meta}
-              onChange={(e) => setMeta(e.target.value)}
-              placeholder={KIND_OPTIONS.find((k) => k.kind === kind)?.metaHint}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
-          </div>
-        </div>
+            {!useSteps && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Loại nội dung</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {KIND_OPTIONS.map((k) => (
+                    <button
+                      key={k.kind}
+                      type="button"
+                      onClick={() => setKind(k.kind)}
+                      className={`px-2 py-2 rounded-lg border text-xs font-medium transition ${
+                        kind === k.kind
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300"
+                      }`}
+                    >
+                      {k.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        <div className="px-6 py-4 border-t bg-slate-50 flex items-center justify-end gap-2">
+            {isExtended && (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Hình thức tải nội dung
+                  </label>
+                  <select
+                    value={uploadMode}
+                    onChange={(e) => setUploadMode(e.target.value as "link" | "file")}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  >
+                    <option value="link">Copy liên kết</option>
+                    <option value="file">Tải file lên</option>
+                  </select>
+                </div>
+
+                {uploadMode === "link" ? (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                      Liên kết nội dung <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      value={link}
+                      onChange={(e) => setLink(e.target.value)}
+                      placeholder="Dán URL YouTube / Google Drive / PDF…"
+                      className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                      Tải file <span className="text-rose-500">*</span>
+                    </label>
+                    <label className="flex items-center justify-center gap-2 px-3 py-6 text-sm rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-600 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition">
+                      <Plus className="h-4 w-4" />
+                      {fileName || "Chọn file từ máy"}
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+                      />
+                    </label>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Mô tả</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={3}
+                    placeholder="Mô tả ngắn về học liệu, mục tiêu, ghi chú cho học sinh…"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Phương pháp đánh giá hoàn thành
+                  </label>
+                  <select
+                    value={completion}
+                    onChange={(e) => setCompletion(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  >
+                    {COMPLETION_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+
+            {!isExtended && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Thời lượng / Số trang
+                </label>
+                <input
+                  value={meta}
+                  onChange={(e) => setMeta(e.target.value)}
+                  placeholder={KIND_OPTIONS.find((k) => k.kind === kind)?.metaHint}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="px-6 py-4 border-t bg-slate-50 flex items-center justify-between gap-2">
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
           >
             Hủy
           </button>
-          <button
-            onClick={() => canSubmit && onSubmit({ unitId, kind, title: title.trim(), meta: meta.trim() || undefined })}
-            disabled={!canSubmit}
-            className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
-          >
-            <Check className="h-4 w-4" /> Thêm & đồng bộ
-          </button>
+          <div className="flex items-center gap-2">
+            {useSteps && step === 2 && (
+              <button
+                onClick={() => setStep(1)}
+                className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+              >
+                <ArrowLeft className="h-4 w-4" /> Quay lại
+              </button>
+            )}
+            {useSteps && step === 1 ? (
+              <button
+                onClick={() => setStep(2)}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center gap-1.5"
+              >
+                Tiếp theo <ChevronRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+              >
+                <Check className="h-4 w-4" /> Thêm & đồng bộ
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

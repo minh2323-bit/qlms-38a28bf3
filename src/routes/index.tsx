@@ -24,7 +24,7 @@ import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
-import { KNOWLEDGE_TREE, getChapterOfUnit } from "@/lib/knowledge-tree";
+import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree } from "@/lib/knowledge-tree";
 import {
   useMaterials, addMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
@@ -429,6 +429,9 @@ function KnowledgeTree({
   onPickUnit, activeUnit, onClose,
 }: { onPickUnit: (id: string, week: number) => void; activeUnit: string | null; onClose: () => void }) {
   const [q, setQ] = useState("");
+  const [grade, setGrade] = useState("4");
+  const [subject, setSubject] = useState("toan");
+  const tree = getKnowledgeTree(grade, subject);
   return (
     <div className="w-72 shrink-0 border-r bg-slate-50/60 p-4 space-y-3 animate-in slide-in-from-left-4 duration-200">
       <div className="flex items-center justify-between">
@@ -438,13 +441,13 @@ function KnowledgeTree({
         </Button>
       </div>
       <div className="flex gap-2">
-        <Select defaultValue="3">
+        <Select value={grade} onValueChange={setGrade}>
           <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Khối" /></SelectTrigger>
           <SelectContent>
             {[1,2,3,4,5].map((k) => <SelectItem key={k} value={String(k)}>Khối {k}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select defaultValue="toan">
+        <Select value={subject} onValueChange={setSubject}>
           <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="toan">Toán</SelectItem>
@@ -461,7 +464,12 @@ function KnowledgeTree({
         />
       </div>
       <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1">
-        {KNOWLEDGE_TREE.map((ch) => (
+        {tree.length === 0 && (
+          <div className="text-xs text-slate-400 italic px-2 py-6 text-center border border-dashed rounded-lg">
+            Chưa có dữ liệu cây kiến thức cho Khối {grade} – {subject === "toan" ? "Toán" : "Tiếng Việt"}.
+          </div>
+        )}
+        {tree.map((ch) => (
           <details key={ch.id} open className="group">
             <summary className="cursor-pointer text-xs font-bold text-slate-700 uppercase py-1 flex items-center gap-1">
               <ChevronDown className="h-3 w-3 group-open:rotate-0 -rotate-90 transition" />
