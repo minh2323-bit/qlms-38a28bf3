@@ -19,7 +19,7 @@ import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
 import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
 import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
-import { KNOWLEDGE_TREE, getUnitTitle } from "@/lib/knowledge-tree";
+import { KNOWLEDGE_TREE, getUnitTitle, getChapterOfUnit } from "@/lib/knowledge-tree";
 import {
   useMaterials, addMaterial, type MaterialKind, type Material,
 } from "@/lib/teaching-store";
