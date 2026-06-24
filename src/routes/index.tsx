@@ -23,6 +23,7 @@ import {
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import { AppShell } from "@/components/AppShell";
+import { toast } from "sonner";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 import {
   useMaterials, addMaterial, type Material, type MaterialKind,
