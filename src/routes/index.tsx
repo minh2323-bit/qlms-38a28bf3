@@ -674,10 +674,10 @@ function LessonPanel({
   ];
 
   const quickAdd = (kind: MaterialKind, label: string) => setAdding({ kind, label });
-  const submitAdd = (title: string, meta: string) => {
+  const submitAdd = (title: string, meta: string, unitId: string) => {
     if (!adding) return;
     addMaterial({
-      classRealId: lesson.class, subject: lesson.subject, unitId: lesson.unitId,
+      classRealId: lesson.class, subject: lesson.subject, unitId,
       kind: adding.kind, title, meta: meta || undefined, origin: "schedule",
     });
     setAdding(null);
