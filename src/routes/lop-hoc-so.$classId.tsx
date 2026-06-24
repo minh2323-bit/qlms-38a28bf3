@@ -410,16 +410,19 @@ function AddMaterialModal({
   const defaultKind: MaterialKind =
     mode === "lesson" ? "slide" : mode === "exercise" ? "exercise" : "doc";
 
+  const [chapterId, setChapterId] = useState<string>(KNOWLEDGE_TREE[0].id);
   const [unitId, setUnitId] = useState<string>("");
   const [kind, setKind] = useState<MaterialKind>(defaultKind);
   const [title, setTitle] = useState("");
   const [meta, setMeta] = useState("");
 
+  const chapter = KNOWLEDGE_TREE.find((c) => c.id === chapterId) ?? KNOWLEDGE_TREE[0];
+
   const titleLabel =
     mode === "lesson" ? "Thêm bài giảng" :
     mode === "exercise" ? "Thêm bài tập" : "Thêm học liệu";
 
-  const canSubmit = unitId && title.trim().length > 0;
+  const canSubmit = !!chapterId && !!unitId && title.trim().length > 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
@@ -432,28 +435,47 @@ function AddMaterialModal({
         </div>
 
         <div className="px-6 py-5 space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              Chương / Chủ đề <span className="text-rose-500">*</span>
-            </label>
-            <select
-              value={unitId}
-              onChange={(e) => setUnitId(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            >
-              <option value="">— Chọn nội dung theo chương trình —</option>
-              {KNOWLEDGE_TREE.map((ch) => (
-                <optgroup key={ch.id} label={ch.title}>
-                  {ch.units.map((u) => (
-                    <option key={u.id} value={u.id}>{u.title}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-            <p className="text-xs text-slate-500 mt-1">
-              Đơn vị kiến thức này dùng chung với Lịch báo giảng — bài giảng sẽ tự động đồng bộ.
-            </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Chương <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={chapterId}
+                onChange={(e) => {
+                  const ch = KNOWLEDGE_TREE.find((c) => c.id === e.target.value);
+                  setChapterId(e.target.value);
+                  setUnitId(ch?.units[0]?.id ?? "");
+                }}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              >
+                {KNOWLEDGE_TREE.map((ch) => (
+                  <option key={ch.id} value={ch.id}>{ch.title}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Bài <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={unitId}
+                onChange={(e) => setUnitId(e.target.value)}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              >
+                <option value="">— Chọn bài —</option>
+                {chapter.units.map((u) => (
+                  <option key={u.id} value={u.id}>{u.title}</option>
+                ))}
+              </select>
+            </div>
           </div>
+          <p className="text-xs text-slate-500 -mt-1">
+            Chương / Bài này dùng chung với Lịch báo giảng — học liệu sẽ tự động đồng bộ vào đúng tiết.
+          </p>
+
+          {/* placeholder to keep diff scope; removed legacy hint paragraph */}
+          {false && <span>{getUnitTitle(unitId)}{getChapterOfUnit(unitId)?.id}</span>}
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Loại nội dung</label>
