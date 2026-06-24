@@ -19,7 +19,7 @@ import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
 import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
 import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
-export const Route = createFileRoute("/lop-hoc-so")({
+export const Route = createFileRoute("/lop-hoc-so/")({
   head: () => ({
     meta: [
       { title: "Lớp học số – LMS Giáo viên | Tiểu học Tô Hiệu" },
