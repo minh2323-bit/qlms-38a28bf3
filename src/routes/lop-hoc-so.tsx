@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   CheckSquare, Check, X, ImagePlus, ArrowLeft, ArrowRight,
 } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/lop-hoc-so")({
 
 type ClassStatus = "draft" | "deployed";
 type ClassRow = {
+  id: string;
   name: string; lop: string; subject: string;
   baiGiang: number; hocLieu: number; hocSinh: number;
   thumb: string;
@@ -37,14 +39,14 @@ type ClassRow = {
 };
 
 const CLASSES_SEED: ClassRow[] = [
-  { name: "Lớp 4A - Toán năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
-  { name: "Lớp 4A - Tiếng Việt năm học 2025 - 2026", lop: "4A", subject: "Tiếng Việt", baiGiang: 12, hocLieu: 14, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
-  { name: "Lớp 3D năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D, status: "deployed" },
-  { name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A, status: "deployed" },
-  { name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B, status: "draft" },
-  { name: "Lớp 3C năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C, status: "deployed" },
-  { name: "Các bạn học sinh cần ôn tập đặc biệt", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview, status: "draft" },
-  { name: "Lớp 4C năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C, status: "deployed" },
+  { id: "c1", name: "Lớp 4A - Toán năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
+  { id: "c2", name: "Lớp 4A - Tiếng Việt năm học 2025 - 2026", lop: "4A", subject: "Tiếng Việt", baiGiang: 12, hocLieu: 14, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
+  { id: "c3", name: "Lớp 3D năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D, status: "deployed" },
+  { id: "c4", name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A, status: "deployed" },
+  { id: "c5", name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B, status: "draft" },
+  { id: "c6", name: "Lớp 3C năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C, status: "deployed" },
+  { id: "c7", name: "Các bạn học sinh cần ôn tập đặc biệt", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview, status: "draft" },
+  { id: "c8", name: "Lớp 4C năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C, status: "deployed" },
 ];
 
 const TOTAL_LESSONS = 8;
@@ -62,6 +64,11 @@ function genStudents(lop: string): { id: string; name: string; code: string }[] 
   }));
 }
 
+function generateId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 function DigitalClassesPage() {
   const [classes, setClasses] = useState<ClassRow[]>(CLASSES_SEED);
   const [classView, setClassView] = useState<"grid" | "list">("grid");
@@ -71,6 +78,13 @@ function DigitalClassesPage() {
   const [classSelectMode, setClassSelectMode] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
   const [openCreate, setOpenCreate] = useState(false);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!highlightedId) return;
+    const t = setTimeout(() => setHighlightedId(null), 3000);
+    return () => clearTimeout(t);
+  }, [highlightedId]);
 
   const toggleClassSel = (id: string) => setSelectedClasses((s) => {
     const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
@@ -85,7 +99,10 @@ function DigitalClassesPage() {
   });
 
   const handleCreate = (row: ClassRow) => {
-    setClasses((prev) => [row, ...prev]);
+    const newRow = { ...row, id: row.id || generateId() };
+    setClasses((prev) => [newRow, ...prev]);
+    setHighlightedId(newRow.id);
+    toast.success("Thêm lớp học thành công");
     setOpenCreate(false);
   };
 
@@ -148,12 +165,13 @@ function DigitalClassesPage() {
           <div className={classView === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
             {filteredClasses.map((c) => (
               <ClassCard
-                key={c.name}
+                key={c.id}
                 c={c}
                 selectMode={classSelectMode}
-                selected={selectedClasses.has(c.name)}
-                onToggleSelect={() => toggleClassSel(c.name)}
-                onEnterSelect={() => { setClassSelectMode(true); toggleClassSel(c.name); }}
+                selected={selectedClasses.has(c.id)}
+                onToggleSelect={() => toggleClassSel(c.id)}
+                onEnterSelect={() => { setClassSelectMode(true); toggleClassSel(c.id); }}
+                isNew={c.id === highlightedId}
               />
             ))}
           </div>
@@ -239,10 +257,10 @@ function StatusTag({ status }: { status: ClassStatus }) {
   );
 }
 
-function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect }: { c: ClassRow } & SelectProps) {
+function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isNew }: { c: ClassRow } & SelectProps & { isNew?: boolean }) {
   return (
     <div
-      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""}`}
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""} ${isNew ? "class-highlight" : ""}`}
       onClick={selectMode ? onToggleSelect : undefined}
       role={selectMode ? "button" : undefined}
     >
@@ -339,6 +357,7 @@ function CreateClassModal({
   const totalStudents = Object.keys(selectedStudents).length;
 
   const buildRow = (status: ClassStatus): ClassRow => ({
+    id: generateId(),
     name: tenLop || "Lớp học mới",
     lop: ganLop || pickedClass || "—",
     subject: "Toán",
