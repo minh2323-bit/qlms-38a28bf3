@@ -9,26 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LopHocSoIndexRouteImport } from './routes/lop-hoc-so.index'
 import { Route as LopHocSoClassIdRouteImport } from './routes/lop-hoc-so.$classId'
 import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc-lieu'
 import { Route as HocLieuBaiGiangRouteImport } from './routes/hoc-lieu.bai-giang'
 
+const LopHocSoRoute = LopHocSoRouteImport.update({
+  id: '/lop-hoc-so',
+  path: '/lop-hoc-so',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LopHocSoIndexRoute = LopHocSoIndexRouteImport.update({
-  id: '/lop-hoc-so/',
-  path: '/lop-hoc-so/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => LopHocSoRoute,
 } as any)
 const LopHocSoClassIdRoute = LopHocSoClassIdRouteImport.update({
-  id: '/lop-hoc-so/$classId',
-  path: '/lop-hoc-so/$classId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$classId',
+  path: '/$classId',
+  getParentRoute: () => LopHocSoRoute,
 } as any)
 const HocLieuKhoHocLieuRoute = HocLieuKhoHocLieuRouteImport.update({
   id: '/hoc-lieu/kho-hoc-lieu',
@@ -43,6 +49,7 @@ const HocLieuBaiGiangRoute = HocLieuBaiGiangRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRoute
@@ -67,6 +75,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/lop-hoc-so'
     | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/lop-hoc-so/$classId'
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/lop-hoc-so'
     | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/lop-hoc-so/$classId'
@@ -89,14 +99,20 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LopHocSoRoute: typeof LopHocSoRouteWithChildren
   HocLieuBaiGiangRoute: typeof HocLieuBaiGiangRoute
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
-  LopHocSoClassIdRoute: typeof LopHocSoClassIdRoute
-  LopHocSoIndexRoute: typeof LopHocSoIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/lop-hoc-so': {
+      id: '/lop-hoc-so'
+      path: '/lop-hoc-so'
+      fullPath: '/lop-hoc-so'
+      preLoaderRoute: typeof LopHocSoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -106,17 +122,17 @@ declare module '@tanstack/react-router' {
     }
     '/lop-hoc-so/': {
       id: '/lop-hoc-so/'
-      path: '/lop-hoc-so'
+      path: '/'
       fullPath: '/lop-hoc-so/'
       preLoaderRoute: typeof LopHocSoIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LopHocSoRoute
     }
     '/lop-hoc-so/$classId': {
       id: '/lop-hoc-so/$classId'
-      path: '/lop-hoc-so/$classId'
+      path: '/$classId'
       fullPath: '/lop-hoc-so/$classId'
       preLoaderRoute: typeof LopHocSoClassIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LopHocSoRoute
     }
     '/hoc-lieu/kho-hoc-lieu': {
       id: '/hoc-lieu/kho-hoc-lieu'
@@ -135,12 +151,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  HocLieuBaiGiangRoute: HocLieuBaiGiangRoute,
-  HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
+interface LopHocSoRouteChildren {
+  LopHocSoClassIdRoute: typeof LopHocSoClassIdRoute
+  LopHocSoIndexRoute: typeof LopHocSoIndexRoute
+}
+
+const LopHocSoRouteChildren: LopHocSoRouteChildren = {
   LopHocSoClassIdRoute: LopHocSoClassIdRoute,
   LopHocSoIndexRoute: LopHocSoIndexRoute,
+}
+
+const LopHocSoRouteWithChildren = LopHocSoRoute._addFileChildren(
+  LopHocSoRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  LopHocSoRoute: LopHocSoRouteWithChildren,
+  HocLieuBaiGiangRoute: HocLieuBaiGiangRoute,
+  HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
