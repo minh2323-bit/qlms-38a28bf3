@@ -24,6 +24,7 @@ const NAV: NavItem[] = [
     to: "/lop-hoc-so",
     submenu: [
       { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
+      { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
       { icon: ClipboardList, label: "Giao bài tập, nhiệm vụ" },
     ],
   },
@@ -31,10 +32,8 @@ const NAV: NavItem[] = [
     icon: BookOpen,
     label: "Học liệu\n& Bài kiểm tra",
     submenu: [
-      { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
       { icon: Tag, label: "Học liệu bản quyền" },
-      { icon: Library, label: "Kho học liệu", to: "/hoc-lieu/kho-hoc-lieu" },
-      { icon: Video, label: "Video tương tác" },
+      { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
       { icon: ListChecks, label: "Đề kiểm tra" },
     ],
