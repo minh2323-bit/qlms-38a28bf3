@@ -23,6 +23,10 @@ import {
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import { AppShell } from "@/components/AppShell";
+import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
+import {
+  useMaterials, addMaterial, type Material, type MaterialKind,
+} from "@/lib/teaching-store";
 
 
 export const Route = createFileRoute("/")({
