@@ -129,7 +129,7 @@ function ClassDetailPage() {
   };
 
   return (
-    <AppShell title="Chi tiết lớp học">
+    <AppShell>
       {/* Top banner with class info */}
       <section
         className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm"
