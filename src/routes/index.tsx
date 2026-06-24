@@ -127,30 +127,16 @@ const buildGrid = (): WeekGrid => {
   return g;
 };
 
-const MATERIAL_META: Record<string, { icon: typeof FileText; bg: string; fg: string }> = {
-  syllabus: { icon: BookOpen,     bg: "bg-indigo-100",  fg: "text-indigo-700" },
-  slide:    { icon: Presentation, bg: "bg-purple-100",  fg: "text-purple-700" },
-  doc:      { icon: FileType2,    bg: "bg-sky-100",     fg: "text-sky-700" },
-  ex:       { icon: ClipboardCheck, bg: "bg-amber-100", fg: "text-amber-700" },
-  video:    { icon: Video,        bg: "bg-rose-100",    fg: "text-rose-700" },
+const MATERIAL_META: Record<MaterialKind, { icon: typeof FileText; bg: string; fg: string }> = {
+  syllabus: { icon: BookOpen,       bg: "bg-indigo-100",  fg: "text-indigo-700" },
+  slide:    { icon: Presentation,   bg: "bg-purple-100",  fg: "text-purple-700" },
+  doc:      { icon: FileType2,      bg: "bg-sky-100",     fg: "text-sky-700" },
+  exercise: { icon: ClipboardCheck, bg: "bg-amber-100",   fg: "text-amber-700" },
+  video:    { icon: Video,          bg: "bg-rose-100",    fg: "text-rose-700" },
+  image:    { icon: FileType2,      bg: "bg-emerald-100", fg: "text-emerald-700" },
 };
 
-const MATERIALS_SEED: Record<string, { type: "slide" | "doc" | "ex" | "syllabus"; title: string }[]> = {
-  "u-ps": [
-    { type: "syllabus", title: "Tổng quan kiến thức phân số" },
-    { type: "slide", title: "Slide bài giảng – Phân số" },
-    { type: "doc", title: "Phương pháp cộng, trừ phân số" },
-    { type: "ex", title: "Phiếu luyện tập số 12" },
-  ],
-  "u-stp": [
-    { type: "slide", title: "Slide bài giảng – Số thập phân" },
-    { type: "ex", title: "Bài tập về nhà số 7" },
-  ],
-  "u-tn": [
-    { type: "slide", title: "Slide ôn tập số tự nhiên" },
-    { type: "ex", title: "Phiếu bài tập số tự nhiên" },
-  ],
-};
+// MATERIALS_SEED moved into src/lib/teaching-store.ts
 
 // Chart data per class (and ALL = aggregate)
 const CHART_DATA_BY_CLASS: Record<"ALL" | ClassId, { name: string; done_ok: number; done_no: number; undone: number }[]> = {
