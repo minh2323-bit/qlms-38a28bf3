@@ -803,6 +803,7 @@ function LessonPanel({
       {adding && (
         <QuickAddModal
           label={adding.label}
+          defaultUnitId={lesson.unitId}
           onCancel={() => setAdding(null)}
           onSubmit={submitAdd}
         />
