@@ -31,41 +31,42 @@ function uid() {
 /* ---------- Seed ---------- */
 // Mirrors MATERIALS_SEED in /index.tsx, but instantiated per (class, subject, unit) so
 // the same content shows up in both the class detail page and the schedule lesson panel.
+// Seed theo cây kiến thức Toán Lớp 4
 const SEED_TEMPLATES: Record<string, { kind: MaterialKind; title: string; meta?: string }[]> = {
-  "u-ps": [
-    { kind: "syllabus", title: "Tổng quan kiến thức phân số", meta: "1 trang" },
-    { kind: "slide",    title: "Slide bài giảng – Phân số",   meta: "24 slide" },
-    { kind: "doc",      title: "Phương pháp cộng, trừ phân số", meta: "8 trang" },
-    { kind: "exercise", title: "Phiếu luyện tập số 12",        meta: "12 câu" },
+  "u3-khainiem": [
+    { kind: "syllabus", title: "Tổng quan kiến thức phân số",    meta: "1 trang" },
+    { kind: "slide",    title: "Slide bài giảng – Khái niệm phân số", meta: "24 slide" },
+    { kind: "doc",      title: "Tài liệu: Phân số và ý nghĩa",   meta: "8 trang" },
+    { kind: "exercise", title: "Phiếu luyện tập phân số",        meta: "12 câu" },
   ],
-  "u-stp": [
-    { kind: "slide",    title: "Slide bài giảng – Số thập phân", meta: "18 slide" },
-    { kind: "exercise", title: "Bài tập về nhà số 7",            meta: "10 câu" },
+  "u3-quydong": [
+    { kind: "slide",    title: "Slide – Quy đồng mẫu số",        meta: "18 slide" },
+    { kind: "exercise", title: "Bài tập quy đồng mẫu số",        meta: "10 câu" },
   ],
-  "u-tn": [
-    { kind: "slide",    title: "Slide ôn tập số tự nhiên",  meta: "20 slide" },
-    { kind: "exercise", title: "Phiếu bài tập số tự nhiên", meta: "12 câu" },
-    { kind: "video",    title: "Video: Giới thiệu số tự nhiên", meta: "12:35" },
+  "u1-sotunhien": [
+    { kind: "slide",    title: "Slide ôn tập số tự nhiên",       meta: "20 slide" },
+    { kind: "exercise", title: "Phiếu bài tập số có nhiều chữ số", meta: "12 câu" },
+    { kind: "video",    title: "Video: Hàng và lớp",             meta: "12:35" },
   ],
-  "u-lt": [
-    { kind: "slide",    title: "Slide làm tròn số thập phân", meta: "12 slide" },
+  "u1-lamtron": [
+    { kind: "slide",    title: "Slide – Làm tròn số tự nhiên",   meta: "12 slide" },
   ],
-  "u-tsl": [
-    { kind: "doc",      title: "Tài liệu: Tỉ số phần trăm",  meta: "6 trang" },
-    { kind: "exercise", title: "Bài tập tỉ số phần trăm",    meta: "10 câu" },
+  "u2-trungbinh": [
+    { kind: "doc",      title: "Tài liệu: Tìm số trung bình cộng", meta: "6 trang" },
+    { kind: "exercise", title: "Bài tập trung bình cộng",        meta: "10 câu" },
   ],
 };
 
-// (classReal, subject, unitId) combos taken from lessons that appear in index.tsx schedule.
+// (classReal, subject, unitId) combos – khớp với seed lessons trong index.tsx schedule.
 const SEED_COMBOS: Array<[string, string, string]> = [
-  ["3A", "Toán", "u-ps"], ["3B", "Toán", "u-ps"], ["3C", "Toán", "u-ps"], ["3D", "Toán", "u-ps"],
-  ["4A", "Toán", "u-tn"], ["4B", "Toán", "u-tn"], ["4C", "Toán", "u-tn"],
-  ["3A", "Toán", "u-stp"], ["3B", "Toán", "u-stp"], ["3C", "Toán", "u-stp"], ["3D", "Toán", "u-sstp"],
-  ["4A", "Toán", "u-lt"], ["4B", "Toán", "u-lt"], ["4C", "Toán", "u-sstp"],
-  ["3A", "Toán", "u-pct"], ["3B", "Toán", "u-pct"],
-  ["4A", "Toán", "u-tsl"], ["4B", "Toán", "u-dl"], ["3A", "Toán", "u-hh"],
-  // Also seed Tiếng Việt for class 4A so its class detail page has content.
-  ["4A", "Tiếng Việt", "u-ps"],
+  ["3A", "Toán", "u3-khainiem"], ["3B", "Toán", "u3-khainiem"],
+  ["3C", "Toán", "u3-khainiem"], ["3D", "Toán", "u3-khainiem"],
+  ["4A", "Toán", "u1-sotunhien"], ["4B", "Toán", "u1-sotunhien"], ["4C", "Toán", "u1-sotunhien"],
+  ["3A", "Toán", "u3-quydong"], ["3B", "Toán", "u3-quydong"], ["3C", "Toán", "u3-quydong"],
+  ["4A", "Toán", "u1-lamtron"], ["4B", "Toán", "u1-lamtron"],
+  ["4A", "Toán", "u2-trungbinh"],
+  // Tiếng Việt seed cho lớp 4A để trang chi tiết có nội dung.
+  ["4A", "Tiếng Việt", "u3-khainiem"],
 ];
 
 function seedOnce() {
