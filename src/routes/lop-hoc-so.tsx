@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
@@ -258,13 +258,19 @@ function StatusTag({ status }: { status: ClassStatus }) {
 }
 
 function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isNew }: { c: ClassRow } & SelectProps & { isNew?: boolean }) {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    if (selectMode) { onToggleSelect(); return; }
+    navigate({ to: "/lop-hoc-so/$classId", params: { classId: c.id } });
+  };
   return (
     <div
-      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""} ${isNew ? "class-highlight" : ""}`}
-      onClick={selectMode ? onToggleSelect : undefined}
-      role={selectMode ? "button" : undefined}
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition cursor-pointer ${selected ? "ring-2 ring-indigo-500" : ""} ${isNew ? "class-highlight" : ""}`}
+      onClick={handleClick}
+      role="button"
     >
       {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
+
       <div className="h-28 bg-slate-100 overflow-hidden relative">
         <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
         <div className="absolute top-2 right-2">
