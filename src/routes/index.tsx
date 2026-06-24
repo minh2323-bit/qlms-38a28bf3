@@ -813,10 +813,22 @@ function LessonPanel({
 }
 
 function QuickAddModal({
-  label, onCancel, onSubmit,
-}: { label: string; onCancel: () => void; onSubmit: (title: string, meta: string) => void }) {
+  label, defaultUnitId, onCancel, onSubmit,
+}: {
+  label: string;
+  defaultUnitId: string;
+  onCancel: () => void;
+  onSubmit: (title: string, meta: string, unitId: string) => void;
+}) {
+  const initialChapter = getChapterOfUnit(defaultUnitId)?.id ?? KNOWLEDGE_TREE[0].id;
+  const [chapterId, setChapterId] = useState(initialChapter);
+  const [unitId, setUnitId] = useState(defaultUnitId);
   const [title, setTitle] = useState("");
   const [meta, setMeta] = useState("");
+
+  const chapter = KNOWLEDGE_TREE.find((c) => c.id === chapterId) ?? KNOWLEDGE_TREE[0];
+  const canSubmit = !!chapterId && !!unitId && title.trim().length > 0;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -828,6 +840,42 @@ function QuickAddModal({
         </div>
         <div className="px-5 py-4 space-y-3">
           <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">
+              Chương <span className="text-rose-500">*</span>
+            </label>
+            <select
+              value={chapterId}
+              onChange={(e) => {
+                const ch = KNOWLEDGE_TREE.find((c) => c.id === e.target.value);
+                setChapterId(e.target.value);
+                setUnitId(ch?.units[0]?.id ?? "");
+              }}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            >
+              {KNOWLEDGE_TREE.map((ch) => (
+                <option key={ch.id} value={ch.id}>{ch.title}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">
+              Bài <span className="text-rose-500">*</span>
+            </label>
+            <select
+              value={unitId}
+              onChange={(e) => setUnitId(e.target.value)}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            >
+              <option value="">— Chọn bài —</option>
+              {chapter.units.map((u) => (
+                <option key={u.id} value={u.id}>{u.title}</option>
+              ))}
+            </select>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Bài này sẽ đồng bộ sang đúng nội dung tiết học bên Lớp học số.
+            </p>
+          </div>
+          <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Tiêu đề</label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={`VD: ${label} – ...`} />
           </div>
@@ -835,13 +883,10 @@ function QuickAddModal({
             <label className="block text-sm font-semibold text-slate-700 mb-1">Thời lượng / Số trang</label>
             <Input value={meta} onChange={(e) => setMeta(e.target.value)} placeholder="VD: 12 slide, 8 trang, 12:35" />
           </div>
-          <p className="text-xs text-slate-500">
-            Sẽ tự động xuất hiện trong <b>Lớp học số</b> của lớp này.
-          </p>
         </div>
         <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
-          <Button size="sm" disabled={!title.trim()} onClick={() => onSubmit(title.trim(), meta.trim())}>
+          <Button size="sm" disabled={!canSubmit} onClick={() => onSubmit(title.trim(), meta.trim(), unitId)}>
             Thêm & đồng bộ
           </Button>
         </div>
