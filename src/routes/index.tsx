@@ -94,36 +94,36 @@ const buildGrid = (): WeekGrid => {
   };
   const g = empty();
 
-  // Tuần 1 — Phân số / Số tự nhiên
-  g[1][0][1] = makeLesson("l1",  "3A", "Tìm hiểu về phân số", "u-ps");
-  g[1][1][1] = makeLesson("l2",  "3A", "Luyện tập phân số", "u-ps");
-  g[1][1][2] = makeLesson("l3",  "3B", "Tìm hiểu về phân số", "u-ps");
-  g[1][2][1] = makeLesson("l4",  "3C", "Tìm hiểu về phân số", "u-ps");
-  g[1][2][3] = makeLesson("l5",  "4A", "Ôn tập số tự nhiên", "u-tn");
-  g[1][3][1] = makeLesson("l6",  "3D", "Phân số bằng nhau", "u-ps");
-  g[1][3][2] = makeLesson("l7",  "4B", "Phép cộng số tự nhiên", "u-tn");
-  g[1][4][1] = makeLesson("l8",  "4A", "Phép trừ số tự nhiên", "u-tn");
-  g[1][4][2] = makeLesson("l9",  "4C", "Ôn tập số tự nhiên", "u-tn");
-  g[1][0][6] = makeLesson("l10", "3A", "Bài tập phân số (chiều)", "u-ps");
-  g[1][2][6] = makeLesson("l11", "4B", "Luyện tập số tự nhiên", "u-tn");
-  g[1][4][6] = makeLesson("l12", "3C", "Phân số bằng nhau", "u-ps");
+  // Tuần 1 — Số tự nhiên & Phân số (Toán 4)
+  g[1][0][1] = makeLesson("l1",  "3A", "Khái niệm phân số", "u3-khainiem");
+  g[1][1][1] = makeLesson("l2",  "3A", "Luyện tập phân số", "u3-khainiem");
+  g[1][1][2] = makeLesson("l3",  "3B", "Khái niệm phân số", "u3-khainiem");
+  g[1][2][1] = makeLesson("l4",  "3C", "Khái niệm phân số", "u3-khainiem");
+  g[1][2][3] = makeLesson("l5",  "4A", "Ôn tập số tự nhiên", "u1-sotunhien");
+  g[1][3][1] = makeLesson("l6",  "3D", "Tính chất cơ bản của phân số", "u3-tinhchat");
+  g[1][3][2] = makeLesson("l7",  "4B", "Hàng và lớp", "u1-sotunhien");
+  g[1][4][1] = makeLesson("l8",  "4A", "So sánh các số tự nhiên", "u1-sosanh");
+  g[1][4][2] = makeLesson("l9",  "4C", "Ôn tập số tự nhiên", "u1-sotunhien");
+  g[1][0][6] = makeLesson("l10", "3A", "Bài tập phân số (chiều)", "u3-khainiem");
+  g[1][2][6] = makeLesson("l11", "4B", "Luyện tập số có nhiều chữ số", "u1-sotunhien");
+  g[1][4][6] = makeLesson("l12", "3C", "Rút gọn phân số", "u3-rutgon");
 
-  // Tuần 2 — Số thập phân
-  g[2][0][1] = makeLesson("l13", "3A", "Khái niệm số thập phân", "u-stp");
-  g[2][1][1] = makeLesson("l14", "3B", "Khái niệm số thập phân", "u-stp");
-  g[2][1][2] = makeLesson("l15", "3A", "So sánh số thập phân", "u-sstp");
-  g[2][2][1] = makeLesson("l16", "3C", "Khái niệm số thập phân", "u-stp");
-  g[2][2][2] = makeLesson("l17", "4A", "Làm tròn số thập phân", "u-lt");
-  g[2][3][1] = makeLesson("l18", "3D", "So sánh số thập phân", "u-sstp");
-  g[2][3][2] = makeLesson("l19", "4B", "Làm tròn số thập phân", "u-lt");
-  g[2][4][2] = makeLesson("l20", "4C", "So sánh số thập phân", "u-sstp");
+  // Tuần 2 — Quy đồng / So sánh phân số & Làm tròn số tự nhiên
+  g[2][0][1] = makeLesson("l13", "3A", "Quy đồng mẫu số", "u3-quydong");
+  g[2][1][1] = makeLesson("l14", "3B", "Quy đồng mẫu số", "u3-quydong");
+  g[2][1][2] = makeLesson("l15", "3A", "So sánh các phân số", "u3-sosanh");
+  g[2][2][1] = makeLesson("l16", "3C", "Quy đồng mẫu số", "u3-quydong");
+  g[2][2][2] = makeLesson("l17", "4A", "Làm tròn số tự nhiên", "u1-lamtron");
+  g[2][3][1] = makeLesson("l18", "3D", "So sánh các phân số", "u3-sosanh");
+  g[2][3][2] = makeLesson("l19", "4B", "Làm tròn số tự nhiên", "u1-lamtron");
+  g[2][4][2] = makeLesson("l20", "4C", "So sánh các phân số", "u3-sosanh");
 
-  // Tuần 3
-  g[3][0][1] = makeLesson("l21", "3A", "Cộng số thập phân", "u-pct");
-  g[3][1][1] = makeLesson("l22", "3B", "Trừ số thập phân", "u-pct");
-  g[3][2][1] = makeLesson("l23", "4A", "Tỉ số phần trăm", "u-tsl");
-  g[3][3][2] = makeLesson("l24", "3A", "Hình học trực quan", "u-hh");
-  g[3][4][2] = makeLesson("l25", "4B", "Đo lường thực hành", "u-dl");
+  // Tuần 3 — Phép tính phân số & Hình học/Đo lường
+  g[3][0][1] = makeLesson("l21", "3A", "Phép cộng phân số", "u4-cong");
+  g[3][1][1] = makeLesson("l22", "3B", "Phép trừ phân số", "u4-tru");
+  g[3][2][1] = makeLesson("l23", "4A", "Tìm số trung bình cộng", "u2-trungbinh");
+  g[3][3][2] = makeLesson("l24", "3A", "Hình bình hành", "u5-binhhanh");
+  g[3][4][2] = makeLesson("l25", "4B", "Ki-lô-mét vuông", "u6-km2");
 
   return g;
 };
