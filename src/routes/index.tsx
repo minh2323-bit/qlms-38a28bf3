@@ -33,7 +33,6 @@ import {
   type LiveClass,
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
-import { BarChart3 } from "lucide-react";
 
 
 export const Route = createFileRoute("/")({
