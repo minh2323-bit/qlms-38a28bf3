@@ -261,6 +261,18 @@ function findLiveSlot(startAt: string): { week: number; day: number; period: num
   return null;
 }
 
+// Trả về (week, day) cho một lớp diễn ra buổi tối, nếu rơi vào một ngày của lịch.
+function findEveningSlot(startAt: string): { week: number; day: number } | null {
+  if (!isEvening(startAt)) return null;
+  const d = new Date(startAt);
+  const key = `${d.getDate()}/${d.getMonth() + 1}`;
+  for (const w of WEEKS) {
+    const dayIdx = (DAY_DATES[w.idx] ?? []).indexOf(key);
+    if (dayIdx >= 0) return { week: w.idx, day: dayIdx };
+  }
+  return null;
+}
+
 function TeacherHome() {
   const [grid, setGrid] = useState<WeekGrid>(() => buildGrid());
   const [weekIdx, setWeekIdx] = useState(1);
@@ -279,6 +291,20 @@ function TeacherHome() {
       const slot = findLiveSlot(lc.startAt);
       if (!slot) continue;
       map.set(`${slot.week}-${slot.day}-${slot.period}`, lc);
+    }
+    return map;
+  }, [liveAll, classFilter]);
+
+  // map "w-d" -> LiveClass[] (buổi tối, không chia tiết)
+  const eveningByDay = useMemo(() => {
+    const map = new Map<string, LiveClass[]>();
+    for (const lc of liveAll) {
+      if (classFilter !== "ALL" && lc.classRealId !== classFilter) continue;
+      const slot = findEveningSlot(lc.startAt);
+      if (!slot) continue;
+      const k = `${slot.week}-${slot.day}`;
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(lc);
     }
     return map;
   }, [liveAll, classFilter]);
