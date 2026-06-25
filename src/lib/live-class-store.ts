@@ -16,6 +16,13 @@ export type LiveClass = {
 
 type Listener = () => void;
 
+// Helper tạo datetime-local string (YYYY-MM-DDTHH:mm) tương đối thời điểm hiện tại.
+function nowOffset(minutes: number): string {
+  const d = new Date(Date.now() + minutes * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 // Seed một lớp trực tuyến để demo đồng bộ sang Lịch báo giảng.
 // 2/4/2026 08:00 -> trùng Tiết 1, Thứ 4, Tuần 1 của lớp 4A – Toán.
 let items: LiveClass[] = [
@@ -44,6 +51,48 @@ let items: LiveClass[] = [
     description: "Buổi học tăng cường vào buổi tối cho học sinh lớp 4A.",
     studentCount: 18,
     createdAt: "2026-03-31T09:00:00.000Z",
+  },
+  // ----- Lớp đang diễn ra -----
+  {
+    id: "lc-seed-live-now",
+    classRealId: "4A",
+    subject: "Toán",
+    name: "Luyện tập Phép nhân – đang diễn ra",
+    unitId: "u2-nhan",
+    startAt: nowOffset(-10),
+    endAt: nowOffset(35),
+    link: "https://meet.google.com/live-now-abc",
+    description: "Buổi luyện tập đang diễn ra trực tuyến.",
+    studentCount: 28,
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+  },
+  // ----- Lớp chuẩn bị diễn ra (sắp tới ~30 phút nữa) -----
+  {
+    id: "lc-seed-upcoming-1",
+    classRealId: "4A",
+    subject: "Toán",
+    name: "Chữa bài tập Phân số – sắp diễn ra",
+    unitId: "u4-tru",
+    startAt: nowOffset(30),
+    endAt: nowOffset(75),
+    link: "https://zoom.us/j/upcoming-1",
+    description: "Buổi chữa bài tập sắp bắt đầu.",
+    studentCount: 30,
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+  },
+  // Một lớp khác sắp diễn ra cho lớp 3D – Toán để demo cây kiến thức lớp 3.
+  {
+    id: "lc-seed-upcoming-2",
+    classRealId: "3D",
+    subject: "Toán",
+    name: "Bảng nhân 7 – Lớp học trực tuyến",
+    unitId: "g3-u2-bn7",
+    startAt: nowOffset(90),
+    endAt: nowOffset(135),
+    link: "https://teams.microsoft.com/l/meetup-join/upcoming-2",
+    description: "Lớp ôn tập Bảng nhân 7 cho lớp 3D.",
+    studentCount: 25,
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
   },
 ];
 
