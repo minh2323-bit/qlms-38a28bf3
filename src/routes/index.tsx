@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
-  ClipboardCheck, CalendarClock, Sun, Sunset,
+  ClipboardCheck, CalendarClock, Sun, Sunset, Moon,
   ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
   Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
