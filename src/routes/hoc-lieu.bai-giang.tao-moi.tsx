@@ -12,12 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
+type CreateLessonSearch = { khoi?: string; mon?: string; from?: string };
+
 export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
   head: () => ({
     meta: [
       { title: "Tạo bài giảng mới | Tiểu học Tô Hiệu" },
       { name: "description", content: "Tạo bài giảng mới theo 3 bước." },
     ],
+  }),
+  validateSearch: (s: Record<string, unknown>): CreateLessonSearch => ({
+    khoi: typeof s.khoi === "string" ? s.khoi : undefined,
+    mon: typeof s.mon === "string" ? s.mon : undefined,
+    from: typeof s.from === "string" ? s.from : undefined,
   }),
   component: CreateLessonPage,
 });
@@ -166,12 +173,17 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
 
 function CreateLessonPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const prefilledKhoi = search.khoi ?? "";
+  const prefilledMon = search.mon ?? "";
+  const isPrefilled = !!(prefilledKhoi && prefilledMon);
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Step 1
   const [title, setTitle] = useState("");
-  const [khoi, setKhoi] = useState("");
-  const [mon, setMon] = useState("");
+  const [khoi, setKhoi] = useState(prefilledKhoi);
+  const [mon, setMon] = useState(prefilledMon);
   const [unitId, setUnitId] = useState("");
   const [coverMode, setCoverMode] = useState<"link" | "file">("link");
   const [coverLink, setCoverLink] = useState("");
@@ -271,6 +283,8 @@ function CreateLessonPage() {
             }}
             canCreate={!!canCreate}
             onCreate={onCreateShell}
+            lockGradeSubject={isPrefilled}
+            fromHint={search.from}
           />
         )}
 
@@ -343,11 +357,13 @@ function Step1(props: {
   onPickFile: (f: File) => void;
   canCreate: boolean;
   onCreate: () => void;
+  lockGradeSubject?: boolean;
+  fromHint?: string;
 }) {
   const {
     title, setTitle, khoi, setKhoi, mon, setMon, unitId, setUnitId, tree,
     coverMode, setCoverMode, coverLink, setCoverLink, coverFileName, coverDataUrl,
-    fileRef, onPickFile, canCreate, onCreate,
+    fileRef, onPickFile, canCreate, onCreate, lockGradeSubject, fromHint,
   } = props;
 
   return (
@@ -372,6 +388,16 @@ function Step1(props: {
       </div>
 
       <div className="px-6 py-5 space-y-5">
+        {lockGradeSubject && (
+          <div className="flex items-start gap-2 rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2 text-xs text-indigo-800">
+            <Info className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <b>Khối</b> và <b>Môn</b> đã được tự động điền theo {fromHint ? fromHint : "lớp học"}.
+              Bạn chỉ cần chọn <b>Đơn vị kiến thức</b> phù hợp.
+            </div>
+          </div>
+        )}
+
         <Field label="Tiêu đề bài giảng" required>
           <input
             value={title}
@@ -388,6 +414,7 @@ function Step1(props: {
               onChange={setKhoi}
               options={GRADES}
               placeholder="— Chọn khối —"
+              disabled={lockGradeSubject}
             />
           </Field>
           <Field label="Môn" required>
@@ -396,7 +423,7 @@ function Step1(props: {
               onChange={setMon}
               options={SUBJECTS}
               placeholder="— Chọn môn —"
-              disabled={!khoi}
+              disabled={lockGradeSubject || !khoi}
             />
           </Field>
           <Field label="Đơn vị kiến thức" required>

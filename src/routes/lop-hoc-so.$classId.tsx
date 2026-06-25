@@ -250,8 +250,17 @@ function ClassDetailPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "lesson" })}>
-                  <Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Thêm bài giảng
+                <DropdownMenuItem className="cursor-pointer" asChild>
+                  <Link
+                    to="/hoc-lieu/bai-giang/tao-moi"
+                    search={{
+                      khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`,
+                      mon: info.subject,
+                      from: `lớp ${info.lop} – ${info.subject}`,
+                    }}
+                  >
+                    <Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Thêm bài giảng
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "material" })}>
                   <BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Thêm học liệu

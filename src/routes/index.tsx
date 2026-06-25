@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
@@ -884,7 +884,18 @@ function LessonPanel({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => quickAdd("slide", "Bài giảng")}><Presentation className="h-4 w-4 mr-2" />Bài giảng</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                to="/hoc-lieu/bai-giang/tao-moi"
+                search={{
+                  khoi: `Lớp ${String(lesson.class).replace(/[^0-9]/g, "")}`,
+                  mon: lesson.subject,
+                  from: `tiết ${lesson.class} – ${lesson.subject}`,
+                }}
+              >
+                <Presentation className="h-4 w-4 mr-2" />Bài giảng
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => quickAdd("doc", "Học liệu")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
             <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài kiểm tra")}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
             <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài tập")}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
