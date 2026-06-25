@@ -424,6 +424,7 @@ function TeacherHome() {
                   }}
                   activeLessonId={activeLessonId}
                   liveBySlot={liveBySlot}
+                  eveningByDay={eveningByDay}
                   onPickLive={(lc) => setActiveLive(lc)}
                 />
                 <Legend2 />
