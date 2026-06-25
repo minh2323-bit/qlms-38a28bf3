@@ -541,10 +541,13 @@ function KnowledgeTree({
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
   week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
+  liveBySlot, onPickLive,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
   activeLessonId: string | null;
+  liveBySlot: Map<string, LiveClass>;
+  onPickLive: (lc: LiveClass) => void;
 }) {
   const morning = [1, 2, 3, 4, 5];
   const afternoon = [6, 7, 8, 9, 10];
@@ -555,6 +558,43 @@ function ScheduleGrid({
     if (!l) return null;
     if (classFilter !== "ALL" && l.class !== classFilter) return null;
     return l;
+  };
+
+  const renderCell = (d: number, p: number, afternoonBg: boolean) => {
+    const l = cellFor(d, p);
+    const isFocus = l && focusUnit && l.unitId === focusUnit;
+    const isActive = l && activeLessonId === l.id;
+    const live = liveBySlot.get(`${week}-${d}-${p}`);
+    return (
+      <td key={d} className={`border border-slate-200 p-1 align-top h-10 ${afternoonBg ? "bg-purple-50/30" : ""}`}>
+        {l && (
+          <button
+            onClick={() => onPickLesson(l.id)}
+            className={`w-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
+              CLASS_COLORS[l.class]
+            } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
+              isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
+            }`}
+          >
+            <div className="font-bold">{l.class}</div>
+            <div className="text-[10px] opacity-80">Toán</div>
+            <div className="truncate font-medium">
+              <span className="opacity-70">Nội dung:</span> {l.topic}
+            </div>
+          </button>
+        )}
+        {live && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onPickLive(live); }}
+            title={live.name}
+            className={`mt-1 w-full inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition`}
+          >
+            <Video className="h-3 w-3 shrink-0" />
+            <span className="truncate">{formatTimeRange(live.startAt, live.endAt)}</span>
+          </button>
+        )}
+      </td>
+    );
   };
 
   return (
@@ -574,92 +614,105 @@ function ScheduleGrid({
           </tr>
         </thead>
         <tbody>
-          {morning.map((p, idx) => {
-            return (
-              <tr key={p}>
-                {idx === 0 && (
-                  <td rowSpan={5} className="border border-indigo-800 bg-amber-50 text-amber-700 text-center align-middle font-semibold p-2 w-20">
-                    <div className="flex flex-col items-center gap-2">
-                      <Sun className="h-5 w-5 text-amber-500" />
-                      <span>Buổi sáng</span>
-                    </div>
-                  </td>
-                )}
-                <td className="border border-indigo-800 text-center font-semibold p-1 w-16 bg-white text-indigo-700">
-                  Tiết {p}
+          {morning.map((p, idx) => (
+            <tr key={p}>
+              {idx === 0 && (
+                <td rowSpan={5} className="border border-indigo-800 bg-amber-50 text-amber-700 text-center align-middle font-semibold p-2 w-20">
+                  <div className="flex flex-col items-center gap-2">
+                    <Sun className="h-5 w-5 text-amber-500" />
+                    <span>Buổi sáng</span>
+                  </div>
                 </td>
-                {DAYS.map((_, d) => {
-                  const l = cellFor(d, p);
-                  const isFocus = l && focusUnit && l.unitId === focusUnit;
-                  const isActive = l && activeLessonId === l.id;
-                  return (
-                    <td key={d} className={`border border-slate-200 p-1 align-top h-10`}>
-                      {l && (
-                        <button
-                          onClick={() => onPickLesson(l.id)}
-                          className={`w-full h-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
-                            CLASS_COLORS[l.class]
-                          } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
-                            isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
-                          }`}
-                        >
-                          <div className="font-bold">{l.class}</div>
-                          <div className="text-[10px] opacity-80">Toán</div>
-                          <div className="truncate font-medium">
-                            <span className="opacity-70">Nội dung:</span> {l.topic}
-                          </div>
-                        </button>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-          {afternoon.map((p, idx) => {
-            return (
-              <tr key={p}>
-                {idx === 0 && (
-                  <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20 rounded-bl-lg">
-                    <div className="flex flex-col items-center gap-2">
-                      <Sunset className="h-5 w-5 text-purple-500" />
-                      <span>Buổi chiều</span>
-                    </div>
-                  </td>
-                )}
-                <td className="border border-indigo-800 text-center font-semibold p-1 w-16 bg-white text-indigo-700">
-                  Tiết {p}
+              )}
+              <td className="border border-indigo-800 text-center font-semibold p-1 w-16 bg-white text-indigo-700">
+                Tiết {p}
+              </td>
+              {DAYS.map((_, d) => renderCell(d, p, false))}
+            </tr>
+          ))}
+          {afternoon.map((p, idx) => (
+            <tr key={p}>
+              {idx === 0 && (
+                <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20 rounded-bl-lg">
+                  <div className="flex flex-col items-center gap-2">
+                    <Sunset className="h-5 w-5 text-purple-500" />
+                    <span>Buổi chiều</span>
+                  </div>
                 </td>
-                {DAYS.map((_, d) => {
-                  const l = cellFor(d, p);
-                  const isFocus = l && focusUnit && l.unitId === focusUnit;
-                  const isActive = l && activeLessonId === l.id;
-                  return (
-                    <td key={d} className={`border border-slate-200 p-1 align-top h-10 bg-purple-50/30`}>
-                      {l && (
-                        <button
-                          onClick={() => onPickLesson(l.id)}
-                          className={`w-full h-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
-                            CLASS_COLORS[l.class]
-                          } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
-                            isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
-                          }`}
-                        >
-                          <div className="font-bold">{l.class}</div>
-                          <div className="text-[10px] opacity-80">Toán</div>
-                          <div className="truncate font-medium">
-                            <span className="opacity-70">Nội dung:</span> {l.topic}
-                          </div>
-                        </button>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+              )}
+              <td className="border border-indigo-800 text-center font-semibold p-1 w-16 bg-white text-indigo-700">
+                Tiết {p}
+              </td>
+              {DAYS.map((_, d) => renderCell(d, p, true))}
+            </tr>
+          ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/* ----- Live class popup ----- */
+function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-5 py-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50 flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 min-w-0">
+            <span className="h-9 w-9 rounded-lg inline-flex items-center justify-center bg-emerald-600 text-white shrink-0">
+              <Video className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold text-slate-800 truncate">{live.name}</h3>
+              <p className="text-xs text-emerald-700 font-medium mt-0.5">Lớp học trực tuyến</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/60 text-slate-500 shrink-0">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-2.5 text-sm">
+          <div className="flex justify-between gap-3">
+            <span className="text-slate-500">Lớp</span>
+            <span className="font-semibold text-slate-800">{live.classRealId}</span>
+          </div>
+          <div className="flex justify-between gap-3">
+            <span className="text-slate-500">Môn</span>
+            <span className="font-semibold text-slate-800">{live.subject}</span>
+          </div>
+          <div className="flex justify-between gap-3">
+            <span className="text-slate-500">Thời gian</span>
+            <span className="font-semibold text-slate-800">
+              {formatTimeRange(live.startAt, live.endAt)}
+            </span>
+          </div>
+          <div className="flex justify-between gap-3">
+            <span className="text-slate-500">Số lượng học sinh</span>
+            <span className="font-semibold text-slate-800 inline-flex items-center gap-1">
+              <Users className="h-3.5 w-3.5 text-slate-400" />
+              {live.studentCount}
+            </span>
+          </div>
+          {live.description && (
+            <div className="pt-2 border-t text-slate-600 text-xs leading-relaxed">
+              {live.description}
+            </div>
+          )}
+        </div>
+        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end">
+          <a
+            href={live.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+          >
+            <Video className="h-4 w-4" /> Vào lớp ngay
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
