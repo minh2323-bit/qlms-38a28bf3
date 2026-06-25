@@ -459,12 +459,14 @@ const COMPLETION_OPTIONS = [
 ];
 
 function AddMaterialModal({
-  mode, onClose, onSubmit,
+  mode, classInfo, onClose, onSubmit,
 }: {
   mode: "lesson" | "material" | "exercise";
+  classInfo: ClassInfo;
   onClose: () => void;
   onSubmit: (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => void;
 }) {
+  const tree = useMemo(() => getTreeForClass(classInfo.lop, classInfo.subject), [classInfo.lop, classInfo.subject]);
   const defaultKind: MaterialKind =
     mode === "lesson" ? "slide" : mode === "exercise" ? "exercise" : "video";
 
