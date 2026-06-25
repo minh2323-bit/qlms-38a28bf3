@@ -23,6 +23,10 @@ import { KNOWLEDGE_TREE, getUnitTitle, getChapterOfUnit } from "@/lib/knowledge-
 import {
   useMaterials, addMaterial, type MaterialKind, type Material,
 } from "@/lib/teaching-store";
+import {
+  useLiveClasses, addLiveClass, formatTimeRange, formatDate,
+  type LiveClass,
+} from "@/lib/live-class-store";
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
   head: () => ({
@@ -70,6 +74,13 @@ function ClassDetailPage() {
   const classMaterials = useMemo(
     () => allMaterials.filter((m) => m.classRealId === info.lop && m.subject === info.subject),
     [allMaterials, info.lop, info.subject],
+  );
+
+  const allLive = useLiveClasses();
+  const classLive = useMemo(
+    () => allLive.filter((l) => l.classRealId === info.lop && l.subject === info.subject)
+      .sort((a, b) => a.startAt.localeCompare(b.startAt)),
+    [allLive, info.lop, info.subject],
   );
 
   // Group by unitId → sections
@@ -252,6 +263,10 @@ function ClassDetailPage() {
         </div>
 
         <div className="mt-5 space-y-3">
+          {classLive.length > 0 && (
+            <LiveClassesSection items={classLive} />
+          )}
+
           {orderedGroups.map((g) => (
             <GroupRow
               key={g.unitId}
@@ -265,7 +280,7 @@ function ClassDetailPage() {
               dragging={dragId === g.unitId}
             />
           ))}
-          {orderedGroups.length === 0 && (
+          {orderedGroups.length === 0 && classLive.length === 0 && (
             <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
               Chưa có học liệu nào. Bấm <b className="text-indigo-700">Thêm nội dung</b> để bắt đầu.
             </div>
@@ -307,9 +322,20 @@ function ClassDetailPage() {
         <LiveClassModal
           classInfo={info}
           onClose={() => setLiveOpen(false)}
-          onCreated={(name) => {
+          onCreated={(data) => {
+            addLiveClass({
+              classRealId: info.lop,
+              subject: info.subject,
+              name: data.name,
+              unitId: data.unitId,
+              startAt: data.startAt,
+              endAt: data.endAt,
+              link: data.link,
+              description: data.description,
+              studentCount: data.studentCount,
+            });
             setLiveOpen(false);
-            toast.success(`Đã tạo lớp học trực tuyến "${name}"`);
+            toast.success(`Đã tạo lớp học trực tuyến "${data.name}" – đã đồng bộ Lịch báo giảng`);
           }}
         />
       )}
@@ -760,12 +786,17 @@ const STUDENT_DB: Record<string, Student[]> = {
   ],
 };
 
+type LiveCreatePayload = {
+  name: string; unitId: string; startAt: string; endAt: string;
+  link: string; description?: string; studentCount: number;
+};
+
 function LiveClassModal({
   classInfo, onClose, onCreated,
 }: {
   classInfo: ClassInfo;
   onClose: () => void;
-  onCreated: (name: string) => void;
+  onCreated: (data: LiveCreatePayload) => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
 
@@ -1057,7 +1088,11 @@ function LiveClassModal({
               </button>
             ) : (
               <button
-                onClick={() => canCreate && onCreated(name.trim())}
+                onClick={() => canCreate && onCreated({
+                  name: name.trim(), unitId, startAt, endAt,
+                  link: link.trim(), description: description.trim() || undefined,
+                  studentCount: selected.size,
+                })}
                 disabled={!canCreate}
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
               >
@@ -1067,6 +1102,62 @@ function LiveClassModal({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ============================ Live classes list ============================ */
+
+function LiveClassesSection({ items }: { items: LiveClass[] }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="rounded-xl border border-emerald-200 bg-white overflow-hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-3 px-4 py-3 bg-emerald-50 hover:bg-emerald-100 transition"
+      >
+        {open ? <ChevronDown className="h-4 w-4 text-emerald-700" /> : <ChevronRight className="h-4 w-4 text-emerald-700" />}
+        <span className="h-7 w-7 rounded-lg inline-flex items-center justify-center bg-emerald-100 text-emerald-700">
+          <Video className="h-4 w-4" />
+        </span>
+        <span className="font-semibold text-emerald-800 text-left flex-1">
+          Lớp học trực tuyến đã tạo
+        </span>
+        <span className="text-xs text-emerald-700 font-medium">
+          {items.length} lớp
+        </span>
+      </button>
+      {open && (
+        <ul className="divide-y divide-slate-100">
+          {items.map((l) => (
+            <li key={l.id} className="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
+              <span className="h-9 w-9 rounded-lg inline-flex items-center justify-center bg-emerald-50 text-emerald-700 shrink-0">
+                <Video className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-slate-800 truncate">{l.name}</div>
+                <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-3 flex-wrap">
+                  <span>Ngày tạo: <b className="text-slate-700">{formatDate(l.createdAt)}</b></span>
+                  <span className="inline-flex items-center gap-1">
+                    <Users className="h-3.5 w-3.5 text-slate-400" />
+                    <b className="text-slate-700">{l.studentCount}</b> học sinh tham dự
+                  </span>
+                  <span className="text-slate-400">·</span>
+                  <span>{formatTimeRange(l.startAt, l.endAt)}</span>
+                </div>
+              </div>
+              <a
+                href={l.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                <Video className="h-3.5 w-3.5" /> Vào lớp
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
