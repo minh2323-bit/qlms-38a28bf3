@@ -322,9 +322,20 @@ function ClassDetailPage() {
         <LiveClassModal
           classInfo={info}
           onClose={() => setLiveOpen(false)}
-          onCreated={(name) => {
+          onCreated={(data) => {
+            addLiveClass({
+              classRealId: info.lop,
+              subject: info.subject,
+              name: data.name,
+              unitId: data.unitId,
+              startAt: data.startAt,
+              endAt: data.endAt,
+              link: data.link,
+              description: data.description,
+              studentCount: data.studentCount,
+            });
             setLiveOpen(false);
-            toast.success(`Đã tạo lớp học trực tuyến "${name}"`);
+            toast.success(`Đã tạo lớp học trực tuyến "${data.name}" – đã đồng bộ Lịch báo giảng`);
           }}
         />
       )}
