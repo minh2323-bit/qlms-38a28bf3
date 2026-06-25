@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "QLMS" },
+      { name: "description", content: "LMS homepage for teachers to view lesson schedules and access teaching materials." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "QLMS" },
+      { property: "og:description", content: "LMS homepage for teachers to view lesson schedules and access teaching materials." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "QLMS" },
+      { name: "twitter:description", content: "LMS homepage for teachers to view lesson schedules and access teaching materials." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/34e3e8ef-5462-4933-b213-276bf8703ba0/id-preview-2c8b5ecf--9ffba322-27eb-460a-a6c5-770556f3e465.lovable.app-1782372414311.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/34e3e8ef-5462-4933-b213-276bf8703ba0/id-preview-2c8b5ecf--9ffba322-27eb-460a-a6c5-770556f3e465.lovable.app-1782372414311.png" },
     ],
     links: [
       {
