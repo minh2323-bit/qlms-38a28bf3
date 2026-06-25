@@ -416,6 +416,10 @@ function TeacherHome() {
 
           {/* Chart Section — driven by same classFilter */}
           <ChartSection classFilter={classFilter} />
+
+          {activeLive && (
+            <LiveClassPopup live={activeLive} onClose={() => setActiveLive(null)} />
+          )}
       </>
     </AppShell>
 
