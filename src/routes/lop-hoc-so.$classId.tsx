@@ -330,7 +330,6 @@ function GroupRow({
       >
         {reorder && <GripVertical className="h-4 w-4 text-slate-400" />}
         {expanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
-        <Presentation className="h-4 w-4 text-indigo-600" />
         <span className="font-semibold text-slate-800 text-left flex-1">{group.title}</span>
         <span className="text-xs text-slate-500 font-medium">
           {group.items.length} học liệu
