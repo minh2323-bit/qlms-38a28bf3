@@ -215,17 +215,12 @@ function ClassDetailPage() {
               {totals.lessons} chương/chủ đề • {totals.items} học liệu — đồng bộ với Lịch báo giảng
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setReorder((v) => !v)}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border transition ${
-                reorder
-                  ? "bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700"
-                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-              }`}
+              onClick={() => setLiveOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
             >
-              <MoveVertical className="h-4 w-4" />
-              {reorder ? "Xong sắp xếp" : "Sắp xếp"}
+              <Video className="h-4 w-4" /> Tạo lớp học trực tuyến
             </button>
             <button
               onClick={() => toast.message("Thêm chủ đề / Mục lục (demo)")}
