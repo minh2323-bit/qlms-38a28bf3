@@ -662,7 +662,7 @@ function ScheduleGrid({
           {afternoon.map((p, idx) => (
             <tr key={p}>
               {idx === 0 && (
-                <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20 rounded-bl-lg">
+                <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20">
                   <div className="flex flex-col items-center gap-2">
                     <Sunset className="h-5 w-5 text-purple-500" />
                     <span>Buổi chiều</span>
@@ -675,6 +675,41 @@ function ScheduleGrid({
               {DAYS.map((_, d) => renderCell(d, p, true))}
             </tr>
           ))}
+          {/* Evening row — chỉ phân theo ngày, không chia tiết */}
+          {(() => {
+            const hasAny = DAYS.some((_, d) => (eveningByDay.get(`${week}-${d}`) ?? []).length > 0);
+            if (!hasAny) return null;
+            return (
+              <tr>
+                <td colSpan={2} className="border border-indigo-800 bg-indigo-50 text-indigo-700 text-center align-middle font-semibold p-2 rounded-bl-lg">
+                  <div className="flex flex-col items-center gap-1">
+                    <Moon className="h-5 w-5 text-indigo-500" />
+                    <span>Buổi tối</span>
+                  </div>
+                </td>
+                {DAYS.map((_, d) => {
+                  const list = eveningByDay.get(`${week}-${d}`) ?? [];
+                  return (
+                    <td key={d} className="border border-slate-200 p-1 align-top h-14 bg-indigo-50/30">
+                      <div className="flex flex-col gap-1">
+                        {list.map((lc) => (
+                          <button
+                            key={lc.id}
+                            onClick={() => onPickLive(lc)}
+                            title={lc.name}
+                            className="w-full text-left inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
+                          >
+                            <Video className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{formatTimeRange(lc.startAt, lc.endAt)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })()}
         </tbody>
       </table>
     </div>
