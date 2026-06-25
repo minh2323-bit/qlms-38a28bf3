@@ -318,6 +318,13 @@ function ClassDetailPage() {
         </div>
       </section>
 
+      <AnnouncementSection
+        classRealId={info.lop}
+        subject={info.subject}
+        teacherName={info.teacher}
+      />
+
+
       {addOpen && (
         <AddMaterialModal
           mode={addOpen.kind}
