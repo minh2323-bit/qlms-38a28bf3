@@ -786,12 +786,17 @@ const STUDENT_DB: Record<string, Student[]> = {
   ],
 };
 
+type LiveCreatePayload = {
+  name: string; unitId: string; startAt: string; endAt: string;
+  link: string; description?: string; studentCount: number;
+};
+
 function LiveClassModal({
   classInfo, onClose, onCreated,
 }: {
   classInfo: ClassInfo;
   onClose: () => void;
-  onCreated: (name: string) => void;
+  onCreated: (data: LiveCreatePayload) => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
 
