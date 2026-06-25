@@ -246,6 +246,20 @@ const CHART_DATA_BY_CLASS: Record<"ALL" | ClassId, { name: string; done_ok: numb
 
 /* ---------------- Components ---------------- */
 
+function findLiveSlot(startAt: string): { week: number; day: number; period: number } | null {
+  const d = new Date(startAt);
+  const key = `${d.getDate()}/${d.getMonth() + 1}`;
+  for (const w of WEEKS) {
+    const dayIdx = (DAY_DATES[w.idx] ?? []).indexOf(key);
+    if (dayIdx < 0) continue;
+    const time = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    for (const [p, [s, e]] of Object.entries(PERIOD_TIMES)) {
+      if (time >= s && time <= e) return { week: w.idx, day: dayIdx, period: Number(p) };
+    }
+  }
+  return null;
+}
+
 function TeacherHome() {
   const [grid, setGrid] = useState<WeekGrid>(() => buildGrid());
   const [weekIdx, setWeekIdx] = useState(1);
@@ -253,6 +267,20 @@ function TeacherHome() {
   const [showTree, setShowTree] = useState(false);
   const [focusUnit, setFocusUnit] = useState<string | null>(null);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
+  const [activeLive, setActiveLive] = useState<LiveClass | null>(null);
+
+  const liveAll = useLiveClasses();
+  // map slot key "w-d-p" -> live class (respecting class filter)
+  const liveBySlot = useMemo(() => {
+    const map = new Map<string, LiveClass>();
+    for (const lc of liveAll) {
+      if (classFilter !== "ALL" && lc.classRealId !== classFilter) continue;
+      const slot = findLiveSlot(lc.startAt);
+      if (!slot) continue;
+      map.set(`${slot.week}-${slot.day}-${slot.period}`, lc);
+    }
+    return map;
+  }, [liveAll, classFilter]);
 
   useEffect(() => {
     if (!focusUnit) return;
