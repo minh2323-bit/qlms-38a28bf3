@@ -283,6 +283,8 @@ function CreateLessonPage() {
             }}
             canCreate={!!canCreate}
             onCreate={onCreateShell}
+            lockGradeSubject={isPrefilled}
+            fromHint={search.from}
           />
         )}
 
