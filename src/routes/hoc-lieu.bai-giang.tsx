@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Presentation as PresentationIcon, Users, MoreVertical,
@@ -247,12 +247,15 @@ function LessonsPage() {
             <div className="flex-1 min-w-0">
               {lessonView === "grid" ? (
                 <div className={`grid grid-cols-1 md:grid-cols-2 ${filterOpen ? "lg:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"} gap-4`}>
-                  <button className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[280px]">
+                  <Link
+                    to="/hoc-lieu/bai-giang/tao-moi"
+                    className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[280px]"
+                  >
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
                       <Plus className="h-7 w-7 text-indigo-600" />
                     </div>
                     <p className="mt-4 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
-                  </button>
+                  </Link>
                   {filteredLessons.map((l) => (
                     <LessonCardView
                       key={l.title + l.author}
@@ -521,15 +524,15 @@ function LessonsTable({
         <tbody>
           <tr className="border-t border-slate-200 bg-white">
             <td colSpan={8} className="px-4 py-5">
-              <button
-                type="button"
-                className="mx-auto flex flex-col items-center justify-center gap-1.5 group"
+              <Link
+                to="/hoc-lieu/bai-giang/tao-moi"
+                className="mx-auto flex flex-col items-center justify-center gap-1.5 group w-fit"
               >
                 <span className="h-11 w-11 rounded-full bg-sky-100 border-2 border-sky-300 flex items-center justify-center text-sky-500 group-hover:bg-sky-200 transition">
                   <Plus className="h-6 w-6" strokeWidth={2.5} />
                 </span>
                 <span className="text-sm font-medium text-sky-600">Thêm bài giảng mới</span>
-              </button>
+              </Link>
             </td>
           </tr>
           {lessons.map((l, i) => {
