@@ -51,14 +51,14 @@ type ClassInfo = {
 };
 
 const CLASS_DB: Record<string, ClassInfo> = {
-  c1: { id: "c1", name: "Lớp 4A - Toán năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp Toán nâng cao dành cho học sinh lớp 4A.", lop: "4A", subject: "Toán" },
-  c2: { id: "c2", name: "Lớp 4A - Tiếng Việt năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp Tiếng Việt 4A theo chương trình GDPT 2018.", lop: "4A", subject: "Tiếng Việt" },
-  c3: { id: "c3", name: "Lớp 3D năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp 3D – Toán cơ bản.", lop: "3D", subject: "Toán" },
-  c4: { id: "c4", name: "Lớp 3A năm học 2025 - 2026", code: "LH-3A-2526", students: 38, teacher: "Cô Lê Thu Hà", thumb: thumbLop3A, description: "Lớp 3A – Toán.", lop: "3A", subject: "Toán" },
-  c5: { id: "c5", name: "Lớp 3B năm học 2025 - 2026", code: "LH-3B-2526", students: 42, teacher: "Thầy Phạm Văn Nam", thumb: thumbLop3B, description: "Lớp 3B – Toán cơ bản (bản nháp).", lop: "3B", subject: "Toán" },
-  c6: { id: "c6", name: "Lớp 3C năm học 2025 - 2026", code: "LH-3C-2526", students: 39, teacher: "Cô Đỗ Mỹ Linh", thumb: thumbLop3C, description: "Lớp 3C – Toán.", lop: "3C", subject: "Toán" },
-  c7: { id: "c7", name: "Các bạn học sinh cần ôn tập đặc biệt", code: "LH-REVIEW-2526", students: 41, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4BReview, description: "Lớp ghép dành cho học sinh khối 4 cần ôn tập kiến thức nền.", lop: "4B", subject: "Toán" },
-  c8: { id: "c8", name: "Lớp 4C năm học 2025 - 2026", code: "LH-4C-2526", students: 40, teacher: "Thầy Hoàng Anh Tuấn", thumb: thumbLop4C, description: "Lớp 4C – Toán.", lop: "4C", subject: "Toán" },
+  c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán" },
+  c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt" },
+  c3: { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp học dành riêng cho lớp 3D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3D", subject: "Toán" },
+  c4: { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", code: "LH-3A-2526", students: 38, teacher: "Cô Lê Thu Hà", thumb: thumbLop3A, description: "Lớp học dành riêng cho lớp 3A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3A", subject: "Toán" },
+  c5: { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", code: "LH-3B-2526", students: 42, teacher: "Thầy Phạm Văn Nam", thumb: thumbLop3B, description: "Lớp học dành riêng cho lớp 3B. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3B", subject: "Toán" },
+  c6: { id: "c6", name: "Lớp 3C Năm học 2025 - 2026", code: "LH-3C-2526", students: 39, teacher: "Cô Đỗ Mỹ Linh", thumb: thumbLop3C, description: "Lớp học dành riêng cho lớp 3C. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3C", subject: "Toán" },
+  c7: { id: "c7", name: "Lớp 4B, 4C, 4D Năm học 2025 - 2026", code: "LH-REVIEW-2526", students: 41, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4BReview, description: "Lớp học dành riêng cho lớp 4B, 4C, 4D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4B", subject: "Toán" },
+  c8: { id: "c8", name: "Lớp 4C Năm học 2025 - 2026", code: "LH-4C-2526", students: 40, teacher: "Thầy Hoàng Anh Tuấn", thumb: thumbLop4C, description: "Lớp học dành riêng cho lớp 4C. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4C", subject: "Toán" },
 };
 
 /* ============================ Page ============================ */
@@ -197,11 +197,6 @@ function ClassDetailPage() {
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
                 <span className="opacity-90">Giáo viên:</span>
                 <span className="font-semibold">{info.teacher}</span>
-              </div>
-
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
-                <span className="opacity-90">Lớp · Môn:</span>
-                <span className="font-semibold">{info.lop} · {info.subject}</span>
               </div>
             </div>
 
