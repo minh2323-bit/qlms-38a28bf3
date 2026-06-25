@@ -12,12 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
+type CreateLessonSearch = { khoi?: string; mon?: string; from?: string };
+
 export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
   head: () => ({
     meta: [
       { title: "Tạo bài giảng mới | Tiểu học Tô Hiệu" },
       { name: "description", content: "Tạo bài giảng mới theo 3 bước." },
     ],
+  }),
+  validateSearch: (s: Record<string, unknown>): CreateLessonSearch => ({
+    khoi: typeof s.khoi === "string" ? s.khoi : undefined,
+    mon: typeof s.mon === "string" ? s.mon : undefined,
+    from: typeof s.from === "string" ? s.from : undefined,
   }),
   component: CreateLessonPage,
 });
