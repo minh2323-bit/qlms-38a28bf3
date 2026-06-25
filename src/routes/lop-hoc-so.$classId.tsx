@@ -23,6 +23,10 @@ import { KNOWLEDGE_TREE, getUnitTitle, getChapterOfUnit } from "@/lib/knowledge-
 import {
   useMaterials, addMaterial, type MaterialKind, type Material,
 } from "@/lib/teaching-store";
+import {
+  useLiveClasses, addLiveClass, formatTimeRange, formatDate,
+  type LiveClass,
+} from "@/lib/live-class-store";
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
   head: () => ({
