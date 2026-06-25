@@ -69,6 +69,19 @@ const SEED_COMBOS: Array<[string, string, string]> = [
   ["4A", "Tiếng Việt", "u3-khainiem"],
 ];
 
+// Học liệu độc lập (không thuộc bài giảng nào) — ngang hàng với bài giảng trong course
+const MISC_TEMPLATES: Array<{ kind: MaterialKind; title: string; meta?: string }> = [
+  { kind: "doc",      title: "Nội quy lớp học và hướng dẫn sử dụng",  meta: "2 trang" },
+  { kind: "video",    title: "Video giới thiệu khóa học",             meta: "03:20" },
+  { kind: "exercise", title: "Bài khảo sát đầu năm",                  meta: "10 câu" },
+];
+const MISC_CLASSES: Array<[string, string]> = [
+  ["4A", "Toán"], ["4A", "Tiếng Việt"],
+  ["3A", "Toán"], ["3B", "Toán"], ["3C", "Toán"], ["3D", "Toán"],
+  ["4B", "Toán"], ["4C", "Toán"],
+];
+
+
 function seedOnce() {
   if (materials.length) return;
   const acc: Material[] = [];
