@@ -480,7 +480,7 @@ function AddMaterialModal({
   const [meta, setMeta] = useState("");
 
   // Trường mở rộng cho Video / Tài liệu
-  const [subject] = useState("Toán");
+  const [subject] = useState(classInfo.subject);
   const [uploadMode, setUploadMode] = useState<"link" | "file">("link");
   const [link, setLink] = useState("");
   const [fileName, setFileName] = useState("");
