@@ -300,8 +300,6 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
           </DropdownMenu>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-y-1 text-sm text-slate-600">
-          <div><span className="font-medium text-slate-500">Khối/Lớp:</span> {c.lop}</div>
-          <div><span className="font-medium text-slate-500">Môn:</span> {c.subject}</div>
           <div><span className="font-medium text-slate-500">Số bài giảng:</span> {c.baiGiang}</div>
           <div><span className="font-medium text-slate-500">Số học liệu:</span> {c.hocLieu}</div>
         </div>
