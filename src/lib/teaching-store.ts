@@ -96,9 +96,19 @@ function seedOnce() {
       });
     }
   }
+  for (const [cls, subj] of MISC_CLASSES) {
+    for (const m of MISC_TEMPLATES) {
+      acc.push({
+        id: uid(),
+        classRealId: cls, subject: subj, unitId: "_misc",
+        kind: m.kind, title: m.title, meta: m.meta, origin: "seed",
+      });
+    }
+  }
   materials = acc;
 }
 seedOnce();
+
 
 /* ---------- Read ---------- */
 export function getMaterials(): Material[] {
