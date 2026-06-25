@@ -396,6 +396,8 @@ function TeacherHome() {
                     setActiveLessonId(id);
                   }}
                   activeLessonId={activeLessonId}
+                  liveBySlot={liveBySlot}
+                  onPickLive={(lc) => setActiveLive(lc)}
                 />
                 <Legend2 />
               </div>
