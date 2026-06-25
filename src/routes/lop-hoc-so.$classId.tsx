@@ -198,11 +198,6 @@ function ClassDetailPage() {
                 <span className="opacity-90">Giáo viên:</span>
                 <span className="font-semibold">{info.teacher}</span>
               </div>
-
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
-                <span className="opacity-90">Lớp · Môn:</span>
-                <span className="font-semibold">{info.lop} · {info.subject}</span>
-              </div>
             </div>
 
             {info.description && (
