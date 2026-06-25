@@ -357,11 +357,13 @@ function Step1(props: {
   onPickFile: (f: File) => void;
   canCreate: boolean;
   onCreate: () => void;
+  lockGradeSubject?: boolean;
+  fromHint?: string;
 }) {
   const {
     title, setTitle, khoi, setKhoi, mon, setMon, unitId, setUnitId, tree,
     coverMode, setCoverMode, coverLink, setCoverLink, coverFileName, coverDataUrl,
-    fileRef, onPickFile, canCreate, onCreate,
+    fileRef, onPickFile, canCreate, onCreate, lockGradeSubject, fromHint,
   } = props;
 
   return (
