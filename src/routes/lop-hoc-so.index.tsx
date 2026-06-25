@@ -410,7 +410,7 @@ function CreateClassModal({
                 <input
                   value={tenLop}
                   onChange={(e) => setTenLop(e.target.value)}
-                  placeholder="VD: Lớp 4A - Toán năm học 2025 - 2026"
+                  placeholder="VD: Lớp 4A Năm học 2025 - 2026"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </Field>
