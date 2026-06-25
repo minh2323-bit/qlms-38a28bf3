@@ -584,8 +584,8 @@ function AddMaterialModal({
                   onChange={(e) => setUnitId(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                  <option value="">— Chọn đơn vị kiến thức —</option>
-                  {KNOWLEDGE_TREE.map((ch) => (
+                  <option value="">— Chọn đơn vị kiến thức ({classInfo.subject} – Lớp {classInfo.lop.replace(/[^0-9]/g, "")}) —</option>
+                  {tree.map((ch) => (
                     <optgroup key={ch.id} label={ch.title}>
                       {ch.units.map((u) => (
                         <option key={u.id} value={u.id}>{u.title}</option>
