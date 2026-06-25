@@ -575,9 +575,8 @@ function Step2(props: {
             <tbody className="divide-y divide-slate-100">
               {topics.map((tp) => {
                 const items = rows.filter((m) => m.topicId === tp.id);
-                return (
-                  <>
-                    <tr key={"h-" + tp.id} className="bg-indigo-50/40">
+                  <React.Fragment key={tp.id}>
+                    <tr className="bg-indigo-50/40">
                       <td colSpan={6} className="px-3 py-2 font-semibold text-indigo-700">
                         {tp.name}
                         <button
