@@ -315,6 +315,7 @@ function ClassDetailPage() {
       {addOpen && (
         <AddMaterialModal
           mode={addOpen.kind}
+          classInfo={info}
           onClose={() => setAddOpen(null)}
           onSubmit={handleAdd}
         />
