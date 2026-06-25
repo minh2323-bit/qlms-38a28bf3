@@ -627,7 +627,7 @@ function Step2(props: {
                         </tr>
                       );
                     })}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>
