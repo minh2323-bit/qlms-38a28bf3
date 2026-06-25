@@ -14,7 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LopHocSoIndexRouteImport } from './routes/lop-hoc-so.index'
 import { Route as LopHocSoClassIdRouteImport } from './routes/lop-hoc-so.$classId'
 import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc-lieu'
-import { Route as HocLieuBaiGiangRouteImport } from './routes/hoc-lieu.bai-giang'
+import { Route as HocLieuBaiGiangIndexRouteImport } from './routes/hoc-lieu.bai-giang.index'
 import { Route as HocLieuBaiGiangTaoMoiRouteImport } from './routes/hoc-lieu.bai-giang.tao-moi'
 
 const LopHocSoRoute = LopHocSoRouteImport.update({
@@ -42,78 +42,79 @@ const HocLieuKhoHocLieuRoute = HocLieuKhoHocLieuRouteImport.update({
   path: '/hoc-lieu/kho-hoc-lieu',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HocLieuBaiGiangRoute = HocLieuBaiGiangRouteImport.update({
-  id: '/hoc-lieu/bai-giang',
-  path: '/hoc-lieu/bai-giang',
+const HocLieuBaiGiangIndexRoute = HocLieuBaiGiangIndexRouteImport.update({
+  id: '/hoc-lieu/bai-giang/',
+  path: '/hoc-lieu/bai-giang/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HocLieuBaiGiangTaoMoiRoute = HocLieuBaiGiangTaoMoiRouteImport.update({
-  id: '/tao-moi',
-  path: '/tao-moi',
-  getParentRoute: () => HocLieuBaiGiangRoute,
+  id: '/hoc-lieu/bai-giang/tao-moi',
+  path: '/hoc-lieu/bai-giang/tao-moi',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
-  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRoute
   '/lop-hoc-so/': typeof LopHocSoIndexRoute
   '/hoc-lieu/bai-giang/tao-moi': typeof HocLieuBaiGiangTaoMoiRoute
+  '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRoute
   '/lop-hoc-so': typeof LopHocSoIndexRoute
   '/hoc-lieu/bai-giang/tao-moi': typeof HocLieuBaiGiangTaoMoiRoute
+  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
-  '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRoute
   '/lop-hoc-so/': typeof LopHocSoIndexRoute
   '/hoc-lieu/bai-giang/tao-moi': typeof HocLieuBaiGiangTaoMoiRoute
+  '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/lop-hoc-so'
-    | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/lop-hoc-so/$classId'
     | '/lop-hoc-so/'
     | '/hoc-lieu/bai-giang/tao-moi'
+    | '/hoc-lieu/bai-giang/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/lop-hoc-so/$classId'
     | '/lop-hoc-so'
     | '/hoc-lieu/bai-giang/tao-moi'
+    | '/hoc-lieu/bai-giang'
   id:
     | '__root__'
     | '/'
     | '/lop-hoc-so'
-    | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/lop-hoc-so/$classId'
     | '/lop-hoc-so/'
     | '/hoc-lieu/bai-giang/tao-moi'
+    | '/hoc-lieu/bai-giang/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
-  HocLieuBaiGiangRoute: typeof HocLieuBaiGiangRouteWithChildren
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
+  HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
+  HocLieuBaiGiangIndexRoute: typeof HocLieuBaiGiangIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -153,19 +154,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocLieuKhoHocLieuRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hoc-lieu/bai-giang': {
-      id: '/hoc-lieu/bai-giang'
+    '/hoc-lieu/bai-giang/': {
+      id: '/hoc-lieu/bai-giang/'
       path: '/hoc-lieu/bai-giang'
-      fullPath: '/hoc-lieu/bai-giang'
-      preLoaderRoute: typeof HocLieuBaiGiangRouteImport
+      fullPath: '/hoc-lieu/bai-giang/'
+      preLoaderRoute: typeof HocLieuBaiGiangIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoc-lieu/bai-giang/tao-moi': {
       id: '/hoc-lieu/bai-giang/tao-moi'
-      path: '/tao-moi'
+      path: '/hoc-lieu/bai-giang/tao-moi'
       fullPath: '/hoc-lieu/bai-giang/tao-moi'
       preLoaderRoute: typeof HocLieuBaiGiangTaoMoiRouteImport
-      parentRoute: typeof HocLieuBaiGiangRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -184,34 +185,13 @@ const LopHocSoRouteWithChildren = LopHocSoRoute._addFileChildren(
   LopHocSoRouteChildren,
 )
 
-interface HocLieuBaiGiangRouteChildren {
-  HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
-}
-
-const HocLieuBaiGiangRouteChildren: HocLieuBaiGiangRouteChildren = {
-  HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
-}
-
-const HocLieuBaiGiangRouteWithChildren = HocLieuBaiGiangRoute._addFileChildren(
-  HocLieuBaiGiangRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LopHocSoRoute: LopHocSoRouteWithChildren,
-  HocLieuBaiGiangRoute: HocLieuBaiGiangRouteWithChildren,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
+  HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
+  HocLieuBaiGiangIndexRoute: HocLieuBaiGiangIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
