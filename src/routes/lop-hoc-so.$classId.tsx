@@ -76,6 +76,13 @@ function ClassDetailPage() {
     [allMaterials, info.lop, info.subject],
   );
 
+  const allLive = useLiveClasses();
+  const classLive = useMemo(
+    () => allLive.filter((l) => l.classRealId === info.lop && l.subject === info.subject)
+      .sort((a, b) => a.startAt.localeCompare(b.startAt)),
+    [allLive, info.lop, info.subject],
+  );
+
   // Group by unitId → sections
   type Group = { unitId: string; title: string; items: Material[] };
   const groups: Group[] = useMemo(() => {
