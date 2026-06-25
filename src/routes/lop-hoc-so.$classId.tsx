@@ -135,6 +135,7 @@ function ClassDetailPage() {
 
   /* add modal */
   const [addOpen, setAddOpen] = useState<null | { kind: "lesson" | "material" | "exercise" }>(null);
+  const [liveOpen, setLiveOpen] = useState(false);
   const handleAdd = (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => {
     addMaterial({
       classRealId: info.lop, subject: info.subject, origin: "class",
@@ -215,17 +216,12 @@ function ClassDetailPage() {
               {totals.lessons} chương/chủ đề • {totals.items} học liệu — đồng bộ với Lịch báo giảng
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setReorder((v) => !v)}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border transition ${
-                reorder
-                  ? "bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700"
-                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-              }`}
+              onClick={() => setLiveOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
             >
-              <MoveVertical className="h-4 w-4" />
-              {reorder ? "Xong sắp xếp" : "Sắp xếp"}
+              <Video className="h-4 w-4" /> Tạo lớp học trực tuyến
             </button>
             <button
               onClick={() => toast.message("Thêm chủ đề / Mục lục (demo)")}
@@ -276,6 +272,22 @@ function ClassDetailPage() {
           )}
         </div>
 
+        {orderedGroups.length > 1 && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={() => setReorder((v) => !v)}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border transition ${
+                reorder
+                  ? "bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              <MoveVertical className="h-4 w-4" />
+              {reorder ? "Xong sắp xếp" : "Sắp xếp"}
+            </button>
+          </div>
+        )}
+
         <div className="mt-4">
           <Link to="/lop-hoc-so" className="text-sm font-medium text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1">
             <ArrowLeft className="h-4 w-4" /> Quay lại danh sách lớp
@@ -288,6 +300,17 @@ function ClassDetailPage() {
           mode={addOpen.kind}
           onClose={() => setAddOpen(null)}
           onSubmit={handleAdd}
+        />
+      )}
+
+      {liveOpen && (
+        <LiveClassModal
+          classInfo={info}
+          onClose={() => setLiveOpen(false)}
+          onCreated={(name) => {
+            setLiveOpen(false);
+            toast.success(`Đã tạo lớp học trực tuyến "${name}"`);
+          }}
         />
       )}
     </AppShell>
@@ -330,7 +353,6 @@ function GroupRow({
       >
         {reorder && <GripVertical className="h-4 w-4 text-slate-400" />}
         {expanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
-        <Presentation className="h-4 w-4 text-indigo-600" />
         <span className="font-semibold text-slate-800 text-left flex-1">{group.title}</span>
         <span className="text-xs text-slate-500 font-medium">
           {group.items.length} học liệu
@@ -690,6 +712,356 @@ function AddMaterialModal({
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
               >
                 <Check className="h-4 w-4" /> Thêm & đồng bộ
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ Live class modal ============================ */
+
+type Student = { id: string; code: string; name: string; dob: string };
+
+const STUDENT_DB: Record<string, Student[]> = {
+  "4A": [
+    { id: "s1",  code: "0123456783", name: "Nguyễn An",        dob: "15/03/2015" },
+    { id: "s2",  code: "0365427720", name: "Mai Huyền",        dob: "02/07/2015" },
+    { id: "s3",  code: "0123456787", name: "Trần Bảo",         dob: "21/11/2015" },
+    { id: "s4",  code: "0348844088", name: "Thanh Vân",        dob: "08/05/2015" },
+    { id: "s5",  code: "0335773123", name: "Vũ Huy Hoàng",     dob: "30/09/2015" },
+    { id: "s6",  code: "0912125548", name: "Phạm Tất Thắng",   dob: "12/12/2015" },
+    { id: "s7",  code: "0934778812", name: "Lê Minh Châu",     dob: "04/02/2015" },
+    { id: "s8",  code: "0978221190", name: "Hoàng Khánh Linh", dob: "19/06/2015" },
+  ],
+  "4B": [
+    { id: "s9",  code: "0901123456", name: "Đỗ Quang Huy",     dob: "11/01/2015" },
+    { id: "s10", code: "0901123457", name: "Nguyễn Bích Ngọc", dob: "23/04/2015" },
+    { id: "s11", code: "0901123458", name: "Bùi Tiến Dũng",    dob: "07/08/2015" },
+  ],
+  "4C": [
+    { id: "s12", code: "0902223456", name: "Hà Thu Phương",    dob: "14/03/2015" },
+    { id: "s13", code: "0902223457", name: "Lý Văn Tài",       dob: "26/10/2015" },
+  ],
+  "3A": [
+    { id: "s14", code: "0903334456", name: "Trịnh Mỹ Duyên",   dob: "05/05/2016" },
+    { id: "s15", code: "0903334457", name: "Phan Đức Anh",     dob: "18/09/2016" },
+  ],
+  "3B": [
+    { id: "s16", code: "0904445567", name: "Ngô Hồng Nhung",   dob: "22/02/2016" },
+  ],
+  "3C": [
+    { id: "s17", code: "0905556678", name: "Tô Quốc Việt",     dob: "30/07/2016" },
+  ],
+  "3D": [
+    { id: "s18", code: "0906667789", name: "Đặng Phương Mai",  dob: "11/11/2016" },
+  ],
+};
+
+function LiveClassModal({
+  classInfo, onClose, onCreated,
+}: {
+  classInfo: ClassInfo;
+  onClose: () => void;
+  onCreated: (name: string) => void;
+}) {
+  const [step, setStep] = useState<1 | 2>(1);
+
+  // Step 1 fields
+  const [name, setName] = useState("");
+  const [unitId, setUnitId] = useState("");
+  const [startAt, setStartAt] = useState("");
+  const [endAt, setEndAt] = useState("");
+  const [link, setLink] = useState("");
+  const [description, setDescription] = useState("");
+
+  // Step 2 fields
+  const grade = classInfo.lop.replace(/[^0-9]/g, ""); // "4A" -> "4"
+  const [filterGrade, setFilterGrade] = useState(grade);
+  const gradeClasses = useMemo(
+    () => Object.keys(STUDENT_DB).filter((c) => c.startsWith(filterGrade)),
+    [filterGrade],
+  );
+  const [filterClass, setFilterClass] = useState(classInfo.lop);
+  const students = STUDENT_DB[filterClass] ?? [];
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const allChecked = students.length > 0 && students.every((s) => selected.has(s.id));
+  const toggleAll = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allChecked) students.forEach((s) => next.delete(s.id));
+      else students.forEach((s) => next.add(s.id));
+      return next;
+    });
+  };
+  const toggleOne = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const linkValid = /^(https?:\/\/)?(meet\.google\.com|.*zoom\.us|teams\.microsoft\.com|.*teams\.live\.com)\//i.test(link.trim());
+
+  const canNext =
+    name.trim().length > 0 &&
+    !!unitId &&
+    !!startAt && !!endAt &&
+    linkValid;
+
+  const canCreate = selected.size > 0;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[92vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">Điền thông tin lớp học</h2>
+            <div className="mt-1.5 flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                {classInfo.lop}
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {classInfo.subject}
+              </span>
+              <span className="text-xs text-slate-500">· Bước {step}/2</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {step === 1 && (
+              <button
+                onClick={() => canNext && setStep(2)}
+                disabled={!canNext}
+                className="px-3 py-1.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Ghi
+              </button>
+            )}
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {step === 1 && (
+          <div className="px-6 py-5 space-y-4 overflow-y-auto">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Tên lớp <span className="text-rose-500">*</span>
+              </label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="VD: Ôn tập Phép cộng phân số – Lớp 4A"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Đơn vị kiến thức học <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={unitId}
+                onChange={(e) => setUnitId(e.target.value)}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              >
+                <option value="">— Chọn đơn vị kiến thức ({classInfo.subject} – Lớp {classInfo.lop.replace(/[^0-9]/g, "")}) —</option>
+                {KNOWLEDGE_TREE.map((ch) => (
+                  <optgroup key={ch.id} label={ch.title}>
+                    {ch.units.map((u) => (
+                      <option key={u.id} value={u.id}>{u.title}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Bắt đầu <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={startAt}
+                  onChange={(e) => setStartAt(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Kết thúc <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={endAt}
+                  onChange={(e) => setEndAt(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                Đường dẫn liên kết tới lớp học <span className="text-rose-500">*</span>
+              </label>
+              <input
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                placeholder="https://meet.google.com/... hoặc Zoom / Teams"
+                className={`w-full px-3 py-2 text-sm rounded-lg border bg-white focus:outline-none focus:ring-2 ${
+                  link && !linkValid
+                    ? "border-rose-300 focus:ring-rose-200"
+                    : "border-slate-200 focus:ring-indigo-200"
+                }`}
+              />
+              <p className={`mt-1 text-xs ${link && !linkValid ? "text-rose-500" : "text-slate-500"}`}>
+                Chỉ chấp nhận liên kết Google Meet, Zoom hoặc Microsoft Teams.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Mô tả lớp học</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                placeholder="Mục tiêu buổi học, yêu cầu chuẩn bị…"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 resize-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="px-6 py-5 space-y-4 overflow-y-auto">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Khối</label>
+                <select
+                  value={filterGrade}
+                  onChange={(e) => {
+                    setFilterGrade(e.target.value);
+                    const first = Object.keys(STUDENT_DB).find((c) => c.startsWith(e.target.value));
+                    if (first) setFilterClass(first);
+                  }}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white"
+                >
+                  {["3", "4", "5"].map((g) => (
+                    <option key={g} value={g}>Khối {g}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Lớp</label>
+                <select
+                  value={filterClass}
+                  onChange={(e) => setFilterClass(e.target.value)}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white"
+                >
+                  {gradeClasses.map((c) => (
+                    <option key={c} value={c}>Lớp {c}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ml-auto text-sm text-slate-600">
+                Đã chọn: <span className="font-bold text-indigo-700">{selected.size}</span> học sinh
+              </div>
+            </div>
+
+            <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-semibold w-12">STT</th>
+                    <th className="px-3 py-2 text-left font-semibold">Mã định danh</th>
+                    <th className="px-3 py-2 text-left font-semibold">Tên học sinh</th>
+                    <th className="px-3 py-2 text-left font-semibold">Ngày sinh</th>
+                    <th className="px-3 py-2 text-center font-semibold w-14">
+                      <input
+                        type="checkbox"
+                        checked={allChecked}
+                        onChange={toggleAll}
+                        className="h-4 w-4 accent-indigo-600 cursor-pointer"
+                      />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {students.map((s, idx) => {
+                    const checked = selected.has(s.id);
+                    return (
+                      <tr
+                        key={s.id}
+                        className={`hover:bg-slate-50 cursor-pointer ${checked ? "bg-indigo-50/40" : ""}`}
+                        onClick={() => toggleOne(s.id)}
+                      >
+                        <td className="px-3 py-2 text-slate-500">{String(idx + 1).padStart(2, "0")}</td>
+                        <td className="px-3 py-2 font-mono text-slate-700">{s.code}</td>
+                        <td className="px-3 py-2 text-slate-800 font-medium">{s.name}</td>
+                        <td className="px-3 py-2 text-slate-600">{s.dob}</td>
+                        <td className="px-3 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleOne(s.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-4 w-4 accent-indigo-600 cursor-pointer"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {students.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-6 text-center text-sm text-slate-400 italic">
+                        Không có học sinh nào trong lớp này.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        <div className="px-6 py-4 border-t bg-slate-50 flex items-center justify-between gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+          >
+            Hủy
+          </button>
+          <div className="flex items-center gap-2">
+            {step === 2 && (
+              <button
+                onClick={() => setStep(1)}
+                className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+              >
+                <ArrowLeft className="h-4 w-4" /> Quay lại
+              </button>
+            )}
+            {step === 1 ? (
+              <button
+                onClick={() => canNext && setStep(2)}
+                disabled={!canNext}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+              >
+                Tiếp tục <ChevronRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => canCreate && onCreated(name.trim())}
+                disabled={!canCreate}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+              >
+                <Check className="h-4 w-4" /> Tạo lớp học
               </button>
             )}
           </div>
