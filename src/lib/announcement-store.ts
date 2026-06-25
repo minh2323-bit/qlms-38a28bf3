@@ -87,9 +87,13 @@ export function removeAnnouncement(id: string) {
 }
 
 export function useAnnouncements(classRealId: string, subject: string): Announcement[] {
-  return useSyncExternalStore(
+  const all = useSyncExternalStore(
     (l) => { listeners.add(l); return () => { listeners.delete(l); }; },
-    () => listAnnouncements(classRealId, subject),
-    () => listAnnouncements(classRealId, subject),
+    () => items,
+    () => items,
   );
+  return all
+    .filter((a) => a.classRealId === classRealId && a.subject === subject)
+    .sort((a, b) => b.createdAt - a.createdAt);
 }
+
