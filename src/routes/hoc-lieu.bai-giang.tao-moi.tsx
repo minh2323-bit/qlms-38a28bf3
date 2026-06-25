@@ -173,12 +173,17 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
 
 function CreateLessonPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const prefilledKhoi = search.khoi ?? "";
+  const prefilledMon = search.mon ?? "";
+  const isPrefilled = !!(prefilledKhoi && prefilledMon);
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Step 1
   const [title, setTitle] = useState("");
-  const [khoi, setKhoi] = useState("");
-  const [mon, setMon] = useState("");
+  const [khoi, setKhoi] = useState(prefilledKhoi);
+  const [mon, setMon] = useState(prefilledMon);
   const [unitId, setUnitId] = useState("");
   const [coverMode, setCoverMode] = useState<"link" | "file">("link");
   const [coverLink, setCoverLink] = useState("");
