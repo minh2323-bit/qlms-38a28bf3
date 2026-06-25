@@ -339,7 +339,7 @@ function Step1(props: {
   coverLink: string; setCoverLink: (v: string) => void;
   coverFileName: string;
   coverDataUrl: string;
-  fileRef: React.RefObject<HTMLInputElement>;
+  fileRef: React.RefObject<HTMLInputElement | null>;
   onPickFile: (f: File) => void;
   canCreate: boolean;
   onCreate: () => void;
