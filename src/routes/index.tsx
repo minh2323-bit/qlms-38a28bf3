@@ -29,9 +29,11 @@ import {
   useMaterials, addMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
 import {
-  useLiveClasses, PERIOD_TIMES, formatTimeRange,
+  useLiveClasses, PERIOD_TIMES, formatTimeRange, isLiveEnded, isEvening,
   type LiveClass,
 } from "@/lib/live-class-store";
+import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
+import { BarChart3 } from "lucide-react";
 
 
 export const Route = createFileRoute("/")({
