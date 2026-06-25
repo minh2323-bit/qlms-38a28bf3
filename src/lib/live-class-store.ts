@@ -32,6 +32,19 @@ let items: LiveClass[] = [
     studentCount: 32,
     createdAt: "2026-03-30T10:00:00.000Z",
   },
+  {
+    id: "lc-seed-2",
+    classRealId: "4A",
+    subject: "Toán",
+    name: "Phụ đạo buổi tối – Phép cộng phân số",
+    unitId: "u4-cong",
+    startAt: "2026-04-03T19:30",
+    endAt: "2026-04-03T20:30",
+    link: "https://meet.google.com/evn-pqrs-tuv",
+    description: "Buổi học tăng cường vào buổi tối cho học sinh lớp 4A.",
+    studentCount: 18,
+    createdAt: "2026-03-31T09:00:00.000Z",
+  },
 ];
 
 const listeners = new Set<Listener>();
