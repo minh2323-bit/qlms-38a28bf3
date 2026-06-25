@@ -28,6 +28,10 @@ import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree } from "@/lib/knowle
 import {
   useMaterials, addMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
+import {
+  useLiveClasses, PERIOD_TIMES, formatTimeRange,
+  type LiveClass,
+} from "@/lib/live-class-store";
 
 
 export const Route = createFileRoute("/")({
