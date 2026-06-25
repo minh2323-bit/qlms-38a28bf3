@@ -39,14 +39,14 @@ type ClassRow = {
 };
 
 const CLASSES_SEED: ClassRow[] = [
-  { id: "c1", name: "Lớp 4A - Toán năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
-  { id: "c2", name: "Lớp 4A - Tiếng Việt năm học 2025 - 2026", lop: "4A", subject: "Tiếng Việt", baiGiang: 12, hocLieu: 14, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
-  { id: "c3", name: "Lớp 3D năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D, status: "deployed" },
-  { id: "c4", name: "Lớp 3A năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A, status: "deployed" },
-  { id: "c5", name: "Lớp 3B năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B, status: "draft" },
-  { id: "c6", name: "Lớp 3C năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C, status: "deployed" },
-  { id: "c7", name: "Các bạn học sinh cần ôn tập đặc biệt", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview, status: "draft" },
-  { id: "c8", name: "Lớp 4C năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C, status: "deployed" },
+  { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
+  { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", lop: "4A", subject: "Tiếng Việt", baiGiang: 12, hocLieu: 14, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
+  { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D, status: "deployed" },
+  { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A, status: "deployed" },
+  { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B, status: "draft" },
+  { id: "c6", name: "Lớp 3C Năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C, status: "deployed" },
+  { id: "c7", name: "Lớp 4B, 4C, 4D Năm học 2025 - 2026", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview, status: "draft" },
+  { id: "c8", name: "Lớp 4C Năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C, status: "deployed" },
 ];
 
 const TOTAL_LESSONS = 8;
