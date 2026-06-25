@@ -135,6 +135,7 @@ function ClassDetailPage() {
 
   /* add modal */
   const [addOpen, setAddOpen] = useState<null | { kind: "lesson" | "material" | "exercise" }>(null);
+  const [liveOpen, setLiveOpen] = useState(false);
   const handleAdd = (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => {
     addMaterial({
       classRealId: info.lop, subject: info.subject, origin: "class",
