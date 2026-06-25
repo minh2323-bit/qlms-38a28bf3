@@ -718,6 +718,8 @@ function ScheduleGrid({
 
 /* ----- Live class popup ----- */
 function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => void }) {
+  const [showStats, setShowStats] = useState(false);
+  const ended = isLiveEnded(live);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" onClick={onClose}>
       <div
@@ -731,7 +733,9 @@ function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => voi
             </span>
             <div className="min-w-0">
               <h3 className="text-base font-bold text-slate-800 truncate">{live.name}</h3>
-              <p className="text-xs text-emerald-700 font-medium mt-0.5">Lớp học trực tuyến</p>
+              <p className="text-xs text-emerald-700 font-medium mt-0.5">
+                Lớp học trực tuyến {ended && <span className="ml-1 text-slate-500">· Đã kết thúc</span>}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/60 text-slate-500 shrink-0">
@@ -767,16 +771,26 @@ function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => voi
           )}
         </div>
         <div className="px-5 py-3 border-t bg-slate-50 flex justify-end">
-          <a
-            href={live.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-          >
-            <Video className="h-4 w-4" /> Vào lớp ngay
-          </a>
+          {ended ? (
+            <button
+              onClick={() => setShowStats(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              <BarChart3 className="h-4 w-4" /> Xem thống kê
+            </button>
+          ) : (
+            <a
+              href={live.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              <Video className="h-4 w-4" /> Vào lớp ngay
+            </a>
+          )}
         </div>
       </div>
+      {showStats && <LiveClassStatsModal live={live} onClose={() => setShowStats(false)} />}
     </div>
   );
 }
