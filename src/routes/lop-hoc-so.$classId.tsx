@@ -28,7 +28,9 @@ import {
   type LiveClass,
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
+import { AnnouncementSection } from "@/components/AnnouncementSection";
 import { BarChart3 } from "lucide-react";
+
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
   head: () => ({
@@ -315,6 +317,13 @@ function ClassDetailPage() {
           </Link>
         </div>
       </section>
+
+      <AnnouncementSection
+        classRealId={info.lop}
+        subject={info.subject}
+        teacherName={info.teacher}
+      />
+
 
       {addOpen && (
         <AddMaterialModal
