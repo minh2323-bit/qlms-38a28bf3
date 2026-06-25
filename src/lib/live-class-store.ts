@@ -109,3 +109,63 @@ export function formatDate(iso: string): string {
   const d = new Date(iso);
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 }
+
+/* ---------- Status & Stats ---------- */
+// Coi như "đã kết thúc" nếu thời điểm hiện tại > endAt.
+export function isLiveEnded(lc: Pick<LiveClass, "endAt">): boolean {
+  return new Date(lc.endAt).getTime() < Date.now();
+}
+
+// Lớp diễn ra vào buổi tối (sau khung tiết 10 — từ 18:30 trở đi).
+export function isEvening(startAt: string): boolean {
+  const d = new Date(startAt);
+  const minutes = d.getHours() * 60 + d.getMinutes();
+  return minutes >= 18 * 60 + 30;
+}
+
+export type Attendee = {
+  name: string;
+  joinAt: string;  // "HH:mm"
+  leaveAt: string; // "HH:mm"
+};
+
+// Mock danh sách học sinh tham dự — sinh ổn định theo id để demo.
+const ATTENDEE_POOL = [
+  "Nguyễn An", "Mai Huyền", "Trần Bảo", "Thanh Vân", "Vũ Huy Hoàng",
+  "Phạm Tất Thắng", "Lê Minh Châu", "Hoàng Khánh Linh", "Đỗ Quang Huy",
+  "Nguyễn Bích Ngọc", "Bùi Tiến Dũng", "Hà Thu Phương", "Lý Văn Tài",
+  "Trịnh Mỹ Duyên", "Phan Đức Anh", "Ngô Hồng Nhung", "Tô Quốc Việt",
+  "Đặng Phương Mai", "Vũ Hà Trang", "Nguyễn Tuấn Kiệt", "Lê Bảo Châu",
+  "Phạm Quang Minh", "Hoàng Thu Hằng", "Đinh Bảo Long", "Trần Mỹ Linh",
+  "Nguyễn Đăng Khoa", "Bùi Hà My", "Lý Khánh Vy", "Phạm Hữu Phước",
+  "Đỗ Nhật Nam", "Cao Thị Hoa", "Nguyễn Quỳnh Như",
+];
+
+function pad(n: number) { return String(n).padStart(2, "0"); }
+function addMinutes(time: string, mins: number) {
+  const [h, m] = time.split(":").map(Number);
+  const total = h * 60 + m + mins;
+  return `${pad(Math.floor(total / 60) % 24)}:${pad(((total % 60) + 60) % 60)}`;
+}
+
+export function getAttendees(lc: LiveClass): Attendee[] {
+  const startTime = `${pad(new Date(lc.startAt).getHours())}:${pad(new Date(lc.startAt).getMinutes())}`;
+  const endTime = `${pad(new Date(lc.endAt).getHours())}:${pad(new Date(lc.endAt).getMinutes())}`;
+  // Tạo seed đơn giản từ id để kết quả ổn định giữa các lần render.
+  let seed = 0;
+  for (const ch of lc.id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+  const rand = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 0xffffffff;
+  };
+  return Array.from({ length: lc.studentCount }, (_, i) => {
+    const name = ATTENDEE_POOL[(i + (seed % ATTENDEE_POOL.length)) % ATTENDEE_POOL.length];
+    const joinOffset = Math.floor(rand() * 4); // 0–3 phút sau khi bắt đầu
+    const earlyLeave = rand() < 0.15 ? Math.floor(rand() * 10) + 1 : 0;
+    return {
+      name,
+      joinAt: addMinutes(startTime, joinOffset),
+      leaveAt: addMinutes(endTime, -earlyLeave),
+    };
+  });
+}
