@@ -21,7 +21,7 @@ import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
 import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
 import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
 
-export const Route = createFileRoute("/hoc-lieu/bai-giang")({
+export const Route = createFileRoute("/hoc-lieu/bai-giang/")({
   head: () => ({
     meta: [
       { title: "Bài giảng – Học liệu & Bài kiểm tra | Tiểu học Tô Hiệu" },
