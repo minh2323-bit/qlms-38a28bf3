@@ -19,7 +19,7 @@ import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
 import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
 import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
 
-import { KNOWLEDGE_TREE, getUnitTitle, getChapterOfUnit } from "@/lib/knowledge-tree";
+import { getTreeForClass, getUnitTitle, getChapterOfUnit } from "@/lib/knowledge-tree";
 import {
   useMaterials, addMaterial, type MaterialKind, type Material,
 } from "@/lib/teaching-store";
@@ -315,6 +315,7 @@ function ClassDetailPage() {
       {addOpen && (
         <AddMaterialModal
           mode={addOpen.kind}
+          classInfo={info}
           onClose={() => setAddOpen(null)}
           onSubmit={handleAdd}
         />
@@ -458,12 +459,14 @@ const COMPLETION_OPTIONS = [
 ];
 
 function AddMaterialModal({
-  mode, onClose, onSubmit,
+  mode, classInfo, onClose, onSubmit,
 }: {
   mode: "lesson" | "material" | "exercise";
+  classInfo: ClassInfo;
   onClose: () => void;
   onSubmit: (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => void;
 }) {
+  const tree = useMemo(() => getTreeForClass(classInfo.lop, classInfo.subject), [classInfo.lop, classInfo.subject]);
   const defaultKind: MaterialKind =
     mode === "lesson" ? "slide" : mode === "exercise" ? "exercise" : "video";
 
@@ -477,7 +480,7 @@ function AddMaterialModal({
   const [meta, setMeta] = useState("");
 
   // Trường mở rộng cho Video / Tài liệu
-  const [subject] = useState("Toán");
+  const [subject] = useState(classInfo.subject);
   const [uploadMode, setUploadMode] = useState<"link" | "file">("link");
   const [link, setLink] = useState("");
   const [fileName, setFileName] = useState("");
@@ -581,8 +584,8 @@ function AddMaterialModal({
                   onChange={(e) => setUnitId(e.target.value)}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                  <option value="">— Chọn đơn vị kiến thức —</option>
-                  {KNOWLEDGE_TREE.map((ch) => (
+                  <option value="">— Chọn đơn vị kiến thức ({classInfo.subject} – Lớp {classInfo.lop.replace(/[^0-9]/g, "")}) —</option>
+                  {tree.map((ch) => (
                     <optgroup key={ch.id} label={ch.title}>
                       {ch.units.map((u) => (
                         <option key={u.id} value={u.id}>{u.title}</option>
@@ -801,6 +804,7 @@ function LiveClassModal({
   onCreated: (data: LiveCreatePayload) => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
+  const tree = useMemo(() => getTreeForClass(classInfo.lop, classInfo.subject), [classInfo.lop, classInfo.subject]);
 
   // Step 1 fields
   const [name, setName] = useState("");
@@ -905,7 +909,7 @@ function LiveClassModal({
                 className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
               >
                 <option value="">— Chọn đơn vị kiến thức ({classInfo.subject} – Lớp {classInfo.lop.replace(/[^0-9]/g, "")}) —</option>
-                {KNOWLEDGE_TREE.map((ch) => (
+                {tree.map((ch) => (
                   <optgroup key={ch.id} label={ch.title}>
                     {ch.units.map((u) => (
                       <option key={u.id} value={u.id}>{u.title}</option>

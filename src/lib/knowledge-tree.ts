@@ -1,11 +1,11 @@
-// Cây kiến thức môn Toán – Lớp 4 (Chương trình GDPT 2018)
-// Cấu trúc bám theo Học liệu số HCM: 3 mạch kiến thức.
+// Cây kiến thức môn Toán – Tiểu học (Chương trình GDPT 2018)
+// Cấu trúc bám theo Học liệu số HCM (hoclieuso.hcm.edu.vn): các mạch kiến thức.
 // Dùng chung cho: Lịch báo giảng, Lớp học số (Add học liệu/bài giảng), Học liệu.
 
 export type KnowledgeUnit = { id: string; title: string; week: number };
 export type KnowledgeChapter = { id: string; title: string; units: KnowledgeUnit[] };
 
-/** Tree mặc định: Khối 4 – Toán. */
+/** Tree mặc định trang chủ (Khối 4 – Toán) — giữ lại export cũ để tương thích. */
 export const KNOWLEDGE_TREE: KnowledgeChapter[] = [
   {
     id: "ch1",
@@ -68,16 +68,119 @@ export const KNOWLEDGE_TREE: KnowledgeChapter[] = [
   },
 ];
 
-/** Trả về cây kiến thức theo khối + môn. Hiện chỉ có Khối 4 – Toán. */
-export function getKnowledgeTree(grade: string, subject: string): KnowledgeChapter[] {
-  if (String(grade) === "4" && subject === "toan") return KNOWLEDGE_TREE;
+/** Cây kiến thức Khối 3 – Toán. */
+export const KNOWLEDGE_TREE_G3: KnowledgeChapter[] = [
+  {
+    id: "g3-ch1",
+    title: "Ôn tập và bổ sung",
+    units: [
+      { id: "g3-u1-onso",       title: "Ôn tập các số trong phạm vi 1 000",          week: 1 },
+      { id: "g3-u1-oncongtru",  title: "Ôn tập phép cộng, phép trừ trong phạm vi 1 000", week: 1 },
+      { id: "g3-u1-onnhanchia", title: "Ôn tập phép nhân, phép chia",                 week: 1 },
+      { id: "g3-u1-bieuthuc",   title: "Tính giá trị của biểu thức số",               week: 2 },
+    ],
+  },
+  {
+    id: "g3-ch2",
+    title: "Bảng nhân, bảng chia",
+    units: [
+      { id: "g3-u2-bn6",   title: "Bảng nhân 6",                week: 2 },
+      { id: "g3-u2-bn7",   title: "Bảng nhân 7",                week: 2 },
+      { id: "g3-u2-bn8",   title: "Bảng nhân 8",                week: 3 },
+      { id: "g3-u2-bn9",   title: "Bảng nhân 9",                week: 3 },
+      { id: "g3-u2-bc6",   title: "Bảng chia 6",                week: 3 },
+      { id: "g3-u2-bc7",   title: "Bảng chia 7",                week: 3 },
+      { id: "g3-u2-bc8",   title: "Bảng chia 8",                week: 4 },
+      { id: "g3-u2-bc9",   title: "Bảng chia 9",                week: 4 },
+      { id: "g3-u2-modong",title: "Mô-đun gấp, giảm một số đi nhiều lần", week: 4 },
+    ],
+  },
+  {
+    id: "g3-ch3",
+    title: "Các số trong phạm vi 10 000 – 100 000",
+    units: [
+      { id: "g3-u3-10000",   title: "Các số trong phạm vi 10 000",              week: 5 },
+      { id: "g3-u3-100000",  title: "Các số trong phạm vi 100 000",             week: 5 },
+      { id: "g3-u3-sosanh",  title: "So sánh các số trong phạm vi 100 000",     week: 5 },
+      { id: "g3-u3-lamtron", title: "Làm tròn số đến hàng chục, hàng trăm",     week: 6 },
+    ],
+  },
+  {
+    id: "g3-ch4",
+    title: "Cộng, trừ, nhân, chia trong phạm vi 100 000",
+    units: [
+      { id: "g3-u4-cong",   title: "Phép cộng trong phạm vi 100 000",            week: 6 },
+      { id: "g3-u4-tru",    title: "Phép trừ trong phạm vi 100 000",             week: 6 },
+      { id: "g3-u4-nhan",   title: "Nhân số có nhiều chữ số với số có một chữ số", week: 7 },
+      { id: "g3-u4-chia",   title: "Chia số có nhiều chữ số cho số có một chữ số", week: 7 },
+      { id: "g3-u4-tinhgt", title: "Tính giá trị của biểu thức",                 week: 7 },
+      { id: "g3-u4-tdang",  title: "Tìm thành phần chưa biết của phép tính",     week: 8 },
+    ],
+  },
+  {
+    id: "g3-ch5",
+    title: "Hình học và Đo lường",
+    units: [
+      { id: "g3-u5-diem",     title: "Điểm, đoạn thẳng, đường thẳng",            week: 8 },
+      { id: "g3-u5-gocvuong", title: "Góc vuông, góc không vuông",               week: 8 },
+      { id: "g3-u5-tamgiac",  title: "Hình tam giác, hình tứ giác",              week: 9 },
+      { id: "g3-u5-cnhat",    title: "Hình chữ nhật, hình vuông",                week: 9 },
+      { id: "g3-u5-chuvi",    title: "Chu vi hình chữ nhật, hình vuông",         week: 9 },
+      { id: "g3-u5-dientich", title: "Diện tích hình chữ nhật, hình vuông",      week: 9 },
+      { id: "g3-u5-mm",       title: "Mi-li-mét",                                week: 9 },
+      { id: "g3-u5-gam",      title: "Gam",                                      week: 9 },
+      { id: "g3-u5-lit",      title: "Mi-li-lít",                                week: 9 },
+      { id: "g3-u5-nhietdo",  title: "Nhiệt độ",                                 week: 9 },
+      { id: "g3-u5-tien",     title: "Tiền Việt Nam",                            week: 9 },
+      { id: "g3-u5-thoigian", title: "Đơn vị đo thời gian",                      week: 9 },
+    ],
+  },
+  {
+    id: "g3-ch6",
+    title: "Một số yếu tố Thống kê và Xác suất",
+    units: [
+      { id: "g3-u6-thuthap",  title: "Thu thập, phân loại, ghi chép số liệu",    week: 10 },
+      { id: "g3-u6-bangso",   title: "Bảng số liệu thống kê",                    week: 10 },
+      { id: "g3-u6-xacsuat",  title: "Sự kiện chắc chắn, có thể, không thể",     week: 10 },
+    ],
+  },
+];
+
+/** Map nhãn Khối/Môn → key chuẩn. */
+function normalizeGrade(grade: string | number): string {
+  return String(grade).replace(/[^0-9]/g, "");
+}
+function normalizeSubject(subject: string): string {
+  const s = subject.toLowerCase();
+  if (s.includes("toán") || s === "toan") return "toan";
+  if (s.includes("tiếng việt") || s === "tv") return "tv";
+  return s;
+}
+
+/** Trả về cây kiến thức theo khối + môn. */
+export function getKnowledgeTree(grade: string | number, subject: string): KnowledgeChapter[] {
+  const g = normalizeGrade(grade);
+  const s = normalizeSubject(subject);
+  if (s !== "toan") return [];
+  if (g === "4") return KNOWLEDGE_TREE;
+  if (g === "3") return KNOWLEDGE_TREE_G3;
   return [];
 }
 
+/** Helper cho lớp học (truyền "4A"/"3D" và "Toán"). */
+export function getTreeForClass(classLop: string, subject: string): KnowledgeChapter[] {
+  return getKnowledgeTree(normalizeGrade(classLop), subject);
+}
+
+/** Tổng hợp tất cả cây để tra cứu cross-grade. */
+const ALL_TREES: KnowledgeChapter[][] = [KNOWLEDGE_TREE, KNOWLEDGE_TREE_G3];
+
 export function getUnit(unitId: string): KnowledgeUnit | undefined {
-  for (const ch of KNOWLEDGE_TREE) {
-    const u = ch.units.find((u) => u.id === unitId);
-    if (u) return u;
+  for (const tree of ALL_TREES) {
+    for (const ch of tree) {
+      const u = ch.units.find((u) => u.id === unitId);
+      if (u) return u;
+    }
   }
   return undefined;
 }
@@ -87,7 +190,11 @@ export function getUnitTitle(unitId: string): string {
 }
 
 export function getChapterOfUnit(unitId: string): KnowledgeChapter | undefined {
-  return KNOWLEDGE_TREE.find((ch) => ch.units.some((u) => u.id === unitId));
+  for (const tree of ALL_TREES) {
+    const ch = tree.find((ch) => ch.units.some((u) => u.id === unitId));
+    if (ch) return ch;
+  }
+  return undefined;
 }
 
 export function getChapterTitle(unitId: string): string {
