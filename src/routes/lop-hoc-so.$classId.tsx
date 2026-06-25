@@ -272,6 +272,22 @@ function ClassDetailPage() {
           )}
         </div>
 
+        {orderedGroups.length > 1 && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={() => setReorder((v) => !v)}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border transition ${
+                reorder
+                  ? "bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              <MoveVertical className="h-4 w-4" />
+              {reorder ? "Xong sắp xếp" : "Sắp xếp"}
+            </button>
+          </div>
+        )}
+
         <div className="mt-4">
           <Link to="/lop-hoc-so" className="text-sm font-medium text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1">
             <ArrowLeft className="h-4 w-4" /> Quay lại danh sách lớp
@@ -284,6 +300,17 @@ function ClassDetailPage() {
           mode={addOpen.kind}
           onClose={() => setAddOpen(null)}
           onSubmit={handleAdd}
+        />
+      )}
+
+      {liveOpen && (
+        <LiveClassModal
+          classInfo={info}
+          onClose={() => setLiveOpen(false)}
+          onCreated={(name) => {
+            setLiveOpen(false);
+            toast.success(`Đã tạo lớp học trực tuyến "${name}"`);
+          }}
         />
       )}
     </AppShell>
