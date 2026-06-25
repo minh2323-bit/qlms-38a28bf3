@@ -804,6 +804,7 @@ function LiveClassModal({
   onCreated: (data: LiveCreatePayload) => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
+  const tree = useMemo(() => getTreeForClass(classInfo.lop, classInfo.subject), [classInfo.lop, classInfo.subject]);
 
   // Step 1 fields
   const [name, setName] = useState("");
