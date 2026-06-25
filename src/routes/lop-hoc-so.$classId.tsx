@@ -1088,7 +1088,11 @@ function LiveClassModal({
               </button>
             ) : (
               <button
-                onClick={() => canCreate && onCreated(name.trim())}
+                onClick={() => canCreate && onCreated({
+                  name: name.trim(), unitId, startAt, endAt,
+                  link: link.trim(), description: description.trim() || undefined,
+                  studentCount: selected.size,
+                })}
                 disabled={!canCreate}
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
               >
