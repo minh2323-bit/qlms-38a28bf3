@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
-  ClipboardCheck, CalendarClock, Sun, Sunset,
+  ClipboardCheck, CalendarClock, Sun, Sunset, Moon,
   ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
   Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
@@ -29,9 +29,10 @@ import {
   useMaterials, addMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
 import {
-  useLiveClasses, PERIOD_TIMES, formatTimeRange,
+  useLiveClasses, PERIOD_TIMES, formatTimeRange, isLiveEnded, isEvening,
   type LiveClass,
 } from "@/lib/live-class-store";
+import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
 
 
 export const Route = createFileRoute("/")({
@@ -260,6 +261,18 @@ function findLiveSlot(startAt: string): { week: number; day: number; period: num
   return null;
 }
 
+// Trả về (week, day) cho một lớp diễn ra buổi tối, nếu rơi vào một ngày của lịch.
+function findEveningSlot(startAt: string): { week: number; day: number } | null {
+  if (!isEvening(startAt)) return null;
+  const d = new Date(startAt);
+  const key = `${d.getDate()}/${d.getMonth() + 1}`;
+  for (const w of WEEKS) {
+    const dayIdx = (DAY_DATES[w.idx] ?? []).indexOf(key);
+    if (dayIdx >= 0) return { week: w.idx, day: dayIdx };
+  }
+  return null;
+}
+
 function TeacherHome() {
   const [grid, setGrid] = useState<WeekGrid>(() => buildGrid());
   const [weekIdx, setWeekIdx] = useState(1);
@@ -278,6 +291,20 @@ function TeacherHome() {
       const slot = findLiveSlot(lc.startAt);
       if (!slot) continue;
       map.set(`${slot.week}-${slot.day}-${slot.period}`, lc);
+    }
+    return map;
+  }, [liveAll, classFilter]);
+
+  // map "w-d" -> LiveClass[] (buổi tối, không chia tiết)
+  const eveningByDay = useMemo(() => {
+    const map = new Map<string, LiveClass[]>();
+    for (const lc of liveAll) {
+      if (classFilter !== "ALL" && lc.classRealId !== classFilter) continue;
+      const slot = findEveningSlot(lc.startAt);
+      if (!slot) continue;
+      const k = `${slot.week}-${slot.day}`;
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(lc);
     }
     return map;
   }, [liveAll, classFilter]);
@@ -397,6 +424,7 @@ function TeacherHome() {
                   }}
                   activeLessonId={activeLessonId}
                   liveBySlot={liveBySlot}
+                  eveningByDay={eveningByDay}
                   onPickLive={(lc) => setActiveLive(lc)}
                 />
                 <Legend2 />
@@ -541,12 +569,13 @@ function KnowledgeTree({
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
   week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
-  liveBySlot, onPickLive,
+  liveBySlot, eveningByDay, onPickLive,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
   activeLessonId: string | null;
   liveBySlot: Map<string, LiveClass>;
+  eveningByDay: Map<string, LiveClass[]>;
   onPickLive: (lc: LiveClass) => void;
 }) {
   const morning = [1, 2, 3, 4, 5];
@@ -633,7 +662,7 @@ function ScheduleGrid({
           {afternoon.map((p, idx) => (
             <tr key={p}>
               {idx === 0 && (
-                <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20 rounded-bl-lg">
+                <td rowSpan={5} className="border border-indigo-800 bg-purple-50 text-purple-700 text-center align-middle font-semibold p-2 w-20">
                   <div className="flex flex-col items-center gap-2">
                     <Sunset className="h-5 w-5 text-purple-500" />
                     <span>Buổi chiều</span>
@@ -646,6 +675,41 @@ function ScheduleGrid({
               {DAYS.map((_, d) => renderCell(d, p, true))}
             </tr>
           ))}
+          {/* Evening row — chỉ phân theo ngày, không chia tiết */}
+          {(() => {
+            const hasAny = DAYS.some((_, d) => (eveningByDay.get(`${week}-${d}`) ?? []).length > 0);
+            if (!hasAny) return null;
+            return (
+              <tr>
+                <td colSpan={2} className="border border-indigo-800 bg-indigo-50 text-indigo-700 text-center align-middle font-semibold p-2 rounded-bl-lg">
+                  <div className="flex flex-col items-center gap-1">
+                    <Moon className="h-5 w-5 text-indigo-500" />
+                    <span>Buổi tối</span>
+                  </div>
+                </td>
+                {DAYS.map((_, d) => {
+                  const list = eveningByDay.get(`${week}-${d}`) ?? [];
+                  return (
+                    <td key={d} className="border border-slate-200 p-1 align-top h-14 bg-indigo-50/30">
+                      <div className="flex flex-col gap-1">
+                        {list.map((lc) => (
+                          <button
+                            key={lc.id}
+                            onClick={() => onPickLive(lc)}
+                            title={lc.name}
+                            className="w-full text-left inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
+                          >
+                            <Video className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{formatTimeRange(lc.startAt, lc.endAt)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })()}
         </tbody>
       </table>
     </div>
@@ -654,6 +718,8 @@ function ScheduleGrid({
 
 /* ----- Live class popup ----- */
 function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => void }) {
+  const [showStats, setShowStats] = useState(false);
+  const ended = isLiveEnded(live);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" onClick={onClose}>
       <div
@@ -667,7 +733,9 @@ function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => voi
             </span>
             <div className="min-w-0">
               <h3 className="text-base font-bold text-slate-800 truncate">{live.name}</h3>
-              <p className="text-xs text-emerald-700 font-medium mt-0.5">Lớp học trực tuyến</p>
+              <p className="text-xs text-emerald-700 font-medium mt-0.5">
+                Lớp học trực tuyến {ended && <span className="ml-1 text-slate-500">· Đã kết thúc</span>}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/60 text-slate-500 shrink-0">
@@ -703,16 +771,26 @@ function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => voi
           )}
         </div>
         <div className="px-5 py-3 border-t bg-slate-50 flex justify-end">
-          <a
-            href={live.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-          >
-            <Video className="h-4 w-4" /> Vào lớp ngay
-          </a>
+          {ended ? (
+            <button
+              onClick={() => setShowStats(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              <BarChart3 className="h-4 w-4" /> Xem thống kê
+            </button>
+          ) : (
+            <a
+              href={live.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              <Video className="h-4 w-4" /> Vào lớp ngay
+            </a>
+          )}
         </div>
       </div>
+      {showStats && <LiveClassStatsModal live={live} onClose={() => setShowStats(false)} />}
     </div>
   );
 }

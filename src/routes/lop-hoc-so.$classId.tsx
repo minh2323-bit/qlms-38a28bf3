@@ -24,9 +24,11 @@ import {
   useMaterials, addMaterial, type MaterialKind, type Material,
 } from "@/lib/teaching-store";
 import {
-  useLiveClasses, addLiveClass, formatTimeRange, formatDate,
+  useLiveClasses, addLiveClass, formatTimeRange, formatDate, isLiveEnded,
   type LiveClass,
 } from "@/lib/live-class-store";
+import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
+import { BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
   head: () => ({
@@ -1110,6 +1112,7 @@ function LiveClassModal({
 
 function LiveClassesSection({ items }: { items: LiveClass[] }) {
   const [open, setOpen] = useState(true);
+  const [stats, setStats] = useState<LiveClass | null>(null);
   return (
     <div className="rounded-xl border border-emerald-200 bg-white overflow-hidden">
       <button
@@ -1129,35 +1132,55 @@ function LiveClassesSection({ items }: { items: LiveClass[] }) {
       </button>
       {open && (
         <ul className="divide-y divide-slate-100">
-          {items.map((l) => (
-            <li key={l.id} className="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
-              <span className="h-9 w-9 rounded-lg inline-flex items-center justify-center bg-emerald-50 text-emerald-700 shrink-0">
-                <Video className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-slate-800 truncate">{l.name}</div>
-                <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-3 flex-wrap">
-                  <span>Ngày tạo: <b className="text-slate-700">{formatDate(l.createdAt)}</b></span>
-                  <span className="inline-flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5 text-slate-400" />
-                    <b className="text-slate-700">{l.studentCount}</b> học sinh tham dự
-                  </span>
-                  <span className="text-slate-400">·</span>
-                  <span>{formatTimeRange(l.startAt, l.endAt)}</span>
+          {items.map((l) => {
+            const ended = isLiveEnded(l);
+            return (
+              <li key={l.id} className="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
+                <span className="h-9 w-9 rounded-lg inline-flex items-center justify-center bg-emerald-50 text-emerald-700 shrink-0">
+                  <Video className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-slate-800 truncate flex items-center gap-2">
+                    {l.name}
+                    {ended && (
+                      <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                        Đã kết thúc
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-3 flex-wrap">
+                    <span>Ngày tạo: <b className="text-slate-700">{formatDate(l.createdAt)}</b></span>
+                    <span className="inline-flex items-center gap-1">
+                      <Users className="h-3.5 w-3.5 text-slate-400" />
+                      <b className="text-slate-700">{l.studentCount}</b> học sinh tham dự
+                    </span>
+                    <span className="text-slate-400">·</span>
+                    <span>{formatTimeRange(l.startAt, l.endAt)}</span>
+                  </div>
                 </div>
-              </div>
-              <a
-                href={l.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-              >
-                <Video className="h-3.5 w-3.5" /> Vào lớp
-              </a>
-            </li>
-          ))}
+                {ended ? (
+                  <button
+                    onClick={() => setStats(l)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                  >
+                    <BarChart3 className="h-3.5 w-3.5" /> Xem thống kê
+                  </button>
+                ) : (
+                  <a
+                    href={l.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+                  >
+                    <Video className="h-3.5 w-3.5" /> Vào lớp
+                  </a>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
+      {stats && <LiveClassStatsModal live={stats} onClose={() => setStats(null)} />}
     </div>
   );
 }
