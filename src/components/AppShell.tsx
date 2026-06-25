@@ -26,6 +26,7 @@ const NAV: NavItem[] = [
       { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
       { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
       { icon: ClipboardList, label: "Giao bài tập, nhiệm vụ" },
+      { icon: Video, label: "Lớp học trực tuyến" },
     ],
   },
   {
