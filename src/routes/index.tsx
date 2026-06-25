@@ -569,12 +569,13 @@ function KnowledgeTree({
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
   week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
-  liveBySlot, onPickLive,
+  liveBySlot, eveningByDay, onPickLive,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
   activeLessonId: string | null;
   liveBySlot: Map<string, LiveClass>;
+  eveningByDay: Map<string, LiveClass[]>;
   onPickLive: (lc: LiveClass) => void;
 }) {
   const morning = [1, 2, 3, 4, 5];
