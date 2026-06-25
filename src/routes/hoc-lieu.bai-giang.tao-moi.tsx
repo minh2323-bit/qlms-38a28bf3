@@ -388,6 +388,16 @@ function Step1(props: {
       </div>
 
       <div className="px-6 py-5 space-y-5">
+        {lockGradeSubject && (
+          <div className="flex items-start gap-2 rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2 text-xs text-indigo-800">
+            <Info className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <b>Khối</b> và <b>Môn</b> đã được tự động điền theo {fromHint ? fromHint : "lớp học"}.
+              Bạn chỉ cần chọn <b>Đơn vị kiến thức</b> phù hợp.
+            </div>
+          </div>
+        )}
+
         <Field label="Tiêu đề bài giảng" required>
           <input
             value={title}
@@ -404,6 +414,7 @@ function Step1(props: {
               onChange={setKhoi}
               options={GRADES}
               placeholder="— Chọn khối —"
+              disabled={lockGradeSubject}
             />
           </Field>
           <Field label="Môn" required>
@@ -412,7 +423,7 @@ function Step1(props: {
               onChange={setMon}
               options={SUBJECTS}
               placeholder="— Chọn môn —"
-              disabled={!khoi}
+              disabled={lockGradeSubject || !khoi}
             />
           </Field>
           <Field label="Đơn vị kiến thức" required>
