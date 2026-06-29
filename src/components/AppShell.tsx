@@ -4,9 +4,14 @@ import {
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
   ClipboardList, Video, Building2, School, Landmark,
   Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag,
+  ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
+import studentAvatar from "@/assets/student-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 type SubItem = { icon: typeof Home; label: string; to?: string };
 type NavItem = {
@@ -16,7 +21,7 @@ type NavItem = {
   submenu?: SubItem[];
 };
 
-const NAV: NavItem[] = [
+const TEACHER_NAV: NavItem[] = [
   { icon: Home, label: "Trang chủ", to: "/" },
   {
     icon: GraduationCap,
@@ -73,8 +78,32 @@ const NAV: NavItem[] = [
   },
 ];
 
-export function SidebarNav() {
+const STUDENT_NAV: NavItem[] = [
+  { icon: Home, label: "Trang chủ", to: "/hoc-sinh" },
+  {
+    icon: GraduationCap,
+    label: "Hoạt động\nhọc tập",
+    submenu: [
+      { icon: BookMarked, label: "Lớp học / Bài giảng", to: "/hoc-sinh/lop-bai-giang" },
+      { icon: ClipboardList, label: "Nhiệm vụ, bài tập", to: "/hoc-sinh/nhiem-vu" },
+      { icon: Video, label: "Lớp học trực tuyến", to: "/hoc-sinh/lop-truc-tuyen" },
+    ],
+  },
+  { icon: Sparkles, label: "Học liệu\ntăng cường", to: "/hoc-sinh/hoc-lieu" },
+  {
+    icon: FolderKanban,
+    label: "Kỳ thi",
+    submenu: [
+      { icon: Landmark, label: "Kỳ thi chính thức", to: "/hoc-sinh/ky-thi-chinh-thuc" },
+      { icon: BookOpenIcon, label: "Kỳ thi ôn tập", to: "/hoc-sinh/ky-thi-on-tap" },
+      { icon: RouteIcon, label: "Lộ trình học tập", to: "/hoc-sinh/lo-trinh" },
+    ],
+  },
+];
+
+export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const NAV = role === "student" ? STUDENT_NAV : TEACHER_NAV;
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
       <div className="w-16 h-16 flex items-center justify-center mb-2">
@@ -125,12 +154,18 @@ export function SidebarNav() {
   );
 }
 
-export function TopBar() {
+export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
+  const isStudent = role === "student";
+  const name = isStudent ? "Phí Song Ngân" : "G/v Phùng Thúy Hằng";
+  const subtitle = isStudent ? "Học sinh · Lớp 4A" : "Giáo viên";
+  const greeting = isStudent ? "Chào mừng," : "Xin chào,";
+  const avatar = isStudent ? studentAvatar : teacherAvatar;
+
   return (
     <header className="h-16 bg-white border-b flex items-center justify-between px-6 shrink-0">
       <div>
-        <p className="text-sm text-slate-500">Xin chào,</p>
-        <p className="text-base font-semibold text-slate-800">G/v Phùng Thúy Hằng</p>
+        <p className="text-sm text-slate-500">{greeting}</p>
+        <p className="text-base font-semibold text-slate-800">{name}</p>
       </div>
       <div className="flex items-center gap-4">
         <button className="relative p-2 rounded-full hover:bg-slate-100">
@@ -139,27 +174,58 @@ export function TopBar() {
         </button>
         <div className="text-right">
           <p className="text-sm font-semibold text-slate-800">Tiểu học Tô Hiệu</p>
-          <p className="text-xs text-slate-500">Giáo viên</p>
+          <p className="text-xs text-slate-500">{subtitle}</p>
         </div>
-        <img
-          src={teacherAvatar}
-          alt="Ảnh đại diện giáo viên"
-          width={40}
-          height={40}
-          loading="lazy"
-          className="h-10 w-10 rounded-full object-cover ring-2 ring-indigo-100"
-        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1 rounded-full pl-1 pr-2 py-0.5 hover:bg-slate-100 transition">
+              <img
+                src={avatar}
+                alt="Ảnh đại diện"
+                width={40}
+                height={40}
+                loading="lazy"
+                className="h-10 w-10 rounded-full object-cover ring-2 ring-indigo-100"
+              />
+              <ChevronDown className="h-4 w-4 text-slate-500" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuLabel className="text-xs text-slate-500">Chuyển tài khoản</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/" className="flex items-center gap-2 cursor-pointer">
+                <img src={teacherAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Giáo viên</span>
+                  <span className="text-[11px] text-slate-500">Phùng Thúy Hằng</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/hoc-sinh" className="flex items-center gap-2 cursor-pointer">
+                <img src={studentAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Học sinh</span>
+                  <span className="text-[11px] text-slate-500">Phí Song Ngân · 4A</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: "teacher" | "student" }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const role: "teacher" | "student" = roleProp ?? (pathname.startsWith("/hoc-sinh") ? "student" : "teacher");
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      <SidebarNav />
+      <SidebarNav role={role} />
       <div className="flex-1 min-w-0 flex flex-col">
-        <TopBar />
+        <TopBar role={role} />
         <main className="flex-1 p-4 space-y-4 overflow-y-auto">{children}</main>
       </div>
     </div>
