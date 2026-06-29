@@ -96,7 +96,15 @@ const STUDENT_NAV: NavItem[] = [
     submenu: [
       { icon: Landmark, label: "Kỳ thi chính thức", to: "/hoc-sinh/ky-thi-chinh-thuc" },
       { icon: BookOpenIcon, label: "Kỳ thi ôn tập", to: "/hoc-sinh/ky-thi-on-tap" },
-      { icon: RouteIcon, label: "Lộ trình học tập", to: "/hoc-sinh/lo-trinh" },
+    ],
+  },
+  {
+    icon: RouteIcon,
+    label: "Lộ trình\nhọc tập",
+    submenu: [
+      { icon: ClipboardList, label: "Lịch sử học tập", to: "/hoc-sinh/lich-su-hoc-tap" },
+      { icon: TrendingUp, label: "Thống kê hoạt động", to: "/hoc-sinh/thong-ke-hoat-dong" },
+      { icon: Sparkles, label: "Cá nhân hóa lộ trình", to: "/hoc-sinh/lo-trinh" },
     ],
   },
 ];
