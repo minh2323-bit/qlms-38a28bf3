@@ -105,6 +105,7 @@ const PERIODS = [1, 2, 3, 4, 5] as const;
 
 function StudentHome() {
   const [activePeriod, setActivePeriod] = useState<{ day: number; period: number } | null>(null);
+  const [tasksOpen, setTasksOpen] = useState(false);
   const liveAll = useLiveClasses();
 
   const myLive = useMemo(
@@ -120,6 +121,14 @@ function StudentHome() {
       const t = new Date(l.startAt).getTime();
       return t >= now && t <= horizon;
     }).length;
+  }, [myLive]);
+
+  // Lớp đang diễn ra (now ∈ [startAt, endAt])
+  const ongoingLive = useMemo(() => {
+    const now = Date.now();
+    return myLive.find(
+      (l) => new Date(l.startAt).getTime() <= now && new Date(l.endAt).getTime() >= now,
+    );
   }, [myLive]);
 
   // Buổi tối — map day index "10..17" -> evening lives
@@ -143,7 +152,11 @@ function StudentHome() {
 
   return (
     <AppShell role="student">
-      <DashboardSection upcomingCount={upcomingCount} />
+      <DashboardSection
+        upcomingCount={upcomingCount}
+        ongoingLive={ongoingLive}
+        onOpenTasks={() => setTasksOpen(true)}
+      />
 
       <section className="bg-white rounded-2xl border shadow-sm">
         <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
@@ -174,9 +187,12 @@ function StudentHome() {
           )}
         </div>
       </section>
+
+      <TasksDialog open={tasksOpen} onOpenChange={setTasksOpen} />
     </AppShell>
   );
 }
+
 
 /* ---------------- Dashboard ---------------- */
 function DashboardSection({ upcomingCount }: { upcomingCount: number }) {
