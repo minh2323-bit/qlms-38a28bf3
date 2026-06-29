@@ -195,13 +195,26 @@ function StudentHome() {
 
 
 /* ---------------- Dashboard ---------------- */
-function DashboardSection({ upcomingCount }: { upcomingCount: number }) {
-  const items = [
+type LiveLite = { id: string; name: string; link: string; subject: string; startAt: string; endAt: string };
+
+function DashboardSection({
+  upcomingCount, ongoingLive, onOpenTasks,
+}: {
+  upcomingCount: number;
+  ongoingLive: LiveLite | undefined;
+  onOpenTasks: () => void;
+}) {
+  type Item = {
+    value: string; label: string; sub: string;
+    icon: typeof ClipboardList; bg: string; fg: string; bar: string;
+    to?: string; onClick?: () => void;
+  };
+  const items: Item[] = [
     {
       value: "3", label: "Bài tập cần hoàn thành",
       sub: "2 bài Toán · 1 bài Tiếng Việt",
       icon: ClipboardList, bg: "bg-amber-50", fg: "text-amber-600", bar: "bg-amber-500",
-      to: "/hoc-sinh/nhiem-vu",
+      onClick: onOpenTasks,
     },
     {
       value: String(Math.max(upcomingCount, 3)), label: "Buổi học trực tuyến sắp diễn ra",
@@ -210,37 +223,119 @@ function DashboardSection({ upcomingCount }: { upcomingCount: number }) {
       to: "/hoc-sinh/lop-truc-tuyen",
     },
     {
+      value: "2", label: "Kỳ thi sắp diễn ra",
+      sub: "Toán · Tiếng Việt",
+      icon: Trophy, bg: "bg-rose-50", fg: "text-rose-600", bar: "bg-rose-500",
+      to: "/hoc-sinh/ky-thi-chinh-thuc",
+    },
+    {
       value: "3", label: "Bài giáo viên vừa chấm",
       sub: "Mới có điểm hôm nay",
       icon: CheckCircle2, bg: "bg-indigo-50", fg: "text-indigo-600", bar: "bg-indigo-500",
       to: "/hoc-sinh/nhiem-vu",
     },
   ];
+
+  const cardCls = "relative flex items-center gap-3 rounded-lg border border-slate-200 p-3 hover:shadow-md hover:border-indigo-300 transition overflow-hidden group text-left";
+
   return (
-    <section className="bg-white rounded-xl border shadow-sm p-3">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        {items.map((s) => (
-          <Link
-            key={s.label}
-            to={s.to}
-            className="relative flex items-center gap-3 rounded-lg border border-slate-200 p-3 hover:shadow-md hover:border-indigo-300 transition overflow-hidden group"
-          >
-            <span className={`absolute left-0 top-0 h-full w-1 ${s.bar}`} />
-            <span className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
-              <s.icon className={`h-5 w-5 ${s.fg}`} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="text-2xl font-black text-slate-800 leading-none">{s.value}</div>
-              <div className="text-xs font-semibold text-slate-700 mt-1">{s.label}</div>
-              <div className="text-[11px] text-slate-500">{s.sub}</div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition" />
-          </Link>
-        ))}
+    <section className="bg-white rounded-xl border shadow-sm p-3 space-y-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {items.map((s) => {
+          const inner = (
+            <>
+              <span className={`absolute left-0 top-0 h-full w-1 ${s.bar}`} />
+              <span className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
+                <s.icon className={`h-5 w-5 ${s.fg}`} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-2xl font-black text-slate-800 leading-none">{s.value}</div>
+                <div className="text-xs font-semibold text-slate-700 mt-1">{s.label}</div>
+                <div className="text-[11px] text-slate-500">{s.sub}</div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition" />
+            </>
+          );
+          return s.to ? (
+            <Link key={s.label} to={s.to} className={cardCls}>{inner}</Link>
+          ) : (
+            <button key={s.label} onClick={s.onClick} className={cardCls}>{inner}</button>
+          );
+        })}
       </div>
+
+      {ongoingLive && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 flex items-center gap-3">
+          <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <span className="absolute inset-0 rounded-full ring-2 ring-amber-400 animate-ping opacity-60" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-white uppercase tracking-wide">Đang diễn ra</span>
+              <span className="text-sm font-semibold text-amber-900 truncate">{ongoingLive.name}</span>
+            </div>
+            <p className="text-[11px] text-amber-700 mt-0.5">
+              {ongoingLive.subject} · {formatTimeRange(ongoingLive.startAt, ongoingLive.endAt)} · Vào muộn không cần tìm link, bấm “Vào ngay”.
+            </p>
+          </div>
+          <a
+            href={ongoingLive.link} target="_blank" rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-amber-600 text-white text-xs font-bold hover:bg-amber-700"
+          >
+            <Play className="h-3.5 w-3.5" /> Vào ngay
+          </a>
+        </div>
+      )}
     </section>
   );
 }
+
+/* ---------------- Tasks Dialog (popup) ---------------- */
+type Task = { id: string; title: string; subject: string; teacher: string; deadline: string; premium?: boolean };
+const PENDING_TASKS: Task[] = [
+  { id: "t1", title: "Làm tròn số đến hàng chục, hàng trăm", subject: "Toán", teacher: "Phùng Thúy Hằng", deadline: "18/06/2026, 12:15", premium: true },
+  { id: "t2", title: "Luyện tập: So sánh phân số", subject: "Toán", teacher: "Nguyễn Thị Trang", deadline: "19/06/2026, 17:00" },
+  { id: "t3", title: "Đọc hiểu: Cây bàng (bài tập 3)", subject: "Tiếng Việt", teacher: "Nguyễn Thị Trang", deadline: "20/06/2026, 22:00" },
+];
+
+function TasksDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 text-amber-600" />
+            Nhiệm vụ, bài tập cần làm
+          </DialogTitle>
+        </DialogHeader>
+        <ul className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+          {PENDING_TASKS.map((t) => (
+            <li key={t.id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:shadow-sm transition">
+              <button className="h-8 w-8 rounded-full border bg-white text-slate-400 hover:text-indigo-700 hover:border-indigo-300 flex items-center justify-center shrink-0" aria-label="Quay lại">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h4 className="font-bold text-slate-800 text-sm truncate">{t.title}</h4>
+                  {t.premium && <Crown className="h-4 w-4 text-emerald-500 shrink-0" />}
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Hạn nộp: <span className="font-medium text-slate-700">{t.deadline}</span> · {t.subject}
+                </p>
+                <p className="text-[11px] text-slate-500">GV: {t.teacher}</p>
+              </div>
+              <button className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border-2 border-amber-400 bg-amber-50 text-amber-700 text-sm font-bold hover:bg-amber-100">
+                Làm bài <Play className="h-3.5 w-3.5 fill-amber-700" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 /* ---------------- Schedule Grid ---------------- */
 function ScheduleGrid({
