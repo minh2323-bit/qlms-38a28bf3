@@ -19,6 +19,7 @@ import { Route as HocSinhNhiemVuRouteImport } from './routes/hoc-sinh.nhiem-vu'
 import { Route as HocSinhLopTrucTuyenRouteImport } from './routes/hoc-sinh.lop-truc-tuyen'
 import { Route as HocSinhLopBaiGiangRouteImport } from './routes/hoc-sinh.lop-bai-giang'
 import { Route as HocSinhLoTrinhRouteImport } from './routes/hoc-sinh.lo-trinh'
+import { Route as HocSinhLichSuHocTapRouteImport } from './routes/hoc-sinh.lich-su-hoc-tap'
 import { Route as HocSinhKyThiOnTapRouteImport } from './routes/hoc-sinh.ky-thi-on-tap'
 import { Route as HocSinhKyThiChinhThucRouteImport } from './routes/hoc-sinh.ky-thi-chinh-thuc'
 import { Route as HocSinhHocLieuRouteImport } from './routes/hoc-sinh.hoc-lieu'
@@ -76,6 +77,11 @@ const HocSinhLoTrinhRoute = HocSinhLoTrinhRouteImport.update({
   path: '/lo-trinh',
   getParentRoute: () => HocSinhRoute,
 } as any)
+const HocSinhLichSuHocTapRoute = HocSinhLichSuHocTapRouteImport.update({
+  id: '/lich-su-hoc-tap',
+  path: '/lich-su-hoc-tap',
+  getParentRoute: () => HocSinhRoute,
+} as any)
 const HocSinhKyThiOnTapRoute = HocSinhKyThiOnTapRouteImport.update({
   id: '/ky-thi-on-tap',
   path: '/ky-thi-on-tap',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
   '/hoc-sinh/ky-thi-on-tap': typeof HocSinhKyThiOnTapRoute
+  '/hoc-sinh/lich-su-hoc-tap': typeof HocSinhLichSuHocTapRoute
   '/hoc-sinh/lo-trinh': typeof HocSinhLoTrinhRoute
   '/hoc-sinh/lop-bai-giang': typeof HocSinhLopBaiGiangRoute
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
   '/hoc-sinh/ky-thi-on-tap': typeof HocSinhKyThiOnTapRoute
+  '/hoc-sinh/lich-su-hoc-tap': typeof HocSinhLichSuHocTapRoute
   '/hoc-sinh/lo-trinh': typeof HocSinhLoTrinhRoute
   '/hoc-sinh/lop-bai-giang': typeof HocSinhLopBaiGiangRoute
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
   '/hoc-sinh/ky-thi-on-tap': typeof HocSinhKyThiOnTapRoute
+  '/hoc-sinh/lich-su-hoc-tap': typeof HocSinhLichSuHocTapRoute
   '/hoc-sinh/lo-trinh': typeof HocSinhLoTrinhRoute
   '/hoc-sinh/lop-bai-giang': typeof HocSinhLopBaiGiangRoute
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
     | '/hoc-sinh/ky-thi-on-tap'
+    | '/hoc-sinh/lich-su-hoc-tap'
     | '/hoc-sinh/lo-trinh'
     | '/hoc-sinh/lop-bai-giang'
     | '/hoc-sinh/lop-truc-tuyen'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
     | '/hoc-sinh/ky-thi-on-tap'
+    | '/hoc-sinh/lich-su-hoc-tap'
     | '/hoc-sinh/lo-trinh'
     | '/hoc-sinh/lop-bai-giang'
     | '/hoc-sinh/lop-truc-tuyen'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
     | '/hoc-sinh/ky-thi-on-tap'
+    | '/hoc-sinh/lich-su-hoc-tap'
     | '/hoc-sinh/lo-trinh'
     | '/hoc-sinh/lop-bai-giang'
     | '/hoc-sinh/lop-truc-tuyen'
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocSinhLoTrinhRouteImport
       parentRoute: typeof HocSinhRoute
     }
+    '/hoc-sinh/lich-su-hoc-tap': {
+      id: '/hoc-sinh/lich-su-hoc-tap'
+      path: '/lich-su-hoc-tap'
+      fullPath: '/hoc-sinh/lich-su-hoc-tap'
+      preLoaderRoute: typeof HocSinhLichSuHocTapRouteImport
+      parentRoute: typeof HocSinhRoute
+    }
     '/hoc-sinh/ky-thi-on-tap': {
       id: '/hoc-sinh/ky-thi-on-tap'
       path: '/ky-thi-on-tap'
@@ -345,6 +364,7 @@ interface HocSinhRouteChildren {
   HocSinhHocLieuRoute: typeof HocSinhHocLieuRoute
   HocSinhKyThiChinhThucRoute: typeof HocSinhKyThiChinhThucRoute
   HocSinhKyThiOnTapRoute: typeof HocSinhKyThiOnTapRoute
+  HocSinhLichSuHocTapRoute: typeof HocSinhLichSuHocTapRoute
   HocSinhLoTrinhRoute: typeof HocSinhLoTrinhRoute
   HocSinhLopBaiGiangRoute: typeof HocSinhLopBaiGiangRoute
   HocSinhLopTrucTuyenRoute: typeof HocSinhLopTrucTuyenRoute
@@ -356,6 +376,7 @@ const HocSinhRouteChildren: HocSinhRouteChildren = {
   HocSinhHocLieuRoute: HocSinhHocLieuRoute,
   HocSinhKyThiChinhThucRoute: HocSinhKyThiChinhThucRoute,
   HocSinhKyThiOnTapRoute: HocSinhKyThiOnTapRoute,
+  HocSinhLichSuHocTapRoute: HocSinhLichSuHocTapRoute,
   HocSinhLoTrinhRoute: HocSinhLoTrinhRoute,
   HocSinhLopBaiGiangRoute: HocSinhLopBaiGiangRoute,
   HocSinhLopTrucTuyenRoute: HocSinhLopTrucTuyenRoute,
