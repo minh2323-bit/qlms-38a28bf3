@@ -45,11 +45,15 @@ function Page() {
         <div className="p-6">
           {tab === "lop" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <article className="rounded-xl border overflow-hidden hover:shadow-md transition">
-                <img src={thumb4A} alt="Lớp 4A" className="h-36 w-full object-cover" loading="lazy" />
+              <Link
+                to="/hoc-sinh/lop/$lop"
+                params={{ lop: STUDENT_CLASS }}
+                className="rounded-xl border overflow-hidden hover:shadow-md hover:border-indigo-300 transition block"
+              >
+                <img src={thumb4A} alt={`Lớp ${STUDENT_CLASS}`} className="h-36 w-full object-cover" loading="lazy" />
                 <div className="p-4 space-y-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-slate-800">Lớp 4A</h3>
+                    <h3 className="font-bold text-slate-800">Lớp {STUDENT_CLASS}</h3>
                     <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Đang học</Badge>
                   </div>
                   <p className="text-xs text-slate-500">Năm học 2025 – 2026</p>
@@ -57,7 +61,7 @@ function Page() {
                     Lớp học của em — nơi xem tất cả bài giảng, học liệu và thông báo từ giáo viên.
                   </p>
                 </div>
-              </article>
+              </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
