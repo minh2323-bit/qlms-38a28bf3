@@ -761,6 +761,9 @@ function AddMaterialMiniModal({
             {MATERIAL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </Field>
+        {type === "Video" && (
+          <VideoSource />
+        )}
         <Field label="Cách đánh giá hoàn thành">
           <select
             value={completion}
@@ -770,6 +773,7 @@ function AddMaterialMiniModal({
             {COMPLETION_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </Field>
+
         <div className="flex justify-end gap-2 pt-1">
           <button
             onClick={onClose}
