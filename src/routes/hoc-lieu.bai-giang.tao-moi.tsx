@@ -203,11 +203,8 @@ function CreateLessonPage() {
   const [lessonCreated, setLessonCreated] = useState(false);
 
   // Step 2
-  const [topics, setTopics] = useState<Topic[]>([
-    { id: "t-start",   name: "Khởi động" },
-    { id: "t-knowled", name: "Hình thành kiến thức" },
-    { id: "t-practice", name: "Luyện tập" },
-  ]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+
   const [materials, setMaterials] = useState<Material[]>([]);
   const [addingMaterialAt, setAddingMaterialAt] = useState<string | null>(null); // topicId or null
   const [editMatId, setEditMatId] = useState<string | null>(null);
@@ -764,6 +761,9 @@ function AddMaterialMiniModal({
             {MATERIAL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </Field>
+        {type === "Video" && (
+          <VideoSource />
+        )}
         <Field label="Cách đánh giá hoàn thành">
           <select
             value={completion}
@@ -773,6 +773,7 @@ function AddMaterialMiniModal({
             {COMPLETION_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </Field>
+
         <div className="flex justify-end gap-2 pt-1">
           <button
             onClick={onClose}
@@ -790,6 +791,46 @@ function AddMaterialMiniModal({
     </SmallModal>
   );
 }
+
+function VideoSource() {
+  const [mode, setMode] = useState<"link" | "file">("link");
+  const [link, setLink] = useState("");
+  const [fileName, setFileName] = useState("");
+  return (
+    <Field label="Nguồn video">
+      <div className="flex items-center gap-4 mb-2 text-sm">
+        <label className="inline-flex items-center gap-1.5 cursor-pointer">
+          <input type="radio" checked={mode === "link"} onChange={() => setMode("link")} />
+          Gửi link
+        </label>
+        <label className="inline-flex items-center gap-1.5 cursor-pointer">
+          <input type="radio" checked={mode === "file"} onChange={() => setMode("file")} />
+          Tải file
+        </label>
+      </div>
+      {mode === "link" ? (
+        <input
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          placeholder="Dán link YouTube/Vimeo/Drive…"
+          className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white"
+        />
+      ) : (
+        <label className="flex items-center justify-between gap-2 px-3 py-2.5 text-sm rounded-lg border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-600">
+          <span className="truncate">{fileName || "Chọn tệp video để tải lên"}</span>
+          <span className="text-indigo-600 font-semibold">Chọn tệp</span>
+          <input
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+          />
+        </label>
+      )}
+    </Field>
+  );
+}
+
 
 /* ============================ Step 3 ============================ */
 

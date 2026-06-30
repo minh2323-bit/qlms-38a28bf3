@@ -426,7 +426,11 @@ function CreateClassModal({
                   </select>
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
+                <p className="mt-1 text-xs text-slate-500 italic">
+                  Chọn khi bạn muốn đồng bộ các học liệu của lớp lên lịch báo giảng
+                </p>
               </Field>
+
               <Field label="Mô tả">
                 <input
                   value={moTa}
