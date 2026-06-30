@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
 import { BookMarked, Presentation, FileText, Video, ListChecks } from "lucide-react";
