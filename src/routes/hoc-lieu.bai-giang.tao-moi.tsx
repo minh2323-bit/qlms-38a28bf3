@@ -792,6 +792,46 @@ function AddMaterialMiniModal({
   );
 }
 
+function VideoSource() {
+  const [mode, setMode] = useState<"link" | "file">("link");
+  const [link, setLink] = useState("");
+  const [fileName, setFileName] = useState("");
+  return (
+    <Field label="Nguồn video">
+      <div className="flex items-center gap-4 mb-2 text-sm">
+        <label className="inline-flex items-center gap-1.5 cursor-pointer">
+          <input type="radio" checked={mode === "link"} onChange={() => setMode("link")} />
+          Gửi link
+        </label>
+        <label className="inline-flex items-center gap-1.5 cursor-pointer">
+          <input type="radio" checked={mode === "file"} onChange={() => setMode("file")} />
+          Tải file
+        </label>
+      </div>
+      {mode === "link" ? (
+        <input
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          placeholder="Dán link YouTube/Vimeo/Drive…"
+          className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white"
+        />
+      ) : (
+        <label className="flex items-center justify-between gap-2 px-3 py-2.5 text-sm rounded-lg border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-600">
+          <span className="truncate">{fileName || "Chọn tệp video để tải lên"}</span>
+          <span className="text-indigo-600 font-semibold">Chọn tệp</span>
+          <input
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+          />
+        </label>
+      )}
+    </Field>
+  );
+}
+
+
 /* ============================ Step 3 ============================ */
 
 function Step3(props: {
