@@ -203,11 +203,8 @@ function CreateLessonPage() {
   const [lessonCreated, setLessonCreated] = useState(false);
 
   // Step 2
-  const [topics, setTopics] = useState<Topic[]>([
-    { id: "t-start",   name: "Khởi động" },
-    { id: "t-knowled", name: "Hình thành kiến thức" },
-    { id: "t-practice", name: "Luyện tập" },
-  ]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+
   const [materials, setMaterials] = useState<Material[]>([]);
   const [addingMaterialAt, setAddingMaterialAt] = useState<string | null>(null); // topicId or null
   const [editMatId, setEditMatId] = useState<string | null>(null);
