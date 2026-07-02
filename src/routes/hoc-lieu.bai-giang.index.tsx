@@ -380,12 +380,13 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
       role={selectMode ? "button" : undefined}
     >
       {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
-      <div className="h-36 bg-slate-100 overflow-hidden">
+      <div className="h-28 bg-slate-100 overflow-hidden">
         <img src={l.thumb} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
       </div>
-      <div className="p-4 flex-1 flex flex-col">
+      <div className="p-3 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-slate-800">{l.title}</h3>
+          <h3 className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2">{l.title}</h3>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500 shrink-0">
