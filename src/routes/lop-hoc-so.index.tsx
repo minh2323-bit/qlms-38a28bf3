@@ -162,7 +162,7 @@ function DigitalClassesPage() {
             </div>
           </div>
 
-          <div className={classView === "grid" ? "grid grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
+          <div className={classView === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" : "space-y-3"}>
             {filteredClasses.map((c) => (
               <ClassCard
                 key={c.id}
@@ -271,18 +271,18 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
     >
       {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
 
-      <div className="h-28 bg-slate-100 overflow-hidden relative">
+      <div className="h-24 bg-slate-100 overflow-hidden relative">
         <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-1.5 right-1.5">
           <StatusTag status={c.status} />
         </div>
       </div>
-      <div className="p-4">
-        <div className="flex items-start justify-between">
-          <h3 className="font-semibold text-slate-800">{c.name}</h3>
+      <div className="p-3">
+        <div className="flex items-start justify-between gap-1">
+          <h3 className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2">{c.name}</h3>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500">
+              <button onClick={(e) => e.stopPropagation()} className="p-0.5 rounded hover:bg-slate-100 text-slate-500 shrink-0">
                 <MoreVertical className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
@@ -299,14 +299,15 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="mt-2 grid grid-cols-2 gap-y-1 text-sm text-slate-600">
-          <div><span className="font-medium text-slate-500">Số bài giảng:</span> {c.baiGiang}</div>
-          <div><span className="font-medium text-slate-500">Số học liệu:</span> {c.hocLieu}</div>
+        <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-600">
+          <span><span className="text-slate-500">BG:</span> {c.baiGiang}</span>
+          <span><span className="text-slate-500">HL:</span> {c.hocLieu}</span>
         </div>
-        <div className="mt-3 pt-3 border-t flex items-center justify-end text-sm text-slate-600">
-          <Users className="h-4 w-4 mr-1.5" /> {c.hocSinh} học sinh
+        <div className="mt-2 pt-2 border-t flex items-center justify-end text-xs text-slate-600">
+          <Users className="h-3.5 w-3.5 mr-1" /> {c.hocSinh} học sinh
         </div>
       </div>
+
     </div>
   );
 }

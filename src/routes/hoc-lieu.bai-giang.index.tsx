@@ -246,16 +246,17 @@ function LessonsPage() {
             {/* Lessons content */}
             <div className="flex-1 min-w-0">
               {lessonView === "grid" ? (
-                <div className={`grid grid-cols-1 md:grid-cols-2 ${filterOpen ? "lg:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"} gap-4`}>
+                <div className={`grid grid-cols-2 md:grid-cols-3 ${filterOpen ? "lg:grid-cols-4" : "lg:grid-cols-4 xl:grid-cols-5"} gap-3`}>
                   <Link
                     to="/hoc-lieu/bai-giang/tao-moi"
-                    className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[280px]"
+                    className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[220px]"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
-                      <Plus className="h-7 w-7 text-indigo-600" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
+                      <Plus className="h-6 w-6 text-indigo-600" />
                     </div>
-                    <p className="mt-4 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
+                    <p className="mt-3 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
                   </Link>
+
                   {filteredLessons.map((l) => (
                     <LessonCardView
                       key={l.title + l.author}
@@ -379,12 +380,13 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
       role={selectMode ? "button" : undefined}
     >
       {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
-      <div className="h-36 bg-slate-100 overflow-hidden">
+      <div className="h-28 bg-slate-100 overflow-hidden">
         <img src={l.thumb} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
       </div>
-      <div className="p-4 flex-1 flex flex-col">
+      <div className="p-3 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-slate-800">{l.title}</h3>
+          <h3 className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2">{l.title}</h3>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-100 text-slate-500 shrink-0">

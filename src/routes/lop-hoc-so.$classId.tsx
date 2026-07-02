@@ -44,48 +44,58 @@ export const Route = createFileRoute("/lop-hoc-so/$classId")({
 
 /* ============================ Mock class info ============================ */
 
+type ClassStatus = "draft" | "deployed";
 type ClassInfo = {
   id: string; name: string; code: string; students: number;
   teacher: string; thumb: string; description: string;
   /** real class id used for sync with lịch báo giảng */
   lop: string;
   subject: string;
+  status: ClassStatus;
+  subjectsTaught: string[];
 };
 
 const CLASS_DB: Record<string, ClassInfo> = {
-  c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán" },
-  c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt" },
-  c3: { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp học dành riêng cho lớp 3D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3D", subject: "Toán" },
-  c4: { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", code: "LH-3A-2526", students: 38, teacher: "Cô Lê Thu Hà", thumb: thumbLop3A, description: "Lớp học dành riêng cho lớp 3A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3A", subject: "Toán" },
-  c5: { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", code: "LH-3B-2526", students: 42, teacher: "Thầy Phạm Văn Nam", thumb: thumbLop3B, description: "Lớp học dành riêng cho lớp 3B. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3B", subject: "Toán" },
-  c6: { id: "c6", name: "Lớp 3C Năm học 2025 - 2026", code: "LH-3C-2526", students: 39, teacher: "Cô Đỗ Mỹ Linh", thumb: thumbLop3C, description: "Lớp học dành riêng cho lớp 3C. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3C", subject: "Toán" },
-  c7: { id: "c7", name: "Lớp 4B, 4C, 4D Năm học 2025 - 2026", code: "LH-REVIEW-2526", students: 41, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4BReview, description: "Lớp học dành riêng cho lớp 4B, 4C, 4D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4B", subject: "Toán" },
-  c8: { id: "c8", name: "Lớp 4C Năm học 2025 - 2026", code: "LH-4C-2526", students: 40, teacher: "Thầy Hoàng Anh Tuấn", thumb: thumbLop4C, description: "Lớp học dành riêng cho lớp 4C. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4C", subject: "Toán" },
+  c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"] },
+  c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"] },
+  c3: { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp học dành riêng cho lớp 3D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3D", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Đạo đức"] },
+  c4: { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", code: "LH-3A-2526", students: 38, teacher: "Cô Lê Thu Hà", thumb: thumbLop3A, description: "Lớp học dành riêng cho lớp 3A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt"] },
+  c5: { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", code: "LH-3B-2526", students: 42, teacher: "Thầy Phạm Văn Nam", thumb: thumbLop3B, description: "Lớp học dành riêng cho lớp 3B. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3B", subject: "Toán", status: "draft", subjectsTaught: ["Toán", "Khoa học"] },
+  c6: { id: "c6", name: "Lớp 3C Năm học 2025 - 2026", code: "LH-3C-2526", students: 39, teacher: "Cô Đỗ Mỹ Linh", thumb: thumbLop3C, description: "Lớp học dành riêng cho lớp 3C. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3C", subject: "Toán", status: "deployed", subjectsTaught: ["Toán"] },
+  c7: { id: "c7", name: "Lớp 4B, 4C, 4D Năm học 2025 - 2026", code: "LH-REVIEW-2526", students: 41, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4BReview, description: "Lớp học dành riêng cho lớp 4B, 4C, 4D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4B", subject: "Toán", status: "draft", subjectsTaught: ["Toán"] },
+  c8: { id: "c8", name: "Lớp 4C Năm học 2025 - 2026", code: "LH-4C-2526", students: 40, teacher: "Thầy Hoàng Anh Tuấn", thumb: thumbLop4C, description: "Lớp học dành riêng cho lớp 4C. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4C", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Khoa học"] },
 };
+
 
 /* ============================ Page ============================ */
 
 function ClassDetailPage() {
   const { classId } = Route.useParams();
   const navigate = useNavigate();
-  const info: ClassInfo = CLASS_DB[classId] ?? {
+  const fallback: ClassInfo = {
     id: classId, name: "Lớp học", code: `LH-${classId.toUpperCase()}`,
     students: 0, teacher: "—", thumb: thumbLop4A, description: "",
-    lop: "4A", subject: "Toán",
+    lop: "4A", subject: "Toán", status: "draft", subjectsTaught: ["Toán"],
   };
+  const info: ClassInfo = CLASS_DB[classId] ?? fallback;
+
+  const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
+  const [status, setStatus] = useState<ClassStatus>(info.status);
+  const [locked, setLocked] = useState<boolean>(false);
 
   const allMaterials = useMaterials();
   const classMaterials = useMemo(
-    () => allMaterials.filter((m) => m.classRealId === info.lop && m.subject === info.subject),
-    [allMaterials, info.lop, info.subject],
+    () => allMaterials.filter((m) => m.classRealId === info.lop && m.subject === selectedSubject),
+    [allMaterials, info.lop, selectedSubject],
   );
 
   const allLive = useLiveClasses();
   const classLive = useMemo(
-    () => allLive.filter((l) => l.classRealId === info.lop && l.subject === info.subject)
+    () => allLive.filter((l) => l.classRealId === info.lop && l.subject === selectedSubject)
       .sort((a, b) => a.startAt.localeCompare(b.startAt)),
-    [allLive, info.lop, info.subject],
+    [allLive, info.lop, selectedSubject],
   );
+
 
   // Group by unitId → sections
   type Group = { unitId: string; title: string; items: Material[] };
@@ -153,7 +163,7 @@ function ClassDetailPage() {
   const [liveOpen, setLiveOpen] = useState(false);
   const handleAdd = (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => {
     addMaterial({
-      classRealId: info.lop, subject: info.subject, origin: "class",
+      classRealId: info.lop, subject: selectedSubject, origin: "class",
       ...m,
     });
     setAddOpen(null);
@@ -200,6 +210,11 @@ function ClassDetailPage() {
                 <span className="opacity-90">Giáo viên:</span>
                 <span className="font-semibold">{info.teacher}</span>
               </div>
+
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
+                <span className="opacity-90">Môn:</span>
+                <span className="font-semibold">{info.subjectsTaught.join(", ")}</span>
+              </div>
             </div>
 
             {info.description && (
@@ -207,6 +222,41 @@ function ClassDetailPage() {
                 {info.description}
               </p>
             )}
+
+            {/* Deploy / Lock button */}
+            <div className="mt-5 flex items-center gap-2 flex-wrap">
+              {status === "draft" ? (
+                <button
+                  onClick={() => { setStatus("deployed"); toast.success("Đã triển khai lớp học"); }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow"
+                >
+                  <Check className="h-4 w-4" /> Triển khai lớp học
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setLocked((v) => !v);
+                    toast.success(locked ? "Đã mở khóa lớp học" : "Đã khóa lớp học");
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg shadow ${
+                    locked
+                      ? "bg-white text-indigo-700 hover:bg-slate-100"
+                      : "bg-amber-500 hover:bg-amber-600 text-white"
+                  }`}
+                >
+                  {locked ? "Mở khóa lớp học" : "Khóa lớp học"}
+                </button>
+              )}
+              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                status === "draft"
+                  ? "bg-amber-100 text-amber-700"
+                  : locked
+                    ? "bg-slate-200 text-slate-700"
+                    : "bg-emerald-100 text-emerald-700"
+              }`}>
+                {status === "draft" ? "Bản nháp" : locked ? "Đã khóa" : "Đã triển khai"}
+              </span>
+            </div>
           </div>
 
           <div className="hidden md:block">
@@ -216,6 +266,30 @@ function ClassDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Subject selector */}
+      <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-5">
+        <h2 className="text-sm font-bold text-slate-700 mb-3">Môn học phụ trách</h2>
+        <div className="flex flex-wrap gap-2">
+          {info.subjectsTaught.map((s) => {
+            const active = selectedSubject === s;
+            return (
+              <button
+                key={s}
+                onClick={() => setSelectedSubject(s)}
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold border transition ${
+                  active
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:text-indigo-700"
+                }`}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
 
       {/* White content section */}
       <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
@@ -252,8 +326,9 @@ function ClassDetailPage() {
                     to="/hoc-lieu/bai-giang/tao-moi"
                     search={{
                       khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`,
-                      mon: info.subject,
-                      from: `lớp ${info.lop} – ${info.subject}`,
+                      mon: selectedSubject,
+                      from: `lớp ${info.lop} – ${selectedSubject}`,
+
                     }}
                   >
                     <Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Thêm bài giảng
@@ -320,7 +395,7 @@ function ClassDetailPage() {
 
       <AnnouncementSection
         classRealId={info.lop}
-        subject={info.subject}
+        subject={selectedSubject}
         teacherName={info.teacher}
       />
 
@@ -341,7 +416,7 @@ function ClassDetailPage() {
           onCreated={(data) => {
             addLiveClass({
               classRealId: info.lop,
-              subject: info.subject,
+              subject: selectedSubject,
               name: data.name,
               unitId: data.unitId,
               startAt: data.startAt,
