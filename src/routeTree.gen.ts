@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
 import { Route as HocSinhRouteImport } from './routes/hoc-sinh'
+import { Route as GiaoBaiTapRouteImport } from './routes/giao-bai-tap'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LopHocSoIndexRouteImport } from './routes/lop-hoc-so.index'
 import { Route as HocSinhIndexRouteImport } from './routes/hoc-sinh.index'
@@ -43,6 +44,11 @@ const HocSinhRoute = HocSinhRouteImport.update({
   path: '/hoc-sinh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GiaoBaiTapRoute = GiaoBaiTapRouteImport.update({
+  id: '/giao-bai-tap',
+  path: '/giao-bai-tap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -59,9 +65,9 @@ const HocSinhIndexRoute = HocSinhIndexRouteImport.update({
   getParentRoute: () => HocSinhRoute,
 } as any)
 const GiaoBaiTapIndexRoute = GiaoBaiTapIndexRouteImport.update({
-  id: '/giao-bai-tap/',
-  path: '/giao-bai-tap/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => GiaoBaiTapRoute,
 } as any)
 const LopHocSoClassIdRoute = LopHocSoClassIdRouteImport.update({
   id: '/$classId',
@@ -141,9 +147,9 @@ const HocLieuBaiGiangLessonSlugRoute =
   } as any)
 const GiaoBaiTapTaoMoiBaiTapDocRoute =
   GiaoBaiTapTaoMoiBaiTapDocRouteImport.update({
-    id: '/giao-bai-tap/tao-moi/bai-tap-doc',
-    path: '/giao-bai-tap/tao-moi/bai-tap-doc',
-    getParentRoute: () => rootRouteImport,
+    id: '/tao-moi/bai-tap-doc',
+    path: '/tao-moi/bai-tap-doc',
+    getParentRoute: () => GiaoBaiTapRoute,
   } as any)
 const LopHocSoClassIdHocLieuMaterialIdRoute =
   LopHocSoClassIdHocLieuMaterialIdRouteImport.update({
@@ -154,6 +160,7 @@ const LopHocSoClassIdHocLieuMaterialIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/giao-bai-tap': typeof GiaoBaiTapRouteWithChildren
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/giao-bai-tap': typeof GiaoBaiTapRouteWithChildren
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
@@ -230,6 +238,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/giao-bai-tap'
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/hoc-lieu/kho-hoc-lieu'
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/giao-bai-tap'
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/hoc-lieu/kho-hoc-lieu'
@@ -304,11 +314,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GiaoBaiTapRoute: typeof GiaoBaiTapRouteWithChildren
   HocSinhRoute: typeof HocSinhRouteWithChildren
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
-  GiaoBaiTapIndexRoute: typeof GiaoBaiTapIndexRoute
-  GiaoBaiTapTaoMoiBaiTapDocRoute: typeof GiaoBaiTapTaoMoiBaiTapDocRoute
   HocLieuBaiGiangLessonSlugRoute: typeof HocLieuBaiGiangLessonSlugRoute
   HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
   HocLieuBaiGiangIndexRoute: typeof HocLieuBaiGiangIndexRoute
@@ -328,6 +337,13 @@ declare module '@tanstack/react-router' {
       path: '/hoc-sinh'
       fullPath: '/hoc-sinh'
       preLoaderRoute: typeof HocSinhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/giao-bai-tap': {
+      id: '/giao-bai-tap'
+      path: '/giao-bai-tap'
+      fullPath: '/giao-bai-tap'
+      preLoaderRoute: typeof GiaoBaiTapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -353,10 +369,10 @@ declare module '@tanstack/react-router' {
     }
     '/giao-bai-tap/': {
       id: '/giao-bai-tap/'
-      path: '/giao-bai-tap'
+      path: '/'
       fullPath: '/giao-bai-tap/'
       preLoaderRoute: typeof GiaoBaiTapIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GiaoBaiTapRoute
     }
     '/lop-hoc-so/$classId': {
       id: '/lop-hoc-so/$classId'
@@ -465,10 +481,10 @@ declare module '@tanstack/react-router' {
     }
     '/giao-bai-tap/tao-moi/bai-tap-doc': {
       id: '/giao-bai-tap/tao-moi/bai-tap-doc'
-      path: '/giao-bai-tap/tao-moi/bai-tap-doc'
+      path: '/tao-moi/bai-tap-doc'
       fullPath: '/giao-bai-tap/tao-moi/bai-tap-doc'
       preLoaderRoute: typeof GiaoBaiTapTaoMoiBaiTapDocRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof GiaoBaiTapRoute
     }
     '/lop-hoc-so/$classId/hoc-lieu/$materialId': {
       id: '/lop-hoc-so/$classId/hoc-lieu/$materialId'
@@ -479,6 +495,20 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface GiaoBaiTapRouteChildren {
+  GiaoBaiTapIndexRoute: typeof GiaoBaiTapIndexRoute
+  GiaoBaiTapTaoMoiBaiTapDocRoute: typeof GiaoBaiTapTaoMoiBaiTapDocRoute
+}
+
+const GiaoBaiTapRouteChildren: GiaoBaiTapRouteChildren = {
+  GiaoBaiTapIndexRoute: GiaoBaiTapIndexRoute,
+  GiaoBaiTapTaoMoiBaiTapDocRoute: GiaoBaiTapTaoMoiBaiTapDocRoute,
+}
+
+const GiaoBaiTapRouteWithChildren = GiaoBaiTapRoute._addFileChildren(
+  GiaoBaiTapRouteChildren,
+)
 
 interface HocSinhRouteChildren {
   HocSinhHocLieuRoute: typeof HocSinhHocLieuRoute
@@ -539,11 +569,10 @@ const LopHocSoRouteWithChildren = LopHocSoRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GiaoBaiTapRoute: GiaoBaiTapRouteWithChildren,
   HocSinhRoute: HocSinhRouteWithChildren,
   LopHocSoRoute: LopHocSoRouteWithChildren,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
-  GiaoBaiTapIndexRoute: GiaoBaiTapIndexRoute,
-  GiaoBaiTapTaoMoiBaiTapDocRoute: GiaoBaiTapTaoMoiBaiTapDocRoute,
   HocLieuBaiGiangLessonSlugRoute: HocLieuBaiGiangLessonSlugRoute,
   HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
   HocLieuBaiGiangIndexRoute: HocLieuBaiGiangIndexRoute,
