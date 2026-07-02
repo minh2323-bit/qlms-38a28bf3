@@ -72,24 +72,30 @@ const CLASS_DB: Record<string, ClassInfo> = {
 function ClassDetailPage() {
   const { classId } = Route.useParams();
   const navigate = useNavigate();
-  const info: ClassInfo = CLASS_DB[classId] ?? {
+  const fallback: ClassInfo = {
     id: classId, name: "Lớp học", code: `LH-${classId.toUpperCase()}`,
     students: 0, teacher: "—", thumb: thumbLop4A, description: "",
-    lop: "4A", subject: "Toán",
+    lop: "4A", subject: "Toán", status: "draft", subjectsTaught: ["Toán"],
   };
+  const info: ClassInfo = CLASS_DB[classId] ?? fallback;
+
+  const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
+  const [status, setStatus] = useState<ClassStatus>(info.status);
+  const [locked, setLocked] = useState<boolean>(false);
 
   const allMaterials = useMaterials();
   const classMaterials = useMemo(
-    () => allMaterials.filter((m) => m.classRealId === info.lop && m.subject === info.subject),
-    [allMaterials, info.lop, info.subject],
+    () => allMaterials.filter((m) => m.classRealId === info.lop && m.subject === selectedSubject),
+    [allMaterials, info.lop, selectedSubject],
   );
 
   const allLive = useLiveClasses();
   const classLive = useMemo(
-    () => allLive.filter((l) => l.classRealId === info.lop && l.subject === info.subject)
+    () => allLive.filter((l) => l.classRealId === info.lop && l.subject === selectedSubject)
       .sort((a, b) => a.startAt.localeCompare(b.startAt)),
-    [allLive, info.lop, info.subject],
+    [allLive, info.lop, selectedSubject],
   );
+
 
   // Group by unitId → sections
   type Group = { unitId: string; title: string; items: Material[] };
