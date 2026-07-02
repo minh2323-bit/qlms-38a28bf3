@@ -352,7 +352,7 @@ function ClassDetailPage() {
           onCreated={(data) => {
             addLiveClass({
               classRealId: info.lop,
-              subject: info.subject,
+              subject: selectedSubject,
               name: data.name,
               unitId: data.unitId,
               startAt: data.startAt,
