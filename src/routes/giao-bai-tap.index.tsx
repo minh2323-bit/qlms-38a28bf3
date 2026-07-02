@@ -335,6 +335,39 @@ function Page() {
           })}
         </ul>
       </section>
+
+      <Dialog open={licensedOpen} onOpenChange={setLicensedOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <Crown className="h-5 w-5 text-amber-500" /> Chọn loại bài tập bản quyền
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-center text-sky-700 font-semibold">
+            Vui lòng chọn loại hình học liệu bạn muốn sử dụng để giao bài tập cho học sinh.
+          </p>
+          <div className="grid grid-cols-3 gap-4 py-2">
+            {[
+              { key: "material", icon: FileIcon, color: "text-violet-600 bg-violet-50",
+                title: "Học liệu", desc: "Giao bài tập từ kho học liệu bản quyền có sẵn." },
+              { key: "bank", icon: Timer, color: "text-orange-500 bg-orange-50",
+                title: "Bộ câu hỏi", desc: "Tạo bài tập bằng cách chọn các bộ câu hỏi từ học liệu." },
+              { key: "custom", icon: ClipboardEdit, color: "text-teal-600 bg-teal-50",
+                title: "Biên soạn tùy chỉnh", desc: "Tạo bài tập bằng cách chọn các câu hỏi từ học liệu." },
+            ].map((o) => (
+              <button key={o.key}
+                onClick={() => { setLicensedOpen(false); addQuick("licensed"); }}
+                className="rounded-2xl border-2 border-slate-100 bg-white p-6 text-center hover:border-indigo-300 hover:shadow-md transition group">
+                <div className={`h-16 w-16 rounded-xl mx-auto flex items-center justify-center ${o.color}`}>
+                  <o.icon className="h-8 w-8" />
+                </div>
+                <div className="mt-4 text-base font-bold text-sky-700 group-hover:text-indigo-700">{o.title}</div>
+                <div className="mt-1 text-xs text-slate-500 leading-relaxed">{o.desc}</div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
