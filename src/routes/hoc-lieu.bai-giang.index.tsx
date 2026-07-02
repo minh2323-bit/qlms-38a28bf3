@@ -371,13 +371,28 @@ function SelectCircle({ selected, onClick }: { selected: boolean; onClick: () =>
   );
 }
 
+export function slugifyLesson(s: string): string {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/gi, "d")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect }: { l: LessonCard } & SelectProps) {
   const canShare = l.approved && l.shared !== "hanoi";
+  const slug = slugifyLesson(l.title);
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (selectMode) { onToggleSelect(); return; }
+    // Let inner links/buttons handle their own clicks
+    const target = e.target as HTMLElement;
+    if (target.closest("button, a")) return;
+    // Navigate via anchor click fallback
+    (e.currentTarget.querySelector("[data-lesson-link]") as HTMLAnchorElement | null)?.click();
+  };
   return (
     <div
-      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col hover:shadow-md transition ${selected ? "ring-2 ring-indigo-500" : ""}`}
-      onClick={selectMode ? onToggleSelect : undefined}
-      role={selectMode ? "button" : undefined}
+      className={`relative bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col hover:shadow-md transition cursor-pointer ${selected ? "ring-2 ring-indigo-500" : ""}`}
+      onClick={handleCardClick}
+      role="button"
     >
       {selectMode && <SelectCircle selected={selected} onClick={onToggleSelect} />}
       <div className="h-28 bg-slate-100 overflow-hidden">
@@ -385,7 +400,14 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
       </div>
       <div className="p-3 flex-1 flex flex-col">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2">{l.title}</h3>
+          <Link
+            data-lesson-link
+            to="/hoc-lieu/bai-giang/$lessonSlug"
+            params={{ lessonSlug: slug }}
+            className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2 hover:text-indigo-700"
+          >
+            {l.title}
+          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
