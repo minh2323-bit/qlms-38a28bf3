@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -92,6 +92,7 @@ function isOverdue(t: Task) { return new Date(t.dueAt).getTime() < Date.now(); }
 
 /* ---------- Page ---------- */
 function Page() {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>(SEED);
 
   // filters
@@ -167,7 +168,7 @@ function Page() {
               <DropdownMenuItem onClick={() => addQuick("practice")}>
                 <FileText className="h-4 w-4 mr-2 text-indigo-600" /> Đề luyện tập
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => addQuick("reading")}>
+              <DropdownMenuItem onClick={() => navigate({ to: "/giao-bai-tap/tao-moi/bai-tap-doc" })}>
                 <BookOpen className="h-4 w-4 mr-2 text-emerald-600" /> Bài tập đọc - Tìm hiểu
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => addQuick("licensed")}>
