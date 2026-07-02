@@ -658,20 +658,10 @@ function Page() {
                 </span>
               </label>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1">
-                    <PenLine className="h-4 w-4" /> Thêm thủ công <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64">
-                  {(["single","multi","essay","drag","fill","match"] as QKind[]).map((k) => (
-                    <DropdownMenuItem key={k} onClick={() => setManualKind(k)}>
-                      {Q_LABEL[k]}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button onClick={() => setPickerOpen(true)} className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1">
+                <PenLine className="h-4 w-4" /> Thêm thủ công <ChevronDown className="h-4 w-4" />
+              </Button>
+
             </div>
 
             <div className="border rounded-xl overflow-hidden">
