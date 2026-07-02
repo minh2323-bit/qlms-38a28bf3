@@ -448,6 +448,8 @@ function GroupRow({
   onDrop: (overId: string) => void;
   dragging: boolean;
 }) {
+  const { classId } = Route.useParams();
+  const completed = useCompletion();
   const draggableProps = reorder
     ? {
         draggable: true,
@@ -490,18 +492,36 @@ function GroupRow({
 
       {expanded && (
         <ul className="divide-y divide-slate-100">
-          {group.items.map((c) => (
-            <li key={c.id} className="pl-12 pr-4 py-2.5 flex items-center gap-3 hover:bg-slate-50">
-              <ItemIcon kind={c.kind} />
-              <span className="text-sm text-slate-700 flex-1 truncate">{c.title}</span>
-              {c.origin === "schedule" && (
-                <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
-                  Từ lịch
-                </span>
-              )}
-              <span className="text-xs text-slate-500">{c.meta}</span>
-            </li>
-          ))}
+          {group.items.map((c) => {
+            const done = completed.has(c.id);
+            return (
+              <li key={c.id}>
+                <Link
+                  to="/lop-hoc-so/$classId/hoc-lieu/$materialId"
+                  params={{ classId, materialId: c.id }}
+                  className="pl-12 pr-4 py-2.5 flex items-center gap-3 hover:bg-indigo-50/60 transition"
+                >
+                  <span className="relative">
+                    <ItemIcon kind={c.kind} />
+                    {done && (
+                      <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white inline-flex items-center justify-center">
+                        <Check className="h-2 w-2 text-white" strokeWidth={3} />
+                      </span>
+                    )}
+                  </span>
+                  <span className={`text-sm flex-1 truncate ${done ? "text-slate-500 line-through" : "text-slate-700"}`}>
+                    {c.title}
+                  </span>
+                  {c.origin === "schedule" && (
+                    <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
+                      Từ lịch
+                    </span>
+                  )}
+                  <span className="text-xs text-slate-500">{c.meta}</span>
+                </Link>
+              </li>
+            );
+          })}
           {group.items.length === 0 && (
             <li className="pl-12 pr-4 py-3 text-sm text-slate-400 italic">Chưa có học liệu trong bài giảng này.</li>
           )}
