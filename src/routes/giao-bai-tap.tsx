@@ -92,6 +92,7 @@ function isOverdue(t: Task) { return new Date(t.dueAt).getTime() < Date.now(); }
 
 /* ---------- Page ---------- */
 function Page() {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>(SEED);
 
   // filters
