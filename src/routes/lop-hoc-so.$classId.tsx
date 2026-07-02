@@ -163,7 +163,7 @@ function ClassDetailPage() {
   const [liveOpen, setLiveOpen] = useState(false);
   const handleAdd = (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => {
     addMaterial({
-      classRealId: info.lop, subject: info.subject, origin: "class",
+      classRealId: info.lop, subject: selectedSubject, origin: "class",
       ...m,
     });
     setAddOpen(null);
