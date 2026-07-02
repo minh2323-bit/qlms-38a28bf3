@@ -812,6 +812,34 @@ function Page() {
         setQuestions((p) => [...p, ...qs]);
         toast.success(`Đã thêm ${qs.length} câu`);
       }} />
+
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-sky-700">Chọn dạng câu hỏi</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-3 gap-4 py-2">
+            {([
+              { k: "single", Icon: CircleDot, color: "text-indigo-600 bg-indigo-50", desc: "Chọn 1 phương án đúng" },
+              { k: "multi", Icon: CheckSquare, color: "text-violet-600 bg-violet-50", desc: "Chọn nhiều phương án đúng" },
+              { k: "essay", Icon: FileText, color: "text-amber-600 bg-amber-50", desc: "Học sinh trả lời tự luận" },
+              { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Sắp xếp các mục theo thứ tự" },
+              { k: "fill", Icon: TextCursorInput, color: "text-emerald-600 bg-emerald-50", desc: "Điền từ vào chỗ trống" },
+              { k: "match", Icon: Link2, color: "text-rose-600 bg-rose-50", desc: "Nối các cặp tương ứng" },
+            ] as { k: QKind; Icon: typeof CircleDot; color: string; desc: string }[]).map(({ k, Icon, color, desc }) => (
+              <button key={k}
+                onClick={() => { setPickerOpen(false); setManualKind(k); }}
+                className="rounded-2xl border-2 border-slate-100 bg-white p-5 text-left hover:border-indigo-300 hover:shadow-md transition group">
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${color}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div className="mt-3 text-sm font-bold text-slate-800 group-hover:text-indigo-700">{Q_LABEL[k]}</div>
+                <div className="mt-1 text-xs text-slate-500">{desc}</div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
