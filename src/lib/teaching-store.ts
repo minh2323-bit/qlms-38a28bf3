@@ -141,6 +141,40 @@ export function removeMaterial(id: string) {
   if (materials.length !== before) emit();
 }
 
+export function updateMaterial(id: string, patch: Partial<Omit<Material, "id">>) {
+  let changed = false;
+  materials = materials.map((m) => {
+    if (m.id !== id) return m;
+    changed = true;
+    return { ...m, ...patch };
+  });
+  if (changed) emit();
+}
+
+export function moveMaterials(ids: string[], target: { classRealId: string; subject: string; unitId: string }) {
+  const set = new Set(ids);
+  let changed = false;
+  materials = materials.map((m) => {
+    if (!set.has(m.id)) return m;
+    changed = true;
+    return { ...m, ...target };
+  });
+  if (changed) emit();
+}
+
+export function copyMaterials(ids: string[], target: { classRealId: string; subject: string; unitId: string }) {
+  const clones: Material[] = [];
+  materials.forEach((m) => {
+    if (ids.includes(m.id)) {
+      clones.push({ ...m, ...target, id: uid(), origin: "class" });
+    }
+  });
+  if (clones.length) {
+    materials = [...materials, ...clones];
+    emit();
+  }
+}
+
 /* ---------- Subscribe / hook ---------- */
 export function subscribe(l: Listener) {
   listeners.add(l);
