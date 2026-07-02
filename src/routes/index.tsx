@@ -815,7 +815,10 @@ function LessonPanel({
   grid: WeekGrid; setGrid: (g: WeekGrid) => void; weekIdx: number;
 }) {
   const [editMode, setEditMode] = useState(false);
-  useEffect(() => { setEditMode(false); }, [lesson.id]);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [moveOpen, setMoveOpen] = useState<null | "move" | "copy">(null);
+  useEffect(() => { setEditMode(false); setSelected(new Set()); }, [lesson.id]);
+  useEffect(() => { if (!editMode) setSelected(new Set()); }, [editMode]);
 
   const allMaterials = useMaterials();
   const materials = useMemo(
@@ -829,17 +832,28 @@ function LessonPanel({
 
   const [adding, setAdding] = useState<null | { kind: MaterialKind; label: string }>(null);
 
-  const onDragStart = (e: React.DragEvent, mIdx: number) => {
-    e.dataTransfer.setData("mIdx", String(mIdx));
+  const onDragStart = (e: React.DragEvent, mId: string) => {
+    e.dataTransfer.setData("mId", mId);
+    e.dataTransfer.effectAllowed = "move";
   };
   const onDropToSlot = (e: React.DragEvent, day: number, period: number) => {
     e.preventDefault();
-    const idx = Number(e.dataTransfer.getData("mIdx"));
-    const newId = `${lesson.id}-mv-${idx}-${day}-${period}`;
-    const next: WeekGrid = JSON.parse(JSON.stringify(grid));
-    if (!next[weekIdx][day][period]) {
+    const mId = e.dataTransfer.getData("mId");
+    const occ = grid[weekIdx]?.[day]?.[period];
+    if (mId && occ) {
+      // Chuyển học liệu sang tiết đã có (cùng của mình)
+      moveMaterials([mId], { classRealId: occ.class, subject: occ.subject, unitId: occ.unitId });
+      toast.success(`Đã chuyển học liệu sang tiết ${occ.class} – ${occ.topic}`);
+      return;
+    }
+    if (mId && !occ) {
+      // Tạo tiết mới ở ô trống, mang theo tiêu đề học liệu
+      const m = allMaterials.find((x) => x.id === mId);
+      const next: WeekGrid = JSON.parse(JSON.stringify(grid));
       next[weekIdx][day][period] = {
-        ...lesson, id: newId, topic: materials[idx]?.title ?? lesson.topic,
+        ...lesson,
+        id: `${lesson.id}-mv-${mId}-${day}-${period}`,
+        topic: m?.title ?? lesson.topic,
       };
       setGrid(next);
     }
@@ -862,6 +876,26 @@ function LessonPanel({
     toast.success(`Đã thêm vào lớp ${lesson.class} – đồng bộ Lớp học số`);
   };
 
+  const toggleSel = (id: string) => setSelected((s) => {
+    const next = new Set(s);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+
+  const doMoveOrCopy = (target: Lesson, mode: "move" | "copy") => {
+    const ids = Array.from(selected);
+    const payload = { classRealId: target.class, subject: target.subject, unitId: target.unitId };
+    if (mode === "move") {
+      moveMaterials(ids, payload);
+      toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
+    } else {
+      copyMaterials(ids, payload);
+      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
+    }
+    setSelected(new Set());
+    setMoveOpen(null);
+  };
+
   return (
     <aside className="w-[340px] shrink-0 border-l bg-slate-50/60 flex flex-col animate-in slide-in-from-right-4 duration-200">
       <div className="px-4 py-3 border-b bg-white flex items-start justify-between gap-2">
@@ -878,30 +912,53 @@ function LessonPanel({
       </div>
 
       <div className="px-4 py-3 border-b bg-white space-y-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center justify-center gap-2 rounded-lg py-3 text-[15px] font-semibold text-white shadow-md hover:shadow-lg transition bg-gradient-to-r from-indigo-700 via-purple-600 to-fuchsia-500">
-              <Plus className="h-5 w-5" /> Thêm nội dung mới
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem asChild>
-              <Link
-                to="/hoc-lieu/bai-giang/tao-moi"
-                search={{
-                  khoi: `Lớp ${String(lesson.class).replace(/[^0-9]/g, "")}`,
-                  mon: lesson.subject,
-                  from: `tiết ${lesson.class} – ${lesson.subject}`,
-                }}
-              >
-                <Presentation className="h-4 w-4 mr-2" />Bài giảng
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => quickAdd("doc", "Học liệu")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài kiểm tra")}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài tập")}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!editMode && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="w-full flex items-center justify-center gap-2 rounded-lg py-3 text-[15px] font-semibold text-white shadow-md hover:shadow-lg transition bg-gradient-to-r from-indigo-700 via-purple-600 to-fuchsia-500">
+                <Plus className="h-5 w-5" /> Thêm nội dung mới
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link
+                  to="/hoc-lieu/bai-giang/tao-moi"
+                  search={{
+                    khoi: `Lớp ${String(lesson.class).replace(/[^0-9]/g, "")}`,
+                    mon: lesson.subject,
+                    from: `tiết ${lesson.class} – ${lesson.subject}`,
+                  }}
+                >
+                  <Presentation className="h-4 w-4 mr-2" />Bài giảng
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => quickAdd("doc", "Học liệu")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài kiểm tra")}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài tập")}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        {editMode && (
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1"
+              disabled={selected.size === 0}
+              onClick={() => setMoveOpen("copy")}
+            >
+              <Copy className="h-4 w-4" /> Tạo bản sao {selected.size > 0 && `(${selected.size})`}
+            </Button>
+            <Button
+              size="sm"
+              className="gap-1 bg-indigo-700 hover:bg-indigo-800"
+              disabled={selected.size === 0}
+              onClick={() => setMoveOpen("move")}
+            >
+              <Move className="h-4 w-4" /> Di chuyển {selected.size > 0 && `(${selected.size})`}
+            </Button>
+          </div>
+        )}
         <Button
           size="sm"
           variant={editMode ? "default" : "outline"}
@@ -917,7 +974,7 @@ function LessonPanel({
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-2.5 flex items-start gap-2">
             <Move className="h-4 w-4 text-indigo-700 mt-0.5 shrink-0" />
             <p className="text-xs text-indigo-800 leading-snug">
-              <b>Chế độ sắp xếp:</b> Kéo các học liệu bên dưới và <b>thả vào ô trống</b> trên lịch báo giảng để gắn sang ngày/tiết khác.
+              <b>Chế độ sắp xếp:</b> Tick chọn học liệu rồi bấm <b>Di chuyển</b> / <b>Tạo bản sao</b>, hoặc <b>kéo–thả</b> trực tiếp sang tiết khác trên lịch bên dưới.
             </p>
           </div>
         )}
@@ -931,13 +988,15 @@ function LessonPanel({
                   <g.icon className="h-4 w-4 text-indigo-700" />
                   {g.title}
                 </div>
-                <button
-                  onClick={() => quickAdd(g.defaultKind, g.title)}
-                  className="h-6 w-6 rounded-full bg-indigo-700 text-white flex items-center justify-center hover:bg-indigo-800 transition"
-                  title={`Thêm ${g.title.toLowerCase()}`}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </button>
+                {!editMode && (
+                  <button
+                    onClick={() => quickAdd(g.defaultKind, g.title)}
+                    className="h-6 w-6 rounded-full bg-indigo-700 text-white flex items-center justify-center hover:bg-indigo-800 transition"
+                    title={`Thêm ${g.title.toLowerCase()}`}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
               {items.length === 0 ? (
                 <p className="text-xs text-slate-400 italic px-3 py-3">Chưa có nội dung</p>
@@ -945,16 +1004,24 @@ function LessonPanel({
                 <ul>
                   {items.map((m) => {
                     const meta = MATERIAL_META[m.kind];
+                    const checked = selected.has(m.id);
                     return (
                       <li
                         key={m.id}
                         draggable={editMode}
-                        onDragStart={(e) => onDragStart(e, materials.indexOf(m))}
+                        onDragStart={(e) => onDragStart(e, m.id)}
                         className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border-t first:border-t-0 transition hover:bg-indigo-50 ${
                           editMode ? "cursor-grab active:cursor-grabbing bg-indigo-50/40 ring-1 ring-inset ring-indigo-100" : ""
-                        }`}
+                        } ${checked ? "bg-indigo-100" : ""}`}
                       >
                         <div className="flex items-center gap-2 min-w-0">
+                          {editMode && (
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={() => toggleSel(m.id)}
+                              className="shrink-0"
+                            />
+                          )}
                           <span className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 ${meta.bg}`}>
                             <meta.icon className={`h-4 w-4 ${meta.fg}`} />
                           </span>
@@ -963,9 +1030,11 @@ function LessonPanel({
                             {m.meta && <div className="text-[10px] text-slate-400">{m.meta}</div>}
                           </div>
                         </div>
-                        <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
-                          <FileCheck2 className="h-3 w-3" />
-                        </button>
+                        {!editMode && (
+                          <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
+                            <FileCheck2 className="h-3 w-3" />
+                          </button>
+                        )}
                       </li>
                     );
                   })}
@@ -978,7 +1047,7 @@ function LessonPanel({
         {editMode && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
             <p className="text-xs text-amber-800 font-medium mb-2">
-              Lịch tuần này — thả vào ô trống để chuyển tiết:
+              Lịch tuần này — kéo học liệu và thả vào tiết bất kỳ để chuyển:
             </p>
             <MiniWeek
               weekIdx={weekIdx} grid={grid}
@@ -997,7 +1066,92 @@ function LessonPanel({
           onSubmit={submitAdd}
         />
       )}
+
+      {moveOpen && (
+        <PickLessonModal
+          mode={moveOpen}
+          count={selected.size}
+          weekIdx={weekIdx}
+          grid={grid}
+          excludeLessonId={lesson.id}
+          onCancel={() => setMoveOpen(null)}
+          onPick={(target) => doMoveOrCopy(target, moveOpen)}
+        />
+      )}
     </aside>
+  );
+}
+
+function PickLessonModal({
+  mode, count, weekIdx, grid, excludeLessonId, onCancel, onPick,
+}: {
+  mode: "move" | "copy"; count: number;
+  weekIdx: number; grid: WeekGrid; excludeLessonId: string;
+  onCancel: () => void; onPick: (lesson: Lesson) => void;
+}) {
+  const title = mode === "move" ? "Di chuyển học liệu" : "Tạo bản sao học liệu";
+  const week = grid[weekIdx] ?? [];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b">
+          <div>
+            <h3 className="text-base font-bold text-slate-800">{title}</h3>
+            <p className="text-xs text-slate-500">
+              Chọn tiết đích trên Lịch báo giảng cho <b>{count}</b> học liệu đã chọn.
+            </p>
+          </div>
+          <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5 overflow-x-auto">
+          <div className="min-w-[720px]">
+            <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+              <div />
+              {DAYS.map((d) => (
+                <div key={d} className="text-xs font-semibold text-center text-slate-600">{d}</div>
+              ))}
+            </div>
+            {[1,2,3,4,5].map((p) => (
+              <div key={p} className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+                <div className="text-xs font-semibold text-slate-500 flex items-center justify-center bg-slate-50 rounded">Tiết {p}</div>
+                {DAYS.map((_, di) => {
+                  const occ = week[di]?.[p];
+                  const isSelf = occ?.id === excludeLessonId;
+                  if (!occ) {
+                    return (
+                      <div key={di} className="h-14 rounded border border-dashed border-slate-200 bg-slate-50/50 text-[10px] text-slate-300 flex items-center justify-center">
+                        Trống
+                      </div>
+                    );
+                  }
+                  return (
+                    <button
+                      key={di}
+                      disabled={isSelf}
+                      onClick={() => onPick(occ)}
+                      className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
+                        isSelf
+                          ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                          : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer`
+                      }`}
+                    >
+                      <div className="font-semibold">{occ.class} · {occ.subject}</div>
+                      <div className="truncate">{occ.topic}</div>
+                      {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end">
+          <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
