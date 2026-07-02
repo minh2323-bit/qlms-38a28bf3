@@ -450,6 +450,7 @@ function Page() {
   // Step 2
   const [questions, setQuestions] = useState<Question[]>([]);
   const [manualKind, setManualKind] = useState<QKind | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const totalScore = useMemo(() => questions.reduce((s, q) => s + (q.score || 0), 0), [questions]);
   const step2Valid = questions.length > 0;
