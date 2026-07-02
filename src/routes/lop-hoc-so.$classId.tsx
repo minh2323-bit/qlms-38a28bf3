@@ -262,8 +262,9 @@ function ClassDetailPage() {
                     to="/hoc-lieu/bai-giang/tao-moi"
                     search={{
                       khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`,
-                      mon: info.subject,
-                      from: `lớp ${info.lop} – ${info.subject}`,
+                      mon: selectedSubject,
+                      from: `lớp ${info.lop} – ${selectedSubject}`,
+
                     }}
                   >
                     <Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Thêm bài giảng
