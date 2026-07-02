@@ -12,11 +12,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2, Search,
   Database, Upload, PenLine, ChevronDown, X,
+  CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 
