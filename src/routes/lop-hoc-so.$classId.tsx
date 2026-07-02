@@ -30,6 +30,7 @@ import {
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
 import { AnnouncementSection } from "@/components/AnnouncementSection";
 import { BarChart3 } from "lucide-react";
+import { useCompletion } from "@/lib/material-progress-store";
 
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
