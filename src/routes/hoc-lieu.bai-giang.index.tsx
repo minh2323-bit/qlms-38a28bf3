@@ -249,13 +249,14 @@ function LessonsPage() {
                 <div className={`grid grid-cols-2 md:grid-cols-3 ${filterOpen ? "lg:grid-cols-4" : "lg:grid-cols-4 xl:grid-cols-5"} gap-3`}>
                   <Link
                     to="/hoc-lieu/bai-giang/tao-moi"
-                    className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[280px]"
+                    className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[220px]"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
-                      <Plus className="h-7 w-7 text-indigo-600" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
+                      <Plus className="h-6 w-6 text-indigo-600" />
                     </div>
-                    <p className="mt-4 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
+                    <p className="mt-3 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
                   </Link>
+
                   {filteredLessons.map((l) => (
                     <LessonCardView
                       key={l.title + l.author}
