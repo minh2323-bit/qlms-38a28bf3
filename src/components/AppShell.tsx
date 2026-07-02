@@ -30,7 +30,7 @@ const TEACHER_NAV: NavItem[] = [
     submenu: [
       { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
       { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
-      { icon: ClipboardList, label: "Giao bài tập, nhiệm vụ" },
+      { icon: ClipboardList, label: "Giao bài tập, nhiệm vụ", to: "/giao-bai-tap" },
       { icon: Video, label: "Lớp học trực tuyến" },
     ],
   },
