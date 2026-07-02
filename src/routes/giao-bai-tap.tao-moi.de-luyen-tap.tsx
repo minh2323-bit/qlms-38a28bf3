@@ -12,11 +12,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2, Search,
   Database, Upload, PenLine, ChevronDown, X,
+  CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -452,6 +450,7 @@ function Page() {
   // Step 2
   const [questions, setQuestions] = useState<Question[]>([]);
   const [manualKind, setManualKind] = useState<QKind | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const totalScore = useMemo(() => questions.reduce((s, q) => s + (q.score || 0), 0), [questions]);
   const step2Valid = questions.length > 0;
@@ -660,20 +659,10 @@ function Page() {
                 </span>
               </label>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1">
-                    <PenLine className="h-4 w-4" /> Thêm thủ công <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64">
-                  {(["single","multi","essay","drag","fill","match"] as QKind[]).map((k) => (
-                    <DropdownMenuItem key={k} onClick={() => setManualKind(k)}>
-                      {Q_LABEL[k]}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button onClick={() => setPickerOpen(true)} className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1">
+                <PenLine className="h-4 w-4" /> Thêm thủ công <ChevronDown className="h-4 w-4" />
+              </Button>
+
             </div>
 
             <div className="border rounded-xl overflow-hidden">
@@ -823,6 +812,34 @@ function Page() {
         setQuestions((p) => [...p, ...qs]);
         toast.success(`Đã thêm ${qs.length} câu`);
       }} />
+
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-sky-700">Chọn dạng câu hỏi</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-3 gap-4 py-2">
+            {([
+              { k: "single", Icon: CircleDot, color: "text-indigo-600 bg-indigo-50", desc: "Chọn 1 phương án đúng" },
+              { k: "multi", Icon: CheckSquare, color: "text-violet-600 bg-violet-50", desc: "Chọn nhiều phương án đúng" },
+              { k: "essay", Icon: FileText, color: "text-amber-600 bg-amber-50", desc: "Học sinh trả lời tự luận" },
+              { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Sắp xếp các mục theo thứ tự" },
+              { k: "fill", Icon: TextCursorInput, color: "text-emerald-600 bg-emerald-50", desc: "Điền từ vào chỗ trống" },
+              { k: "match", Icon: Link2, color: "text-rose-600 bg-rose-50", desc: "Nối các cặp tương ứng" },
+            ] as { k: QKind; Icon: typeof CircleDot; color: string; desc: string }[]).map(({ k, Icon, color, desc }) => (
+              <button key={k}
+                onClick={() => { setPickerOpen(false); setManualKind(k); }}
+                className="rounded-2xl border-2 border-slate-100 bg-white p-5 text-left hover:border-indigo-300 hover:shadow-md transition group">
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${color}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div className="mt-3 text-sm font-bold text-slate-800 group-hover:text-indigo-700">{Q_LABEL[k]}</div>
+                <div className="mt-1 text-xs text-slate-500">{desc}</div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
