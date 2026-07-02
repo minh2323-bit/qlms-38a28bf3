@@ -210,6 +210,11 @@ function ClassDetailPage() {
                 <span className="opacity-90">Giáo viên:</span>
                 <span className="font-semibold">{info.teacher}</span>
               </div>
+
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
+                <span className="opacity-90">Môn:</span>
+                <span className="font-semibold">{info.subjectsTaught.join(", ")}</span>
+              </div>
             </div>
 
             {info.description && (
@@ -217,6 +222,41 @@ function ClassDetailPage() {
                 {info.description}
               </p>
             )}
+
+            {/* Deploy / Lock button */}
+            <div className="mt-5 flex items-center gap-2 flex-wrap">
+              {status === "draft" ? (
+                <button
+                  onClick={() => { setStatus("deployed"); toast.success("Đã triển khai lớp học"); }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow"
+                >
+                  <Check className="h-4 w-4" /> Triển khai lớp học
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setLocked((v) => !v);
+                    toast.success(locked ? "Đã mở khóa lớp học" : "Đã khóa lớp học");
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg shadow ${
+                    locked
+                      ? "bg-white text-indigo-700 hover:bg-slate-100"
+                      : "bg-amber-500 hover:bg-amber-600 text-white"
+                  }`}
+                >
+                  {locked ? "Mở khóa lớp học" : "Khóa lớp học"}
+                </button>
+              )}
+              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                status === "draft"
+                  ? "bg-amber-100 text-amber-700"
+                  : locked
+                    ? "bg-slate-200 text-slate-700"
+                    : "bg-emerald-100 text-emerald-700"
+              }`}>
+                {status === "draft" ? "Bản nháp" : locked ? "Đã khóa" : "Đã triển khai"}
+              </span>
+            </div>
           </div>
 
           <div className="hidden md:block">
@@ -226,6 +266,30 @@ function ClassDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Subject selector */}
+      <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-5">
+        <h2 className="text-sm font-bold text-slate-700 mb-3">Môn học phụ trách</h2>
+        <div className="flex flex-wrap gap-2">
+          {info.subjectsTaught.map((s) => {
+            const active = selectedSubject === s;
+            return (
+              <button
+                key={s}
+                onClick={() => setSelectedSubject(s)}
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold border transition ${
+                  active
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:text-indigo-700"
+                }`}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
 
       {/* White content section */}
       <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
