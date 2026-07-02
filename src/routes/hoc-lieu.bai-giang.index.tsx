@@ -246,7 +246,7 @@ function LessonsPage() {
             {/* Lessons content */}
             <div className="flex-1 min-w-0">
               {lessonView === "grid" ? (
-                <div className={`grid grid-cols-1 md:grid-cols-2 ${filterOpen ? "lg:grid-cols-3" : "lg:grid-cols-3 xl:grid-cols-4"} gap-4`}>
+                <div className={`grid grid-cols-2 md:grid-cols-3 ${filterOpen ? "lg:grid-cols-4" : "lg:grid-cols-4 xl:grid-cols-5"} gap-3`}>
                   <Link
                     to="/hoc-lieu/bai-giang/tao-moi"
                     className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[280px]"
