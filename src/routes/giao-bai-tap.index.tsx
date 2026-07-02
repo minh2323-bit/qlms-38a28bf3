@@ -108,6 +108,7 @@ function Page() {
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<string>("");
   const [status, setStatus] = useState<string>(""); // "overdue" | "active"
+  const [licensedOpen, setLicensedOpen] = useState(false);
 
   const filtered = useMemo(() => tasks.filter((t) => {
     if (grade && t.grade !== grade) return false;
