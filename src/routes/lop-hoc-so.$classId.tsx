@@ -331,7 +331,7 @@ function ClassDetailPage() {
 
       <AnnouncementSection
         classRealId={info.lop}
-        subject={info.subject}
+        subject={selectedSubject}
         teacherName={info.teacher}
       />
 
