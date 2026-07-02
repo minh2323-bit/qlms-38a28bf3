@@ -170,13 +170,13 @@ function Page() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => addQuick("practice")}>
+              <DropdownMenuItem onClick={() => navigate({ to: "/giao-bai-tap/tao-moi/de-luyen-tap" })}>
                 <FileText className="h-4 w-4 mr-2 text-indigo-600" /> Đề luyện tập
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate({ to: "/giao-bai-tap/tao-moi/bai-tap-doc" })}>
                 <BookOpen className="h-4 w-4 mr-2 text-emerald-600" /> Bài tập đọc - Tìm hiểu
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => addQuick("licensed")}>
+              <DropdownMenuItem onClick={() => setLicensedOpen(true)}>
                 <Crown className="h-4 w-4 mr-2 text-amber-600" /> Bài tập bản quyền
               </DropdownMenuItem>
             </DropdownMenuContent>
