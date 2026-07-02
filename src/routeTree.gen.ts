@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
 import { Route as HocSinhRouteImport } from './routes/hoc-sinh'
+import { Route as GiaoBaiTapRouteImport } from './routes/giao-bai-tap'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LopHocSoIndexRouteImport } from './routes/lop-hoc-so.index'
 import { Route as HocSinhIndexRouteImport } from './routes/hoc-sinh.index'
@@ -39,6 +40,11 @@ const LopHocSoRoute = LopHocSoRouteImport.update({
 const HocSinhRoute = HocSinhRouteImport.update({
   id: '/hoc-sinh',
   path: '/hoc-sinh',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiaoBaiTapRoute = GiaoBaiTapRouteImport.update({
+  id: '/giao-bai-tap',
+  path: '/giao-bai-tap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -141,6 +147,7 @@ const LopHocSoClassIdHocLieuMaterialIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/giao-bai-tap': typeof GiaoBaiTapRoute
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/giao-bai-tap': typeof GiaoBaiTapRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/giao-bai-tap': typeof GiaoBaiTapRoute
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/giao-bai-tap'
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/hoc-lieu/kho-hoc-lieu'
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/giao-bai-tap'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/giao-bai-tap'
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/hoc-lieu/kho-hoc-lieu'
@@ -279,6 +291,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GiaoBaiTapRoute: typeof GiaoBaiTapRoute
   HocSinhRoute: typeof HocSinhRouteWithChildren
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
@@ -301,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/hoc-sinh'
       fullPath: '/hoc-sinh'
       preLoaderRoute: typeof HocSinhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/giao-bai-tap': {
+      id: '/giao-bai-tap'
+      path: '/giao-bai-tap'
+      fullPath: '/giao-bai-tap'
+      preLoaderRoute: typeof GiaoBaiTapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -498,6 +518,7 @@ const LopHocSoRouteWithChildren = LopHocSoRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GiaoBaiTapRoute: GiaoBaiTapRoute,
   HocSinhRoute: HocSinhRouteWithChildren,
   LopHocSoRoute: LopHocSoRouteWithChildren,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
