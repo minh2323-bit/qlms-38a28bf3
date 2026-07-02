@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   ClipboardCheck, CalendarClock, Sun, Sunset, Moon,
@@ -981,10 +981,28 @@ function LessonPanel({
 
         {groups.map((g) => {
           const items = materials.filter(g.filter);
+          const itemIds = items.map((m) => m.id);
+          const allChecked = itemIds.length > 0 && itemIds.every((id) => selected.has(id));
+          const someChecked = itemIds.some((id) => selected.has(id));
+          const toggleAll = () => setSelected((s) => {
+            const next = new Set(s);
+            if (allChecked) itemIds.forEach((id) => next.delete(id));
+            else itemIds.forEach((id) => next.add(id));
+            return next;
+          });
+          const isBaiGiang = g.title === "Bài giảng";
           return (
             <div key={g.title} className="bg-white rounded-xl border overflow-hidden">
               <div className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-50 border-b">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  {editMode && itemIds.length > 0 && (
+                    <Checkbox
+                      checked={allChecked ? true : someChecked ? "indeterminate" : false}
+                      onCheckedChange={toggleAll}
+                      className="shrink-0"
+                      title="Chọn tất cả"
+                    />
+                  )}
                   <g.icon className="h-4 w-4 text-indigo-700" />
                   {g.title}
                 </div>
@@ -1005,6 +1023,14 @@ function LessonPanel({
                   {items.map((m) => {
                     const meta = MATERIAL_META[m.kind];
                     const checked = selected.has(m.id);
+                    // Bài giảng: đồng nhất icon & meta = "N chủ đề, M học liệu"
+                    const displayIcon = isBaiGiang ? Presentation : meta.icon;
+                    const displayBg = isBaiGiang ? "bg-purple-100" : meta.bg;
+                    const displayFg = isBaiGiang ? "text-purple-700" : meta.fg;
+                    const h = m.id.length;
+                    const displayMeta = isBaiGiang
+                      ? `${(h % 5) + 2} chủ đề · ${(h % 8) + 3} học liệu`
+                      : m.meta;
                     return (
                       <li
                         key={m.id}
@@ -1022,12 +1048,12 @@ function LessonPanel({
                               className="shrink-0"
                             />
                           )}
-                          <span className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 ${meta.bg}`}>
-                            <meta.icon className={`h-4 w-4 ${meta.fg}`} />
+                          <span className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 ${displayBg}`}>
+                            {React.createElement(displayIcon, { className: `h-4 w-4 ${displayFg}` })}
                           </span>
                           <div className="min-w-0">
                             <div className="text-slate-700 truncate">{m.title}</div>
-                            {m.meta && <div className="text-[10px] text-slate-400">{m.meta}</div>}
+                            {displayMeta && <div className="text-[10px] text-slate-400">{displayMeta}</div>}
                           </div>
                         </div>
                         {!editMode && (
