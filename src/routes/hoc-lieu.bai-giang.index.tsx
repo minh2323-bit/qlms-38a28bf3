@@ -581,7 +581,7 @@ function LessonsTable({
                   </button>
                 </td>
                 <td className="px-4 py-4">
-                  <div className="font-semibold text-slate-800">{l.title}</div>
+                  <Link to="/hoc-lieu/bai-giang/$lessonSlug" params={{ lessonSlug: slugifyLesson(l.title) }} className="font-semibold text-slate-800 hover:text-indigo-700">{l.title}</Link>
                   <div className="mt-1">
                     <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
                       {l.approved ? "Đã duyệt" : "Chờ duyệt"}
