@@ -13,8 +13,12 @@ import {
 import {
   ClipboardList, Plus, MoreVertical, Search, Calendar as CalendarIcon,
   Pencil, BellRing, CalendarClock, Trash2, FileText, BookOpen, Crown, Filter, X,
+  FileText as FileIcon, Timer, ClipboardEdit,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/giao-bai-tap/")({
   head: () => ({ meta: [{ title: "Giao bài tập, nhiệm vụ" }] }),
