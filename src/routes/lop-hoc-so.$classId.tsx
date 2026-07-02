@@ -467,19 +467,33 @@ function GroupRow({
         dragging ? "opacity-50" : ""
       } ${reorder ? "cursor-move" : ""}`}
     >
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 transition"
-      >
+      <div className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 transition">
         {reorder && <GripVertical className="h-4 w-4 text-slate-400" />}
-        {expanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
-        <span className="font-semibold text-slate-800 text-left flex-1">{group.title}</span>
+        <button
+          type="button"
+          onClick={onToggle}
+          className="p-1 rounded hover:bg-slate-200 text-slate-500"
+          aria-label={expanded ? "Thu gọn" : "Mở rộng"}
+        >
+          {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        </button>
+        {group.items[0] ? (
+          <Link
+            to="/lop-hoc-so/$classId/hoc-lieu/$materialId"
+            params={{ classId, materialId: group.items[0].id }}
+            className="font-semibold text-slate-800 text-left flex-1 hover:text-indigo-700 truncate"
+          >
+            {group.title}
+          </Link>
+        ) : (
+          <span className="font-semibold text-slate-800 text-left flex-1">{group.title}</span>
+        )}
         <span className="text-xs text-slate-500 font-medium">
           {group.items.length} học liệu
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <span role="button" onClick={(e) => e.stopPropagation()} className="p-1 rounded hover:bg-slate-200 text-slate-500">
+            <span role="button" className="p-1 rounded hover:bg-slate-200 text-slate-500">
               <MoreVertical className="h-4 w-4" />
             </span>
           </DropdownMenuTrigger>
@@ -489,37 +503,31 @@ function GroupRow({
             <DropdownMenuItem className="cursor-pointer text-rose-600"><Trash2 className="h-4 w-4 mr-2" /> Xóa bài giảng</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </button>
+      </div>
 
       {expanded && (
         <ul className="divide-y divide-slate-100">
           {group.items.map((c) => {
             const done = completed.has(c.id);
             return (
-              <li key={c.id}>
-                <Link
-                  to="/lop-hoc-so/$classId/hoc-lieu/$materialId"
-                  params={{ classId, materialId: c.id }}
-                  className="pl-12 pr-4 py-2.5 flex items-center gap-3 hover:bg-indigo-50/60 transition"
-                >
-                  <span className="relative">
-                    <ItemIcon kind={c.kind} />
-                    {done && (
-                      <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white inline-flex items-center justify-center">
-                        <Check className="h-2 w-2 text-white" strokeWidth={3} />
-                      </span>
-                    )}
-                  </span>
-                  <span className={`text-sm flex-1 truncate ${done ? "text-slate-500 line-through" : "text-slate-700"}`}>
-                    {c.title}
-                  </span>
-                  {c.origin === "schedule" && (
-                    <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
-                      Từ lịch
+              <li key={c.id} className="pl-12 pr-4 py-2.5 flex items-center gap-3">
+                <span className="relative">
+                  <ItemIcon kind={c.kind} />
+                  {done && (
+                    <span className="absolute -right-1 -bottom-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white inline-flex items-center justify-center">
+                      <Check className="h-2 w-2 text-white" strokeWidth={3} />
                     </span>
                   )}
-                  <span className="text-xs text-slate-500">{c.meta}</span>
-                </Link>
+                </span>
+                <span className={`text-sm flex-1 truncate ${done ? "text-slate-500 line-through" : "text-slate-700"}`}>
+                  {c.title}
+                </span>
+                {c.origin === "schedule" && (
+                  <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
+                    Từ lịch
+                  </span>
+                )}
+                <span className="text-xs text-slate-500">{c.meta}</span>
               </li>
             );
           })}
