@@ -13,8 +13,12 @@ import {
 import {
   ClipboardList, Plus, MoreVertical, Search, Calendar as CalendarIcon,
   Pencil, BellRing, CalendarClock, Trash2, FileText, BookOpen, Crown, Filter, X,
+  FileText as FileIcon, Timer, ClipboardEdit,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/giao-bai-tap/")({
   head: () => ({ meta: [{ title: "Giao bài tập, nhiệm vụ" }] }),
@@ -104,6 +108,7 @@ function Page() {
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<string>("");
   const [status, setStatus] = useState<string>(""); // "overdue" | "active"
+  const [licensedOpen, setLicensedOpen] = useState(false);
 
   const filtered = useMemo(() => tasks.filter((t) => {
     if (grade && t.grade !== grade) return false;
@@ -165,13 +170,13 @@ function Page() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => addQuick("practice")}>
+              <DropdownMenuItem onClick={() => navigate({ to: "/giao-bai-tap/tao-moi/de-luyen-tap" })}>
                 <FileText className="h-4 w-4 mr-2 text-indigo-600" /> Đề luyện tập
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate({ to: "/giao-bai-tap/tao-moi/bai-tap-doc" })}>
                 <BookOpen className="h-4 w-4 mr-2 text-emerald-600" /> Bài tập đọc - Tìm hiểu
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => addQuick("licensed")}>
+              <DropdownMenuItem onClick={() => setLicensedOpen(true)}>
                 <Crown className="h-4 w-4 mr-2 text-amber-600" /> Bài tập bản quyền
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -330,6 +335,39 @@ function Page() {
           })}
         </ul>
       </section>
+
+      <Dialog open={licensedOpen} onOpenChange={setLicensedOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <Crown className="h-5 w-5 text-amber-500" /> Chọn loại bài tập bản quyền
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-center text-sky-700 font-semibold">
+            Vui lòng chọn loại hình học liệu bạn muốn sử dụng để giao bài tập cho học sinh.
+          </p>
+          <div className="grid grid-cols-3 gap-4 py-2">
+            {[
+              { key: "material", icon: FileIcon, color: "text-violet-600 bg-violet-50",
+                title: "Học liệu", desc: "Giao bài tập từ kho học liệu bản quyền có sẵn." },
+              { key: "bank", icon: Timer, color: "text-orange-500 bg-orange-50",
+                title: "Bộ câu hỏi", desc: "Tạo bài tập bằng cách chọn các bộ câu hỏi từ học liệu." },
+              { key: "custom", icon: ClipboardEdit, color: "text-teal-600 bg-teal-50",
+                title: "Biên soạn tùy chỉnh", desc: "Tạo bài tập bằng cách chọn các câu hỏi từ học liệu." },
+            ].map((o) => (
+              <button key={o.key}
+                onClick={() => { setLicensedOpen(false); addQuick("licensed"); }}
+                className="rounded-2xl border-2 border-slate-100 bg-white p-6 text-center hover:border-indigo-300 hover:shadow-md transition group">
+                <div className={`h-16 w-16 rounded-xl mx-auto flex items-center justify-center ${o.color}`}>
+                  <o.icon className="h-8 w-8" />
+                </div>
+                <div className="mt-4 text-base font-bold text-sky-700 group-hover:text-indigo-700">{o.title}</div>
+                <div className="mt-1 text-xs text-slate-500 leading-relaxed">{o.desc}</div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
