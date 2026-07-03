@@ -334,19 +334,22 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, onE
 /* ============================ Create Class Modal ============================ */
 
 function CreateClassModal({
-  onClose, onSubmit,
+  onClose, onSubmit, initial,
 }: {
   onClose: () => void;
   onSubmit: (row: ClassRow) => void;
+  initial?: ClassRow | null;
 }) {
+  const isEdit = !!initial;
   const [step, setStep] = useState<1 | 2>(1);
 
   // Step 1
-  const autoCode = useMemo(() => `LH-${Date.now().toString().slice(-6)}`, []);
-  const [tenLop, setTenLop] = useState("");
-  const [ganLop, setGanLop] = useState("");
+  const autoCode = useMemo(() => (initial ? `LH-${initial.id.slice(-6).toUpperCase()}` : `LH-${Date.now().toString().slice(-6)}`), [initial]);
+  const [tenLop, setTenLop] = useState(initial?.name ?? "");
+  const [ganLop, setGanLop] = useState(initial?.lop ?? "");
   const [moTa, setMoTa] = useState("");
-  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(initial?.thumb ?? null);
+
 
   // Step 2
   const [pickedClass, setPickedClass] = useState<string>("");
