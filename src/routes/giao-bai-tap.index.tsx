@@ -22,6 +22,9 @@ import {
 
 export const Route = createFileRoute("/giao-bai-tap/")({
   head: () => ({ meta: [{ title: "Giao bài tập, nhiệm vụ" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    highlight: typeof s.highlight === "string" ? (s.highlight as string) : undefined,
+  }),
   component: Page,
 });
 
@@ -97,6 +100,8 @@ function isOverdue(t: Task) { return new Date(t.dueAt).getTime() < Date.now(); }
 /* ---------- Page ---------- */
 function Page() {
   const navigate = useNavigate();
+  const { highlight } = Route.useSearch();
+  const highlightUngraded = highlight === "ungraded";
   const [tasks, setTasks] = useState<Task[]>(SEED);
 
   // filters
@@ -265,11 +270,14 @@ function Page() {
           )}
           {filtered.map((t) => {
             const overdue = isOverdue(t);
+            const isHighlighted = highlightUngraded && t.graded === 0;
             return (
               <li
                 key={t.id}
                 onClick={() => navigate({ to: "/giao-bai-tap/$taskId", params: { taskId: t.id } })}
-                className="rounded-xl border bg-white p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer"
+                className={`rounded-xl border bg-white p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer ${
+                  isHighlighted ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50/40 shadow-md" : ""
+                }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
