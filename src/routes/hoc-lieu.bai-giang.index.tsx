@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
-  SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2,
+  SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2, Pencil,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -13,6 +13,7 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
+
 
 import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
 import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
@@ -84,7 +85,7 @@ function LessonsPage() {
   const [lessonTrangThai, setLessonTrangThai] = useState("");
   const [lessonFromDate, setLessonFromDate] = useState("");
   const [lessonToDate, setLessonToDate] = useState("");
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(true);
   const [lessonSelectMode, setLessonSelectMode] = useState(false);
   const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set());
 
@@ -246,7 +247,7 @@ function LessonsPage() {
             {/* Lessons content */}
             <div className="flex-1 min-w-0">
               {lessonView === "grid" ? (
-                <div className={`grid grid-cols-2 md:grid-cols-3 ${filterOpen ? "lg:grid-cols-4" : "lg:grid-cols-4 xl:grid-cols-5"} gap-3`}>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   <Link
                     to="/hoc-lieu/bai-giang/tao-moi"
                     className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[220px]"
@@ -378,15 +379,22 @@ export function slugifyLesson(s: string): string {
 }
 
 function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect }: { l: LessonCard } & SelectProps) {
-  const canShare = l.approved && l.shared !== "hanoi";
+  const navigate = useNavigate();
+  const [shareState, setShareState] = useState<"noi-bo" | "hanoi" | "none">(l.shared);
+  const canShare = l.approved && shareState !== "hanoi";
+  const isShared = shareState === "hanoi";
   const slug = slugifyLesson(l.title);
   const handleCardClick = (e: React.MouseEvent) => {
     if (selectMode) { onToggleSelect(); return; }
-    // Let inner links/buttons handle their own clicks
     const target = e.target as HTMLElement;
     if (target.closest("button, a")) return;
-    // Navigate via anchor click fallback
     (e.currentTarget.querySelector("[data-lesson-link]") as HTMLAnchorElement | null)?.click();
+  };
+  const handleEdit = () => {
+    navigate({
+      to: "/hoc-lieu/bai-giang/tao-moi",
+      search: { edit: slug, title: l.title, khoi: l.khoi, mon: l.subject },
+    });
   };
   return (
     <div
@@ -419,6 +427,9 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
               <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
                 <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
               </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={handleEdit}>
+                <Pencil className="h-4 w-4 mr-2 text-emerald-500" /> Sửa
+              </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
               </DropdownMenuItem>
@@ -440,27 +451,41 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
             {l.approved ? "Đã duyệt" : "Chờ duyệt"}
           </span>
-          {l.shared === "noi-bo" && (
+          {shareState === "noi-bo" && (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">Chia sẻ nội bộ</span>
           )}
-          {l.shared === "hanoi" && (
+          {shareState === "hanoi" && (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Đã chia sẻ Hanoi Study</span>
           )}
         </div>
-        <button
-          disabled={!canShare}
-          className={`mt-3 w-full py-2 rounded-lg text-sm font-semibold transition ${
-            canShare
-              ? "bg-indigo-600 text-white hover:bg-indigo-700"
-              : "bg-slate-200 text-slate-500 cursor-not-allowed"
-          }`}
-        >
-          Chia sẻ lên Hanoi Study
-        </button>
+        {isShared ? (
+          <div className="mt-3 space-y-1.5">
+            <div className="text-center text-xs font-semibold text-slate-500">Chờ Sở Duyệt</div>
+            <button
+              onClick={(e) => { e.stopPropagation(); setShareState("noi-bo"); }}
+              className="w-full py-2 rounded-lg text-sm font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition"
+            >
+              Thu hồi
+            </button>
+          </div>
+        ) : (
+          <button
+            disabled={!canShare}
+            onClick={(e) => { e.stopPropagation(); if (canShare) setShareState("hanoi"); }}
+            className={`mt-3 w-full py-2 rounded-lg text-sm font-semibold transition ${
+              canShare
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-slate-200 text-slate-500 cursor-not-allowed"
+            }`}
+          >
+            Chia sẻ lên Hanoi Study
+          </button>
+        )}
       </div>
     </div>
   );
 }
+
 
 type LessonTopic = { name: string; items: string[] };
 type LessonContent = { topics: LessonTopic[]; materials: string[]; quizzes: string[] };

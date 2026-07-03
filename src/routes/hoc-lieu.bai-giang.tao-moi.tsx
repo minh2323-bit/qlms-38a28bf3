@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
-type CreateLessonSearch = { khoi?: string; mon?: string; from?: string };
+type CreateLessonSearch = { khoi?: string; mon?: string; from?: string; edit?: string; title?: string; unitId?: string };
 
 export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
   head: () => ({
@@ -25,9 +25,13 @@ export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
     khoi: typeof s.khoi === "string" ? s.khoi : undefined,
     mon: typeof s.mon === "string" ? s.mon : undefined,
     from: typeof s.from === "string" ? s.from : undefined,
+    edit: typeof s.edit === "string" ? s.edit : undefined,
+    title: typeof s.title === "string" ? s.title : undefined,
+    unitId: typeof s.unitId === "string" ? s.unitId : undefined,
   }),
   component: CreateLessonPage,
 });
+
 
 /* ------------------------------ Constants ------------------------------ */
 
@@ -177,19 +181,21 @@ function CreateLessonPage() {
   const prefilledKhoi = search.khoi ?? "";
   const prefilledMon = search.mon ?? "";
   const isPrefilled = !!(prefilledKhoi && prefilledMon);
+  const isEditing = !!search.edit;
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Step 1
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(search.title ?? "");
   const [khoi, setKhoi] = useState(prefilledKhoi);
   const [mon, setMon] = useState(prefilledMon);
-  const [unitId, setUnitId] = useState("");
+  const [unitId, setUnitId] = useState(search.unitId ?? "");
   const [coverMode, setCoverMode] = useState<"link" | "file">("link");
   const [coverLink, setCoverLink] = useState("");
   const [coverFileName, setCoverFileName] = useState("");
   const [coverDataUrl, setCoverDataUrl] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   const tree = useMemo(
     () => (khoi && mon ? getKnowledgeTree(khoi.replace(/[^0-9]/g, ""), mon) : []),
@@ -238,7 +244,7 @@ function CreateLessonPage() {
             <div className="text-sm text-slate-500">
               <Link to="/hoc-lieu/bai-giang" className="hover:text-indigo-700">Bài giảng</Link>
               <span className="mx-1.5">/</span>
-              <span className="text-slate-700 font-semibold">Tạo bài giảng mới</span>
+              <span className="text-slate-700 font-semibold">{isEditing ? "Sửa bài giảng" : "Tạo bài giảng mới"}</span>
             </div>
             <h1 className="mt-1 text-2xl font-bold text-slate-800">
               {title.trim() || "Bài giảng mới"}

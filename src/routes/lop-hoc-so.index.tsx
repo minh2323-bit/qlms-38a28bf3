@@ -3,8 +3,9 @@ import { useMemo, useState, useEffect } from "react";
 import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
-  CheckSquare, Check, X, ImagePlus, ArrowLeft, ArrowRight,
+  CheckSquare, Check, X, ImagePlus, ArrowLeft, ArrowRight, Pencil,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -78,6 +79,7 @@ function DigitalClassesPage() {
   const [classSelectMode, setClassSelectMode] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
   const [openCreate, setOpenCreate] = useState(false);
+  const [editingClass, setEditingClass] = useState<ClassRow | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -99,12 +101,20 @@ function DigitalClassesPage() {
   });
 
   const handleCreate = (row: ClassRow) => {
-    const newRow = { ...row, id: row.id || generateId() };
-    setClasses((prev) => [newRow, ...prev]);
-    setHighlightedId(newRow.id);
-    toast.success("Thêm lớp học thành công");
+    if (editingClass) {
+      setClasses((prev) => prev.map((c) => (c.id === editingClass.id ? { ...row, id: editingClass.id } : c)));
+      setHighlightedId(editingClass.id);
+      toast.success("Cập nhật lớp học thành công");
+    } else {
+      const newRow = { ...row, id: row.id || generateId() };
+      setClasses((prev) => [newRow, ...prev]);
+      setHighlightedId(newRow.id);
+      toast.success("Thêm lớp học thành công");
+    }
     setOpenCreate(false);
+    setEditingClass(null);
   };
+
 
   return (
     <AppShell>
@@ -162,7 +172,7 @@ function DigitalClassesPage() {
             </div>
           </div>
 
-          <div className={classView === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" : "space-y-3"}>
+          <div className={classView === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" : "space-y-3"}>
             {filteredClasses.map((c) => (
               <ClassCard
                 key={c.id}
@@ -171,6 +181,7 @@ function DigitalClassesPage() {
                 selected={selectedClasses.has(c.id)}
                 onToggleSelect={() => toggleClassSel(c.id)}
                 onEnterSelect={() => { setClassSelectMode(true); toggleClassSel(c.id); }}
+                onEdit={() => { setEditingClass(c); setOpenCreate(true); }}
                 isNew={c.id === highlightedId}
               />
             ))}
@@ -179,10 +190,12 @@ function DigitalClassesPage() {
 
         {openCreate && (
           <CreateClassModal
-            onClose={() => setOpenCreate(false)}
+            initial={editingClass}
+            onClose={() => { setOpenCreate(false); setEditingClass(null); }}
             onSubmit={handleCreate}
           />
         )}
+
       </>
     </AppShell>
   );
@@ -257,7 +270,7 @@ function StatusTag({ status }: { status: ClassStatus }) {
   );
 }
 
-function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isNew }: { c: ClassRow } & SelectProps & { isNew?: boolean }) {
+function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, onEdit, isNew }: { c: ClassRow; onEdit?: () => void } & SelectProps & { isNew?: boolean }) {
   const navigate = useNavigate();
   const handleClick = () => {
     if (selectMode) { onToggleSelect(); return; }
@@ -290,6 +303,11 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
               <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
                 <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
               </DropdownMenuItem>
+              {onEdit && (
+                <DropdownMenuItem className="cursor-pointer" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
+                  <Pencil className="h-4 w-4 mr-2 text-emerald-500" /> Sửa
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
               </DropdownMenuItem>
@@ -299,6 +317,7 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
         <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-600">
           <span><span className="text-slate-500">BG:</span> {c.baiGiang}</span>
           <span><span className="text-slate-500">HL:</span> {c.hocLieu}</span>
@@ -315,19 +334,22 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
 /* ============================ Create Class Modal ============================ */
 
 function CreateClassModal({
-  onClose, onSubmit,
+  onClose, onSubmit, initial,
 }: {
   onClose: () => void;
   onSubmit: (row: ClassRow) => void;
+  initial?: ClassRow | null;
 }) {
+  const isEdit = !!initial;
   const [step, setStep] = useState<1 | 2>(1);
 
   // Step 1
-  const autoCode = useMemo(() => `LH-${Date.now().toString().slice(-6)}`, []);
-  const [tenLop, setTenLop] = useState("");
-  const [ganLop, setGanLop] = useState("");
+  const autoCode = useMemo(() => (initial ? `LH-${initial.id.slice(-6).toUpperCase()}` : `LH-${Date.now().toString().slice(-6)}`), [initial]);
+  const [tenLop, setTenLop] = useState(initial?.name ?? "");
+  const [ganLop, setGanLop] = useState(initial?.lop ?? "");
   const [moTa, setMoTa] = useState("");
-  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(initial?.thumb ?? null);
+
 
   // Step 2
   const [pickedClass, setPickedClass] = useState<string>("");
@@ -385,7 +407,7 @@ function CreateClassModal({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-bold text-slate-800">Thêm lớp học mới</h2>
+          <h2 className="text-lg font-bold text-slate-800">{isEdit ? "Sửa lớp học" : "Thêm lớp học mới"}</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
             <X className="h-5 w-5" />
           </button>
@@ -573,7 +595,7 @@ function CreateClassModal({
                   onClick={() => onSubmit(buildRow("deployed"))}
                   className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
                 >
-                  Tạo lớp học
+                  {isEdit ? "Cập nhật" : "Tạo lớp học"}
                 </button>
               </>
             )}
