@@ -270,7 +270,7 @@ function StatusTag({ status }: { status: ClassStatus }) {
   );
 }
 
-function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isNew }: { c: ClassRow } & SelectProps & { isNew?: boolean }) {
+function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, onEdit, isNew }: { c: ClassRow; onEdit?: () => void } & SelectProps & { isNew?: boolean }) {
   const navigate = useNavigate();
   const handleClick = () => {
     if (selectMode) { onToggleSelect(); return; }
@@ -303,6 +303,11 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
               <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
                 <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
               </DropdownMenuItem>
+              {onEdit && (
+                <DropdownMenuItem className="cursor-pointer" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
+                  <Pencil className="h-4 w-4 mr-2 text-emerald-500" /> Sửa
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
               </DropdownMenuItem>
@@ -312,6 +317,7 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, isN
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
         <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-600">
           <span><span className="text-slate-500">BG:</span> {c.baiGiang}</span>
           <span><span className="text-slate-500">HL:</span> {c.hocLieu}</span>
