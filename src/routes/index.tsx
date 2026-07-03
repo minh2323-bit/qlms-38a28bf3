@@ -511,24 +511,6 @@ function DashboardSection() {
   const [openPending, setOpenPending] = useState(false);
   const navigate = Route.useNavigate();
 
-  const stats: Array<{
-    value: string; label: React.ReactNode; sub?: React.ReactNode;
-    icon: typeof FileText; accent: string; bg: string; bar: string;
-    onClick?: () => void;
-  }> = [
-    { value: "10", label: "bài tập cần chấm", sub: "100 bài tập đã giao",
-      icon: ClipboardCheck, accent: "text-blue-600", bg: "bg-blue-50", bar: "bg-blue-500",
-      onClick: () => navigate({ to: "/giao-bai-tap", search: { highlight: "ungraded" } }) },
-    { value: "10", label: "Bài giảng đã tạo", sub: "50 Học liệu đã tạo",
-      icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
-    { value: "5",  label: "Bài giảng/Học liệu sử dụng tuần này",
-      icon: BookOpenCheck, accent: "text-violet-600", bg: "bg-violet-50", bar: "bg-violet-500" },
-    { value: "10", label: "Học sinh chưa nộp bài",
-      icon: Users, accent: "text-amber-600", bg: "bg-amber-50", bar: "bg-amber-500",
-      onClick: () => setOpenPending(true) },
-    { value: "10", label: "Bài kiểm tra chưa chấm", sub: "100 bài kiểm tra đã tạo",
-      icon: FileCheck2, accent: "text-rose-600", bg: "bg-rose-50", bar: "bg-rose-500" },
-  ];
 
   return (
     <>
