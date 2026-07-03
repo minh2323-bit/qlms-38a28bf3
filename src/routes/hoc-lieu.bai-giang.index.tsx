@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
-  SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2,
+  SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2, Pencil,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -13,6 +13,7 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
+
 
 import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
 import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
