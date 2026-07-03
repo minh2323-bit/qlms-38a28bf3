@@ -291,8 +291,6 @@ function ClassDetailPage() {
         </div>
       </section>
 
-      {/* Hồ sơ giáo dục */}
-      <EducationRecordsSection className={info.name} />
 
 
 
