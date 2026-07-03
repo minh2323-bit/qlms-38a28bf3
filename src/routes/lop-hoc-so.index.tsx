@@ -172,7 +172,7 @@ function DigitalClassesPage() {
             </div>
           </div>
 
-          <div className={classView === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" : "space-y-3"}>
+          <div className={classView === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" : "space-y-3"}>
             {filteredClasses.map((c) => (
               <ClassCard
                 key={c.id}
@@ -181,6 +181,7 @@ function DigitalClassesPage() {
                 selected={selectedClasses.has(c.id)}
                 onToggleSelect={() => toggleClassSel(c.id)}
                 onEnterSelect={() => { setClassSelectMode(true); toggleClassSel(c.id); }}
+                onEdit={() => { setEditingClass(c); setOpenCreate(true); }}
                 isNew={c.id === highlightedId}
               />
             ))}
@@ -189,10 +190,12 @@ function DigitalClassesPage() {
 
         {openCreate && (
           <CreateClassModal
-            onClose={() => setOpenCreate(false)}
+            initial={editingClass}
+            onClose={() => { setOpenCreate(false); setEditingClass(null); }}
             onSubmit={handleCreate}
           />
         )}
+
       </>
     </AppShell>
   );
