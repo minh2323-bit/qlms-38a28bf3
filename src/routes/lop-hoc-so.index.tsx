@@ -79,6 +79,7 @@ function DigitalClassesPage() {
   const [classSelectMode, setClassSelectMode] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState<Set<string>>(new Set());
   const [openCreate, setOpenCreate] = useState(false);
+  const [editingClass, setEditingClass] = useState<ClassRow | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -100,12 +101,20 @@ function DigitalClassesPage() {
   });
 
   const handleCreate = (row: ClassRow) => {
-    const newRow = { ...row, id: row.id || generateId() };
-    setClasses((prev) => [newRow, ...prev]);
-    setHighlightedId(newRow.id);
-    toast.success("Thêm lớp học thành công");
+    if (editingClass) {
+      setClasses((prev) => prev.map((c) => (c.id === editingClass.id ? { ...row, id: editingClass.id } : c)));
+      setHighlightedId(editingClass.id);
+      toast.success("Cập nhật lớp học thành công");
+    } else {
+      const newRow = { ...row, id: row.id || generateId() };
+      setClasses((prev) => [newRow, ...prev]);
+      setHighlightedId(newRow.id);
+      toast.success("Thêm lớp học thành công");
+    }
     setOpenCreate(false);
+    setEditingClass(null);
   };
+
 
   return (
     <AppShell>
