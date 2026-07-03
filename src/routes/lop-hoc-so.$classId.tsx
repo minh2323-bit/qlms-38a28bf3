@@ -533,7 +533,7 @@ function GroupRow({
           {group.items.map((c) => {
             const done = completed.has(c.id);
             return (
-              <li key={c.id} className="pl-12 pr-4 py-2.5 flex items-center gap-3">
+              <li key={c.id} className="pl-12 pr-4 py-2.5 flex items-center gap-3 hover:bg-slate-50">
                 <span className="relative">
                   <ItemIcon kind={c.kind} />
                   {done && (
@@ -542,9 +542,13 @@ function GroupRow({
                     </span>
                   )}
                 </span>
-                <span className={`text-sm flex-1 truncate ${done ? "text-slate-500 line-through" : "text-slate-700"}`}>
+                <Link
+                  to="/lop-hoc-so/$classId/hoc-lieu/$materialId"
+                  params={{ classId, materialId: c.id }}
+                  className={`text-sm flex-1 truncate hover:text-indigo-700 ${done ? "text-slate-500 line-through" : "text-slate-700"}`}
+                >
                   {c.title}
-                </span>
+                </Link>
                 {c.origin === "schedule" && (
                   <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
                     Từ lịch
