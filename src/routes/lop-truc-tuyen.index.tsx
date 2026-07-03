@@ -6,10 +6,12 @@ import {
   updateLiveClass,
   formatTimeRange,
   formatDate,
-  isLiveEnded,
   type LiveClass,
 } from "@/lib/live-class-store";
-import { Video, Pencil, Link2, PlayCircle, BarChart3, Search, Filter } from "lucide-react";
+import {
+  Video, Pencil, Link2, PlayCircle, BarChart3, Search, Filter,
+  Trash2, FileSpreadsheet,
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
@@ -39,6 +41,12 @@ function creatorOf(lc: LiveClass) {
   return CREATOR_POOL[s % CREATOR_POOL.length];
 }
 
+function fmtDT(iso: string) {
+  const d = new Date(iso);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getHours())}:${p(d.getMinutes())} · ${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
+
 function Page() {
   const lives = useLiveClasses();
   const navigate = useNavigate();
@@ -51,7 +59,9 @@ function Page() {
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const [linkModal, setLinkModal] = useState<LiveClass | null>(null);
+  // Two-stage link modal: view first, then edit.
+  const [linkView, setLinkView] = useState<LiveClass | null>(null);
+  const [linkEdit, setLinkEdit] = useState<LiveClass | null>(null);
   const [linkDraft, setLinkDraft] = useState("");
 
   const filtered = useMemo(() => {
@@ -83,13 +93,28 @@ function Page() {
     setSelected(next);
   };
 
-  const openLinkModal = (lc: LiveClass) => { setLinkModal(lc); setLinkDraft(lc.link); };
-  const confirmLink = () => {
-    if (!linkModal) return;
-    updateLiveClass(linkModal.id, { link: linkDraft });
-    toast.success("Đã cập nhật link lớp học");
-    setLinkModal(null);
+  const openLinkView = (lc: LiveClass) => setLinkView(lc);
+  const openLinkEdit = (lc: LiveClass) => {
+    setLinkView(null);
+    setLinkEdit(lc);
+    setLinkDraft(lc.link);
   };
+  const confirmLink = () => {
+    if (!linkEdit) return;
+    updateLiveClass(linkEdit.id, { link: linkDraft });
+    toast.success("Đã cập nhật link lớp học");
+    setLinkEdit(null);
+  };
+
+  const onDelete = () => {
+    if (selected.size === 0) {
+      toast.error("Vui lòng chọn ít nhất một lớp học để xóa");
+      return;
+    }
+    toast.success(`Đã xóa ${selected.size} lớp học`);
+    setSelected(new Set());
+  };
+  const onExport = () => toast.success("Đã xuất Excel danh sách lớp học");
 
   return (
     <AppShell role="teacher">
@@ -104,20 +129,29 @@ function Page() {
           </div>
         </header>
 
-        {/* Filters */}
+        {/* Filters — 2 rows */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 mb-4">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 mb-2">
             <Filter className="h-3.5 w-3.5" /> Bộ lọc
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            <Select label="Khối" value={khoi} onChange={setKhoi} options={[{ v: "all", t: "Tất cả" }, ...khoiOptions.map((k) => ({ v: k, t: `Khối ${k}` }))]} />
-            <Select label="Lớp gán" value={lop} onChange={setLop} options={[{ v: "all", t: "Tất cả" }, ...lopOptions.map((k) => ({ v: k, t: `Lớp ${k}` }))]} />
-            <Select label="Môn" value={mon} onChange={setMon} options={[{ v: "all", t: "Tất cả" }, ...monOptions.map((k) => ({ v: k, t: k }))]} />
+
+          {/* Row 1 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+            <Select label="Khối" value={khoi} onChange={setKhoi}
+              options={[{ v: "all", t: "Tất cả" }, ...khoiOptions.map((k) => ({ v: k, t: `Khối ${k}` }))]} />
+            <Select label="Lớp gán" value={lop} onChange={setLop}
+              options={[{ v: "all", t: "Tất cả" }, ...lopOptions.map((k) => ({ v: k, t: `Lớp ${k}` }))]} />
+            <Select label="Môn" value={mon} onChange={setMon}
+              options={[{ v: "all", t: "Tất cả" }, ...monOptions.map((k) => ({ v: k, t: k }))]} />
             <div>
               <label className="block text-[11px] font-medium text-slate-500 mb-1">Ngày diễn ra</label>
               <input type="date" value={ngay} onChange={(e) => setNgay(e.target.value)}
                 className="w-full h-8 px-2 text-sm rounded-md border border-slate-200 bg-white" />
             </div>
+          </div>
+
+          {/* Row 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 items-end">
             <Select label="Trạng thái" value={status} onChange={(v) => setStatus(v as Status | "all")}
               options={[
                 { v: "all", t: "Tất cả" },
@@ -132,6 +166,16 @@ function Page() {
                 <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm tên lớp..."
                   className="w-full h-8 pl-7 pr-2 text-sm rounded-md border border-slate-200 bg-white" />
               </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={onDelete}
+                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-semibold border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100">
+                <Trash2 className="h-3.5 w-3.5" /> Xóa
+              </button>
+              <button onClick={onExport}
+                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-semibold border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
+                <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất Excel
+              </button>
             </div>
           </div>
         </div>
@@ -149,6 +193,8 @@ function Page() {
                 <th className="px-3 py-2.5 font-semibold">Tên lớp học</th>
                 <th className="px-3 py-2.5 w-40 font-semibold">Người tạo</th>
                 <th className="px-3 py-2.5 w-56 font-semibold">Trạng thái</th>
+                <th className="px-3 py-2.5 w-44 font-semibold">Thời gian bắt đầu</th>
+                <th className="px-3 py-2.5 w-44 font-semibold">Thời gian kết thúc</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
@@ -182,7 +228,7 @@ function Page() {
                         <div className="space-y-1.5">
                           <div className="text-sm font-semibold text-orange-600">Sắp diễn ra</div>
                           <button
-                            onClick={() => openLinkModal(lc)}
+                            onClick={() => openLinkView(lc)}
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100"
                           >
                             <Link2 className="h-3.5 w-3.5" /> Link lớp học
@@ -211,12 +257,16 @@ function Page() {
                         </div>
                       )}
                     </td>
+                    <td className="px-3 py-3 text-slate-700 font-mono text-xs">{fmtDT(lc.startAt)}</td>
+                    <td className="px-3 py-3 text-slate-700 font-mono text-xs">
+                      {st === "da-ket-thuc" ? fmtDT(lc.endAt) : <span className="text-slate-300">—</span>}
+                    </td>
                   </tr>
                 );
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-3 py-8 text-center text-sm text-slate-400 italic">
+                  <td colSpan={8} className="px-3 py-8 text-center text-sm text-slate-400 italic">
                     Không có lớp học phù hợp bộ lọc.
                   </td>
                 </tr>
@@ -226,13 +276,48 @@ function Page() {
         </div>
       </section>
 
-      {/* Link modal */}
-      <Dialog open={!!linkModal} onOpenChange={(o) => !o && setLinkModal(null)}>
+      {/* Link — view only */}
+      <Dialog open={!!linkView} onOpenChange={(o) => !o && setLinkView(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Link lớp học
+              {linkView && (
+                <button
+                  onClick={() => openLinkEdit(linkView)}
+                  className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500"
+                  title="Sửa link"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              Đường dẫn phòng học trực tuyến cho lớp <b>{linkView?.name}</b>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-600">Đường link</label>
+            <div className="w-full min-h-10 px-3 py-2 text-sm rounded-md border border-slate-200 bg-slate-50 text-slate-700 break-all">
+              {linkView?.link}
+            </div>
+          </div>
+          <DialogFooter>
+            <button onClick={() => setLinkView(null)}
+              className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">
+              Đóng
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link — edit */}
+      <Dialog open={!!linkEdit} onOpenChange={(o) => !o && setLinkEdit(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Link lớp học</DialogTitle>
             <DialogDescription>
-              Cập nhật đường dẫn phòng học trực tuyến cho lớp <b>{linkModal?.name}</b>.
+              Cập nhật đường dẫn phòng học trực tuyến cho lớp <b>{linkEdit?.name}</b>.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
@@ -242,7 +327,7 @@ function Page() {
               className="w-full h-10 px-3 text-sm rounded-md border border-slate-200 bg-white" />
           </div>
           <DialogFooter>
-            <button onClick={() => setLinkModal(null)}
+            <button onClick={() => setLinkEdit(null)}
               className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">
               Hủy
             </button>
