@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ArrowLeft, Copy, Users, ChevronDown, ChevronRight, Plus, MoveVertical,
   Video, FileText, ClipboardList, BookOpen, Image as ImageIcon, Presentation,
