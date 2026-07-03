@@ -19,6 +19,9 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer,
 } from "recharts";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
