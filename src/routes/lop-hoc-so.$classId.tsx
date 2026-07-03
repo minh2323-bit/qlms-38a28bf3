@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import {
   ArrowLeft, Copy, Users, ChevronDown, ChevronRight, Plus, MoveVertical,
   Video, FileText, ClipboardList, BookOpen, Image as ImageIcon, Presentation,
-  GripVertical, MoreVertical, Check, Pencil, Trash2, X,
+  GripVertical, MoreVertical, Check, Pencil, Trash2, X, FileCheck2, Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
