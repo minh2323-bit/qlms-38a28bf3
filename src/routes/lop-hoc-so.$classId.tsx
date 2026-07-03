@@ -456,6 +456,9 @@ function ClassDetailPage() {
           }}
         />
       )}
+
+      <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
+      <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
     </AppShell>
   );
 }
