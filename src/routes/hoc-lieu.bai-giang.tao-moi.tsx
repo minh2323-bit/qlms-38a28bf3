@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
-type CreateLessonSearch = { khoi?: string; mon?: string; from?: string };
+type CreateLessonSearch = { khoi?: string; mon?: string; from?: string; edit?: string; title?: string; unitId?: string };
 
 export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
   head: () => ({
@@ -25,9 +25,13 @@ export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
     khoi: typeof s.khoi === "string" ? s.khoi : undefined,
     mon: typeof s.mon === "string" ? s.mon : undefined,
     from: typeof s.from === "string" ? s.from : undefined,
+    edit: typeof s.edit === "string" ? s.edit : undefined,
+    title: typeof s.title === "string" ? s.title : undefined,
+    unitId: typeof s.unitId === "string" ? s.unitId : undefined,
   }),
   component: CreateLessonPage,
 });
+
 
 /* ------------------------------ Constants ------------------------------ */
 
