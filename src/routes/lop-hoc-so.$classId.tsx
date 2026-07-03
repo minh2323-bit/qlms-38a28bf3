@@ -291,6 +291,11 @@ function ClassDetailPage() {
         </div>
       </section>
 
+      {/* Hồ sơ giáo dục */}
+      <EducationRecordsSection className={info.name} />
+
+
+
 
       {/* White content section */}
       <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
