@@ -344,6 +344,9 @@ function ClassDetailPage() {
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "exercise" })}>
                   <ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Thêm bài tập
                 </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => toast.info("Tạo bài kiểm tra (demo)")}>
+                  <FileCheck2 className="h-4 w-4 mr-2 text-rose-500" /> Thêm bài kiểm tra
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
