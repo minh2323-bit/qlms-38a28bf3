@@ -266,7 +266,11 @@ function Page() {
           {filtered.map((t) => {
             const overdue = isOverdue(t);
             return (
-              <li key={t.id} className="rounded-xl border bg-white p-4 hover:shadow-sm transition">
+              <li
+                key={t.id}
+                onClick={() => navigate({ to: "/giao-bai-tap/$taskId", params: { taskId: t.id } })}
+                className="rounded-xl border bg-white p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">

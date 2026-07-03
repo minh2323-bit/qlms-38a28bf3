@@ -30,6 +30,7 @@ import { Route as HocSinhKyThiOnTapRouteImport } from './routes/hoc-sinh.ky-thi-
 import { Route as HocSinhKyThiChinhThucRouteImport } from './routes/hoc-sinh.ky-thi-chinh-thuc'
 import { Route as HocSinhHocLieuRouteImport } from './routes/hoc-sinh.hoc-lieu'
 import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc-lieu'
+import { Route as GiaoBaiTapTaskIdRouteImport } from './routes/giao-bai-tap.$taskId'
 import { Route as HocLieuBaiGiangIndexRouteImport } from './routes/hoc-lieu.bai-giang.index'
 import { Route as HocSinhLopLopRouteImport } from './routes/hoc-sinh.lop.$lop'
 import { Route as HocLieuBaiGiangTaoMoiRouteImport } from './routes/hoc-lieu.bai-giang.tao-moi'
@@ -143,6 +144,11 @@ const HocLieuKhoHocLieuRoute = HocLieuKhoHocLieuRouteImport.update({
   path: '/hoc-lieu/kho-hoc-lieu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GiaoBaiTapTaskIdRoute = GiaoBaiTapTaskIdRouteImport.update({
+  id: '/$taskId',
+  path: '/$taskId',
+  getParentRoute: () => GiaoBaiTapRoute,
+} as any)
 const HocLieuBaiGiangIndexRoute = HocLieuBaiGiangIndexRouteImport.update({
   id: '/hoc-lieu/bai-giang/',
   path: '/hoc-lieu/bai-giang/',
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
+  '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
+  '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
+    | '/giao-bai-tap/$taskId'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/giao-bai-tap/$taskId'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
+    | '/giao-bai-tap/$taskId'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
@@ -520,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocLieuKhoHocLieuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/giao-bai-tap/$taskId': {
+      id: '/giao-bai-tap/$taskId'
+      path: '/$taskId'
+      fullPath: '/giao-bai-tap/$taskId'
+      preLoaderRoute: typeof GiaoBaiTapTaskIdRouteImport
+      parentRoute: typeof GiaoBaiTapRoute
+    }
     '/hoc-lieu/bai-giang/': {
       id: '/hoc-lieu/bai-giang/'
       path: '/hoc-lieu/bai-giang'
@@ -573,12 +592,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface GiaoBaiTapRouteChildren {
+  GiaoBaiTapTaskIdRoute: typeof GiaoBaiTapTaskIdRoute
   GiaoBaiTapIndexRoute: typeof GiaoBaiTapIndexRoute
   GiaoBaiTapTaoMoiBaiTapDocRoute: typeof GiaoBaiTapTaoMoiBaiTapDocRoute
   GiaoBaiTapTaoMoiDeLuyenTapRoute: typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
 }
 
 const GiaoBaiTapRouteChildren: GiaoBaiTapRouteChildren = {
+  GiaoBaiTapTaskIdRoute: GiaoBaiTapTaskIdRoute,
   GiaoBaiTapIndexRoute: GiaoBaiTapIndexRoute,
   GiaoBaiTapTaoMoiBaiTapDocRoute: GiaoBaiTapTaoMoiBaiTapDocRoute,
   GiaoBaiTapTaoMoiDeLuyenTapRoute: GiaoBaiTapTaoMoiDeLuyenTapRoute,
