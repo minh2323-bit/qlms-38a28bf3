@@ -270,11 +270,14 @@ function Page() {
           )}
           {filtered.map((t) => {
             const overdue = isOverdue(t);
+            const isHighlighted = highlightUngraded && t.graded === 0;
             return (
               <li
                 key={t.id}
                 onClick={() => navigate({ to: "/giao-bai-tap/$taskId", params: { taskId: t.id } })}
-                className="rounded-xl border bg-white p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer"
+                className={`rounded-xl border bg-white p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer ${
+                  isHighlighted ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50/40 shadow-md" : ""
+                }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
