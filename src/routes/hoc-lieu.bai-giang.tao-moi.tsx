@@ -244,7 +244,7 @@ function CreateLessonPage() {
             <div className="text-sm text-slate-500">
               <Link to="/hoc-lieu/bai-giang" className="hover:text-indigo-700">Bài giảng</Link>
               <span className="mx-1.5">/</span>
-              <span className="text-slate-700 font-semibold">Tạo bài giảng mới</span>
+              <span className="text-slate-700 font-semibold">{isEditing ? "Sửa bài giảng" : "Tạo bài giảng mới"}</span>
             </div>
             <h1 className="mt-1 text-2xl font-bold text-slate-800">
               {title.trim() || "Bài giảng mới"}
