@@ -1310,3 +1310,84 @@ function LiveClassesSection({ items }: { items: LiveClass[] }) {
     </div>
   );
 }
+
+/* ============================ Education Records ============================ */
+
+type EducationDoc = { id: string; name: string; size: string; uploadedAt: string; uploader: string };
+
+function EducationRecordsSection({ className }: { className: string }) {
+  const initialName = `Kế hoạch giáo dục ${className.replace(" Năm học", " năm học")}`;
+  const [docs, setDocs] = useState<EducationDoc[]>([
+    { id: "d1", name: `${initialName}.pdf`, size: "1.2 MB", uploadedAt: "05/09/2025", uploader: "Cô Nguyễn Thị Hoa" },
+  ]);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const onPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const sizeKb = f.size / 1024;
+    const sizeText = sizeKb >= 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb.toFixed(0)} KB`;
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, "0");
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    setDocs((prev) => [
+      { id: `d-${Date.now()}`, name: f.name, size: sizeText, uploadedAt: `${dd}/${mm}/${today.getFullYear()}`, uploader: "Bạn" },
+      ...prev,
+    ]);
+    if (inputRef.current) inputRef.current.value = "";
+    toast.success("Đã thêm tài liệu vào Hồ sơ giáo dục");
+  };
+
+  return (
+    <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">Hồ sơ giáo dục</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Nơi lưu trữ kế hoạch giáo dục, chương trình, và tài liệu liên quan tới lớp học.
+          </p>
+        </div>
+        <button
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          <Plus className="h-4 w-4" /> Thêm tài liệu
+        </button>
+        <input ref={inputRef} type="file" className="hidden" onChange={onPick} />
+      </div>
+
+      <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 overflow-hidden">
+        {docs.map((d) => (
+          <li key={d.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50">
+            <span className="h-10 w-10 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+              <FileText className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-slate-800 truncate">{d.name}</div>
+              <div className="text-xs text-slate-500 mt-0.5">
+                {d.size} • Tải lên {d.uploadedAt} bởi {d.uploader}
+              </div>
+            </div>
+            <button
+              onClick={() => toast.message("Tải xuống (demo)")}
+              className="px-3 py-1.5 text-xs font-semibold rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              Tải xuống
+            </button>
+            <button
+              onClick={() => setDocs((p) => p.filter((x) => x.id !== d.id))}
+              className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+              aria-label="Xóa"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </li>
+        ))}
+        {docs.length === 0 && (
+          <li className="px-4 py-6 text-center text-sm text-slate-500">Chưa có tài liệu nào.</li>
+        )}
+      </ul>
+    </section>
+  );
+}
+
