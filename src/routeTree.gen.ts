@@ -29,6 +29,7 @@ import { Route as HocSinhLichSuHocTapRouteImport } from './routes/hoc-sinh.lich-
 import { Route as HocSinhKyThiOnTapRouteImport } from './routes/hoc-sinh.ky-thi-on-tap'
 import { Route as HocSinhKyThiChinhThucRouteImport } from './routes/hoc-sinh.ky-thi-chinh-thuc'
 import { Route as HocSinhHocLieuRouteImport } from './routes/hoc-sinh.hoc-lieu'
+import { Route as HocLieuNganHangCauHoiRouteImport } from './routes/hoc-lieu.ngan-hang-cau-hoi'
 import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc-lieu'
 import { Route as GiaoBaiTapTaskIdRouteImport } from './routes/giao-bai-tap.$taskId'
 import { Route as HocLieuBaiGiangIndexRouteImport } from './routes/hoc-lieu.bai-giang.index'
@@ -139,6 +140,11 @@ const HocSinhHocLieuRoute = HocSinhHocLieuRouteImport.update({
   path: '/hoc-lieu',
   getParentRoute: () => HocSinhRoute,
 } as any)
+const HocLieuNganHangCauHoiRoute = HocLieuNganHangCauHoiRouteImport.update({
+  id: '/hoc-lieu/ngan-hang-cau-hoi',
+  path: '/hoc-lieu/ngan-hang-cau-hoi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HocLieuKhoHocLieuRoute = HocLieuKhoHocLieuRouteImport.update({
   id: '/hoc-lieu/kho-hoc-lieu',
   path: '/hoc-lieu/kho-hoc-lieu',
@@ -197,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
+  '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
   '/hoc-sinh/ky-thi-on-tap': typeof HocSinhKyThiOnTapRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
+  '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
   '/hoc-sinh/ky-thi-on-tap': typeof HocSinhKyThiOnTapRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
+  '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
   '/hoc-sinh/hoc-lieu': typeof HocSinhHocLieuRoute
   '/hoc-sinh/ky-thi-chinh-thuc': typeof HocSinhKyThiChinhThucRoute
   '/hoc-sinh/ky-thi-on-tap': typeof HocSinhKyThiOnTapRoute
@@ -289,6 +298,7 @@ export interface FileRouteTypes {
     | '/lop-truc-tuyen'
     | '/giao-bai-tap/$taskId'
     | '/hoc-lieu/kho-hoc-lieu'
+    | '/hoc-lieu/ngan-hang-cau-hoi'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
     | '/hoc-sinh/ky-thi-on-tap'
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/'
     | '/giao-bai-tap/$taskId'
     | '/hoc-lieu/kho-hoc-lieu'
+    | '/hoc-lieu/ngan-hang-cau-hoi'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
     | '/hoc-sinh/ky-thi-on-tap'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/lop-truc-tuyen'
     | '/giao-bai-tap/$taskId'
     | '/hoc-lieu/kho-hoc-lieu'
+    | '/hoc-lieu/ngan-hang-cau-hoi'
     | '/hoc-sinh/hoc-lieu'
     | '/hoc-sinh/ky-thi-chinh-thuc'
     | '/hoc-sinh/ky-thi-on-tap'
@@ -378,6 +390,7 @@ export interface RootRouteChildren {
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
   LopTrucTuyenRoute: typeof LopTrucTuyenRouteWithChildren
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
+  HocLieuNganHangCauHoiRoute: typeof HocLieuNganHangCauHoiRoute
   HocLieuBaiGiangLessonSlugRoute: typeof HocLieuBaiGiangLessonSlugRoute
   HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
   HocLieuBaiGiangIndexRoute: typeof HocLieuBaiGiangIndexRoute
@@ -524,6 +537,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/hoc-sinh/hoc-lieu'
       preLoaderRoute: typeof HocSinhHocLieuRouteImport
       parentRoute: typeof HocSinhRoute
+    }
+    '/hoc-lieu/ngan-hang-cau-hoi': {
+      id: '/hoc-lieu/ngan-hang-cau-hoi'
+      path: '/hoc-lieu/ngan-hang-cau-hoi'
+      fullPath: '/hoc-lieu/ngan-hang-cau-hoi'
+      preLoaderRoute: typeof HocLieuNganHangCauHoiRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/hoc-lieu/kho-hoc-lieu': {
       id: '/hoc-lieu/kho-hoc-lieu'
@@ -687,6 +707,7 @@ const rootRouteChildren: RootRouteChildren = {
   LopHocSoRoute: LopHocSoRouteWithChildren,
   LopTrucTuyenRoute: LopTrucTuyenRouteWithChildren,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
+  HocLieuNganHangCauHoiRoute: HocLieuNganHangCauHoiRoute,
   HocLieuBaiGiangLessonSlugRoute: HocLieuBaiGiangLessonSlugRoute,
   HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
   HocLieuBaiGiangIndexRoute: HocLieuBaiGiangIndexRoute,

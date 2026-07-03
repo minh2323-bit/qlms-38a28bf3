@@ -40,7 +40,7 @@ const TEACHER_NAV: NavItem[] = [
     submenu: [
       { icon: Tag, label: "Học liệu bản quyền" },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
-      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/hoc-lieu/ngan-hang-cau-hoi" },
       { icon: ListChecks, label: "Đề kiểm tra" },
     ],
   },
