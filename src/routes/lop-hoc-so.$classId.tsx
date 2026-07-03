@@ -397,11 +397,31 @@ function ClassDetailPage() {
         </div>
       </section>
 
+      {/* Bài kiểm tra */}
+      <TestsSection className={info.name} />
+
+      {/* Lớp học trực tuyến (đã tạo) */}
+      {classLive.length > 0 && (
+        <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+          <div className="mb-3">
+            <h2 className="text-lg font-bold text-slate-800">Lớp học trực tuyến</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Danh sách phòng học trực tuyến của lớp — đã đồng bộ với Lịch báo giảng.
+            </p>
+          </div>
+          <LiveClassesSection items={classLive} />
+        </section>
+      )}
+
+      {/* Hồ sơ giáo dục */}
+      <EducationRecordsSection className={info.name} />
+
       <AnnouncementSection
         classRealId={info.lop}
         subject={selectedSubject}
         teacherName={info.teacher}
       />
+
 
 
       {addOpen && (
