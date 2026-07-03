@@ -10,6 +10,9 @@ import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 import thumbLop4A from "@/assets/thumb-lop-4a.jpg";
 import thumbLop3D from "@/assets/thumb-lop-3d.jpg";
@@ -162,6 +165,8 @@ function ClassDetailPage() {
   /* add modal */
   const [addOpen, setAddOpen] = useState<null | { kind: "lesson" | "material" | "exercise" }>(null);
   const [liveOpen, setLiveOpen] = useState(false);
+  const [taskPickerOpen, setTaskPickerOpen] = useState(false);
+  const [testPickerOpen, setTestPickerOpen] = useState(false);
   const handleAdd = (m: { unitId: string; kind: MaterialKind; title: string; meta?: string }) => {
     addMaterial({
       classRealId: info.lop, subject: selectedSubject, origin: "class",
@@ -341,10 +346,10 @@ function ClassDetailPage() {
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "material" })}>
                   <BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Thêm học liệu
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "exercise" })}>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => setTaskPickerOpen(true)}>
                   <ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Thêm bài tập
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => toast.info("Tạo bài kiểm tra (demo)")}>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => setTestPickerOpen(true)}>
                   <FileCheck2 className="h-4 w-4 mr-2 text-rose-500" /> Thêm bài kiểm tra
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -454,6 +459,9 @@ function ClassDetailPage() {
           }}
         />
       )}
+
+      <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
+      <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
     </AppShell>
   );
 }
@@ -1479,5 +1487,88 @@ function TestsSection({ className: _className }: { className: string }) {
     </section>
   );
 }
+
+/* ============================ Task/Test pickers ============================ */
+
+function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const navigate = useNavigate();
+  const opts = [
+    { key: "practice", label: "Đề luyện tập", desc: "Tự tạo đề luyện tập với 6 dạng câu hỏi.",
+      icon: FileText, color: "text-indigo-600 bg-indigo-50",
+      go: () => navigate({ to: "/giao-bai-tap/tao-moi/de-luyen-tap" }) },
+    { key: "reading", label: "Bài tập đọc - Tìm hiểu", desc: "Giao bài đọc kèm câu hỏi cho học sinh.",
+      icon: BookOpen, color: "text-emerald-600 bg-emerald-50",
+      go: () => navigate({ to: "/giao-bai-tap/tao-moi/bai-tap-doc" }) },
+    { key: "licensed", label: "Bài tập bản quyền", desc: "Giao từ kho học liệu bản quyền có sẵn.",
+      icon: FileCheck2, color: "text-amber-600 bg-amber-50",
+      go: () => navigate({ to: "/giao-bai-tap" }) },
+  ] as const;
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 text-amber-500" /> Chọn loại bài tập
+          </DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-slate-600">Vui lòng chọn loại bài tập bạn muốn giao cho lớp.</p>
+        <div className="grid grid-cols-3 gap-3 py-2">
+          {opts.map((o) => (
+            <button
+              key={o.key}
+              onClick={() => { o.go(); onClose(); }}
+              className="rounded-xl border border-slate-200 p-4 text-center hover:border-indigo-300 hover:shadow-md transition"
+            >
+              <div className={`mx-auto h-11 w-11 rounded-full flex items-center justify-center ${o.color}`}>
+                <o.icon className="h-5 w-5" />
+              </div>
+              <div className="mt-2 font-semibold text-slate-800 text-sm">{o.label}</div>
+              <div className="text-[11px] text-slate-500 mt-1 leading-snug">{o.desc}</div>
+            </button>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TestPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const navigate = useNavigate();
+  const opts = [
+    { key: "bank", label: "Thêm từ Kho đề kiểm tra", desc: "Chọn đề có sẵn từ kho đề kiểm tra của bạn.",
+      icon: BookOpen, color: "text-indigo-600 bg-indigo-50",
+      go: () => navigate({ to: "/hoc-lieu/de-kiem-tra" }) },
+    { key: "new", label: "Thêm mới", desc: "Tạo đề mới từ khung ma trận hoặc tự soạn.",
+      icon: Plus, color: "text-emerald-600 bg-emerald-50",
+      go: () => navigate({ to: "/hoc-lieu/de-kiem-tra" }) },
+  ] as const;
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileCheck2 className="h-5 w-5 text-rose-500" /> Thêm bài kiểm tra
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3 py-2">
+          {opts.map((o) => (
+            <button
+              key={o.key}
+              onClick={() => { o.go(); onClose(); }}
+              className="rounded-xl border border-slate-200 p-5 text-center hover:border-indigo-300 hover:shadow-md transition"
+            >
+              <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center ${o.color}`}>
+                <o.icon className="h-6 w-6" />
+              </div>
+              <div className="mt-3 font-semibold text-slate-800">{o.label}</div>
+              <div className="text-xs text-slate-500 mt-1 leading-snug">{o.desc}</div>
+            </button>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 
