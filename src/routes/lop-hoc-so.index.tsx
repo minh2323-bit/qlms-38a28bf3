@@ -3,8 +3,9 @@ import { useMemo, useState, useEffect } from "react";
 import {
   GraduationCap, Presentation as PresentationIcon, Users, MoreVertical,
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
-  CheckSquare, Check, X, ImagePlus, ArrowLeft, ArrowRight,
+  CheckSquare, Check, X, ImagePlus, ArrowLeft, ArrowRight, Pencil,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import {
