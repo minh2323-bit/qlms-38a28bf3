@@ -181,10 +181,13 @@ export function isEvening(startAt: string): boolean {
   return minutes >= 18 * 60 + 30;
 }
 
+export type AttendanceSession = { joinAt: string; leaveAt: string };
 export type Attendee = {
   name: string;
-  joinAt: string;  // "HH:mm"
-  leaveAt: string; // "HH:mm"
+  dob: string;               // "DD/MM/YYYY"
+  sessions: AttendanceSession[];
+  joinAt: string;            // first session (backward compat)
+  leaveAt: string;           // last session (backward compat)
 };
 
 // Mock danh sách học sinh tham dự — sinh ổn định theo id để demo.
@@ -209,7 +212,6 @@ function addMinutes(time: string, mins: number) {
 export function getAttendees(lc: LiveClass): Attendee[] {
   const startTime = `${pad(new Date(lc.startAt).getHours())}:${pad(new Date(lc.startAt).getMinutes())}`;
   const endTime = `${pad(new Date(lc.endAt).getHours())}:${pad(new Date(lc.endAt).getMinutes())}`;
-  // Tạo seed đơn giản từ id để kết quả ổn định giữa các lần render.
   let seed = 0;
   for (const ch of lc.id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
   const rand = () => {
@@ -218,12 +220,28 @@ export function getAttendees(lc: LiveClass): Attendee[] {
   };
   return Array.from({ length: lc.studentCount }, (_, i) => {
     const name = ATTENDEE_POOL[(i + (seed % ATTENDEE_POOL.length)) % ATTENDEE_POOL.length];
-    const joinOffset = Math.floor(rand() * 4); // 0–3 phút sau khi bắt đầu
-    const earlyLeave = rand() < 0.15 ? Math.floor(rand() * 10) + 1 : 0;
+    const day = Math.floor(rand() * 28) + 1;
+    const month = Math.floor(rand() * 12) + 1;
+    const year = 2015 + Math.floor(rand() * 2);
+    const dob = `${pad(day)}/${pad(month)}/${year}`;
+
+    const r = rand();
+    const sessionCount = r < 0.5 ? 1 : r < 0.8 ? 2 : 3;
+    const sessions: AttendanceSession[] = [];
+    let cursor = Math.floor(rand() * 4);
+    for (let s = 0; s < sessionCount; s++) {
+      const join = addMinutes(startTime, cursor);
+      cursor += 5 + Math.floor(rand() * 12);
+      const leave = s === sessionCount - 1
+        ? addMinutes(endTime, -(rand() < 0.15 ? Math.floor(rand() * 8) + 1 : 0))
+        : addMinutes(startTime, cursor);
+      sessions.push({ joinAt: join, leaveAt: leave });
+      cursor += 1 + Math.floor(rand() * 4);
+    }
     return {
-      name,
-      joinAt: addMinutes(startTime, joinOffset),
-      leaveAt: addMinutes(endTime, -earlyLeave),
+      name, dob, sessions,
+      joinAt: sessions[0].joinAt,
+      leaveAt: sessions[sessions.length - 1].leaveAt,
     };
   });
 }
