@@ -343,10 +343,10 @@ function ClassDetailPage() {
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "material" })}>
                   <BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Thêm học liệu
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "exercise" })}>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => setTaskPickerOpen(true)}>
                   <ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Thêm bài tập
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => toast.info("Tạo bài kiểm tra (demo)")}>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => setTestPickerOpen(true)}>
                   <FileCheck2 className="h-4 w-4 mr-2 text-rose-500" /> Thêm bài kiểm tra
                 </DropdownMenuItem>
               </DropdownMenuContent>
