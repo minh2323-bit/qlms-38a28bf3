@@ -514,50 +514,50 @@ function DashboardSection() {
 
   return (
     <>
-      <section className="bg-white rounded-2xl border shadow-sm p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <section className="bg-white rounded-2xl border shadow-sm p-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
           {/* 1. Bài tập cần chấm */}
           <button
             type="button"
             onClick={() => navigate({ to: "/giao-bai-tap", search: { highlight: "ungraded" } })}
-            className="relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
+            className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
           >
-            <span className="absolute left-0 top-0 h-full w-1.5 bg-blue-500" />
-            <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-blue-50">
-              <ClipboardCheck className="h-6 w-6 text-blue-600" />
+            <span className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
+            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-blue-50">
+              <ClipboardCheck className="h-5 w-5 text-blue-600" />
             </span>
             <div className="min-w-0">
-              <div className="text-4xl font-black leading-none text-blue-600">10</div>
-              <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">bài tập cần chấm</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">100 bài tập đã giao</div>
+              <div className="text-2xl font-black leading-none text-blue-600">10</div>
+              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">bài tập cần chấm</div>
+              <div className="text-[10px] text-slate-500 mt-0.5">100 bài tập đã giao</div>
             </div>
           </button>
 
           {/* 2. Merged: Bài giảng/Học liệu đã tạo + sử dụng tuần này */}
-          <div className="relative rounded-xl border border-slate-200 overflow-hidden lg:col-span-2 grid grid-cols-2 divide-x divide-slate-200">
-            <span className="absolute left-0 top-0 h-full w-1.5 bg-emerald-500" />
-            <div className="flex items-center gap-4 p-4">
-              <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-emerald-50">
-                <Presentation className="h-6 w-6 text-emerald-600" />
+          <div className="relative rounded-xl border border-slate-200 overflow-hidden lg:col-span-3 grid grid-cols-2 divide-x divide-slate-200">
+            <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
+            <div className="flex items-center gap-2.5 p-2.5">
+              <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-50">
+                <Presentation className="h-5 w-5 text-emerald-600" />
               </span>
               <div className="min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <div className="text-4xl font-black leading-none text-emerald-600">10</div>
-                  <div className="text-[13px] font-semibold text-slate-800 leading-snug">Bài giảng đã tạo</div>
+                <div className="flex items-baseline gap-1.5 flex-wrap">
+                  <div className="text-2xl font-black leading-none text-emerald-600">10</div>
+                  <div className="text-[12px] font-semibold text-slate-800 leading-tight">Bài giảng đã tạo</div>
                 </div>
-                <div className="flex items-baseline gap-2 mt-1.5 flex-wrap">
+                <div className="flex items-baseline gap-1.5 mt-1 flex-wrap">
                   <div className="text-2xl font-black leading-none text-emerald-600">50</div>
-                  <div className="text-[13px] font-semibold text-slate-800 leading-snug">Học liệu đã tạo</div>
+                  <div className="text-[12px] font-semibold text-slate-800 leading-tight">Học liệu đã tạo</div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4 p-4">
-              <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-violet-50">
-                <BookOpenCheck className="h-6 w-6 text-violet-600" />
+            <div className="flex items-center gap-2.5 p-2.5">
+              <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-violet-50">
+                <BookOpenCheck className="h-5 w-5 text-violet-600" />
               </span>
               <div className="min-w-0">
-                <div className="text-4xl font-black leading-none text-violet-600">5</div>
-                <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">Bài giảng/Học liệu sử dụng tuần này</div>
+                <div className="text-2xl font-black leading-none text-violet-600">5</div>
+                <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Bài giảng/Học liệu sử dụng tuần này</div>
               </div>
             </div>
           </div>
@@ -566,28 +566,28 @@ function DashboardSection() {
           <button
             type="button"
             onClick={() => setOpenPending(true)}
-            className="relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
+            className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
           >
-            <span className="absolute left-0 top-0 h-full w-1.5 bg-amber-500" />
-            <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-amber-50">
-              <Users className="h-6 w-6 text-amber-600" />
+            <span className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
+            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
+              <Users className="h-5 w-5 text-amber-600" />
             </span>
             <div className="min-w-0">
-              <div className="text-4xl font-black leading-none text-amber-600">10</div>
-              <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">Học sinh chưa nộp bài</div>
+              <div className="text-2xl font-black leading-none text-amber-600">10</div>
+              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Học sinh chưa nộp bài</div>
             </div>
           </button>
 
           {/* 4. Bài kiểm tra chưa chấm */}
-          <div className="relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden">
-            <span className="absolute left-0 top-0 h-full w-1.5 bg-rose-500" />
-            <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-rose-50">
-              <FileCheck2 className="h-6 w-6 text-rose-600" />
+          <div className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden">
+            <span className="absolute left-0 top-0 h-full w-1 bg-rose-500" />
+            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-rose-50">
+              <FileCheck2 className="h-5 w-5 text-rose-600" />
             </span>
             <div className="min-w-0">
-              <div className="text-4xl font-black leading-none text-rose-600">10</div>
-              <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">Bài kiểm tra chưa chấm</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">100 bài kiểm tra đã tạo</div>
+              <div className="text-2xl font-black leading-none text-rose-600">10</div>
+              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Bài kiểm tra chưa chấm</div>
+              <div className="text-[10px] text-slate-500 mt-0.5">100 bài kiểm tra đã tạo</div>
             </div>
           </div>
         </div>
