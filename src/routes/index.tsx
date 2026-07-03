@@ -458,36 +458,134 @@ function TeacherHome() {
 
 
 
-/* ----- Dashboard (compact) ----- */
+/* ----- Dashboard ----- */
+type PendingStudent = { name: string; klass: string; tasks: string[] };
+const PENDING_STUDENTS: PendingStudent[] = [
+  { name: "Nguyễn An",        klass: "4A", tasks: ["Ôn tập cộng trừ phân số", "Luyện đề 02"] },
+  { name: "Trần Bảo",         klass: "4A", tasks: ["Ôn tập cộng trừ phân số"] },
+  { name: "Vũ Huy Hoàng",     klass: "4B", tasks: ["Đọc hiểu: Cây bàng", "Luyện đề 01", "Ôn tập cộng trừ phân số"] },
+  { name: "Phạm Tất Thắng",   klass: "4B", tasks: ["Đọc hiểu: Cây bàng"] },
+  { name: "Lê Minh Châu",     klass: "3A", tasks: ["Bài tập đọc số 10 000"] },
+  { name: "Hoàng Khánh Linh", klass: "3C", tasks: ["Bài tập đọc số 10 000", "Luyện đề 01"] },
+  { name: "Đỗ Quang Huy",     klass: "4A", tasks: ["Luyện đề 02"] },
+  { name: "Nguyễn Bích Ngọc", klass: "4C", tasks: ["Ôn tập cộng trừ phân số"] },
+  { name: "Bùi Tiến Dũng",    klass: "3D", tasks: ["Bài tập đọc số 10 000"] },
+  { name: "Mai Huyền",        klass: "3B", tasks: ["Luyện đề 01"] },
+];
+
 function DashboardSection() {
-  const stats = [
-    { value: "6",   label: "Bài giảng",       sub: "Đang dạy 4 · Nháp 2",   icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
-    { value: "109", label: "Bài tập", sub: <span className="inline-flex items-center gap-1"><Bell className="h-3 w-3 text-amber-500" />5 bài cần chấm</span>,       icon: ClipboardCheck, accent: "text-blue-600",   bg: "bg-blue-50",   bar: "bg-blue-500" },
-    { value: "248", label: "Học liệu cá nhân",sub: "Slide 92 · Đề 156",     icon: Library,        accent: "text-violet-600", bg: "bg-violet-50",  bar: "bg-violet-500" },
-    { value: "186", label: "Học sinh đang dạy", sub: null,          icon: Users,          accent: "text-cyan-600",   bg: "bg-cyan-50",    bar: "bg-cyan-500" },
+  const [openPending, setOpenPending] = useState(false);
+  const navigate = Route.useNavigate();
+
+  const stats: Array<{
+    value: string; label: React.ReactNode; sub?: React.ReactNode;
+    icon: typeof FileText; accent: string; bg: string; bar: string;
+    onClick?: () => void;
+  }> = [
+    { value: "10", label: "bài tập cần chấm", sub: "100 bài tập đã giao",
+      icon: ClipboardCheck, accent: "text-blue-600", bg: "bg-blue-50", bar: "bg-blue-500",
+      onClick: () => navigate({ to: "/giao-bai-tap", search: { highlight: "ungraded" } }) },
+    { value: "10", label: "Bài giảng đã tạo", sub: "50 Học liệu đã tạo",
+      icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
+    { value: "5",  label: "Bài giảng/Học liệu sử dụng tuần này",
+      icon: BookOpenCheck, accent: "text-violet-600", bg: "bg-violet-50", bar: "bg-violet-500" },
+    { value: "10", label: "Học sinh chưa nộp bài",
+      icon: Users, accent: "text-amber-600", bg: "bg-amber-50", bar: "bg-amber-500",
+      onClick: () => setOpenPending(true) },
+    { value: "10", label: "Bài kiểm tra chưa chấm", sub: "100 bài kiểm tra đã tạo",
+      icon: FileCheck2, accent: "text-rose-600", bg: "bg-rose-50", bar: "bg-rose-500" },
   ];
 
   return (
-    <section className="bg-white rounded-xl border shadow-sm p-3">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="relative flex items-center gap-3 rounded-lg border border-slate-200 p-2.5 hover:shadow-sm transition overflow-hidden group"
-          >
-            <span className={`absolute left-0 top-0 h-full w-1 ${s.bar}`} />
-            <span className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${s.bg}`}>
-              <s.icon className={`h-4 w-4 ${s.accent}`} />
-            </span>
-            <div className="min-w-0">
-              <div className="text-lg font-black text-slate-800 leading-none">{s.value}</div>
-              <div className="text-[11px] font-semibold text-slate-700 mt-0.5 truncate">{s.label}</div>
-              {s.sub && <div className="text-[10px] text-slate-500 truncate">{s.sub}</div>}
-            </div>
+    <>
+      <section className="bg-white rounded-2xl border shadow-sm p-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {stats.map((s, i) => {
+            const clickable = !!s.onClick;
+            return (
+              <div
+                key={i}
+                onClick={s.onClick}
+                className={`relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden transition ${
+                  clickable ? "cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5" : ""
+                }`}
+              >
+                <span className={`absolute left-0 top-0 h-full w-1.5 ${s.bar}`} />
+                <span className={`h-14 w-14 rounded-xl flex items-center justify-center shrink-0 ${s.bg}`}>
+                  <s.icon className={`h-6 w-6 ${s.accent}`} />
+                </span>
+                <div className="min-w-0">
+                  <div className={`text-4xl font-black leading-none ${s.accent}`}>{s.value}</div>
+                  <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">{s.label}</div>
+                  {s.sub && <div className="text-[11px] text-slate-500 mt-0.5">{s.sub}</div>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <PendingStudentsDialog open={openPending} onOpenChange={setOpenPending} />
+    </>
+  );
+}
+
+function PendingStudentsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <div className="flex items-center justify-between gap-4 pr-6">
+            <DialogTitle>Học sinh chưa nộp bài</DialogTitle>
+            <Button
+              size="sm"
+              className="bg-amber-500 hover:bg-amber-600 text-white gap-1"
+              onClick={() => toast.success("Đã gửi nhắc nhở tới tất cả học sinh chưa nộp bài")}
+            >
+              <Bell className="h-4 w-4" /> Nhắc nhở tất cả
+            </Button>
           </div>
-        ))}
-      </div>
-    </section>
+        </DialogHeader>
+        <div className="rounded-lg border overflow-hidden max-h-[60vh] overflow-y-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-slate-600 text-xs uppercase sticky top-0">
+              <tr>
+                <th className="px-3 py-2 text-left">Họ và tên</th>
+                <th className="px-3 py-2 text-left w-20">Lớp</th>
+                <th className="px-3 py-2 text-left">Bài tập chưa nộp</th>
+                <th className="px-3 py-2 text-center w-24">Nhắc nhở</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {PENDING_STUDENTS.map((s) => (
+                <tr key={s.name} className="hover:bg-slate-50">
+                  <td className="px-3 py-2 font-medium text-slate-800">{s.name}</td>
+                  <td className="px-3 py-2">{s.klass}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex flex-wrap gap-1">
+                      {s.tasks.map((t, i) => (
+                        <span key={i} className="inline-flex items-center rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[11px] px-2 py-0.5">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <button
+                      onClick={() => toast.success(`Đã nhắc nhở ${s.name}`)}
+                      className="p-1.5 rounded-md hover:bg-amber-50 text-amber-600"
+                      title="Nhắc nhở"
+                    >
+                      <Bell className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
