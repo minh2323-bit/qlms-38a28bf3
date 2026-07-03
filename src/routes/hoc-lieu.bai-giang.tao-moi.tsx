@@ -181,19 +181,21 @@ function CreateLessonPage() {
   const prefilledKhoi = search.khoi ?? "";
   const prefilledMon = search.mon ?? "";
   const isPrefilled = !!(prefilledKhoi && prefilledMon);
+  const isEditing = !!search.edit;
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Step 1
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(search.title ?? "");
   const [khoi, setKhoi] = useState(prefilledKhoi);
   const [mon, setMon] = useState(prefilledMon);
-  const [unitId, setUnitId] = useState("");
+  const [unitId, setUnitId] = useState(search.unitId ?? "");
   const [coverMode, setCoverMode] = useState<"link" | "file">("link");
   const [coverLink, setCoverLink] = useState("");
   const [coverFileName, setCoverFileName] = useState("");
   const [coverDataUrl, setCoverDataUrl] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   const tree = useMemo(
     () => (khoi && mon ? getKnowledgeTree(khoi.replace(/[^0-9]/g, ""), mon) : []),
