@@ -407,7 +407,7 @@ function CreateClassModal({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-bold text-slate-800">Thêm lớp học mới</h2>
+          <h2 className="text-lg font-bold text-slate-800">{isEdit ? "Sửa lớp học" : "Thêm lớp học mới"}</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
             <X className="h-5 w-5" />
           </button>
