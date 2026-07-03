@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import {
   ArrowLeft, Copy, Users, ChevronDown, ChevronRight, Plus, MoveVertical,
   Video, FileText, ClipboardList, BookOpen, Image as ImageIcon, Presentation,
-  GripVertical, MoreVertical, Check, Pencil, Trash2, X,
+  GripVertical, MoreVertical, Check, Pencil, Trash2, X, FileCheck2, Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -291,8 +291,6 @@ function ClassDetailPage() {
         </div>
       </section>
 
-      {/* Hồ sơ giáo dục */}
-      <EducationRecordsSection className={info.name} />
 
 
 
@@ -346,15 +344,15 @@ function ClassDetailPage() {
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setAddOpen({ kind: "exercise" })}>
                   <ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Thêm bài tập
                 </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => toast.info("Tạo bài kiểm tra (demo)")}>
+                  <FileCheck2 className="h-4 w-4 mr-2 text-rose-500" /> Thêm bài kiểm tra
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
         <div className="mt-5 space-y-3">
-          {classLive.length > 0 && (
-            <LiveClassesSection items={classLive} />
-          )}
 
           {orderedGroups.map((g) => (
             <GroupRow
@@ -369,7 +367,7 @@ function ClassDetailPage() {
               dragging={dragId === g.unitId}
             />
           ))}
-          {orderedGroups.length === 0 && classLive.length === 0 && (
+          {orderedGroups.length === 0 && (
             <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
               Chưa có học liệu nào. Bấm <b className="text-indigo-700">Thêm nội dung</b> để bắt đầu.
             </div>
@@ -399,11 +397,31 @@ function ClassDetailPage() {
         </div>
       </section>
 
+      {/* Bài kiểm tra */}
+      <TestsSection className={info.name} />
+
+      {/* Lớp học trực tuyến (đã tạo) */}
+      {classLive.length > 0 && (
+        <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+          <div className="mb-3">
+            <h2 className="text-lg font-bold text-slate-800">Lớp học trực tuyến</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Danh sách phòng học trực tuyến của lớp — đã đồng bộ với Lịch báo giảng.
+            </p>
+          </div>
+          <LiveClassesSection items={classLive} />
+        </section>
+      )}
+
+      {/* Hồ sơ giáo dục */}
+      <EducationRecordsSection className={info.name} />
+
       <AnnouncementSection
         classRealId={info.lop}
         subject={selectedSubject}
         teacherName={info.teacher}
       />
+
 
 
       {addOpen && (
@@ -515,7 +533,7 @@ function GroupRow({
           {group.items.map((c) => {
             const done = completed.has(c.id);
             return (
-              <li key={c.id} className="pl-12 pr-4 py-2.5 flex items-center gap-3">
+              <li key={c.id} className="pl-12 pr-4 py-2.5 flex items-center gap-3 hover:bg-slate-50">
                 <span className="relative">
                   <ItemIcon kind={c.kind} />
                   {done && (
@@ -524,9 +542,13 @@ function GroupRow({
                     </span>
                   )}
                 </span>
-                <span className={`text-sm flex-1 truncate ${done ? "text-slate-500 line-through" : "text-slate-700"}`}>
+                <Link
+                  to="/lop-hoc-so/$classId/hoc-lieu/$materialId"
+                  params={{ classId, materialId: c.id }}
+                  className={`text-sm flex-1 truncate hover:text-indigo-700 ${done ? "text-slate-500 line-through" : "text-slate-700"}`}
+                >
                   {c.title}
-                </span>
+                </Link>
                 {c.origin === "schedule" && (
                   <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
                     Từ lịch
@@ -1390,4 +1412,72 @@ function EducationRecordsSection({ className }: { className: string }) {
     </section>
   );
 }
+
+/* ============================ Tests Section ============================ */
+
+type TestItem = { id: string; name: string; startAt: string; endAt: string };
+
+function TestsSection({ className: _className }: { className: string }) {
+  const [open, setOpen] = useState(true);
+  const [tests] = useState<TestItem[]>([
+    { id: "t1", name: "Kiểm tra 15 phút – Chương Phân số",  startAt: "05/07/2026 08:00", endAt: "05/07/2026 08:15" },
+    { id: "t2", name: "Kiểm tra giữa kỳ II – Toán 4",       startAt: "10/07/2026 07:30", endAt: "10/07/2026 08:15" },
+    { id: "t3", name: "Kiểm tra cuối chương – Số đo đại lượng", startAt: "18/07/2026 14:00", endAt: "18/07/2026 14:45" },
+  ]);
+
+  return (
+    <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">Bài kiểm tra</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Danh sách các bài kiểm tra giáo viên đã tạo cho lớp học.
+          </p>
+        </div>
+        <button
+          onClick={() => toast.info("Tạo bài kiểm tra (demo)")}
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700"
+        >
+          <Plus className="h-4 w-4" /> Thêm bài kiểm tra
+        </button>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-slate-200 overflow-hidden">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 transition text-left"
+        >
+          {open ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
+          <span className="font-semibold text-slate-700 flex-1">Danh sách bài kiểm tra</span>
+          <span className="text-xs text-slate-500 font-medium">{tests.length} bài</span>
+        </button>
+        {open && (
+          <ul className="divide-y divide-slate-100">
+            {tests.map((t) => (
+              <li key={t.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50">
+                <span className="h-9 w-9 rounded-lg inline-flex items-center justify-center bg-rose-50 text-rose-600 shrink-0">
+                  <FileCheck2 className="h-4 w-4" />
+                </span>
+                <button
+                  onClick={() => toast.message(`Xem chi tiết: ${t.name}`)}
+                  className="text-sm font-semibold text-slate-800 hover:text-indigo-700 flex-1 truncate text-left"
+                >
+                  {t.name}
+                </button>
+                <span className="text-xs text-slate-500 inline-flex items-center gap-1.5 shrink-0">
+                  <Clock className="h-3.5 w-3.5 text-slate-400" />
+                  {t.startAt} → {t.endAt}
+                </span>
+              </li>
+            ))}
+            {tests.length === 0 && (
+              <li className="px-4 py-6 text-center text-sm text-slate-500">Chưa có bài kiểm tra nào.</li>
+            )}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
 

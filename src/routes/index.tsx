@@ -468,69 +468,128 @@ function TeacherHome() {
 
 
 /* ----- Dashboard ----- */
-type PendingStudent = { name: string; klass: string; tasks: string[] };
+type PendingTask = { name: string; deadline: string; overdue: boolean };
+type PendingStudent = { name: string; klass: string; tasks: PendingTask[] };
 const PENDING_STUDENTS: PendingStudent[] = [
-  { name: "Nguyễn An",        klass: "4A", tasks: ["Ôn tập cộng trừ phân số", "Luyện đề 02"] },
-  { name: "Trần Bảo",         klass: "4A", tasks: ["Ôn tập cộng trừ phân số"] },
-  { name: "Vũ Huy Hoàng",     klass: "4B", tasks: ["Đọc hiểu: Cây bàng", "Luyện đề 01", "Ôn tập cộng trừ phân số"] },
-  { name: "Phạm Tất Thắng",   klass: "4B", tasks: ["Đọc hiểu: Cây bàng"] },
-  { name: "Lê Minh Châu",     klass: "3A", tasks: ["Bài tập đọc số 10 000"] },
-  { name: "Hoàng Khánh Linh", klass: "3C", tasks: ["Bài tập đọc số 10 000", "Luyện đề 01"] },
-  { name: "Đỗ Quang Huy",     klass: "4A", tasks: ["Luyện đề 02"] },
-  { name: "Nguyễn Bích Ngọc", klass: "4C", tasks: ["Ôn tập cộng trừ phân số"] },
-  { name: "Bùi Tiến Dũng",    klass: "3D", tasks: ["Bài tập đọc số 10 000"] },
-  { name: "Mai Huyền",        klass: "3B", tasks: ["Luyện đề 01"] },
+  { name: "Nguyễn An",        klass: "4A", tasks: [
+    { name: "Ôn tập cộng trừ phân số", deadline: "02/07/2026", overdue: true },
+    { name: "Luyện đề 02",             deadline: "05/07/2026", overdue: false },
+  ]},
+  { name: "Trần Bảo",         klass: "4A", tasks: [
+    { name: "Ôn tập cộng trừ phân số", deadline: "02/07/2026", overdue: true },
+  ]},
+  { name: "Vũ Huy Hoàng",     klass: "4B", tasks: [
+    { name: "Đọc hiểu: Cây bàng",       deadline: "01/07/2026", overdue: true },
+    { name: "Luyện đề 01",              deadline: "04/07/2026", overdue: false },
+    { name: "Ôn tập cộng trừ phân số",  deadline: "02/07/2026", overdue: true },
+  ]},
+  { name: "Phạm Tất Thắng",   klass: "4B", tasks: [
+    { name: "Đọc hiểu: Cây bàng", deadline: "01/07/2026", overdue: true },
+  ]},
+  { name: "Lê Minh Châu",     klass: "3A", tasks: [
+    { name: "Bài tập đọc số 10 000", deadline: "06/07/2026", overdue: false },
+  ]},
+  { name: "Hoàng Khánh Linh", klass: "3C", tasks: [
+    { name: "Bài tập đọc số 10 000", deadline: "06/07/2026", overdue: false },
+    { name: "Luyện đề 01",           deadline: "04/07/2026", overdue: false },
+  ]},
+  { name: "Đỗ Quang Huy",     klass: "4A", tasks: [
+    { name: "Luyện đề 02", deadline: "05/07/2026", overdue: false },
+  ]},
+  { name: "Nguyễn Bích Ngọc", klass: "4C", tasks: [
+    { name: "Ôn tập cộng trừ phân số", deadline: "02/07/2026", overdue: true },
+  ]},
+  { name: "Bùi Tiến Dũng",    klass: "3D", tasks: [
+    { name: "Bài tập đọc số 10 000", deadline: "06/07/2026", overdue: false },
+  ]},
+  { name: "Mai Huyền",        klass: "3B", tasks: [
+    { name: "Luyện đề 01", deadline: "04/07/2026", overdue: false },
+  ]},
 ];
 
 function DashboardSection() {
   const [openPending, setOpenPending] = useState(false);
   const navigate = Route.useNavigate();
 
-  const stats: Array<{
-    value: string; label: React.ReactNode; sub?: React.ReactNode;
-    icon: typeof FileText; accent: string; bg: string; bar: string;
-    onClick?: () => void;
-  }> = [
-    { value: "10", label: "bài tập cần chấm", sub: "100 bài tập đã giao",
-      icon: ClipboardCheck, accent: "text-blue-600", bg: "bg-blue-50", bar: "bg-blue-500",
-      onClick: () => navigate({ to: "/giao-bai-tap", search: { highlight: "ungraded" } }) },
-    { value: "10", label: "Bài giảng đã tạo", sub: "50 Học liệu đã tạo",
-      icon: Presentation, accent: "text-emerald-600", bg: "bg-emerald-50", bar: "bg-emerald-500" },
-    { value: "5",  label: "Bài giảng/Học liệu sử dụng tuần này",
-      icon: BookOpenCheck, accent: "text-violet-600", bg: "bg-violet-50", bar: "bg-violet-500" },
-    { value: "10", label: "Học sinh chưa nộp bài",
-      icon: Users, accent: "text-amber-600", bg: "bg-amber-50", bar: "bg-amber-500",
-      onClick: () => setOpenPending(true) },
-    { value: "10", label: "Bài kiểm tra chưa chấm", sub: "100 bài kiểm tra đã tạo",
-      icon: FileCheck2, accent: "text-rose-600", bg: "bg-rose-50", bar: "bg-rose-500" },
-  ];
 
   return (
     <>
       <section className="bg-white rounded-2xl border shadow-sm p-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {stats.map((s, i) => {
-            const clickable = !!s.onClick;
-            return (
-              <div
-                key={i}
-                onClick={s.onClick}
-                className={`relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden transition ${
-                  clickable ? "cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5" : ""
-                }`}
-              >
-                <span className={`absolute left-0 top-0 h-full w-1.5 ${s.bar}`} />
-                <span className={`h-14 w-14 rounded-xl flex items-center justify-center shrink-0 ${s.bg}`}>
-                  <s.icon className={`h-6 w-6 ${s.accent}`} />
-                </span>
-                <div className="min-w-0">
-                  <div className={`text-4xl font-black leading-none ${s.accent}`}>{s.value}</div>
-                  <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">{s.label}</div>
-                  {s.sub && <div className="text-[11px] text-slate-500 mt-0.5">{s.sub}</div>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* 1. Bài tập cần chấm */}
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/giao-bai-tap", search: { highlight: "ungraded" } })}
+            className="relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
+          >
+            <span className="absolute left-0 top-0 h-full w-1.5 bg-blue-500" />
+            <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-blue-50">
+              <ClipboardCheck className="h-6 w-6 text-blue-600" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-4xl font-black leading-none text-blue-600">10</div>
+              <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">bài tập cần chấm</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">100 bài tập đã giao</div>
+            </div>
+          </button>
+
+          {/* 2. Merged: Bài giảng/Học liệu đã tạo + sử dụng tuần này */}
+          <div className="relative rounded-xl border border-slate-200 overflow-hidden lg:col-span-2 grid grid-cols-2 divide-x divide-slate-200">
+            <span className="absolute left-0 top-0 h-full w-1.5 bg-emerald-500" />
+            <div className="flex items-center gap-4 p-4">
+              <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-emerald-50">
+                <Presentation className="h-6 w-6 text-emerald-600" />
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <div className="text-4xl font-black leading-none text-emerald-600">10</div>
+                  <div className="text-[13px] font-semibold text-slate-800 leading-snug">Bài giảng đã tạo</div>
+                </div>
+                <div className="flex items-baseline gap-2 mt-1.5 flex-wrap">
+                  <div className="text-2xl font-black leading-none text-emerald-600">50</div>
+                  <div className="text-[13px] font-semibold text-slate-800 leading-snug">Học liệu đã tạo</div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+            <div className="flex items-center gap-4 p-4">
+              <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-violet-50">
+                <BookOpenCheck className="h-6 w-6 text-violet-600" />
+              </span>
+              <div className="min-w-0">
+                <div className="text-4xl font-black leading-none text-violet-600">5</div>
+                <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">Bài giảng/Học liệu sử dụng tuần này</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Học sinh chưa nộp bài */}
+          <button
+            type="button"
+            onClick={() => setOpenPending(true)}
+            className="relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
+          >
+            <span className="absolute left-0 top-0 h-full w-1.5 bg-amber-500" />
+            <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-amber-50">
+              <Users className="h-6 w-6 text-amber-600" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-4xl font-black leading-none text-amber-600">10</div>
+              <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">Học sinh chưa nộp bài</div>
+            </div>
+          </button>
+
+          {/* 4. Bài kiểm tra chưa chấm */}
+          <div className="relative flex items-center gap-4 rounded-xl border border-slate-200 p-4 overflow-hidden">
+            <span className="absolute left-0 top-0 h-full w-1.5 bg-rose-500" />
+            <span className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-rose-50">
+              <FileCheck2 className="h-6 w-6 text-rose-600" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-4xl font-black leading-none text-rose-600">10</div>
+              <div className="text-[13px] font-semibold text-slate-800 mt-1.5 leading-snug">Bài kiểm tra chưa chấm</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">100 bài kiểm tra đã tạo</div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -540,9 +599,30 @@ function DashboardSection() {
 }
 
 function PendingStudentsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const [classFilter, setClassFilter] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "overdue" | "on_time">("ALL");
+
+  const classOptions = useMemo(
+    () => Array.from(new Set(PENDING_STUDENTS.map((s) => s.klass))).sort(),
+    [],
+  );
+
+  const rows = useMemo(() => {
+    return PENDING_STUDENTS
+      .filter((s) => classFilter === "ALL" || s.klass === classFilter)
+      .map((s) => ({
+        ...s,
+        tasks: s.tasks.filter((t) =>
+          statusFilter === "ALL" ? true :
+          statusFilter === "overdue" ? t.overdue : !t.overdue,
+        ),
+      }))
+      .filter((s) => s.tasks.length > 0);
+  }, [classFilter, statusFilter]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <div className="flex items-center justify-between gap-4 pr-6">
             <DialogTitle>Học sinh chưa nộp bài</DialogTitle>
@@ -555,6 +635,31 @@ function PendingStudentsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
             </Button>
           </div>
         </DialogHeader>
+
+        <div className="flex flex-wrap items-center gap-3 pb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-500 uppercase">Lớp:</span>
+            <Select value={classFilter} onValueChange={setClassFilter}>
+              <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tất cả lớp</SelectItem>
+                {classOptions.map((c) => <SelectItem key={c} value={c}>Lớp {c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-500 uppercase">Trạng thái:</span>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
+              <SelectTrigger className="h-8 w-40 text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tất cả</SelectItem>
+                <SelectItem value="overdue">Quá hạn</SelectItem>
+                <SelectItem value="on_time">Chưa quá hạn</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="rounded-lg border overflow-hidden max-h-[60vh] overflow-y-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-600 text-xs uppercase sticky top-0">
@@ -566,18 +671,27 @@ function PendingStudentsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
               </tr>
             </thead>
             <tbody className="divide-y">
-              {PENDING_STUDENTS.map((s) => (
-                <tr key={s.name} className="hover:bg-slate-50">
+              {rows.map((s) => (
+                <tr key={s.name} className="hover:bg-slate-50 align-top">
                   <td className="px-3 py-2 font-medium text-slate-800">{s.name}</td>
                   <td className="px-3 py-2">{s.klass}</td>
                   <td className="px-3 py-2">
-                    <div className="flex flex-wrap gap-1">
+                    <ul className="space-y-1.5">
                       {s.tasks.map((t, i) => (
-                        <span key={i} className="inline-flex items-center rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[11px] px-2 py-0.5">
-                          {t}
-                        </span>
+                        <li key={i} className="flex items-center gap-2 flex-wrap">
+                          <span className={`inline-flex items-center rounded-full text-[11px] px-2 py-0.5 border ${
+                            t.overdue
+                              ? "bg-rose-50 border-rose-200 text-rose-700"
+                              : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                          }`}>
+                            {t.name}
+                          </span>
+                          <span className={`text-[11px] ${t.overdue ? "text-rose-600 font-semibold" : "text-slate-500"}`}>
+                            Hạn: {t.deadline}{t.overdue ? " · Quá hạn" : ""}
+                          </span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </td>
                   <td className="px-3 py-2 text-center">
                     <button
@@ -590,6 +704,9 @@ function PendingStudentsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
                   </td>
                 </tr>
               ))}
+              {rows.length === 0 && (
+                <tr><td colSpan={4} className="px-3 py-8 text-center text-slate-400 italic">Không có học sinh phù hợp bộ lọc.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
