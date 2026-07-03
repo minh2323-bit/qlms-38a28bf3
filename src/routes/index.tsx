@@ -468,18 +468,43 @@ function TeacherHome() {
 
 
 /* ----- Dashboard ----- */
-type PendingStudent = { name: string; klass: string; tasks: string[] };
+type PendingTask = { name: string; deadline: string; overdue: boolean };
+type PendingStudent = { name: string; klass: string; tasks: PendingTask[] };
 const PENDING_STUDENTS: PendingStudent[] = [
-  { name: "Nguyễn An",        klass: "4A", tasks: ["Ôn tập cộng trừ phân số", "Luyện đề 02"] },
-  { name: "Trần Bảo",         klass: "4A", tasks: ["Ôn tập cộng trừ phân số"] },
-  { name: "Vũ Huy Hoàng",     klass: "4B", tasks: ["Đọc hiểu: Cây bàng", "Luyện đề 01", "Ôn tập cộng trừ phân số"] },
-  { name: "Phạm Tất Thắng",   klass: "4B", tasks: ["Đọc hiểu: Cây bàng"] },
-  { name: "Lê Minh Châu",     klass: "3A", tasks: ["Bài tập đọc số 10 000"] },
-  { name: "Hoàng Khánh Linh", klass: "3C", tasks: ["Bài tập đọc số 10 000", "Luyện đề 01"] },
-  { name: "Đỗ Quang Huy",     klass: "4A", tasks: ["Luyện đề 02"] },
-  { name: "Nguyễn Bích Ngọc", klass: "4C", tasks: ["Ôn tập cộng trừ phân số"] },
-  { name: "Bùi Tiến Dũng",    klass: "3D", tasks: ["Bài tập đọc số 10 000"] },
-  { name: "Mai Huyền",        klass: "3B", tasks: ["Luyện đề 01"] },
+  { name: "Nguyễn An",        klass: "4A", tasks: [
+    { name: "Ôn tập cộng trừ phân số", deadline: "02/07/2026", overdue: true },
+    { name: "Luyện đề 02",             deadline: "05/07/2026", overdue: false },
+  ]},
+  { name: "Trần Bảo",         klass: "4A", tasks: [
+    { name: "Ôn tập cộng trừ phân số", deadline: "02/07/2026", overdue: true },
+  ]},
+  { name: "Vũ Huy Hoàng",     klass: "4B", tasks: [
+    { name: "Đọc hiểu: Cây bàng",       deadline: "01/07/2026", overdue: true },
+    { name: "Luyện đề 01",              deadline: "04/07/2026", overdue: false },
+    { name: "Ôn tập cộng trừ phân số",  deadline: "02/07/2026", overdue: true },
+  ]},
+  { name: "Phạm Tất Thắng",   klass: "4B", tasks: [
+    { name: "Đọc hiểu: Cây bàng", deadline: "01/07/2026", overdue: true },
+  ]},
+  { name: "Lê Minh Châu",     klass: "3A", tasks: [
+    { name: "Bài tập đọc số 10 000", deadline: "06/07/2026", overdue: false },
+  ]},
+  { name: "Hoàng Khánh Linh", klass: "3C", tasks: [
+    { name: "Bài tập đọc số 10 000", deadline: "06/07/2026", overdue: false },
+    { name: "Luyện đề 01",           deadline: "04/07/2026", overdue: false },
+  ]},
+  { name: "Đỗ Quang Huy",     klass: "4A", tasks: [
+    { name: "Luyện đề 02", deadline: "05/07/2026", overdue: false },
+  ]},
+  { name: "Nguyễn Bích Ngọc", klass: "4C", tasks: [
+    { name: "Ôn tập cộng trừ phân số", deadline: "02/07/2026", overdue: true },
+  ]},
+  { name: "Bùi Tiến Dũng",    klass: "3D", tasks: [
+    { name: "Bài tập đọc số 10 000", deadline: "06/07/2026", overdue: false },
+  ]},
+  { name: "Mai Huyền",        klass: "3B", tasks: [
+    { name: "Luyện đề 01", deadline: "04/07/2026", overdue: false },
+  ]},
 ];
 
 function DashboardSection() {
