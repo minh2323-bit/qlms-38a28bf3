@@ -10,6 +10,9 @@ import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 import thumbLop4A from "@/assets/thumb-lop-4a.jpg";
 import thumbLop3D from "@/assets/thumb-lop-3d.jpg";
