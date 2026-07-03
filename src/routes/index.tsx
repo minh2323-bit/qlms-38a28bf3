@@ -393,6 +393,12 @@ function TeacherHome() {
               </Button>
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
+                <Button
+                  onClick={() => toast.success("Đã cập nhật lịch báo giảng từ CSDL")}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-9 px-4 font-bold shadow-md"
+                >
+                  <Database className="h-4 w-4" /> Cập nhật từ CSDL
+                </Button>
               </div>
               <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
                 <Button variant="ghost" size="icon" className="h-7 w-7"
