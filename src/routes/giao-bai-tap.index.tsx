@@ -313,7 +313,10 @@ function Page() {
                   {/* CTA */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="p-2 rounded-md hover:bg-slate-100 shrink-0">
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-2 rounded-md hover:bg-slate-100 shrink-0"
+                      >
                         <MoreVertical className="h-4 w-4 text-slate-600" />
                       </button>
                     </DropdownMenuTrigger>
