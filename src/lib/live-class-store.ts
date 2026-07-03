@@ -110,6 +110,15 @@ export function addLiveClass(lc: Omit<LiveClass, "id" | "createdAt">): LiveClass
   return next;
 }
 
+export function updateLiveClass(id: string, patch: Partial<Omit<LiveClass, "id" | "createdAt">>): void {
+  items = items.map((it) => (it.id === id ? { ...it, ...patch } : it));
+  emit();
+}
+
+export function getLiveClassById(id: string): LiveClass | undefined {
+  return items.find((l) => l.id === id);
+}
+
 export function listLiveClassesForClass(classRealId: string, subject: string): LiveClass[] {
   return items.filter((l) => l.classRealId === classRealId && l.subject === subject);
 }
