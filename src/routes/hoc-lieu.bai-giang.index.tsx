@@ -85,7 +85,7 @@ function LessonsPage() {
   const [lessonTrangThai, setLessonTrangThai] = useState("");
   const [lessonFromDate, setLessonFromDate] = useState("");
   const [lessonToDate, setLessonToDate] = useState("");
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(true);
   const [lessonSelectMode, setLessonSelectMode] = useState(false);
   const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set());
 
