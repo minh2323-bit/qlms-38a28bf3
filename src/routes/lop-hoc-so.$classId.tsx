@@ -350,9 +350,6 @@ function ClassDetailPage() {
         </div>
 
         <div className="mt-5 space-y-3">
-          {classLive.length > 0 && (
-            <LiveClassesSection items={classLive} />
-          )}
 
           {orderedGroups.map((g) => (
             <GroupRow
