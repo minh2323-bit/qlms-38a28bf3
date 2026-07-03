@@ -364,7 +364,7 @@ function ClassDetailPage() {
               dragging={dragId === g.unitId}
             />
           ))}
-          {orderedGroups.length === 0 && classLive.length === 0 && (
+          {orderedGroups.length === 0 && (
             <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
               Chưa có học liệu nào. Bấm <b className="text-indigo-700">Thêm nội dung</b> để bắt đầu.
             </div>
