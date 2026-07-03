@@ -26,17 +26,17 @@ export const Route = createFileRoute("/lop-truc-tuyen/$liveId")({
 
 function Page() {
   const { liveId } = Route.useLoaderData();
-  // Subscribe to updates
   useLiveClasses();
   const lc = getLiveClassById(liveId);
   const [qName, setQName] = useState("");
-  const [qLop, setQLop] = useState("");
+  const [qLop, setQLop] = useState("all");
 
   const attendees = useMemo(() => (lc ? getAttendees(lc) : []), [lc]);
   const total = 40;
+  const lopOptions = lc ? Array.from(new Set([lc.classRealId])) : [];
   const filtered = attendees.filter((a) =>
     a.name.toLowerCase().includes(qName.toLowerCase())
-    && (qLop === "" || (lc?.classRealId ?? "").toLowerCase().includes(qLop.toLowerCase()))
+    && (qLop === "all" || (lc?.classRealId ?? "") === qLop)
   );
 
   if (!lc) return null;
@@ -50,7 +50,7 @@ function Page() {
         </Link>
       </div>
 
-      <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+      <section className="mx-auto max-w-5xl bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
         <div className="flex items-start gap-3 mb-4">
           <span className="h-10 w-10 rounded-lg bg-indigo-600 text-white inline-flex items-center justify-center shrink-0">
             <Video className="h-5 w-5" />
@@ -61,7 +61,6 @@ function Page() {
           </div>
         </div>
 
-        {/* Info header */}
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-3 mb-4">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-1 text-sm">
             <div><span className="font-semibold text-slate-700">Tên lớp:</span> {lc.name}</div>
@@ -84,46 +83,54 @@ function Page() {
           </div>
         </div>
 
-        {/* Search */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
           <div className="relative">
             <Search className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input value={qName} onChange={(e) => setQName(e.target.value)} placeholder="Tên học sinh"
               className="w-full h-9 pl-8 pr-3 text-sm rounded-md border border-slate-200 bg-white" />
           </div>
-          <div className="relative">
-            <Search className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input value={qLop} onChange={(e) => setQLop(e.target.value)} placeholder="Lớp"
-              className="w-full h-9 pl-8 pr-3 text-sm rounded-md border border-slate-200 bg-white" />
-          </div>
+          <select value={qLop} onChange={(e) => setQLop(e.target.value)}
+            className="w-full h-9 px-3 text-sm rounded-md border border-slate-200 bg-white">
+            <option value="all">Tất cả lớp</option>
+            {lopOptions.map((l) => <option key={l} value={l}>Lớp {l}</option>)}
+          </select>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto rounded-xl border border-slate-200">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr className="text-left">
                 <th className="px-3 py-2.5 w-12 font-semibold">STT</th>
-                <th className="px-3 py-2.5 w-32 font-semibold">Mã học sinh</th>
+                <th className="px-3 py-2.5 w-28 font-semibold">Mã học sinh</th>
                 <th className="px-3 py-2.5 font-semibold">Họ và tên</th>
-                <th className="px-3 py-2.5 w-24 font-semibold">Lớp</th>
-                <th className="px-3 py-2.5 w-32 font-semibold">Thời gian vào</th>
-                <th className="px-3 py-2.5 w-32 font-semibold">Thời gian ra</th>
+                <th className="px-3 py-2.5 w-28 font-semibold">Ngày sinh</th>
+                <th className="px-3 py-2.5 w-20 font-semibold">Lớp</th>
+                <th className="px-3 py-2.5 w-28 font-semibold">Thời gian vào</th>
+                <th className="px-3 py-2.5 w-28 font-semibold">Thời gian ra</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
               {filtered.map((a, i) => (
-                <tr key={i} className="hover:bg-slate-50">
+                <tr key={i} className="hover:bg-slate-50 align-top">
                   <td className="px-3 py-2 text-slate-500">{String(i + 1).padStart(2, "0")}</td>
                   <td className="px-3 py-2 font-mono text-slate-700">HS{String(1000 + i + 1)}</td>
                   <td className="px-3 py-2 font-medium text-slate-800">{a.name}</td>
+                  <td className="px-3 py-2 text-slate-700">{a.dob}</td>
                   <td className="px-3 py-2 text-slate-700">{lc.classRealId}</td>
-                  <td className="px-3 py-2 font-mono text-slate-700">{a.joinAt}</td>
-                  <td className="px-3 py-2 font-mono text-slate-700">{a.leaveAt}</td>
+                  <td className="px-3 py-2 font-mono text-slate-700">
+                    <div className="space-y-0.5">
+                      {a.sessions.map((s, k) => <div key={k}>{s.joinAt}</div>)}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 font-mono text-slate-700">
+                    <div className="space-y-0.5">
+                      {a.sessions.map((s, k) => <div key={k}>{s.leaveAt}</div>)}
+                    </div>
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-3 py-8 text-center text-sm text-slate-400 italic">Không có kết quả.</td></tr>
+                <tr><td colSpan={7} className="px-3 py-8 text-center text-sm text-slate-400 italic">Không có kết quả.</td></tr>
               )}
             </tbody>
           </table>
