@@ -113,11 +113,41 @@ const STUDENT_NAV: NavItem[] = [
 export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const NAV = role === "student" ? STUDENT_NAV : TEACHER_NAV;
+  const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
+  const [year, setYear] = useState(YEARS[0]);
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
-      <div className="w-16 h-16 flex items-center justify-center mb-2">
+      <div className="w-16 h-16 flex items-center justify-center mb-1">
         <img src={qlmsLogo} alt="QLMS" className="h-full w-full object-contain" />
       </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            title={`Năm học ${year}`}
+            className="w-20 mb-2 px-1 py-1.5 rounded-lg border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-700 text-[10px] font-semibold leading-tight flex flex-col items-center gap-0.5 transition"
+          >
+            <span className="text-[9px] uppercase text-slate-500 font-medium">Năm học</span>
+            <span className="flex items-center gap-0.5">
+              {year}
+              <ChevronDown className="h-3 w-3" />
+            </span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" side="right" className="w-44">
+          <DropdownMenuLabel className="text-xs text-slate-500">Chọn năm học</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {YEARS.map((y) => (
+            <DropdownMenuItem
+              key={y}
+              onSelect={() => setYear(y)}
+              className={`cursor-pointer text-sm ${y === year ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
+            >
+              Năm học {y}
+              {y !== YEARS[0] && <span className="ml-auto text-[10px] text-slate-400">Xem lại</span>}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       {NAV.map((it) => {
         const active = it.to ? pathname === it.to : false;
         const cls = `w-20 py-3 rounded-xl flex flex-col items-center gap-1 text-[11px] font-medium leading-tight whitespace-pre-line text-center transition ${
