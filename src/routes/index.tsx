@@ -37,6 +37,7 @@ import {
   type LiveClass,
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
+import { WEEKS, DAY_DATES, getCurrentWeekIdx } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/")({
@@ -74,18 +75,7 @@ type WeekGrid = Record<number, Record<number, Record<number, Lesson | null>>>;
 const makeLesson = (id: string, c: ClassId, topic: string, unitId: string): Lesson =>
   ({ id, class: c, subject: "Toán", topic, unitId });
 
-const WEEKS = [
-  { idx: 1, label: "Tuần 1", range: "31/3 – 6/4/2026" },
-  { idx: 2, label: "Tuần 2", range: "7/4 – 13/4/2026" },
-  { idx: 3, label: "Tuần 3", range: "14/4 – 20/4/2026" },
-];
-
-const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
-const DAY_DATES: Record<number, string[]> = {
-  1: ["31/3", "1/4", "2/4", "3/4", "4/4", "5/4", "6/4"],
-  2: ["7/4", "8/4", "9/4", "10/4", "11/4", "12/4", "13/4"],
-  3: ["14/4", "15/4", "16/4", "17/4", "18/4", "19/4", "20/4"],
-};
+// WEEKS + DAY_DATES nay được sinh từ src/lib/school-weeks.ts (bắt đầu 5/9 hằng năm).
 
 // KNOWLEDGE_TREE moved to src/lib/knowledge-tree.ts
 
