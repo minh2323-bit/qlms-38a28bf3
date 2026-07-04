@@ -76,6 +76,7 @@ const makeLesson = (id: string, c: ClassId, topic: string, unitId: string): Less
   ({ id, class: c, subject: "Toán", topic, unitId });
 
 // WEEKS + DAY_DATES nay được sinh từ src/lib/school-weeks.ts (bắt đầu 5/9 hằng năm).
+const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
 
 // KNOWLEDGE_TREE moved to src/lib/knowledge-tree.ts
 
