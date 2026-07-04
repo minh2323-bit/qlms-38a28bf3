@@ -261,7 +261,7 @@ function Page() {
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
                         <div className="relative">
                           <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
-                          <span className="absolute top-2 right-2 bg-white rounded-full p-0.5 shadow">
+                          <span className="absolute bottom-2 right-2 bg-white rounded-full p-0.5 shadow ring-1 ring-slate-200">
                             <ProgressRing value={l.progress ?? 0} size={40} stroke={3.5} />
                           </span>
                         </div>
