@@ -284,62 +284,66 @@ function LearningActivitySection() {
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm">
-      <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-indigo-700" />
-          <h2 className="text-xl font-bold text-slate-800">Hoạt động học tập</h2>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => scrollBy(-1)} aria-label="Cuộn trái">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => scrollBy(1)} aria-label="Cuộn phải">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+      <div className="px-6 py-3 border-b flex items-center gap-2">
+        <Activity className="h-5 w-5 text-indigo-700" />
+        <h2 className="text-xl font-bold text-slate-800">Hoạt động học tập</h2>
+      </div>
+
+      {/* Stats row */}
+      <div className="px-6 pt-4">
+        <div className="rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-indigo-50 px-4 py-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <StatCell icon={BookOpen} label="Số lớp đã tham gia" value="5" />
+          <StatCell icon={Presentation} label="Số bài giảng đã học" value="10" />
+          <StatCell icon={CheckCircle2} label="Số bài giảng đã hoàn thành" value="5" />
+          <StatCell icon={Star} label="Môn học nhiều nhất" value="Toán" />
+          <StatCell icon={Layers} label="Học liệu hoàn thành nhiều nhất" value="Video" />
         </div>
       </div>
 
-      <div className="p-4 grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-4">
-        {/* Left stats box */}
-        <aside className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-4">
-          <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-1.5 mb-3">
-            <GraduationCap className="h-4 w-4" /> Thống kê học tập
-          </h3>
-          <ul className="space-y-2.5 text-[13px] text-slate-700">
-            <StatRow icon={BookOpen} label="Số lớp đã tham gia" value="5" />
-            <StatRow icon={Presentation} label="Số bài giảng đã học" value="10" />
-            <StatRow icon={CheckCircle2} label="Số bài giảng đã hoàn thành" value="5" />
-            <StatRow icon={Star} label="Môn học nhiều nhất" value="Toán" />
-            <StatRow icon={Layers} label="Học liệu hoàn thành nhiều nhất" value="Video" />
-          </ul>
-        </aside>
+      {/* Slider with side buttons */}
+      <div className="p-4 relative">
+        <button
+          type="button"
+          onClick={() => scrollBy(-1)}
+          aria-label="Cuộn trái"
+          className="hidden sm:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 h-9 w-9 items-center justify-center rounded-full bg-white border border-slate-200 shadow hover:bg-indigo-50 hover:border-indigo-300 transition"
+        >
+          <ChevronLeft className="h-5 w-5 text-slate-700" />
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollBy(1)}
+          aria-label="Cuộn phải"
+          className="hidden sm:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 h-9 w-9 items-center justify-center rounded-full bg-white border border-slate-200 shadow hover:bg-indigo-50 hover:border-indigo-300 transition"
+        >
+          <ChevronRight className="h-5 w-5 text-slate-700" />
+        </button>
 
-        {/* Right slider */}
         <div
           ref={scrollerRef}
-          className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full"
+          className="flex gap-3 overflow-x-auto pb-2 px-8 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full"
         >
           {sorted.map((l) => {
             const src = SOURCE_META[l.source];
             return (
               <article
                 key={l.id}
-                className="snap-start shrink-0 w-[240px] rounded-xl border border-slate-200 bg-white overflow-hidden hover:shadow-md hover:border-indigo-300 transition"
+                className="snap-start shrink-0 w-[248px] rounded-xl border border-slate-200 bg-white overflow-hidden hover:shadow-md hover:border-indigo-300 transition"
               >
                 <div className="relative">
                   <img src={l.thumb} alt={l.title} loading="lazy" className="h-28 w-full object-cover" />
                   <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow ${src.cls}`}>
                     {src.label}
                   </span>
-                  <span className="absolute top-2 right-2 bg-white rounded-full p-0.5 shadow">
-                    <ProgressRing value={l.progress} size={38} stroke={3.5} />
+                  <span className="absolute bottom-2 right-2 bg-white rounded-full p-0.5 shadow ring-1 ring-slate-200">
+                    <ProgressRing value={l.progress} size={40} stroke={3.5} />
                   </span>
                 </div>
-                <div className="p-3">
+                <div className="p-3 space-y-1">
                   <h4 className="font-bold text-[14px] text-slate-800 leading-snug line-clamp-2 min-h-[36px]">{l.title}</h4>
-                  <p className="text-[12px] text-slate-600 mt-1"><span className="font-bold text-slate-700">Môn:</span> {l.subject}</p>
-                  <p className="text-[12px] text-slate-600"><span className="font-bold text-slate-700">GV:</span> {l.teacher}</p>
-                  <p className="text-[11px] text-slate-500 mt-1"><span className="font-bold text-slate-700">Xem gần nhất:</span> {l.lastViewed}</p>
+                  <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">Môn:</span> {l.subject}</p>
+                  <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">GV:</span> {l.teacher}</p>
+                  <p className="text-[13px] text-slate-500"><span className="font-bold text-slate-700">Xem gần nhất:</span> {l.lastViewed}</p>
                 </div>
               </article>
             );
@@ -350,17 +354,17 @@ function LearningActivitySection() {
   );
 }
 
-function StatRow({ icon: Icon, label, value }: { icon: typeof BookOpen; label: string; value: string }) {
+function StatCell({ icon: Icon, label, value }: { icon: typeof BookOpen; label: string; value: string }) {
   return (
-    <li className="flex items-start gap-2">
-      <span className="h-6 w-6 rounded-md bg-white border border-indigo-100 flex items-center justify-center shrink-0">
-        <Icon className="h-3.5 w-3.5 text-indigo-600" />
+    <div className="flex items-center gap-2.5 min-w-0">
+      <span className="h-9 w-9 rounded-lg bg-white border border-indigo-200 flex items-center justify-center shrink-0 shadow-sm">
+        <Icon className="h-4 w-4 text-indigo-600" />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="font-bold text-slate-800">{label}</div>
-        <div className="text-slate-600">{value}</div>
+        <div className="text-[12px] font-bold text-slate-700 leading-tight truncate">{label}</div>
+        <div className="text-[16px] font-bold text-indigo-700 leading-tight">{value}</div>
       </div>
-    </li>
+    </div>
   );
 }
 
