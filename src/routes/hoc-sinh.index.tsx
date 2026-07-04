@@ -2,15 +2,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   ClipboardList, Video, CheckCircle2, ChevronLeft, ChevronRight, CalendarClock,
-  Sun, Moon, X, BookOpen, Presentation, FileText, ListChecks,
+  ChevronDown, Sun, Moon, X, BookOpen, Presentation, FileText, ListChecks,
   StickyNote, Bell, ArrowRight, AlertCircle, Crown, Trophy, Play,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useMaterials, type MaterialKind } from "@/lib/teaching-store";
 import { useLiveClasses, isEvening, formatTimeRange } from "@/lib/live-class-store";
+import { WEEKS as SCHOOL_WEEKS } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/hoc-sinh/")({
@@ -106,6 +110,8 @@ const PERIODS = [1, 2, 3, 4, 5] as const;
 function StudentHome() {
   const [activePeriod, setActivePeriod] = useState<{ day: number; period: number } | null>(null);
   const [tasksOpen, setTasksOpen] = useState(false);
+  const [weekIdx, setWeekIdx] = useState(31); // Tuần 31 (11/4/2026 nằm trong tuần này)
+  const currentWeek = SCHOOL_WEEKS.find((w) => w.idx === weekIdx) ?? SCHOOL_WEEKS[0];
   const liveAll = useLiveClasses();
 
   const myLive = useMemo(
@@ -162,12 +168,42 @@ function StudentHome() {
         <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-slate-800">Thời khóa biểu</h2>
           <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronLeft className="h-4 w-4" /></Button>
-            <CalendarClock className="h-4 w-4 text-slate-500" />
-            <span className="text-sm font-medium px-2">Tuần 2 · 11/4 – 17/4/2026</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronRight className="h-4 w-4" /></Button>
+            <Button
+              variant="ghost" size="icon" className="h-7 w-7"
+              onClick={() => setWeekIdx((v) => Math.max(1, v - 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-slate-100 transition">
+                  <CalendarClock className="h-4 w-4 text-slate-500" />
+                  <span className="text-sm font-medium">{currentWeek.label} · {currentWeek.range}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64 max-h-80 overflow-y-auto">
+                {SCHOOL_WEEKS.map((w) => (
+                  <DropdownMenuItem
+                    key={w.idx}
+                    onClick={() => setWeekIdx(w.idx)}
+                    className={`flex items-center justify-between gap-2 cursor-pointer ${w.idx === weekIdx ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
+                  >
+                    <span>{w.label}</span>
+                    <span className="text-xs text-slate-500">{w.range}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              variant="ghost" size="icon" className="h-7 w-7"
+              onClick={() => setWeekIdx((v) => Math.min(SCHOOL_WEEKS.length, v + 1))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+
 
         <div className="flex">
           <div className="flex-1 min-w-0 p-4 overflow-x-auto">

@@ -94,6 +94,72 @@ let items: LiveClass[] = [
     studentCount: 25,
     createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
   },
+  // ----- Thêm nhiều lớp sắp diễn ra cho lớp 4A -----
+  {
+    id: "lc-seed-upcoming-4a-tonight",
+    classRealId: "4A",
+    subject: "Toán",
+    name: "Ôn tập cuối tuần – Số tự nhiên",
+    unitId: "u1-sotunhien",
+    startAt: nowOffset(60 * 5),          // ~5h nữa (hôm nay)
+    endAt: nowOffset(60 * 5 + 45),
+    link: "https://meet.google.com/tonight-4a",
+    description: "Buổi ôn tập cuối tuần.",
+    studentCount: 28,
+    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "lc-seed-upcoming-4a-tomorrow-am",
+    classRealId: "4A",
+    subject: "Tiếng Việt",
+    name: "Đọc hiểu – Câu chuyện mùa xuân",
+    unitId: "u-tv-doc",
+    startAt: nowOffset(60 * 22),         // sáng ngày mai
+    endAt: nowOffset(60 * 22 + 45),
+    link: "https://meet.google.com/tomorrow-am-4a",
+    description: "Sáng mai: luyện đọc hiểu.",
+    studentCount: 30,
+    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "lc-seed-upcoming-4a-tomorrow-pm",
+    classRealId: "4A",
+    subject: "Toán",
+    name: "Luyện tập Phân số nâng cao",
+    unitId: "u3-khainiem",
+    startAt: nowOffset(60 * 30),         // chiều mai
+    endAt: nowOffset(60 * 30 + 45),
+    link: "https://meet.google.com/tomorrow-pm-4a",
+    description: "Chiều mai: luyện tập phân số.",
+    studentCount: 27,
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "lc-seed-upcoming-4a-d3",
+    classRealId: "4A",
+    subject: "Tiếng Anh",
+    name: "Speaking Club – Unit 5",
+    unitId: "u-en-5",
+    startAt: nowOffset(60 * 52),         // 2 ngày nữa
+    endAt: nowOffset(60 * 52 + 45),
+    link: "https://meet.google.com/d3-4a",
+    description: "Buổi luyện nói tiếng Anh.",
+    studentCount: 26,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "lc-seed-upcoming-4a-d4",
+    classRealId: "4A",
+    subject: "Khoa học",
+    name: "Thí nghiệm nước và không khí",
+    unitId: "u-kh-1",
+    startAt: nowOffset(60 * 76),         // 3 ngày nữa
+    endAt: nowOffset(60 * 76 + 45),
+    link: "https://meet.google.com/d4-4a",
+    description: "Buổi thí nghiệm.",
+    studentCount: 29,
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 const listeners = new Set<Listener>();
@@ -218,15 +284,20 @@ export function getAttendees(lc: LiveClass): Attendee[] {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     return seed / 0xffffffff;
   };
+  // Đảm bảo "Phí Song Ngân" luôn có mặt ở vị trí 0 để demo popup thống kê của học sinh.
+  const CURRENT_STUDENT = "Phí Song Ngân";
   return Array.from({ length: lc.studentCount }, (_, i) => {
-    const name = ATTENDEE_POOL[(i + (seed % ATTENDEE_POOL.length)) % ATTENDEE_POOL.length];
+    const name = i === 0
+      ? CURRENT_STUDENT
+      : ATTENDEE_POOL[(i + (seed % ATTENDEE_POOL.length)) % ATTENDEE_POOL.length];
     const day = Math.floor(rand() * 28) + 1;
     const month = Math.floor(rand() * 12) + 1;
     const year = 2015 + Math.floor(rand() * 2);
     const dob = `${pad(day)}/${pad(month)}/${year}`;
 
     const r = rand();
-    const sessionCount = r < 0.5 ? 1 : r < 0.8 ? 2 : 3;
+    // Học sinh hiện tại luôn có 3 lần vào/ra để minh họa việc thoát và vào lại.
+    const sessionCount = i === 0 ? 3 : r < 0.5 ? 1 : r < 0.8 ? 2 : 3;
     const sessions: AttendanceSession[] = [];
     let cursor = Math.floor(rand() * 4);
     for (let s = 0; s < sessionCount; s++) {
@@ -236,7 +307,7 @@ export function getAttendees(lc: LiveClass): Attendee[] {
         ? addMinutes(endTime, -(rand() < 0.15 ? Math.floor(rand() * 8) + 1 : 0))
         : addMinutes(startTime, cursor);
       sessions.push({ joinAt: join, leaveAt: leave });
-      cursor += 1 + Math.floor(rand() * 4);
+      cursor += 2 + Math.floor(rand() * 5); // khoảng nghỉ ra ngoài
     }
     return {
       name, dob, sessions,

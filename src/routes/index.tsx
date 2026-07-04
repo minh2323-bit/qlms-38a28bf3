@@ -37,6 +37,7 @@ import {
   type LiveClass,
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
+import { WEEKS, DAY_DATES } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/")({
@@ -74,18 +75,8 @@ type WeekGrid = Record<number, Record<number, Record<number, Lesson | null>>>;
 const makeLesson = (id: string, c: ClassId, topic: string, unitId: string): Lesson =>
   ({ id, class: c, subject: "Toán", topic, unitId });
 
-const WEEKS = [
-  { idx: 1, label: "Tuần 1", range: "31/3 – 6/4/2026" },
-  { idx: 2, label: "Tuần 2", range: "7/4 – 13/4/2026" },
-  { idx: 3, label: "Tuần 3", range: "14/4 – 20/4/2026" },
-];
-
+// WEEKS + DAY_DATES nay được sinh từ src/lib/school-weeks.ts (bắt đầu 5/9 hằng năm).
 const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
-const DAY_DATES: Record<number, string[]> = {
-  1: ["31/3", "1/4", "2/4", "3/4", "4/4", "5/4", "6/4"],
-  2: ["7/4", "8/4", "9/4", "10/4", "11/4", "12/4", "13/4"],
-  3: ["14/4", "15/4", "16/4", "17/4", "18/4", "19/4", "20/4"],
-};
 
 // KNOWLEDGE_TREE moved to src/lib/knowledge-tree.ts
 
@@ -104,35 +95,35 @@ const buildGrid = (): WeekGrid => {
   const g = empty();
 
   // Tuần 1 — Số tự nhiên & Phân số (Toán 4)
-  g[1][0][1] = makeLesson("l1",  "3A", "Khái niệm phân số", "u3-khainiem");
-  g[1][1][1] = makeLesson("l2",  "3A", "Luyện tập phân số", "u3-khainiem");
-  g[1][1][2] = makeLesson("l3",  "3B", "Khái niệm phân số", "u3-khainiem");
-  g[1][2][1] = makeLesson("l4",  "3C", "Khái niệm phân số", "u3-khainiem");
-  g[1][2][3] = makeLesson("l5",  "4A", "Ôn tập số tự nhiên", "u1-sotunhien");
-  g[1][3][1] = makeLesson("l6",  "3D", "Tính chất cơ bản của phân số", "u3-tinhchat");
-  g[1][3][2] = makeLesson("l7",  "4B", "Hàng và lớp", "u1-sotunhien");
-  g[1][4][1] = makeLesson("l8",  "4A", "So sánh các số tự nhiên", "u1-sosanh");
-  g[1][4][2] = makeLesson("l9",  "4C", "Ôn tập số tự nhiên", "u1-sotunhien");
-  g[1][0][6] = makeLesson("l10", "3A", "Bài tập phân số (chiều)", "u3-khainiem");
-  g[1][2][6] = makeLesson("l11", "4B", "Luyện tập số có nhiều chữ số", "u1-sotunhien");
-  g[1][4][6] = makeLesson("l12", "3C", "Rút gọn phân số", "u3-rutgon");
+  g[30][0][1] = makeLesson("l1",  "3A", "Khái niệm phân số", "u3-khainiem");
+  g[30][1][1] = makeLesson("l2",  "3A", "Luyện tập phân số", "u3-khainiem");
+  g[30][1][2] = makeLesson("l3",  "3B", "Khái niệm phân số", "u3-khainiem");
+  g[30][2][1] = makeLesson("l4",  "3C", "Khái niệm phân số", "u3-khainiem");
+  g[30][2][3] = makeLesson("l5",  "4A", "Ôn tập số tự nhiên", "u1-sotunhien");
+  g[30][3][1] = makeLesson("l6",  "3D", "Tính chất cơ bản của phân số", "u3-tinhchat");
+  g[30][3][2] = makeLesson("l7",  "4B", "Hàng và lớp", "u1-sotunhien");
+  g[30][4][1] = makeLesson("l8",  "4A", "So sánh các số tự nhiên", "u1-sosanh");
+  g[30][4][2] = makeLesson("l9",  "4C", "Ôn tập số tự nhiên", "u1-sotunhien");
+  g[30][0][6] = makeLesson("l10", "3A", "Bài tập phân số (chiều)", "u3-khainiem");
+  g[30][2][6] = makeLesson("l11", "4B", "Luyện tập số có nhiều chữ số", "u1-sotunhien");
+  g[30][4][6] = makeLesson("l12", "3C", "Rút gọn phân số", "u3-rutgon");
 
   // Tuần 2 — Quy đồng / So sánh phân số & Làm tròn số tự nhiên
-  g[2][0][1] = makeLesson("l13", "3A", "Quy đồng mẫu số", "u3-quydong");
-  g[2][1][1] = makeLesson("l14", "3B", "Quy đồng mẫu số", "u3-quydong");
-  g[2][1][2] = makeLesson("l15", "3A", "So sánh các phân số", "u3-sosanh");
-  g[2][2][1] = makeLesson("l16", "3C", "Quy đồng mẫu số", "u3-quydong");
-  g[2][2][2] = makeLesson("l17", "4A", "Làm tròn số tự nhiên", "u1-lamtron");
-  g[2][3][1] = makeLesson("l18", "3D", "So sánh các phân số", "u3-sosanh");
-  g[2][3][2] = makeLesson("l19", "4B", "Làm tròn số tự nhiên", "u1-lamtron");
-  g[2][4][2] = makeLesson("l20", "4C", "So sánh các phân số", "u3-sosanh");
+  g[31][0][1] = makeLesson("l13", "3A", "Quy đồng mẫu số", "u3-quydong");
+  g[31][1][1] = makeLesson("l14", "3B", "Quy đồng mẫu số", "u3-quydong");
+  g[31][1][2] = makeLesson("l15", "3A", "So sánh các phân số", "u3-sosanh");
+  g[31][2][1] = makeLesson("l16", "3C", "Quy đồng mẫu số", "u3-quydong");
+  g[31][2][2] = makeLesson("l17", "4A", "Làm tròn số tự nhiên", "u1-lamtron");
+  g[31][3][1] = makeLesson("l18", "3D", "So sánh các phân số", "u3-sosanh");
+  g[31][3][2] = makeLesson("l19", "4B", "Làm tròn số tự nhiên", "u1-lamtron");
+  g[31][4][2] = makeLesson("l20", "4C", "So sánh các phân số", "u3-sosanh");
 
   // Tuần 3 — Phép tính phân số & Hình học/Đo lường
-  g[3][0][1] = makeLesson("l21", "3A", "Phép cộng phân số", "u4-cong");
-  g[3][1][1] = makeLesson("l22", "3B", "Phép trừ phân số", "u4-tru");
-  g[3][2][1] = makeLesson("l23", "4A", "Tìm số trung bình cộng", "u2-trungbinh");
-  g[3][3][2] = makeLesson("l24", "3A", "Hình bình hành", "u5-binhhanh");
-  g[3][4][2] = makeLesson("l25", "4B", "Ki-lô-mét vuông", "u6-km2");
+  g[32][0][1] = makeLesson("l21", "3A", "Phép cộng phân số", "u4-cong");
+  g[32][1][1] = makeLesson("l22", "3B", "Phép trừ phân số", "u4-tru");
+  g[32][2][1] = makeLesson("l23", "4A", "Tìm số trung bình cộng", "u2-trungbinh");
+  g[32][3][2] = makeLesson("l24", "3A", "Hình bình hành", "u5-binhhanh");
+  g[32][4][2] = makeLesson("l25", "4B", "Ki-lô-mét vuông", "u6-km2");
 
   return g;
 };
@@ -279,7 +270,7 @@ function findEveningSlot(startAt: string): { week: number; day: number } | null 
 
 function TeacherHome() {
   const [grid, setGrid] = useState<WeekGrid>(() => buildGrid());
-  const [weekIdx, setWeekIdx] = useState(1);
+  const [weekIdx, setWeekIdx] = useState(30); // Tuần 30 (cuối tháng 3) — nơi có sẵn dữ liệu demo
   const [classFilter, setClassFilter] = useState<"ALL" | ClassId>("ALL");
   const [showTree, setShowTree] = useState(false);
   const [focusUnit, setFocusUnit] = useState<string | null>(null);
