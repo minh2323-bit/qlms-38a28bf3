@@ -27,6 +27,22 @@ const SUBJECTS_LOP4 = [
   "Âm nhạc", "Mĩ thuật", "Giáo dục thể chất", "HĐ trải nghiệm",
 ];
 
+// Mỗi môn có một giáo viên phụ trách
+const TEACHERS_BY_SUBJECT: Record<string, string> = {
+  "Toán": "Cô Phùng Thuý Hằng",
+  "Tiếng Việt": "Cô Nguyễn Thị Hoa",
+  "Tiếng Anh": "Thầy Trần Minh Quân",
+  "Khoa học": "Cô Lê Thị Mai",
+  "Lịch sử & Địa lí": "Thầy Đỗ Văn Nam",
+  "Đạo đức": "Cô Bùi Thị Hạnh",
+  "Tin học": "Thầy Phạm Quốc Anh",
+  "Công nghệ": "Thầy Nguyễn Đức Long",
+  "Âm nhạc": "Cô Vũ Bích Ngọc",
+  "Mĩ thuật": "Cô Trần Thanh Thảo",
+  "Giáo dục thể chất": "Thầy Hoàng Văn Bình",
+  "HĐ trải nghiệm": "Cô Lý Thu Trang",
+};
+
 function Page() {
   const { lop } = Route.useParams();
   const navigate = useNavigate();
@@ -34,10 +50,12 @@ function Page() {
   const allLive = useLiveClasses();
   const [subject, setSubject] = useState<string>("Toán");
 
+  const teacherOfSubject = TEACHERS_BY_SUBJECT[subject] ?? "Cô Nguyễn Thị Hoa";
+
   const info = {
     name: `Lớp ${lop} Năm học 2025 - 2026`,
     code: `LH-${lop}-T2526`,
-    teacher: "Cô Nguyễn Thị Hoa",
+    teacher: teacherOfSubject,
     students: 40,
     thumb: thumbLop4A,
     description: `Lớp ${lop} của em — xem tất cả bài giảng, học liệu và thông báo từ giáo viên theo từng môn học.`,
