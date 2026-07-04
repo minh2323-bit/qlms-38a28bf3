@@ -169,12 +169,44 @@ export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
   const subtitle = isStudent ? "Học sinh · Lớp 4A" : "Giáo viên";
   const greeting = isStudent ? "Chào mừng," : "Xin chào,";
   const avatar = isStudent ? studentAvatar : teacherAvatar;
+  const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
+  const [year, setYear] = useState(YEARS[0]);
 
   return (
     <header className="h-16 bg-white border-b flex items-center justify-between px-6 shrink-0">
-      <div>
-        <p className="text-sm text-slate-500">{greeting}</p>
-        <p className="text-base font-semibold text-slate-800">{name}</p>
+      <div className="flex items-center gap-4">
+        <div>
+          <p className="text-sm text-slate-500">{greeting}</p>
+          <p className="text-base font-semibold text-slate-800">{name}</p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              title={`Năm học ${year}`}
+              className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-indigo-800 transition"
+            >
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-[10px] uppercase tracking-wide text-indigo-100 font-semibold">Năm học</span>
+                <span className="text-base font-bold">{year}</span>
+              </div>
+              <ChevronDown className="h-5 w-5 text-indigo-100 group-hover:translate-y-0.5 transition" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuLabel className="text-xs text-slate-500">Chọn năm học</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {YEARS.map((y) => (
+              <DropdownMenuItem
+                key={y}
+                onSelect={() => setYear(y)}
+                className={`cursor-pointer text-sm ${y === year ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
+              >
+                Năm học {y}
+                {y !== YEARS[0] && <span className="ml-auto text-[10px] text-slate-400">Xem lại</span>}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="flex items-center gap-4">
         <button className="relative p-2 rounded-full hover:bg-slate-100">
