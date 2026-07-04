@@ -321,34 +321,35 @@ function LearningActivitySection() {
 
         <div
           ref={scrollerRef}
-          className="flex gap-3 overflow-x-auto pb-2 px-8 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full"
+          className="flex gap-5 overflow-x-auto pb-2 px-8 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full"
         >
           {sorted.map((l) => {
             const src = SOURCE_META[l.source];
             return (
               <article
                 key={l.id}
-                className="snap-start shrink-0 w-[248px] rounded-xl border border-slate-200 bg-white overflow-hidden hover:shadow-md hover:border-indigo-300 transition"
+                className="snap-start shrink-0 w-[calc((100%-8rem)/5)] min-w-[220px] rounded-xl border border-slate-200 bg-white overflow-hidden hover:shadow-md hover:border-indigo-300 transition"
               >
                 <div className="relative">
-                  <img src={l.thumb} alt={l.title} loading="lazy" className="h-28 w-full object-cover" />
+                  <img src={l.thumb} alt={l.title} loading="lazy" className="h-32 w-full object-cover" />
                   <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow ${src.cls}`}>
                     {src.label}
                   </span>
-                  <span className="absolute bottom-2 right-2 bg-white rounded-full p-0.5 shadow ring-1 ring-slate-200">
-                    <ProgressRing value={l.progress} size={40} stroke={3.5} />
-                  </span>
                 </div>
-                <div className="p-3 space-y-1">
-                  <h4 className="font-bold text-[14px] text-slate-800 leading-snug line-clamp-2 min-h-[36px]">{l.title}</h4>
-                  <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">Môn:</span> {l.subject}</p>
-                  <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">GV:</span> {l.teacher}</p>
-                  <p className="text-[13px] text-slate-500"><span className="font-bold text-slate-700">Xem gần nhất:</span> {l.lastViewed}</p>
+                <div className="p-3.5 flex items-start gap-3">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <h4 className="font-bold text-[14px] text-slate-800 leading-snug line-clamp-2 min-h-[36px]">{l.title}</h4>
+                    <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">Môn:</span> {l.subject}</p>
+                    <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">GV:</span> {l.teacher}</p>
+                    <p className="text-[13px] text-slate-500"><span className="font-bold text-slate-700">Xem gần nhất:</span> {l.lastViewed}</p>
+                  </div>
+                  <ProgressRing value={l.progress} size={44} stroke={4} className="shrink-0 mt-0.5" />
                 </div>
               </article>
             );
           })}
         </div>
+
       </div>
     </section>
   );
