@@ -836,15 +836,15 @@ function ScheduleGrid({
         {l && (
           <button
             onClick={() => onPickLesson(l.id)}
-            className={`w-full text-left p-2 rounded-md text-sm leading-snug transition ${
+            className={`w-full text-left p-2 rounded-md text-[13px] leading-snug transition ${
               CLASS_COLORS[l.class]
             } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
               isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
             }`}
           >
-            <div className="font-bold text-sm">{l.class}</div>
+            <div className="font-bold text-[13px]">{l.class}</div>
             <div className="text-[13px] opacity-80">Toán</div>
-            <div className="truncate font-medium text-sm">
+            <div className="truncate font-medium text-[13px]">
               <span className="opacity-70">Nội dung:</span> {l.topic}
             </div>
           </button>
@@ -853,9 +853,9 @@ function ScheduleGrid({
           <button
             onClick={(e) => { e.stopPropagation(); onPickLive(live); }}
             title={live.name}
-            className={`mt-1 w-full inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition`}
+            className={`mt-1 w-full inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[13px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition`}
           >
-            <Video className="h-3 w-3 shrink-0" />
+            <Video className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">{formatTimeRange(live.startAt, live.endAt)}</span>
           </button>
         )}
@@ -934,9 +934,9 @@ function ScheduleGrid({
                             key={lc.id}
                             onClick={() => onPickLive(lc)}
                             title={lc.name}
-                            className="w-full text-left inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
+                            className="w-full text-left inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[13px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
                           >
-                            <Video className="h-3 w-3 shrink-0" />
+                            <Video className="h-3.5 w-3.5 shrink-0" />
                             <span className="truncate">{formatTimeRange(lc.startAt, lc.endAt)}</span>
                           </button>
                         ))}
