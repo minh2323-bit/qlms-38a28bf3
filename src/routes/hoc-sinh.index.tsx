@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ClipboardList, Video, CheckCircle2, ChevronLeft, ChevronRight, CalendarClock,
   ChevronDown, Sun, Moon, X, BookOpen, Presentation, FileText, ListChecks,
   StickyNote, Bell, ArrowRight, AlertCircle, Crown, Trophy, Play,
+  Activity, GraduationCap, Layers, Star,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,14 @@ import {
 import { useMaterials, type MaterialKind } from "@/lib/teaching-store";
 import { useLiveClasses, isEvening, formatTimeRange } from "@/lib/live-class-store";
 import { WEEKS as SCHOOL_WEEKS } from "@/lib/school-weeks";
+import { ProgressRing } from "@/components/ProgressRing";
+import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
+import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
+import thumbHinhHoc from "@/assets/thumb-hinh-hoc.jpg";
+import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
+import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
+import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
+import thumbOnThiHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
 
 
 export const Route = createFileRoute("/hoc-sinh/")({
