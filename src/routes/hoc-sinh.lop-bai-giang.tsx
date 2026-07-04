@@ -261,12 +261,12 @@ function Page() {
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
                         <div className="relative">
                           <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
-                          <span className="absolute bottom-2 right-2 bg-white rounded-full p-0.5 shadow ring-1 ring-slate-200">
-                            <ProgressRing value={l.progress ?? 0} size={40} stroke={3.5} />
-                          </span>
                         </div>
                         <div className="p-3.5 flex flex-col flex-1">
-                          <h3 className="font-bold text-slate-800 text-[15px] leading-snug">{l.title}</h3>
+                          <div className="flex items-start gap-3">
+                            <h3 className="font-bold text-slate-800 text-[15px] leading-snug flex-1">{l.title}</h3>
+                            <ProgressRing value={l.progress ?? 0} size={44} stroke={4} className="shrink-0" />
+                          </div>
                           <div className="mt-2 space-y-1 text-[13px] text-slate-700">
                             <div className="flex gap-4">
                               <div><span className="font-bold text-slate-700">Khối:</span> <span>{l.khoi}</span></div>
@@ -285,6 +285,7 @@ function Page() {
                               ))}
                             </div>
                           </div>
+
 
                           <div className="mt-4">
                             {auto ? (
