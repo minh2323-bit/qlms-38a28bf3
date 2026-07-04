@@ -192,20 +192,20 @@ function Page() {
               {filtered.length === 0 ? (
                 <p className="text-sm text-slate-500 italic">Không tìm thấy lớp học nào khớp bộ lọc.</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filtered.map((cl) => {
                     const meta = STATUS_META[cl.status];
                     const inner = (
                       <>
-                        <img src={cl.thumb} alt={cl.name} className="h-36 w-full object-cover" loading="lazy" />
-                        <div className="p-4 space-y-1">
+                        <img src={cl.thumb} alt={cl.name} className="h-32 w-full object-cover" loading="lazy" />
+                        <div className="p-3.5 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-slate-800">{cl.name}</h3>
+                            <h3 className="font-bold text-slate-800 text-[15px]">{cl.name}</h3>
                             <Badge className={meta.cls}>{meta.label}</Badge>
                           </div>
-                          <p className="text-xs text-slate-500">Mã lớp: <span className="font-mono">{cl.code}</span></p>
-                          <p className="text-xs text-slate-500">{cl.year}</p>
-                          <p className="text-sm text-slate-600 mt-1">{cl.description}</p>
+                          <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">Mã lớp:</span> <span className="font-mono">{cl.code}</span></p>
+                          <p className="text-[13px] text-slate-600">{cl.year}</p>
+                          <p className="text-xs text-slate-500 mt-1 leading-snug">{cl.description}</p>
                         </div>
                       </>
                     );
