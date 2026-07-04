@@ -129,7 +129,7 @@ function Page() {
   const filteredLectures = useMemo(() => {
     return LECTURES.filter((l) => {
       if (bgSubject !== "Tất cả" && l.subject !== bgSubject) return false;
-      if (bgType !== "Tất cả" && l.loai !== bgType) return false;
+      if (bgType !== "Tất cả" && !l.loai.includes(bgType as LectureType)) return false;
       return true;
     });
   }, [bgSubject, bgType]);
