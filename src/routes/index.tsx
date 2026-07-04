@@ -37,7 +37,7 @@ import {
   type LiveClass,
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
-import { WEEKS, DAY_DATES, getCurrentWeekIdx } from "@/lib/school-weeks";
+import { WEEKS, DAY_DATES } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/")({
