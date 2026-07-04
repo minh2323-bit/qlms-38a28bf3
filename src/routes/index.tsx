@@ -533,7 +533,23 @@ function DashboardSection() {
             </div>
           </button>
 
-          {/* 2. Merged: Bài giảng/Học liệu đã tạo + sử dụng tuần này */}
+          {/* 2. Học sinh chưa nộp bài */}
+          <button
+            type="button"
+            onClick={() => setOpenPending(true)}
+            className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
+          >
+            <span className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
+            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
+              <Users className="h-5 w-5 text-amber-600" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-2xl font-black leading-none text-amber-600">10</div>
+              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Học sinh chưa nộp bài</div>
+            </div>
+          </button>
+
+          {/* 3. Merged: Bài giảng/Học liệu đã tạo + sử dụng tuần này */}
           <div className="relative rounded-xl border border-slate-200 overflow-hidden lg:col-span-3 grid grid-cols-2 divide-x divide-slate-200">
             <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
             <div className="flex items-center gap-2.5 p-2.5">
@@ -562,21 +578,6 @@ function DashboardSection() {
             </div>
           </div>
 
-          {/* 3. Học sinh chưa nộp bài */}
-          <button
-            type="button"
-            onClick={() => setOpenPending(true)}
-            className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
-          >
-            <span className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
-            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
-              <Users className="h-5 w-5 text-amber-600" />
-            </span>
-            <div className="min-w-0">
-              <div className="text-2xl font-black leading-none text-amber-600">10</div>
-              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Học sinh chưa nộp bài</div>
-            </div>
-          </button>
 
           {/* 4. Bài kiểm tra chưa chấm */}
           <div className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden">
