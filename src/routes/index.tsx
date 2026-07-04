@@ -270,7 +270,7 @@ function findEveningSlot(startAt: string): { week: number; day: number } | null 
 
 function TeacherHome() {
   const [grid, setGrid] = useState<WeekGrid>(() => buildGrid());
-  const [weekIdx, setWeekIdx] = useState(() => getCurrentWeekIdx());
+  const [weekIdx, setWeekIdx] = useState(30); // Tuần 30 (cuối tháng 3) — nơi có sẵn dữ liệu demo
   const [classFilter, setClassFilter] = useState<"ALL" | ClassId>("ALL");
   const [showTree, setShowTree] = useState(false);
   const [focusUnit, setFocusUnit] = useState<string | null>(null);
