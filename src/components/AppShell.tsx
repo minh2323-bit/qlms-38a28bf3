@@ -113,8 +113,6 @@ const STUDENT_NAV: NavItem[] = [
 export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const NAV = role === "student" ? STUDENT_NAV : TEACHER_NAV;
-  const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
-  const [year, setYear] = useState(YEARS[0]);
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
       <div className="w-16 h-16 flex items-center justify-center mb-1">
