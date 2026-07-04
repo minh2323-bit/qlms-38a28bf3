@@ -168,12 +168,42 @@ function StudentHome() {
         <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-slate-800">Thời khóa biểu</h2>
           <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronLeft className="h-4 w-4" /></Button>
-            <CalendarClock className="h-4 w-4 text-slate-500" />
-            <span className="text-sm font-medium px-2">Tuần 2 · 11/4 – 17/4/2026</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronRight className="h-4 w-4" /></Button>
+            <Button
+              variant="ghost" size="icon" className="h-7 w-7"
+              onClick={() => setWeekIdx((v) => Math.max(1, v - 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-slate-100 transition">
+                  <CalendarClock className="h-4 w-4 text-slate-500" />
+                  <span className="text-sm font-medium">{currentWeek.label} · {currentWeek.range}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64 max-h-80 overflow-y-auto">
+                {SCHOOL_WEEKS.map((w) => (
+                  <DropdownMenuItem
+                    key={w.idx}
+                    onClick={() => setWeekIdx(w.idx)}
+                    className={`flex items-center justify-between gap-2 cursor-pointer ${w.idx === weekIdx ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
+                  >
+                    <span>{w.label}</span>
+                    <span className="text-xs text-slate-500">{w.range}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              variant="ghost" size="icon" className="h-7 w-7"
+              onClick={() => setWeekIdx((v) => Math.min(SCHOOL_WEEKS.length, v + 1))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+
 
         <div className="flex">
           <div className="flex-1 min-w-0 p-4 overflow-x-auto">
