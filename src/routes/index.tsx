@@ -934,9 +934,9 @@ function ScheduleGrid({
                             key={lc.id}
                             onClick={() => onPickLive(lc)}
                             title={lc.name}
-                            className="w-full text-left inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
+                            className="w-full text-left inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[13px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
                           >
-                            <Video className="h-3 w-3 shrink-0" />
+                            <Video className="h-3.5 w-3.5 shrink-0" />
                             <span className="truncate">{formatTimeRange(lc.startAt, lc.endAt)}</span>
                           </button>
                         ))}
