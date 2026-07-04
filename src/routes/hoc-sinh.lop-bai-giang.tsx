@@ -48,7 +48,7 @@ const CLASSES: ClassCard[] = [
     id: "BT-TOAN",
     name: "Lớp bổ túc Toán",
     code: "LH-BT-TOAN-2526",
-    status: "dang-trien-khai",
+    status: "da-khoa",
     year: "Năm học 2025 – 2026",
     description: "Lớp bổ túc kiến thức Toán cơ bản dành cho học sinh cần củng cố nền tảng.",
     thumb: thumbBoTucToan,
@@ -57,7 +57,7 @@ const CLASSES: ClassCard[] = [
     id: "HSG-ANH",
     name: "Lớp ôn thi HSG Tiếng Anh",
     code: "LH-HSG-ANH-2526",
-    status: "dang-trien-khai",
+    status: "dang-hoc",
     year: "Năm học 2025 – 2026",
     description: "Lớp bồi dưỡng học sinh giỏi Tiếng Anh, luyện đề và mở rộng nâng cao.",
     thumb: thumbOnThiHsgAnh,
@@ -70,34 +70,41 @@ const STATUS_META: Record<ClassStatus, { label: string; cls: string }> = {
   "da-khoa":          { label: "Đã khoá",        cls: "bg-slate-200 text-slate-600 hover:bg-slate-200" },
 };
 
-type LectureType = "Bài giảng điện tử" | "Video" | "Tài liệu";
+type LectureType = "Bài giảng điện tử" | "Video" | "Tài liệu" | "Slide" | "Bài tập";
 type Lecture = {
   id: string;
   title: string;
   khoi: string;
   subject: string;
   author: string;
-  classes: string;
   releaseDate: string;
-  loai: LectureType;
+  loai: LectureType[];
   thumb: string;
   autoEnrolled?: boolean;
 };
 
 const LECTURES: Lecture[] = [
-  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C", releaseDate: "15/09/2025", loai: "Bài giảng điện tử", thumb: thumbPhanSo, autoEnrolled: true },
-  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C", releaseDate: "22/09/2025", loai: "Bài giảng điện tử", thumb: thumbSoThapPhan, autoEnrolled: true },
-  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", classes: "Mở cho toàn khối 4", releaseDate: "05/10/2025", loai: "Video", thumb: thumbHinhHoc },
-  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B", releaseDate: "12/10/2025", loai: "Tài liệu", thumb: thumbDoLuong, autoEnrolled: true },
-  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", classes: "Đăng ký tự do", releaseDate: "19/10/2025", loai: "Bài giảng điện tử", thumb: thumbPhanTram },
-  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C; 4D", releaseDate: "28/10/2025", loai: "Bài giảng điện tử", thumb: thumbSoTuNhien, autoEnrolled: true },
-  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", classes: "4A; 4B", releaseDate: "03/11/2025", loai: "Tài liệu", thumb: thumb4A, autoEnrolled: true },
-  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", classes: "Đăng ký tự do", releaseDate: "10/11/2025", loai: "Video", thumb: thumbOnThiHsgAnh },
-  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "Đăng ký tự do", releaseDate: "15/11/2025", loai: "Bài giảng điện tử", thumb: thumbBoTucToan },
+  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/09/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbPhanSo, autoEnrolled: true },
+  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "22/09/2025", loai: ["Bài giảng điện tử", "Slide"], thumb: thumbSoThapPhan, autoEnrolled: true },
+  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", releaseDate: "05/10/2025", loai: ["Video"], thumb: thumbHinhHoc },
+  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "12/10/2025", loai: ["Tài liệu", "Bài tập"], thumb: thumbDoLuong, autoEnrolled: true },
+  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", releaseDate: "19/10/2025", loai: ["Bài giảng điện tử", "Video"], thumb: thumbPhanTram },
+  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "28/10/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbSoTuNhien, autoEnrolled: true },
+  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", releaseDate: "03/11/2025", loai: ["Tài liệu"], thumb: thumb4A, autoEnrolled: true },
+  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", releaseDate: "10/11/2025", loai: ["Video", "Bài tập"], thumb: thumbOnThiHsgAnh },
+  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/11/2025", loai: ["Bài giảng điện tử", "Tài liệu"], thumb: thumbBoTucToan },
 ];
 
 const SUBJECT_OPTIONS = ["Tất cả", "Toán", "Tiếng Việt", "Tiếng Anh"] as const;
-const TYPE_OPTIONS = ["Tất cả", "Bài giảng điện tử", "Video", "Tài liệu"] as const;
+const TYPE_OPTIONS = ["Tất cả", "Bài giảng điện tử", "Video", "Tài liệu", "Slide", "Bài tập"] as const;
+
+const TYPE_TAG_STYLES: Record<LectureType, string> = {
+  "Bài giảng điện tử": "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "Video":             "bg-rose-100 text-rose-700 border-rose-200",
+  "Tài liệu":          "bg-amber-100 text-amber-700 border-amber-200",
+  "Slide":             "bg-sky-100 text-sky-700 border-sky-200",
+  "Bài tập":           "bg-emerald-100 text-emerald-700 border-emerald-200",
+};
 
 function Page() {
   const [tab, setTab] = useState<"lop" | "baigiang">("lop");
@@ -122,7 +129,7 @@ function Page() {
   const filteredLectures = useMemo(() => {
     return LECTURES.filter((l) => {
       if (bgSubject !== "Tất cả" && l.subject !== bgSubject) return false;
-      if (bgType !== "Tất cả" && l.loai !== bgType) return false;
+      if (bgType !== "Tất cả" && !l.loai.includes(bgType as LectureType)) return false;
       return true;
     });
   }, [bgSubject, bgType]);
@@ -185,20 +192,20 @@ function Page() {
               {filtered.length === 0 ? (
                 <p className="text-sm text-slate-500 italic">Không tìm thấy lớp học nào khớp bộ lọc.</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filtered.map((cl) => {
                     const meta = STATUS_META[cl.status];
                     const inner = (
                       <>
-                        <img src={cl.thumb} alt={cl.name} className="h-36 w-full object-cover" loading="lazy" />
-                        <div className="p-4 space-y-1">
+                        <img src={cl.thumb} alt={cl.name} className="h-32 w-full object-cover" loading="lazy" />
+                        <div className="p-3.5 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-slate-800">{cl.name}</h3>
+                            <h3 className="font-bold text-slate-800 text-[15px]">{cl.name}</h3>
                             <Badge className={meta.cls}>{meta.label}</Badge>
                           </div>
-                          <p className="text-xs text-slate-500">Mã lớp: <span className="font-mono">{cl.code}</span></p>
-                          <p className="text-xs text-slate-500">{cl.year}</p>
-                          <p className="text-sm text-slate-600 mt-1">{cl.description}</p>
+                          <p className="text-[13px] text-slate-600"><span className="font-bold text-slate-700">Mã lớp:</span> <span className="font-mono">{cl.code}</span></p>
+                          <p className="text-[13px] text-slate-600">{cl.year}</p>
+                          <p className="text-xs text-slate-500 mt-1 leading-snug">{cl.description}</p>
                         </div>
                       </>
                     );
@@ -236,7 +243,7 @@ function Page() {
                   onChange={setBgType}
                   options={TYPE_OPTIONS as unknown as string[]}
                 />
-                <span className="text-xs text-slate-500 ml-auto">
+                <span className="text-base font-bold text-indigo-700 ml-auto bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
                   {filteredLectures.length} bài giảng
                 </span>
               </div>
@@ -244,29 +251,39 @@ function Page() {
               {filteredLectures.length === 0 ? (
                 <p className="text-sm text-slate-500 italic">Không có bài giảng phù hợp.</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filteredLectures.map((l) => {
                     const isEnrolled = enrolled.has(l.id);
                     const auto = !!l.autoEnrolled;
                     return (
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
-                        <img src={l.thumb} alt={l.title} className="h-36 w-full object-cover" loading="lazy" />
-                        <div className="p-4 flex flex-col flex-1">
+                        <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
+                        <div className="p-3.5 flex flex-col flex-1">
                           <h3 className="font-bold text-slate-800 text-[15px] leading-snug">{l.title}</h3>
-                          <div className="mt-2 grid grid-cols-2 gap-y-1 text-xs text-slate-600">
-                            <div><span className="text-slate-500">Khối:</span> <b className="text-slate-800">{l.khoi}</b></div>
-                            <div><span className="text-slate-500">Môn:</span> <b className="text-slate-800">{l.subject}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">GV:</span> <b className="text-slate-800">{l.author}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">Danh sách lớp gán:</span> <b className="text-slate-800">{l.classes}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">Loại:</span> <b className="text-slate-800">{l.loai}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">Ngày phát hành:</span> <b className="text-slate-800">{l.releaseDate}</b></div>
+                          <div className="mt-2 space-y-1 text-[13px] text-slate-700">
+                            <div className="flex gap-4">
+                              <div><span className="font-bold text-slate-700">Khối:</span> <span>{l.khoi}</span></div>
+                              <div><span className="font-bold text-slate-700">Môn:</span> <span>{l.subject}</span></div>
+                            </div>
+                            <div><span className="font-bold text-slate-700">GV:</span> <span>{l.author}</span></div>
+                            <div><span className="font-bold text-slate-700">Ngày phát hành:</span> <span>{l.releaseDate}</span></div>
+                            <div className="pt-1 flex flex-wrap gap-1.5">
+                              {l.loai.map((t) => (
+                                <span
+                                  key={t}
+                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${TYPE_TAG_STYLES[t]}`}
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
                           </div>
 
                           <div className="mt-4">
                             {auto ? (
                               <button
                                 disabled
-                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-100 text-slate-500 text-sm font-semibold cursor-not-allowed border border-slate-200"
+                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-100 text-slate-500 text-[13px] font-semibold cursor-not-allowed border border-slate-200"
                               >
                                 <CheckCircle2 className="h-4 w-4" /> Giáo viên tự động ghi danh
                               </button>
