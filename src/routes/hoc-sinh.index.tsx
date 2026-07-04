@@ -2,15 +2,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   ClipboardList, Video, CheckCircle2, ChevronLeft, ChevronRight, CalendarClock,
-  Sun, Moon, X, BookOpen, Presentation, FileText, ListChecks,
+  ChevronDown, Sun, Moon, X, BookOpen, Presentation, FileText, ListChecks,
   StickyNote, Bell, ArrowRight, AlertCircle, Crown, Trophy, Play,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useMaterials, type MaterialKind } from "@/lib/teaching-store";
 import { useLiveClasses, isEvening, formatTimeRange } from "@/lib/live-class-store";
+import { WEEKS as SCHOOL_WEEKS } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/hoc-sinh/")({
