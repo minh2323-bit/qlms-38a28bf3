@@ -27,6 +27,22 @@ const SUBJECTS_LOP4 = [
   "Âm nhạc", "Mĩ thuật", "Giáo dục thể chất", "HĐ trải nghiệm",
 ];
 
+// Mỗi môn có một giáo viên phụ trách
+const TEACHERS_BY_SUBJECT: Record<string, string> = {
+  "Toán": "Cô Phùng Thuý Hằng",
+  "Tiếng Việt": "Cô Nguyễn Thị Hoa",
+  "Tiếng Anh": "Thầy Trần Minh Quân",
+  "Khoa học": "Cô Lê Thị Mai",
+  "Lịch sử & Địa lí": "Thầy Đỗ Văn Nam",
+  "Đạo đức": "Cô Bùi Thị Hạnh",
+  "Tin học": "Thầy Phạm Quốc Anh",
+  "Công nghệ": "Thầy Nguyễn Đức Long",
+  "Âm nhạc": "Cô Vũ Bích Ngọc",
+  "Mĩ thuật": "Cô Trần Thanh Thảo",
+  "Giáo dục thể chất": "Thầy Hoàng Văn Bình",
+  "HĐ trải nghiệm": "Cô Lý Thu Trang",
+};
+
 function Page() {
   const { lop } = Route.useParams();
   const navigate = useNavigate();
@@ -34,10 +50,12 @@ function Page() {
   const allLive = useLiveClasses();
   const [subject, setSubject] = useState<string>("Toán");
 
+  const teacherOfSubject = TEACHERS_BY_SUBJECT[subject] ?? "Cô Nguyễn Thị Hoa";
+
   const info = {
     name: `Lớp ${lop} Năm học 2025 - 2026`,
     code: `LH-${lop}-T2526`,
-    teacher: "Cô Nguyễn Thị Hoa",
+    teacher: teacherOfSubject,
     students: 40,
     thumb: thumbLop4A,
     description: `Lớp ${lop} của em — xem tất cả bài giảng, học liệu và thông báo từ giáo viên theo từng môn học.`,
@@ -145,20 +163,25 @@ function Page() {
         </div>
       </section>
 
-      {/* Materials of selected subject */}
+      {/* 1. Thông báo */}
+      <AnnouncementSection
+        classRealId={lop}
+        subject={subject}
+        teacherName={info.teacher}
+      />
+
+      {/* 2. Nội dung học liệu môn học */}
       <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Nội dung môn {subject}</h2>
             <p className="text-sm text-slate-500 mt-0.5">
-              {totals.lessons} chương/chủ đề • {totals.items} học liệu
+              {totals.lessons} chương/chủ đề • {totals.items} học liệu • GV: <span className="font-semibold text-slate-700">{info.teacher}</span>
             </p>
           </div>
         </div>
 
         <div className="mt-5 space-y-3">
-          {classLive.length > 0 && <LiveClassesSection items={classLive} />}
-
           {groups.map((g) => (
             <div key={g.unitId} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
               <button
@@ -199,28 +222,30 @@ function Page() {
             </div>
           ))}
 
-          {groups.length === 0 && classLive.length === 0 && (
+          {groups.length === 0 && (
             <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
               Giáo viên chưa cập nhật học liệu cho môn <b>{subject}</b>.
             </div>
           )}
         </div>
-
-        <div className="mt-4">
-          <Link
-            to="/hoc-sinh/lop-bai-giang"
-            className="text-sm font-medium text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1"
-          >
-            <ArrowLeft className="h-4 w-4" /> Quay lại danh sách lớp
-          </Link>
-        </div>
       </section>
 
-      <AnnouncementSection
-        classRealId={lop}
-        subject={subject}
-        teacherName={info.teacher}
-      />
+      {/* 3. Lớp học trực tuyến */}
+      {classLive.length > 0 && (
+        <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+          <h2 className="text-lg font-bold text-slate-800 mb-4">Lớp học trực tuyến — {subject}</h2>
+          <LiveClassesSection items={classLive} />
+        </section>
+      )}
+
+      <div className="mt-6">
+        <Link
+          to="/hoc-sinh/lop-bai-giang"
+          className="text-sm font-medium text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1"
+        >
+          <ArrowLeft className="h-4 w-4" /> Quay lại danh sách lớp
+        </Link>
+      </div>
     </AppShell>
   );
 }
