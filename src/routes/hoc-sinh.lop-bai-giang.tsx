@@ -243,7 +243,7 @@ function Page() {
                   onChange={setBgType}
                   options={TYPE_OPTIONS as unknown as string[]}
                 />
-                <span className="text-xs text-slate-500 ml-auto">
+                <span className="text-base font-bold text-indigo-700 ml-auto bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
                   {filteredLectures.length} bài giảng
                 </span>
               </div>
@@ -251,29 +251,39 @@ function Page() {
               {filteredLectures.length === 0 ? (
                 <p className="text-sm text-slate-500 italic">Không có bài giảng phù hợp.</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filteredLectures.map((l) => {
                     const isEnrolled = enrolled.has(l.id);
                     const auto = !!l.autoEnrolled;
                     return (
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
-                        <img src={l.thumb} alt={l.title} className="h-36 w-full object-cover" loading="lazy" />
-                        <div className="p-4 flex flex-col flex-1">
+                        <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
+                        <div className="p-3.5 flex flex-col flex-1">
                           <h3 className="font-bold text-slate-800 text-[15px] leading-snug">{l.title}</h3>
-                          <div className="mt-2 grid grid-cols-2 gap-y-1 text-xs text-slate-600">
-                            <div><span className="text-slate-500">Khối:</span> <b className="text-slate-800">{l.khoi}</b></div>
-                            <div><span className="text-slate-500">Môn:</span> <b className="text-slate-800">{l.subject}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">GV:</span> <b className="text-slate-800">{l.author}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">Danh sách lớp gán:</span> <b className="text-slate-800">{l.classes}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">Loại:</span> <b className="text-slate-800">{l.loai}</b></div>
-                            <div className="col-span-2"><span className="text-slate-500">Ngày phát hành:</span> <b className="text-slate-800">{l.releaseDate}</b></div>
+                          <div className="mt-2 space-y-1 text-[13px] text-slate-700">
+                            <div className="flex gap-4">
+                              <div><span className="font-bold text-slate-700">Khối:</span> <span>{l.khoi}</span></div>
+                              <div><span className="font-bold text-slate-700">Môn:</span> <span>{l.subject}</span></div>
+                            </div>
+                            <div><span className="font-bold text-slate-700">GV:</span> <span>{l.author}</span></div>
+                            <div><span className="font-bold text-slate-700">Ngày phát hành:</span> <span>{l.releaseDate}</span></div>
+                            <div className="pt-1 flex flex-wrap gap-1.5">
+                              {l.loai.map((t) => (
+                                <span
+                                  key={t}
+                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${TYPE_TAG_STYLES[t]}`}
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
                           </div>
 
                           <div className="mt-4">
                             {auto ? (
                               <button
                                 disabled
-                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-100 text-slate-500 text-sm font-semibold cursor-not-allowed border border-slate-200"
+                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-100 text-slate-500 text-[13px] font-semibold cursor-not-allowed border border-slate-200"
                               >
                                 <CheckCircle2 className="h-4 w-4" /> Giáo viên tự động ghi danh
                               </button>
