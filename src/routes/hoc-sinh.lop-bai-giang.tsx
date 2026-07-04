@@ -1,12 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useMemo, useState } from "react";
-import { BookMarked, Presentation, FileText, Video, ListChecks, Search, Hash } from "lucide-react";
-import { useMaterials } from "@/lib/teaching-store";
+import { BookMarked, Search, Hash, ChevronDown, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import thumb4A from "@/assets/thumb-lop-4a.jpg";
 import thumbBoTucToan from "@/assets/thumb-bo-tuc-toan.jpg";
 import thumbOnThiHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
+import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
+import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
+import thumbHinhHoc from "@/assets/thumb-hinh-hoc.jpg";
+import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
+import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
+import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
 
 export const Route = createFileRoute("/hoc-sinh/lop-bai-giang")({
   head: () => ({ meta: [{ title: "Lớp học & Bài giảng – Học sinh" }] }),
