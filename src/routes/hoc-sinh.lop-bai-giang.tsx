@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { useMemo, useState } from "react";
 import { BookMarked, Search, Hash, ChevronDown, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ProgressRing } from "@/components/ProgressRing";
 import thumb4A from "@/assets/thumb-lop-4a.jpg";
 import thumbBoTucToan from "@/assets/thumb-bo-tuc-toan.jpg";
 import thumbOnThiHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
@@ -81,18 +82,19 @@ type Lecture = {
   loai: LectureType[];
   thumb: string;
   autoEnrolled?: boolean;
+  progress?: number; // 0..100
 };
 
 const LECTURES: Lecture[] = [
-  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/09/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbPhanSo, autoEnrolled: true },
-  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "22/09/2025", loai: ["Bài giảng điện tử", "Slide"], thumb: thumbSoThapPhan, autoEnrolled: true },
-  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", releaseDate: "05/10/2025", loai: ["Video"], thumb: thumbHinhHoc },
-  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "12/10/2025", loai: ["Tài liệu", "Bài tập"], thumb: thumbDoLuong, autoEnrolled: true },
-  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", releaseDate: "19/10/2025", loai: ["Bài giảng điện tử", "Video"], thumb: thumbPhanTram },
-  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "28/10/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbSoTuNhien, autoEnrolled: true },
-  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", releaseDate: "03/11/2025", loai: ["Tài liệu"], thumb: thumb4A, autoEnrolled: true },
-  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", releaseDate: "10/11/2025", loai: ["Video", "Bài tập"], thumb: thumbOnThiHsgAnh },
-  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/11/2025", loai: ["Bài giảng điện tử", "Tài liệu"], thumb: thumbBoTucToan },
+  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/09/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbPhanSo, autoEnrolled: true, progress: 45 },
+  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "22/09/2025", loai: ["Bài giảng điện tử", "Slide"], thumb: thumbSoThapPhan, autoEnrolled: true, progress: 72 },
+  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", releaseDate: "05/10/2025", loai: ["Video"], thumb: thumbHinhHoc, progress: 30 },
+  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "12/10/2025", loai: ["Tài liệu", "Bài tập"], thumb: thumbDoLuong, autoEnrolled: true, progress: 60 },
+  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", releaseDate: "19/10/2025", loai: ["Bài giảng điện tử", "Video"], thumb: thumbPhanTram, progress: 15 },
+  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "28/10/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbSoTuNhien, autoEnrolled: true, progress: 88 },
+  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", releaseDate: "03/11/2025", loai: ["Tài liệu"], thumb: thumb4A, autoEnrolled: true, progress: 0 },
+  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", releaseDate: "10/11/2025", loai: ["Video", "Bài tập"], thumb: thumbOnThiHsgAnh, progress: 20 },
+  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/11/2025", loai: ["Bài giảng điện tử", "Tài liệu"], thumb: thumbBoTucToan, progress: 0 },
 ];
 
 const SUBJECT_OPTIONS = ["Tất cả", "Toán", "Tiếng Việt", "Tiếng Anh"] as const;
@@ -257,7 +259,12 @@ function Page() {
                     const auto = !!l.autoEnrolled;
                     return (
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
-                        <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
+                        <div className="relative">
+                          <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
+                          <span className="absolute top-2 right-2 bg-white rounded-full p-0.5 shadow">
+                            <ProgressRing value={l.progress ?? 0} size={40} stroke={3.5} />
+                          </span>
+                        </div>
                         <div className="p-3.5 flex flex-col flex-1">
                           <h3 className="font-bold text-slate-800 text-[15px] leading-snug">{l.title}</h3>
                           <div className="mt-2 space-y-1 text-[13px] text-slate-700">

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ClipboardList, Video, CheckCircle2, ChevronLeft, ChevronRight, CalendarClock,
   ChevronDown, Sun, Moon, X, BookOpen, Presentation, FileText, ListChecks,
   StickyNote, Bell, ArrowRight, AlertCircle, Crown, Trophy, Play,
+  Activity, GraduationCap, Layers, Star,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,14 @@ import {
 import { useMaterials, type MaterialKind } from "@/lib/teaching-store";
 import { useLiveClasses, isEvening, formatTimeRange } from "@/lib/live-class-store";
 import { WEEKS as SCHOOL_WEEKS } from "@/lib/school-weeks";
+import { ProgressRing } from "@/components/ProgressRing";
+import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
+import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
+import thumbHinhHoc from "@/assets/thumb-hinh-hoc.jpg";
+import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
+import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
+import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
+import thumbOnThiHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
 
 
 export const Route = createFileRoute("/hoc-sinh/")({
@@ -224,8 +233,134 @@ function StudentHome() {
         </div>
       </section>
 
+      <LearningActivitySection />
+
       <TasksDialog open={tasksOpen} onOpenChange={setTasksOpen} />
     </AppShell>
+  );
+}
+
+/* ---------------- Hoạt động học tập ---------------- */
+type LectureSource = "gv-giao" | "hoc-lieu-tang-cuong";
+type RecentLecture = {
+  id: string;
+  title: string;
+  subject: string;
+  teacher: string;
+  lastViewed: string; // display string
+  progress: number; // 0..100
+  thumb: string;
+  source: LectureSource;
+  order: number; // for sorting (smaller = more recent)
+};
+
+const RECENT_LECTURES: RecentLecture[] = [
+  { id: "r1", title: "Số thập phân và phép so sánh", subject: "Toán", teacher: "Cô Phùng Thuý Hằng", lastViewed: "Hôm nay, 09:15", progress: 72, thumb: thumbSoThapPhan, source: "gv-giao", order: 1 },
+  { id: "r2", title: "Học về phân số", subject: "Toán", teacher: "Cô Phùng Thuý Hằng", lastViewed: "Hôm qua, 20:40", progress: 45, thumb: thumbPhanSo, source: "gv-giao", order: 2 },
+  { id: "r3", title: "Hình học trực quan", subject: "Toán", teacher: "Thầy Nguyễn Văn A", lastViewed: "Hôm qua, 15:22", progress: 30, thumb: thumbHinhHoc, source: "hoc-lieu-tang-cuong", order: 3 },
+  { id: "r4", title: "Tỉ số phần trăm nâng cao", subject: "Toán", teacher: "Thầy Trần Minh Khôi", lastViewed: "2 ngày trước", progress: 15, thumb: thumbPhanTram, source: "hoc-lieu-tang-cuong", order: 4 },
+  { id: "r5", title: "Đo lường và đơn vị đo", subject: "Toán", teacher: "Cô Phùng Thuý Hằng", lastViewed: "3 ngày trước", progress: 60, thumb: thumbDoLuong, source: "gv-giao", order: 5 },
+  { id: "r6", title: "Số tự nhiên và phép tính", subject: "Toán", teacher: "Cô Phùng Thuý Hằng", lastViewed: "4 ngày trước", progress: 88, thumb: thumbSoTuNhien, source: "gv-giao", order: 6 },
+  { id: "r7", title: "Câu lạc bộ Tiếng Anh giao tiếp", subject: "Tiếng Anh", teacher: "Thầy Trần Minh Quân", lastViewed: "5 ngày trước", progress: 20, thumb: thumbOnThiHsgAnh, source: "hoc-lieu-tang-cuong", order: 7 },
+];
+
+const SOURCE_META: Record<LectureSource, { label: string; cls: string }> = {
+  "gv-giao":              { label: "Giáo viên giao",     cls: "bg-indigo-600 text-white" },
+  "hoc-lieu-tang-cuong":  { label: "Học liệu tăng cường", cls: "bg-amber-500 text-white" },
+};
+
+function LearningActivitySection() {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const sorted = useMemo(
+    () => [...RECENT_LECTURES].sort((a, b) => a.order - b.order),
+    [],
+  );
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * 320, behavior: "smooth" });
+  };
+
+  return (
+    <section className="bg-white rounded-2xl border shadow-sm">
+      <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Activity className="h-5 w-5 text-indigo-700" />
+          <h2 className="text-xl font-bold text-slate-800">Hoạt động học tập</h2>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => scrollBy(-1)} aria-label="Cuộn trái">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => scrollBy(1)} aria-label="Cuộn phải">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-4 grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-4">
+        {/* Left stats box */}
+        <aside className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-4">
+          <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-1.5 mb-3">
+            <GraduationCap className="h-4 w-4" /> Thống kê học tập
+          </h3>
+          <ul className="space-y-2.5 text-[13px] text-slate-700">
+            <StatRow icon={BookOpen} label="Số lớp đã tham gia" value="5" />
+            <StatRow icon={Presentation} label="Số bài giảng đã học" value="10" />
+            <StatRow icon={CheckCircle2} label="Số bài giảng đã hoàn thành" value="5" />
+            <StatRow icon={Star} label="Môn học nhiều nhất" value="Toán" />
+            <StatRow icon={Layers} label="Học liệu hoàn thành nhiều nhất" value="Video" />
+          </ul>
+        </aside>
+
+        {/* Right slider */}
+        <div
+          ref={scrollerRef}
+          className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full"
+        >
+          {sorted.map((l) => {
+            const src = SOURCE_META[l.source];
+            return (
+              <article
+                key={l.id}
+                className="snap-start shrink-0 w-[240px] rounded-xl border border-slate-200 bg-white overflow-hidden hover:shadow-md hover:border-indigo-300 transition"
+              >
+                <div className="relative">
+                  <img src={l.thumb} alt={l.title} loading="lazy" className="h-28 w-full object-cover" />
+                  <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow ${src.cls}`}>
+                    {src.label}
+                  </span>
+                  <span className="absolute top-2 right-2 bg-white rounded-full p-0.5 shadow">
+                    <ProgressRing value={l.progress} size={38} stroke={3.5} />
+                  </span>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-bold text-[14px] text-slate-800 leading-snug line-clamp-2 min-h-[36px]">{l.title}</h4>
+                  <p className="text-[12px] text-slate-600 mt-1"><span className="font-bold text-slate-700">Môn:</span> {l.subject}</p>
+                  <p className="text-[12px] text-slate-600"><span className="font-bold text-slate-700">GV:</span> {l.teacher}</p>
+                  <p className="text-[11px] text-slate-500 mt-1"><span className="font-bold text-slate-700">Xem gần nhất:</span> {l.lastViewed}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StatRow({ icon: Icon, label, value }: { icon: typeof BookOpen; label: string; value: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <span className="h-6 w-6 rounded-md bg-white border border-indigo-100 flex items-center justify-center shrink-0">
+        <Icon className="h-3.5 w-3.5 text-indigo-600" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="font-bold text-slate-800">{label}</div>
+        <div className="text-slate-600">{value}</div>
+      </div>
+    </li>
   );
 }
 
