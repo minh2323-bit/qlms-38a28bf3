@@ -135,7 +135,7 @@ function DigitalClassesPage() {
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Tìm tên học liệu"
+                  placeholder="Tìm tên lớp học"
                   className="pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white w-64 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </div>

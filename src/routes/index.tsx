@@ -405,13 +405,33 @@ function TeacherHome() {
                   onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <CalendarClock className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-medium px-2">{week.label} · {week.range}</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-slate-100 transition">
+                      <CalendarClock className="h-4 w-4 text-slate-500" />
+                      <span className="text-sm font-medium">{week.label} · {week.range}</span>
+                      <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-64 max-h-80 overflow-y-auto">
+                    {WEEKS.map((w) => (
+                      <DropdownMenuItem
+                        key={w.idx}
+                        onClick={() => setWeekIdx(w.idx)}
+                        className={`flex items-center justify-between gap-2 cursor-pointer ${w.idx === weekIdx ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
+                      >
+                        <span>{w.label}</span>
+                        <span className="text-xs text-slate-500">{w.range}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button variant="ghost" size="icon" className="h-7 w-7"
                   onClick={() => setWeekIdx(Math.min(WEEKS.length, weekIdx + 1))}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+
             </div>
 
             <div className="flex">
@@ -533,7 +553,23 @@ function DashboardSection() {
             </div>
           </button>
 
-          {/* 2. Merged: Bài giảng/Học liệu đã tạo + sử dụng tuần này */}
+          {/* 2. Học sinh chưa nộp bài */}
+          <button
+            type="button"
+            onClick={() => setOpenPending(true)}
+            className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
+          >
+            <span className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
+            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
+              <Users className="h-5 w-5 text-amber-600" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-2xl font-black leading-none text-amber-600">10</div>
+              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Học sinh chưa nộp bài</div>
+            </div>
+          </button>
+
+          {/* 3. Merged: Bài giảng/Học liệu đã tạo + sử dụng tuần này */}
           <div className="relative rounded-xl border border-slate-200 overflow-hidden lg:col-span-3 grid grid-cols-2 divide-x divide-slate-200">
             <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
             <div className="flex items-center gap-2.5 p-2.5">
@@ -562,21 +598,6 @@ function DashboardSection() {
             </div>
           </div>
 
-          {/* 3. Học sinh chưa nộp bài */}
-          <button
-            type="button"
-            onClick={() => setOpenPending(true)}
-            className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden text-left cursor-pointer hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5 transition"
-          >
-            <span className="absolute left-0 top-0 h-full w-1 bg-amber-500" />
-            <span className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0 bg-amber-50">
-              <Users className="h-5 w-5 text-amber-600" />
-            </span>
-            <div className="min-w-0">
-              <div className="text-2xl font-black leading-none text-amber-600">10</div>
-              <div className="text-[12px] font-semibold text-slate-800 mt-1 leading-tight">Học sinh chưa nộp bài</div>
-            </div>
-          </button>
 
           {/* 4. Bài kiểm tra chưa chấm */}
           <div className="relative flex items-center gap-2.5 rounded-xl border border-slate-200 p-2.5 overflow-hidden">
@@ -824,14 +845,14 @@ function ScheduleGrid({
         {l && (
           <button
             onClick={() => onPickLesson(l.id)}
-            className={`w-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
+            className={`w-full text-left p-2 rounded-md text-[13px] leading-snug transition ${
               CLASS_COLORS[l.class]
             } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
               isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
             }`}
           >
-            <div className="font-bold">{l.class}</div>
-            <div className="text-[10px] opacity-80">Toán</div>
+            <div className="font-bold text-sm">{l.class}</div>
+            <div className="text-[11px] opacity-80">Toán</div>
             <div className="truncate font-medium">
               <span className="opacity-70">Nội dung:</span> {l.topic}
             </div>
