@@ -183,13 +183,11 @@ export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
           <DropdownMenuTrigger asChild>
             <button
               title={`Năm học ${year}`}
-              className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-indigo-800 transition"
+              className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 shadow-sm hover:shadow transition whitespace-nowrap"
             >
-              <div className="flex flex-col items-start leading-tight">
-                <span className="text-[10px] uppercase tracking-wide text-indigo-100 font-semibold">Năm học</span>
-                <span className="text-base font-bold">{year}</span>
-              </div>
-              <ChevronDown className="h-5 w-5 text-indigo-100 group-hover:translate-y-0.5 transition" />
+              <span className="text-[11px] uppercase tracking-wide text-indigo-500 font-semibold">Năm học</span>
+              <span className="text-base font-bold">{year}</span>
+              <ChevronDown className="h-4 w-4 text-indigo-500 group-hover:translate-y-0.5 transition" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
