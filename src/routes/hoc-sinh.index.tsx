@@ -389,12 +389,12 @@ function ScheduleGrid({
         {cell && (
           <button
             onClick={() => onPick(d, p)}
-            className={`w-full h-full text-left p-2 rounded-md text-[11px] leading-tight transition ${
+            className={`w-full h-full text-left p-2 rounded-md text-sm leading-tight transition ${
               SUBJECT_COLORS[cell.subject] ?? "bg-slate-50 text-slate-800 border-l-4 border-slate-400"
             } ${isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"}`}
           >
-            <div className="font-bold">{cell.subject}</div>
-            <div className="text-[10px] opacity-80 truncate">G/v: {cell.teacher}</div>
+            <div className="font-bold text-sm">{cell.subject}</div>
+            <div className="text-[13px] opacity-80 truncate">G/v: {cell.teacher}</div>
           </button>
         )}
       </td>
