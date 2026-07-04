@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { useMemo, useState } from "react";
 import { BookMarked, Search, Hash, ChevronDown, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ProgressRing } from "@/components/ProgressRing";
 import thumb4A from "@/assets/thumb-lop-4a.jpg";
 import thumbBoTucToan from "@/assets/thumb-bo-tuc-toan.jpg";
 import thumbOnThiHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
