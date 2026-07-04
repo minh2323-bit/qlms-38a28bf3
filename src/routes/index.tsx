@@ -405,13 +405,33 @@ function TeacherHome() {
                   onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <CalendarClock className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-medium px-2">{week.label} · {week.range}</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-slate-100 transition">
+                      <CalendarClock className="h-4 w-4 text-slate-500" />
+                      <span className="text-sm font-medium">{week.label} · {week.range}</span>
+                      <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-64 max-h-80 overflow-y-auto">
+                    {WEEKS.map((w) => (
+                      <DropdownMenuItem
+                        key={w.idx}
+                        onClick={() => setWeekIdx(w.idx)}
+                        className={`flex items-center justify-between gap-2 cursor-pointer ${w.idx === weekIdx ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
+                      >
+                        <span>{w.label}</span>
+                        <span className="text-xs text-slate-500">{w.range}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button variant="ghost" size="icon" className="h-7 w-7"
                   onClick={() => setWeekIdx(Math.min(WEEKS.length, weekIdx + 1))}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+
             </div>
 
             <div className="flex">
