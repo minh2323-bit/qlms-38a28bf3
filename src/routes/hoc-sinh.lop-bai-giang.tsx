@@ -70,34 +70,41 @@ const STATUS_META: Record<ClassStatus, { label: string; cls: string }> = {
   "da-khoa":          { label: "Đã khoá",        cls: "bg-slate-200 text-slate-600 hover:bg-slate-200" },
 };
 
-type LectureType = "Bài giảng điện tử" | "Video" | "Tài liệu";
+type LectureType = "Bài giảng điện tử" | "Video" | "Tài liệu" | "Slide" | "Bài tập";
 type Lecture = {
   id: string;
   title: string;
   khoi: string;
   subject: string;
   author: string;
-  classes: string;
   releaseDate: string;
-  loai: LectureType;
+  loai: LectureType[];
   thumb: string;
   autoEnrolled?: boolean;
 };
 
 const LECTURES: Lecture[] = [
-  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C", releaseDate: "15/09/2025", loai: "Bài giảng điện tử", thumb: thumbPhanSo, autoEnrolled: true },
-  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C", releaseDate: "22/09/2025", loai: "Bài giảng điện tử", thumb: thumbSoThapPhan, autoEnrolled: true },
-  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", classes: "Mở cho toàn khối 4", releaseDate: "05/10/2025", loai: "Video", thumb: thumbHinhHoc },
-  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B", releaseDate: "12/10/2025", loai: "Tài liệu", thumb: thumbDoLuong, autoEnrolled: true },
-  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", classes: "Đăng ký tự do", releaseDate: "19/10/2025", loai: "Bài giảng điện tử", thumb: thumbPhanTram },
-  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C; 4D", releaseDate: "28/10/2025", loai: "Bài giảng điện tử", thumb: thumbSoTuNhien, autoEnrolled: true },
-  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", classes: "4A; 4B", releaseDate: "03/11/2025", loai: "Tài liệu", thumb: thumb4A, autoEnrolled: true },
-  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", classes: "Đăng ký tự do", releaseDate: "10/11/2025", loai: "Video", thumb: thumbOnThiHsgAnh },
-  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "Đăng ký tự do", releaseDate: "15/11/2025", loai: "Bài giảng điện tử", thumb: thumbBoTucToan },
+  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/09/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbPhanSo, autoEnrolled: true },
+  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "22/09/2025", loai: ["Bài giảng điện tử", "Slide"], thumb: thumbSoThapPhan, autoEnrolled: true },
+  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", releaseDate: "05/10/2025", loai: ["Video"], thumb: thumbHinhHoc },
+  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "12/10/2025", loai: ["Tài liệu", "Bài tập"], thumb: thumbDoLuong, autoEnrolled: true },
+  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", releaseDate: "19/10/2025", loai: ["Bài giảng điện tử", "Video"], thumb: thumbPhanTram },
+  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "28/10/2025", loai: ["Bài giảng điện tử", "Slide", "Bài tập"], thumb: thumbSoTuNhien, autoEnrolled: true },
+  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", releaseDate: "03/11/2025", loai: ["Tài liệu"], thumb: thumb4A, autoEnrolled: true },
+  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", releaseDate: "10/11/2025", loai: ["Video", "Bài tập"], thumb: thumbOnThiHsgAnh },
+  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", releaseDate: "15/11/2025", loai: ["Bài giảng điện tử", "Tài liệu"], thumb: thumbBoTucToan },
 ];
 
 const SUBJECT_OPTIONS = ["Tất cả", "Toán", "Tiếng Việt", "Tiếng Anh"] as const;
-const TYPE_OPTIONS = ["Tất cả", "Bài giảng điện tử", "Video", "Tài liệu"] as const;
+const TYPE_OPTIONS = ["Tất cả", "Bài giảng điện tử", "Video", "Tài liệu", "Slide", "Bài tập"] as const;
+
+const TYPE_TAG_STYLES: Record<LectureType, string> = {
+  "Bài giảng điện tử": "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "Video":             "bg-rose-100 text-rose-700 border-rose-200",
+  "Tài liệu":          "bg-amber-100 text-amber-700 border-amber-200",
+  "Slide":             "bg-sky-100 text-sky-700 border-sky-200",
+  "Bài tập":           "bg-emerald-100 text-emerald-700 border-emerald-200",
+};
 
 function Page() {
   const [tab, setTab] = useState<"lop" | "baigiang">("lop");
