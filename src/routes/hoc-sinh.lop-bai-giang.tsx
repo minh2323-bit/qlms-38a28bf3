@@ -259,7 +259,12 @@ function Page() {
                     const auto = !!l.autoEnrolled;
                     return (
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
-                        <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
+                        <div className="relative">
+                          <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
+                          <span className="absolute top-2 right-2 bg-white rounded-full p-0.5 shadow">
+                            <ProgressRing value={l.progress ?? 0} size={40} stroke={3.5} />
+                          </span>
+                        </div>
                         <div className="p-3.5 flex flex-col flex-1">
                           <h3 className="font-bold text-slate-800 text-[15px] leading-snug">{l.title}</h3>
                           <div className="mt-2 space-y-1 text-[13px] text-slate-700">
