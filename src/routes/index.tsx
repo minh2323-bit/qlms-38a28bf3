@@ -853,9 +853,9 @@ function ScheduleGrid({
           <button
             onClick={(e) => { e.stopPropagation(); onPickLive(live); }}
             title={live.name}
-            className={`mt-1 w-full inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition`}
+            className={`mt-1 w-full inline-flex items-center gap-1 px-1.5 py-1 rounded-md text-[13px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition`}
           >
-            <Video className="h-3 w-3 shrink-0" />
+            <Video className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">{formatTimeRange(live.startAt, live.endAt)}</span>
           </button>
         )}
