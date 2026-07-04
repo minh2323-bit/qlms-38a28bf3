@@ -824,14 +824,14 @@ function ScheduleGrid({
         {l && (
           <button
             onClick={() => onPickLesson(l.id)}
-            className={`w-full text-left p-1.5 rounded-md text-[11px] leading-tight transition ${
+            className={`w-full text-left p-2 rounded-md text-[13px] leading-snug transition ${
               CLASS_COLORS[l.class]
             } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
               isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
             }`}
           >
-            <div className="font-bold">{l.class}</div>
-            <div className="text-[10px] opacity-80">Toán</div>
+            <div className="font-bold text-sm">{l.class}</div>
+            <div className="text-[11px] opacity-80">Toán</div>
             <div className="truncate font-medium">
               <span className="opacity-70">Nội dung:</span> {l.topic}
             </div>
