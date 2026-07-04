@@ -1,12 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useMemo, useState } from "react";
-import { BookMarked, Presentation, FileText, Video, ListChecks, Search, Hash } from "lucide-react";
-import { useMaterials } from "@/lib/teaching-store";
+import { BookMarked, Search, Hash, ChevronDown, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import thumb4A from "@/assets/thumb-lop-4a.jpg";
 import thumbBoTucToan from "@/assets/thumb-bo-tuc-toan.jpg";
 import thumbOnThiHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
+import thumbPhanSo from "@/assets/thumb-phan-so.jpg";
+import thumbSoThapPhan from "@/assets/thumb-so-thap-phan.jpg";
+import thumbHinhHoc from "@/assets/thumb-hinh-hoc.jpg";
+import thumbDoLuong from "@/assets/thumb-do-luong.jpg";
+import thumbPhanTram from "@/assets/thumb-phan-tram.jpg";
+import thumbSoTuNhien from "@/assets/thumb-so-tu-nhien.jpg";
 
 export const Route = createFileRoute("/hoc-sinh/lop-bai-giang")({
   head: () => ({ meta: [{ title: "Lớp học & Bài giảng – Học sinh" }] }),
@@ -65,13 +70,44 @@ const STATUS_META: Record<ClassStatus, { label: string; cls: string }> = {
   "da-khoa":          { label: "Đã khoá",        cls: "bg-slate-200 text-slate-600 hover:bg-slate-200" },
 };
 
+type LectureType = "Bài giảng điện tử" | "Video" | "Tài liệu";
+type Lecture = {
+  id: string;
+  title: string;
+  khoi: string;
+  subject: string;
+  author: string;
+  classes: string;
+  releaseDate: string;
+  loai: LectureType;
+  thumb: string;
+  autoEnrolled?: boolean;
+};
+
+const LECTURES: Lecture[] = [
+  { id: "bg1", title: "Học về phân số", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C", releaseDate: "15/09/2025", loai: "Bài giảng điện tử", thumb: thumbPhanSo, autoEnrolled: true },
+  { id: "bg2", title: "Số thập phân và phép so sánh", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C", releaseDate: "22/09/2025", loai: "Bài giảng điện tử", thumb: thumbSoThapPhan, autoEnrolled: true },
+  { id: "bg3", title: "Hình học trực quan", khoi: "Lớp 4", subject: "Toán", author: "Hanoi Study (Thầy Nguyễn Văn A)", classes: "Mở cho toàn khối 4", releaseDate: "05/10/2025", loai: "Video", thumb: thumbHinhHoc },
+  { id: "bg4", title: "Đo lường và đơn vị đo", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B", releaseDate: "12/10/2025", loai: "Tài liệu", thumb: thumbDoLuong, autoEnrolled: true },
+  { id: "bg5", title: "Tỉ số phần trăm nâng cao", khoi: "Lớp 4", subject: "Toán", author: "Thầy Trần Minh Khôi", classes: "Đăng ký tự do", releaseDate: "19/10/2025", loai: "Bài giảng điện tử", thumb: thumbPhanTram },
+  { id: "bg6", title: "Số tự nhiên và phép tính", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "4A; 4B; 4C; 4D", releaseDate: "28/10/2025", loai: "Bài giảng điện tử", thumb: thumbSoTuNhien, autoEnrolled: true },
+  { id: "bg7", title: "Luyện đọc hiểu Tiếng Việt 4", khoi: "Lớp 4", subject: "Tiếng Việt", author: "Cô Nguyễn Thị Hoa", classes: "4A; 4B", releaseDate: "03/11/2025", loai: "Tài liệu", thumb: thumb4A, autoEnrolled: true },
+  { id: "bg8", title: "Câu lạc bộ Tiếng Anh giao tiếp", khoi: "Lớp 4", subject: "Tiếng Anh", author: "Thầy Trần Minh Quân", classes: "Đăng ký tự do", releaseDate: "10/11/2025", loai: "Video", thumb: thumbOnThiHsgAnh },
+  { id: "bg9", title: "Bổ trợ Toán cơ bản – Lớp 4", khoi: "Lớp 4", subject: "Toán", author: "Cô Phùng Thuý Hằng", classes: "Đăng ký tự do", releaseDate: "15/11/2025", loai: "Bài giảng điện tử", thumb: thumbBoTucToan },
+];
+
+const SUBJECT_OPTIONS = ["Tất cả", "Toán", "Tiếng Việt", "Tiếng Anh"] as const;
+const TYPE_OPTIONS = ["Tất cả", "Bài giảng điện tử", "Video", "Tài liệu"] as const;
+
 function Page() {
   const [tab, setTab] = useState<"lop" | "baigiang">("lop");
   const [qName, setQName] = useState("");
   const [qCode, setQCode] = useState("");
 
-  const materials = useMaterials().filter((m) => m.classRealId === STUDENT_CLASS);
-  const baiGiang = materials.filter((m) => m.kind === "slide" || m.kind === "syllabus");
+  // Bài giảng tab state
+  const [bgSubject, setBgSubject] = useState<string>("Tất cả");
+  const [bgType, setBgType] = useState<string>("Tất cả");
+  const [enrolled, setEnrolled] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     const n = qName.trim().toLowerCase();
@@ -82,6 +118,21 @@ function Page() {
       return true;
     });
   }, [qName, qCode]);
+
+  const filteredLectures = useMemo(() => {
+    return LECTURES.filter((l) => {
+      if (bgSubject !== "Tất cả" && l.subject !== bgSubject) return false;
+      if (bgType !== "Tất cả" && l.loai !== bgType) return false;
+      return true;
+    });
+  }, [bgSubject, bgType]);
+
+  const toggleEnroll = (id: string) =>
+    setEnrolled((s) => {
+      const n = new Set(s);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
 
   return (
     <AppShell role="student">
@@ -171,23 +222,74 @@ function Page() {
               )}
             </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {baiGiang.length === 0 && (
-                <p className="text-sm text-slate-500 col-span-2">Chưa có bài giảng nào.</p>
-              )}
-              {baiGiang.map((m) => (
-                <div key={m.id} className="flex items-center gap-3 rounded-xl border p-3 hover:shadow transition">
-                  <span className="h-10 w-10 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                    <Presentation className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-slate-800 truncate">{m.title}</div>
-                    <div className="text-[11px] text-slate-500">{m.subject} · {m.meta ?? "Bài giảng"}</div>
-                  </div>
-                  <button className="text-xs font-semibold text-indigo-700 hover:underline">Mở</button>
+            <>
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                <FilterSelect
+                  label="Môn"
+                  value={bgSubject}
+                  onChange={setBgSubject}
+                  options={SUBJECT_OPTIONS as unknown as string[]}
+                />
+                <FilterSelect
+                  label="Loại học liệu"
+                  value={bgType}
+                  onChange={setBgType}
+                  options={TYPE_OPTIONS as unknown as string[]}
+                />
+                <span className="text-xs text-slate-500 ml-auto">
+                  {filteredLectures.length} bài giảng
+                </span>
+              </div>
+
+              {filteredLectures.length === 0 ? (
+                <p className="text-sm text-slate-500 italic">Không có bài giảng phù hợp.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredLectures.map((l) => {
+                    const isEnrolled = enrolled.has(l.id);
+                    const auto = !!l.autoEnrolled;
+                    return (
+                      <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
+                        <img src={l.thumb} alt={l.title} className="h-36 w-full object-cover" loading="lazy" />
+                        <div className="p-4 flex flex-col flex-1">
+                          <h3 className="font-bold text-slate-800 text-[15px] leading-snug">{l.title}</h3>
+                          <div className="mt-2 grid grid-cols-2 gap-y-1 text-xs text-slate-600">
+                            <div><span className="text-slate-500">Khối:</span> <b className="text-slate-800">{l.khoi}</b></div>
+                            <div><span className="text-slate-500">Môn:</span> <b className="text-slate-800">{l.subject}</b></div>
+                            <div className="col-span-2"><span className="text-slate-500">GV:</span> <b className="text-slate-800">{l.author}</b></div>
+                            <div className="col-span-2"><span className="text-slate-500">Danh sách lớp gán:</span> <b className="text-slate-800">{l.classes}</b></div>
+                            <div className="col-span-2"><span className="text-slate-500">Loại:</span> <b className="text-slate-800">{l.loai}</b></div>
+                            <div className="col-span-2"><span className="text-slate-500">Ngày phát hành:</span> <b className="text-slate-800">{l.releaseDate}</b></div>
+                          </div>
+
+                          <div className="mt-4">
+                            {auto ? (
+                              <button
+                                disabled
+                                className="w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-100 text-slate-500 text-sm font-semibold cursor-not-allowed border border-slate-200"
+                              >
+                                <CheckCircle2 className="h-4 w-4" /> Giáo viên tự động ghi danh
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => toggleEnroll(l.id)}
+                                className={`w-full inline-flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition ${
+                                  isEnrolled
+                                    ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                                }`}
+                              >
+                                {isEnrolled ? (<><CheckCircle2 className="h-4 w-4" /> Đã ghi danh</>) : "Ghi danh"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </section>
@@ -195,5 +297,25 @@ function Page() {
   );
 }
 
-// silence unused warnings
-void FileText; void Video; void ListChecks;
+function FilterSelect({
+  label, value, onChange, options,
+}: {
+  label: string; value: string; onChange: (v: string) => void; options: string[];
+}) {
+  return (
+    <label className="inline-flex items-center gap-2 text-sm">
+      <span className="text-slate-600 font-medium">{label}:</span>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="appearance-none pl-3 pr-8 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-200 hover:border-indigo-300"
+        >
+          {options.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+        <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+      </div>
+    </label>
+  );
+}
+

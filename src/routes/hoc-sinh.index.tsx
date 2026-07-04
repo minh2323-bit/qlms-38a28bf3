@@ -346,26 +346,38 @@ function TasksDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: 
           </DialogTitle>
         </DialogHeader>
         <ul className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-          {PENDING_TASKS.map((t) => (
-            <li key={t.id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:shadow-sm transition">
-              <button className="h-8 w-8 rounded-full border bg-white text-slate-400 hover:text-indigo-700 hover:border-indigo-300 flex items-center justify-center shrink-0" aria-label="Quay lại">
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <h4 className="font-bold text-slate-800 text-sm truncate">{t.title}</h4>
-                  {t.premium && <Crown className="h-4 w-4 text-emerald-500 shrink-0" />}
+          {PENDING_TASKS.map((t) => {
+            const [datePart, timePart] = t.deadline.split(", ");
+            const [dd, mm, yyyy] = datePart.split("/").map(Number);
+            const [hh, mi] = (timePart ?? "23:59").split(":").map(Number);
+            const dueMs = new Date(yyyy, mm - 1, dd, hh, mi).getTime();
+            const overdue = dueMs < Date.now();
+            return (
+              <li key={t.id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:shadow-sm transition">
+                <button className="h-8 w-8 rounded-full border bg-white text-slate-400 hover:text-indigo-700 hover:border-indigo-300 flex items-center justify-center shrink-0" aria-label="Quay lại">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h4 className="font-bold text-slate-800 text-sm truncate">{t.title}</h4>
+                    {t.premium && <Crown className="h-4 w-4 text-emerald-500 shrink-0" />}
+                    {overdue && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200">
+                        <AlertCircle className="h-3 w-3" /> Quá hạn
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Hạn nộp: <span className={`font-medium ${overdue ? "text-rose-600" : "text-slate-700"}`}>{t.deadline}</span> · {t.subject}
+                  </p>
+                  <p className="text-[11px] text-slate-500">GV: {t.teacher}</p>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Hạn nộp: <span className="font-medium text-slate-700">{t.deadline}</span> · {t.subject}
-                </p>
-                <p className="text-[11px] text-slate-500">GV: {t.teacher}</p>
-              </div>
-              <button className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border-2 border-amber-400 bg-amber-50 text-amber-700 text-sm font-bold hover:bg-amber-100">
-                Làm bài <Play className="h-3.5 w-3.5 fill-amber-700" />
-              </button>
-            </li>
-          ))}
+                <button className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border-2 border-amber-400 bg-amber-50 text-amber-700 text-sm font-bold hover:bg-amber-100">
+                  Làm bài <Play className="h-3.5 w-3.5 fill-amber-700" />
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </DialogContent>
     </Dialog>
