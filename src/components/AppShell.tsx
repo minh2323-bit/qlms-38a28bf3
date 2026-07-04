@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
