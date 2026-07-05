@@ -379,11 +379,12 @@ function StatCell({ icon: Icon, label, value }: { icon: typeof BookOpen; label: 
 type LiveLite = { id: string; name: string; link: string; subject: string; startAt: string; endAt: string };
 
 function DashboardSection({
-  upcomingCount, ongoingLive, onOpenTasks,
+  upcomingCount, ongoingLive, onOpenTasks, onOpenGraded,
 }: {
   upcomingCount: number;
   ongoingLive: LiveLite | undefined;
   onOpenTasks: () => void;
+  onOpenGraded: () => void;
 }) {
   type Item = {
     value: string; label: string; sub: string;
@@ -413,9 +414,10 @@ function DashboardSection({
       value: "3", label: "Bài giáo viên vừa chấm",
       sub: "Mới có điểm hôm nay",
       icon: CheckCircle2, bg: "bg-indigo-50", fg: "text-indigo-600", bar: "bg-indigo-500",
-      to: "/hoc-sinh/nhiem-vu",
+      onClick: onOpenGraded,
     },
   ];
+
 
   const cardCls = "relative flex items-center gap-3 rounded-lg border border-slate-200 p-3 hover:shadow-md hover:border-indigo-300 transition overflow-hidden group text-left";
 
