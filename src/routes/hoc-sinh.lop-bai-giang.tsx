@@ -19,6 +19,17 @@ export const Route = createFileRoute("/hoc-sinh/lop-bai-giang")({
   component: Page,
 });
 
+function slugify(s: string): string {
+  return s
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d").replace(/Đ/g, "D")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+
 const STUDENT_CLASS = "4A";
 
 type ClassStatus = "dang-hoc" | "dang-trien-khai" | "da-khoa";
@@ -259,13 +270,24 @@ function Page() {
                     const auto = !!l.autoEnrolled;
                     return (
                       <div key={l.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-md hover:border-indigo-300 transition">
-                        <div className="relative">
+                        <Link
+                          to="/hoc-sinh/bai-giang/$lessonSlug"
+                          params={{ lessonSlug: slugify(l.title) }}
+                          className="relative block"
+                        >
                           <img src={l.thumb} alt={l.title} className="h-32 w-full object-cover" loading="lazy" />
-                        </div>
+                        </Link>
                         <div className="p-3.5 flex flex-col flex-1">
                           <div className="flex items-start gap-3">
-                            <h3 className="font-bold text-slate-800 text-[15px] leading-snug flex-1">{l.title}</h3>
+                            <Link
+                              to="/hoc-sinh/bai-giang/$lessonSlug"
+                              params={{ lessonSlug: slugify(l.title) }}
+                              className="font-bold text-slate-800 text-[15px] leading-snug flex-1 hover:text-indigo-700"
+                            >
+                              {l.title}
+                            </Link>
                             <ProgressRing value={l.progress ?? 0} size={44} stroke={4} className="shrink-0" />
+
                           </div>
                           <div className="mt-2 space-y-1 text-[13px] text-slate-700">
                             <div className="flex gap-4">

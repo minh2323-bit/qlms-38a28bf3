@@ -119,6 +119,7 @@ const PERIODS = [1, 2, 3, 4, 5] as const;
 function StudentHome() {
   const [activePeriod, setActivePeriod] = useState<{ day: number; period: number } | null>(null);
   const [tasksOpen, setTasksOpen] = useState(false);
+  const [gradedOpen, setGradedOpen] = useState(false);
   const [weekIdx, setWeekIdx] = useState(31); // Tuần 31 (11/4/2026 nằm trong tuần này)
   const currentWeek = SCHOOL_WEEKS.find((w) => w.idx === weekIdx) ?? SCHOOL_WEEKS[0];
   const liveAll = useLiveClasses();
@@ -171,7 +172,9 @@ function StudentHome() {
         upcomingCount={upcomingCount}
         ongoingLive={ongoingLive}
         onOpenTasks={() => setTasksOpen(true)}
+        onOpenGraded={() => setGradedOpen(true)}
       />
+
 
       <section className="bg-white rounded-2xl border shadow-sm">
         <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
@@ -236,9 +239,11 @@ function StudentHome() {
       <LearningActivitySection />
 
       <TasksDialog open={tasksOpen} onOpenChange={setTasksOpen} />
+      <GradedDialog open={gradedOpen} onOpenChange={setGradedOpen} />
     </AppShell>
   );
 }
+
 
 /* ---------------- Hoạt động học tập ---------------- */
 type LectureSource = "gv-giao" | "hoc-lieu-tang-cuong";
@@ -374,11 +379,12 @@ function StatCell({ icon: Icon, label, value }: { icon: typeof BookOpen; label: 
 type LiveLite = { id: string; name: string; link: string; subject: string; startAt: string; endAt: string };
 
 function DashboardSection({
-  upcomingCount, ongoingLive, onOpenTasks,
+  upcomingCount, ongoingLive, onOpenTasks, onOpenGraded,
 }: {
   upcomingCount: number;
   ongoingLive: LiveLite | undefined;
   onOpenTasks: () => void;
+  onOpenGraded: () => void;
 }) {
   type Item = {
     value: string; label: string; sub: string;
@@ -408,9 +414,10 @@ function DashboardSection({
       value: "3", label: "Bài giáo viên vừa chấm",
       sub: "Mới có điểm hôm nay",
       icon: CheckCircle2, bg: "bg-indigo-50", fg: "text-indigo-600", bar: "bg-indigo-500",
-      to: "/hoc-sinh/nhiem-vu",
+      onClick: onOpenGraded,
     },
   ];
+
 
   const cardCls = "relative flex items-center gap-3 rounded-lg border border-slate-200 p-3 hover:shadow-md hover:border-indigo-300 transition overflow-hidden group text-left";
 
@@ -523,6 +530,52 @@ function TasksDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: 
     </Dialog>
   );
 }
+
+/* ---------------- Graded Dialog (Bài GV vừa chấm) ---------------- */
+type GradedItem = { id: string; title: string; subject: string; submittedAt: string; score: string };
+const GRADED_ITEMS: GradedItem[] = [
+  { id: "g1", title: "Phiếu toán cuối tuần: ôn bảng nhân 6 và bảng chia 6", subject: "Toán", submittedAt: "24/06/2026", score: "6.36/10" },
+  { id: "g2", title: "Tiếng Việt: luyện đọc hiểu câu chuyện mùa hè", subject: "Luyện từ và câu (Tiếng việt)", submittedAt: "24/06/2026", score: "7.5/10" },
+  { id: "g3", title: "Luyện tập tiếng anh tại nhà: viết đoạn văn kể về một người bạn", subject: "Ngoại ngữ", submittedAt: "24/06/2026", score: "8.57/10" },
+];
+
+function GradedDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-indigo-600" />
+            Bài giáo viên vừa chấm
+          </DialogTitle>
+        </DialogHeader>
+        <ul className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+          {GRADED_ITEMS.map((g) => (
+            <li key={g.id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:shadow-sm transition">
+              <div className="min-w-0 flex-1">
+                <h4 className="font-bold text-slate-800 text-sm">{g.title}</h4>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Môn: <span className="font-semibold text-slate-700">{g.subject}</span>
+                  <span className="mx-2">·</span>
+                  Ngày nộp: <span className="font-medium text-slate-700">{g.submittedAt}</span>
+                </p>
+              </div>
+              <div className="text-center shrink-0 min-w-[70px]">
+                <div className="text-[10px] uppercase text-slate-500 font-semibold">Điểm</div>
+                <div className="text-lg font-black text-rose-600 leading-tight">{g.score}</div>
+              </div>
+              <button className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border-2 border-emerald-400 bg-white text-emerald-700 text-sm font-bold hover:bg-emerald-50">
+                Xem bài
+              </button>
+            </li>
+          ))}
+        </ul>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
 
 
 /* ---------------- Schedule Grid ---------------- */
