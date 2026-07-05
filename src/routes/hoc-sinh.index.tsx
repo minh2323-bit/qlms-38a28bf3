@@ -239,9 +239,11 @@ function StudentHome() {
       <LearningActivitySection />
 
       <TasksDialog open={tasksOpen} onOpenChange={setTasksOpen} />
+      <GradedDialog open={gradedOpen} onOpenChange={setGradedOpen} />
     </AppShell>
   );
 }
+
 
 /* ---------------- Hoạt động học tập ---------------- */
 type LectureSource = "gv-giao" | "hoc-lieu-tang-cuong";
