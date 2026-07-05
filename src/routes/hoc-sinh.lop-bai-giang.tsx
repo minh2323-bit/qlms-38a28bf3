@@ -19,6 +19,17 @@ export const Route = createFileRoute("/hoc-sinh/lop-bai-giang")({
   component: Page,
 });
 
+function slugify(s: string): string {
+  return s
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d").replace(/Đ/g, "D")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+
 const STUDENT_CLASS = "4A";
 
 type ClassStatus = "dang-hoc" | "dang-trien-khai" | "da-khoa";
