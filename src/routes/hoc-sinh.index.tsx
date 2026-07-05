@@ -119,6 +119,7 @@ const PERIODS = [1, 2, 3, 4, 5] as const;
 function StudentHome() {
   const [activePeriod, setActivePeriod] = useState<{ day: number; period: number } | null>(null);
   const [tasksOpen, setTasksOpen] = useState(false);
+  const [gradedOpen, setGradedOpen] = useState(false);
   const [weekIdx, setWeekIdx] = useState(31); // Tuần 31 (11/4/2026 nằm trong tuần này)
   const currentWeek = SCHOOL_WEEKS.find((w) => w.idx === weekIdx) ?? SCHOOL_WEEKS[0];
   const liveAll = useLiveClasses();
@@ -171,7 +172,9 @@ function StudentHome() {
         upcomingCount={upcomingCount}
         ongoingLive={ongoingLive}
         onOpenTasks={() => setTasksOpen(true)}
+        onOpenGraded={() => setGradedOpen(true)}
       />
+
 
       <section className="bg-white rounded-2xl border shadow-sm">
         <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
