@@ -430,23 +430,13 @@ function Step1(props: {
             />
           </Field>
           <Field label="Đơn vị kiến thức" required>
-            <select
-              value={unitId}
-              onChange={(e) => setUnitId(e.target.value)}
+            <UnitCheckboxDropdown
+              tree={tree}
               disabled={!mon}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
-            >
-              <option value="">
-                {!mon ? "— Chọn môn trước —" : "— Chọn đơn vị kiến thức —"}
-              </option>
-              {tree.map((ch) => (
-                <optgroup key={ch.id} label={ch.title}>
-                  {ch.units.map((u) => (
-                    <option key={u.id} value={u.id}>{u.title}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+              value={unitId ? unitId.split(",").filter(Boolean) : []}
+              onChange={(ids) => setUnitId(ids.join(","))}
+              placeholder={!mon ? "— Chọn môn trước —" : "— Chọn đơn vị kiến thức —"}
+            />
           </Field>
         </div>
 
@@ -1039,3 +1029,81 @@ function SmallModal({ title, onClose, children }: { title: string; onClose: () =
     </div>
   );
 }
+
+/* ============================ Unit checkbox dropdown ============================ */
+
+function UnitCheckboxDropdown({
+  tree, value, onChange, disabled, placeholder,
+}: {
+  tree: ReturnType<typeof getKnowledgeTree>;
+  value: string[];
+  onChange: (v: string[]) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const toggle = (id: string) => {
+    if (value.includes(id)) onChange(value.filter((x) => x !== id));
+    else onChange([...value, id]);
+  };
+  const label =
+    value.length === 0
+      ? placeholder ?? "— Chọn đơn vị kiến thức —"
+      : `Đã chọn ${value.length} đơn vị kiến thức`;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300 disabled:bg-slate-50 disabled:text-slate-400"
+      >
+        <span className={value.length === 0 ? "text-slate-400" : "text-slate-700"}>{label}</span>
+        <ChevronDown className="h-4 w-4 text-slate-400" />
+      </button>
+      {open && !disabled && (
+        <div className="absolute z-50 mt-1 w-full max-h-72 overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg py-1">
+          {tree.length === 0 && (
+            <div className="px-3 py-2 text-xs text-slate-400">Không có dữ liệu.</div>
+          )}
+          {tree.map((ch) => (
+            <div key={ch.id}>
+              <div className="px-3 py-1.5 text-[11px] font-bold text-slate-500 uppercase bg-slate-50">
+                {ch.title}
+              </div>
+              {ch.units.map((u) => {
+                const checked = value.includes(u.id);
+                return (
+                  <label
+                    key={u.id}
+                    className="flex items-start gap-2 px-3 py-2 text-sm hover:bg-indigo-50/50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggle(u.id)}
+                      className="mt-0.5 h-4 w-4 accent-indigo-600"
+                    />
+                    <span className="text-slate-700">{u.title}</span>
+                  </label>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
