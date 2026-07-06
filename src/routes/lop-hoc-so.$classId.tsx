@@ -1425,9 +1425,10 @@ function EducationRecordsSection({ className }: { className: string }) {
 
 type TestItem = { id: string; name: string; startAt: string; endAt: string };
 
-function TestsSection({ className: _className }: { className: string }) {
+function TestsSection({ classInfo }: { classInfo: ClassInfo }) {
   const [open, setOpen] = useState(true);
-  const [tests] = useState<TestItem[]>([
+  const [modalOpen, setModalOpen] = useState(false);
+  const [tests, setTests] = useState<TestItem[]>([
     { id: "t1", name: "Kiểm tra 15 phút – Chương Phân số",  startAt: "05/07/2026 08:00", endAt: "05/07/2026 08:15" },
     { id: "t2", name: "Kiểm tra giữa kỳ II – Toán 4",       startAt: "10/07/2026 07:30", endAt: "10/07/2026 08:15" },
     { id: "t3", name: "Kiểm tra cuối chương – Số đo đại lượng", startAt: "18/07/2026 14:00", endAt: "18/07/2026 14:45" },
@@ -1443,7 +1444,7 @@ function TestsSection({ className: _className }: { className: string }) {
           </p>
         </div>
         <button
-          onClick={() => toast.info("Tạo bài kiểm tra (demo)")}
+          onClick={() => setModalOpen(true)}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700"
         >
           <Plus className="h-4 w-4" /> Thêm bài kiểm tra
@@ -1484,9 +1485,21 @@ function TestsSection({ className: _className }: { className: string }) {
           </ul>
         )}
       </div>
+
+      <AddTestModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        classInfo={classInfo}
+        onCreated={(name, startAt, endAt) => {
+          setTests((prev) => [{ id: `t-${Date.now()}`, name, startAt, endAt }, ...prev]);
+          setModalOpen(false);
+          toast.success("Đã tạo bài kiểm tra");
+        }}
+      />
     </section>
   );
 }
+
 
 /* ============================ Task/Test pickers ============================ */
 
