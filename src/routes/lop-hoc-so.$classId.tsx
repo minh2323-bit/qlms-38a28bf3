@@ -1583,5 +1583,463 @@ function TestPickerDialog({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
+/* ============================ Add Test Modal ============================ */
 
+function MultiUnitSelect({
+  tree, value, onChange, disabled, placeholder,
+}: {
+  tree: ReturnType<typeof getTreeForClass>;
+  value: string[];
+  onChange: (v: string[]) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const toggle = (id: string) => {
+    if (value.includes(id)) onChange(value.filter((x) => x !== id));
+    else onChange([...value, id]);
+  };
+  const label =
+    value.length === 0
+      ? placeholder ?? "— Chọn đơn vị kiến thức —"
+      : `Đã chọn ${value.length} đơn vị kiến thức`;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300 disabled:bg-slate-50 disabled:text-slate-400"
+      >
+        <span className={value.length === 0 ? "text-slate-400" : "text-slate-700"}>{label}</span>
+        <ChevronDown className="h-4 w-4 text-slate-400" />
+      </button>
+      {open && !disabled && (
+        <div className="absolute z-50 mt-1 w-full max-h-72 overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg py-1">
+          {tree.length === 0 && (
+            <div className="px-3 py-2 text-xs text-slate-400">Không có dữ liệu.</div>
+          )}
+          {tree.map((ch) => (
+            <div key={ch.id}>
+              <div className="px-3 py-1.5 text-[11px] font-bold text-slate-500 uppercase bg-slate-50">
+                {ch.title}
+              </div>
+              {ch.units.map((u) => {
+                const checked = value.includes(u.id);
+                return (
+                  <label
+                    key={u.id}
+                    className="flex items-start gap-2 px-3 py-2 text-sm hover:bg-indigo-50/50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggle(u.id)}
+                      className="mt-0.5 h-4 w-4 accent-indigo-600"
+                    />
+                    <span className="text-slate-700">{u.title}</span>
+                  </label>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NumberStepper({
+  value, onChange, min = 0, max = 999, step = 1,
+}: {
+  value: number; onChange: (v: number) => void; min?: number; max?: number; step?: number;
+}) {
+  return (
+    <input
+      type="number"
+      value={value}
+      min={min}
+      max={max}
+      step={step}
+      onChange={(e) => {
+        const v = Number(e.target.value);
+        if (!Number.isNaN(v)) onChange(v);
+      }}
+      className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+    />
+  );
+}
+
+function AddTestModal({
+  open, onClose, classInfo, onCreated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  classInfo: ClassInfo;
+  onCreated: (name: string, startAt: string, endAt: string) => void;
+}) {
+  // (1) Info
+  const [name, setName] = useState("");
+  const [subject, setSubject] = useState(classInfo.subject);
+  const [unitIds, setUnitIds] = useState<string[]>([]);
+  const [gradeType, setGradeType] = useState<"none" | "h1">("h1");
+
+  // (2) Config
+  const [scaleOptions, setScaleOptions] = useState<number[]>([10, 100]);
+  const [scale, setScale] = useState<string>("10");
+  const [addingScale, setAddingScale] = useState(false);
+  const [newScale, setNewScale] = useState("");
+  const [minScore, setMinScore] = useState(0);
+  const [duration, setDuration] = useState(45);
+  const [startAt, setStartAt] = useState("");
+  const [attempts, setAttempts] = useState(1);
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+
+  // (3) Students
+  const students = STUDENT_DB[classInfo.lop] ?? [];
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(students.map((s) => s.id)));
+
+  // Reset when opening
+  React.useEffect(() => {
+    if (!open) return;
+    setName("");
+    setSubject(classInfo.subject);
+    setUnitIds([]);
+    setGradeType("h1");
+    setScaleOptions([10, 100]);
+    setScale("10");
+    setAddingScale(false);
+    setNewScale("");
+    setMinScore(0);
+    setDuration(45);
+    setStartAt("");
+    setAttempts(1);
+    setShowAnswers(false);
+    setShuffle(false);
+    setSelected(new Set((STUDENT_DB[classInfo.lop] ?? []).map((s) => s.id)));
+  }, [open, classInfo.lop, classInfo.subject]);
+
+  const tree = useMemo(
+    () => getTreeForClass(classInfo.lop, subject),
+    [classInfo.lop, subject],
+  );
+
+  const allChecked = students.length > 0 && students.every((s) => selected.has(s.id));
+  const toggleAll = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allChecked) students.forEach((s) => next.delete(s.id));
+      else students.forEach((s) => next.add(s.id));
+      return next;
+    });
+  };
+  const toggleOne = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const canCreate =
+    name.trim().length > 0 &&
+    unitIds.length > 0 &&
+    !!scale &&
+    duration > 0 &&
+    startAt.trim().length > 0 &&
+    attempts > 0;
+
+  const handleCreate = () => {
+    if (!canCreate) return;
+    // Compute rough end time = start + duration minutes (best-effort format).
+    const d = new Date(startAt);
+    let startFmt = startAt.replace("T", " ");
+    let endFmt = startFmt;
+    if (!Number.isNaN(d.getTime())) {
+      const end = new Date(d.getTime() + duration * 60_000);
+      const fmt = (x: Date) => {
+        const p = (n: number) => String(n).padStart(2, "0");
+        return `${p(x.getDate())}/${p(x.getMonth() + 1)}/${x.getFullYear()} ${p(x.getHours())}:${p(x.getMinutes())}`;
+      };
+      startFmt = fmt(d);
+      endFmt = fmt(end);
+    }
+    onCreated(name.trim(), startFmt, endFmt);
+  };
+
+  const handleAddScale = () => {
+    const n = Number(newScale);
+    if (!Number.isFinite(n) || n <= 0) {
+      toast.error("Thang điểm phải là số dương");
+      return;
+    }
+    if (!scaleOptions.includes(n)) {
+      setScaleOptions((p) => [...p, n]);
+    }
+    setScale(String(n));
+    setNewScale("");
+    setAddingScale(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <FileCheck2 className="h-5 w-5 text-rose-500" /> Thêm bài kiểm tra mới
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-5">
+          {/* Section 1 */}
+          <div className="rounded-xl border border-slate-200 p-4">
+            <h3 className="text-sm font-bold text-slate-800 mb-3">1. Thông tin bài kiểm tra</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Tên bài kiểm tra <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="VD: Kiểm tra 15 phút – Chương Phân số"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Môn</label>
+                  <select
+                    value={subject}
+                    onChange={(e) => { setSubject(e.target.value); setUnitIds([]); }}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+                  >
+                    {(classInfo.subjectsTaught ?? [classInfo.subject]).map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">
+                    Đơn vị kiến thức <span className="text-rose-500">*</span>
+                  </label>
+                  <MultiUnitSelect
+                    tree={tree}
+                    value={unitIds}
+                    onChange={setUnitIds}
+                    placeholder="— Chọn đơn vị kiến thức —"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Loại điểm</label>
+                <select
+                  value={gradeType}
+                  onChange={(e) => setGradeType(e.target.value as "none" | "h1")}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+                >
+                  <option value="none">Kiểm tra không lấy điểm</option>
+                  <option value="h1">Lấy điểm hệ số 1</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2 */}
+          <div className="rounded-xl border border-slate-200 p-4">
+            <h3 className="text-sm font-bold text-slate-800 mb-3">2. Cấu hình đề</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Thang điểm <span className="text-rose-500">*</span>
+                </label>
+                {addingScale ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={newScale}
+                      onChange={(e) => setNewScale(e.target.value)}
+                      placeholder="Nhập số"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+                    />
+                    <button
+                      onClick={handleAddScale}
+                      className="px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                      Thêm
+                    </button>
+                    <button
+                      onClick={() => { setAddingScale(false); setNewScale(""); }}
+                      className="px-2 py-2 text-slate-500 hover:text-slate-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={scale}
+                    onChange={(e) => {
+                      if (e.target.value === "__add") setAddingScale(true);
+                      else setScale(e.target.value);
+                    }}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+                  >
+                    {scaleOptions.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                    <option value="__add">+ Thêm thang điểm</option>
+                  </select>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Điểm tối thiểu</label>
+                <NumberStepper value={minScore} onChange={setMinScore} min={0} max={Number(scale) || 100} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Thời gian làm (phút) <span className="text-rose-500">*</span>
+                </label>
+                <NumberStepper value={duration} onChange={setDuration} min={1} max={600} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Số lượt làm bài <span className="text-rose-500">*</span>
+                </label>
+                <NumberStepper value={attempts} onChange={setAttempts} min={1} max={20} />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Thời gian bắt đầu <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={startAt}
+                  onChange={(e) => setStartAt(e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Đến giờ, học sinh click vào rồi ấn "Làm bài" mới hiển thị đề.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showAnswers}
+                  onChange={(e) => setShowAnswers(e.target.checked)}
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                Cho phép xem đáp án sau khi nộp
+              </label>
+              <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={shuffle}
+                  onChange={(e) => setShuffle(e.target.checked)}
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                Xáo trộn đề và đáp án ngẫu nhiên
+              </label>
+            </div>
+          </div>
+
+          {/* Section 3 */}
+          <div className="rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-slate-800">3. Danh sách học sinh kiểm tra</h3>
+              <div className="text-xs text-slate-600">
+                Đã chọn: <span className="font-bold text-indigo-700">{selected.size}</span> / {students.length} học sinh
+              </div>
+            </div>
+            <div className="border border-slate-200 rounded-xl overflow-hidden max-h-72 overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600 sticky top-0">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-semibold w-12">STT</th>
+                    <th className="px-3 py-2 text-left font-semibold">Mã định danh</th>
+                    <th className="px-3 py-2 text-left font-semibold">Tên học sinh</th>
+                    <th className="px-3 py-2 text-left font-semibold">Ngày sinh</th>
+                    <th className="px-3 py-2 text-center font-semibold w-14">
+                      <input
+                        type="checkbox"
+                        checked={allChecked}
+                        onChange={toggleAll}
+                        className="h-4 w-4 accent-indigo-600 cursor-pointer"
+                      />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {students.map((s, idx) => {
+                    const checked = selected.has(s.id);
+                    return (
+                      <tr
+                        key={s.id}
+                        className={`hover:bg-slate-50 cursor-pointer ${checked ? "bg-indigo-50/40" : ""}`}
+                        onClick={() => toggleOne(s.id)}
+                      >
+                        <td className="px-3 py-2 text-slate-500">{String(idx + 1).padStart(2, "0")}</td>
+                        <td className="px-3 py-2 font-mono text-slate-700">{s.code}</td>
+                        <td className="px-3 py-2 text-slate-800 font-medium">{s.name}</td>
+                        <td className="px-3 py-2 text-slate-600">{s.dob}</td>
+                        <td className="px-3 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleOne(s.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-4 w-4 accent-indigo-600 cursor-pointer"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {students.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-6 text-center text-sm text-slate-400 italic">
+                        Không có học sinh nào trong lớp này.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              Đóng
+            </button>
+            <button
+              onClick={handleCreate}
+              disabled={!canCreate}
+              className="px-4 py-2 text-sm font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+            >
+              <Check className="h-4 w-4" /> Tạo bài kiểm tra
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
