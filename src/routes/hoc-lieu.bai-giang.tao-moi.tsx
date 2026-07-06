@@ -430,23 +430,13 @@ function Step1(props: {
             />
           </Field>
           <Field label="Đơn vị kiến thức" required>
-            <select
-              value={unitId}
-              onChange={(e) => setUnitId(e.target.value)}
+            <UnitCheckboxDropdown
+              tree={tree}
               disabled={!mon}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
-            >
-              <option value="">
-                {!mon ? "— Chọn môn trước —" : "— Chọn đơn vị kiến thức —"}
-              </option>
-              {tree.map((ch) => (
-                <optgroup key={ch.id} label={ch.title}>
-                  {ch.units.map((u) => (
-                    <option key={u.id} value={u.id}>{u.title}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+              value={unitId ? unitId.split(",").filter(Boolean) : []}
+              onChange={(ids) => setUnitId(ids.join(","))}
+              placeholder={!mon ? "— Chọn môn trước —" : "— Chọn đơn vị kiến thức —"}
+            />
           </Field>
         </div>
 
