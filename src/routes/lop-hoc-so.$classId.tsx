@@ -403,7 +403,7 @@ function ClassDetailPage() {
       </section>
 
       {/* Bài kiểm tra */}
-      <TestsSection className={info.name} />
+      <TestsSection classInfo={info} />
 
       {/* Lớp học trực tuyến (đã tạo) */}
       {classLive.length > 0 && (
