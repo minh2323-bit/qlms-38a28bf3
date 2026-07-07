@@ -399,6 +399,12 @@ function DashboardSection({
       onClick: onOpenTasks,
     },
     {
+      value: "3", label: "Bài giáo viên vừa chấm",
+      sub: "Mới có điểm hôm nay",
+      icon: CheckCircle2, bg: "bg-indigo-50", fg: "text-indigo-600", bar: "bg-indigo-500",
+      onClick: onOpenGraded,
+    },
+    {
       value: String(Math.max(upcomingCount, 3)), label: "Buổi học trực tuyến sắp diễn ra",
       sub: "Trong 24 giờ tới",
       icon: Video, bg: "bg-emerald-50", fg: "text-emerald-600", bar: "bg-emerald-500",
@@ -409,12 +415,6 @@ function DashboardSection({
       sub: "Toán · Tiếng Việt",
       icon: Trophy, bg: "bg-rose-50", fg: "text-rose-600", bar: "bg-rose-500",
       to: "/hoc-sinh/ky-thi-chinh-thuc",
-    },
-    {
-      value: "3", label: "Bài giáo viên vừa chấm",
-      sub: "Mới có điểm hôm nay",
-      icon: CheckCircle2, bg: "bg-indigo-50", fg: "text-indigo-600", bar: "bg-indigo-500",
-      onClick: onOpenGraded,
     },
   ];
 
