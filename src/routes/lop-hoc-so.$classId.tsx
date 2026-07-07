@@ -81,7 +81,9 @@ function ClassDetailPage() {
     students: 0, teacher: "—", thumb: thumbLop4A, description: "",
     lop: "4A", subject: "Toán", status: "draft", subjectsTaught: ["Toán"],
   };
-  const info: ClassInfo = CLASS_DB[classId] ?? fallback;
+  const baseInfo: ClassInfo = CLASS_DB[classId] ?? fallback;
+  const [info, setInfo] = useState<ClassInfo>(baseInfo);
+  const [editOpen, setEditOpen] = useState(false);
 
   const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
   const [status, setStatus] = useState<ClassStatus>(info.status);
