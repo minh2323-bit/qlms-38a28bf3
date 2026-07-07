@@ -265,6 +265,8 @@ function LessonDetailPage() {
           </div>
         </aside>
       </div>
+
+      <AnnouncementSection classRealId="4A" subject={info.subject} teacherName={info.author} />
     </AppShell>
   );
 }
