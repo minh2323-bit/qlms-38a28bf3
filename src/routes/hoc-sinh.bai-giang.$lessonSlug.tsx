@@ -5,6 +5,7 @@ import {
   BookOpen, Presentation, PlayCircle, Gamepad2, Heart, FileType,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { AnnouncementSection } from "@/components/AnnouncementSection";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/hoc-sinh/bai-giang/$lessonSlug")({
