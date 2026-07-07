@@ -81,7 +81,9 @@ function ClassDetailPage() {
     students: 0, teacher: "—", thumb: thumbLop4A, description: "",
     lop: "4A", subject: "Toán", status: "draft", subjectsTaught: ["Toán"],
   };
-  const info: ClassInfo = CLASS_DB[classId] ?? fallback;
+  const baseInfo: ClassInfo = CLASS_DB[classId] ?? fallback;
+  const [info, setInfo] = useState<ClassInfo>(baseInfo);
+  const [editOpen, setEditOpen] = useState(false);
 
   const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
   const [status, setStatus] = useState<ClassStatus>(info.status);
@@ -189,6 +191,14 @@ function ClassDetailPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Quay lại
         </button>
+
+        <button
+          onClick={() => setEditOpen(true)}
+          className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-indigo-700 text-sm font-semibold shadow hover:bg-indigo-50"
+        >
+          <Pencil className="h-4 w-4" /> Tùy chỉnh
+        </button>
+
 
         <div className="grid md:grid-cols-[1fr_280px] gap-6 p-6 md:p-8">
           <div className="text-white pt-10 md:pt-0">
@@ -462,7 +472,126 @@ function ClassDetailPage() {
 
       <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
       <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
+
+      <EditClassModal
+        open={editOpen}
+        info={info}
+        onClose={() => setEditOpen(false)}
+        onSave={(next) => { setInfo(next); setEditOpen(false); toast.success("Đã cập nhật thông tin lớp"); }}
+      />
     </AppShell>
+  );
+}
+
+/* ============================ Edit class modal ============================ */
+function EditClassModal({
+  open, info, onClose, onSave,
+}: {
+  open: boolean; info: ClassInfo;
+  onClose: () => void;
+  onSave: (next: ClassInfo) => void;
+}) {
+  const [name, setName] = useState(info.name);
+  const [description, setDescription] = useState(info.description);
+  const [thumb, setThumb] = useState(info.thumb);
+  const fileRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (open) { setName(info.name); setDescription(info.description); setThumb(info.thumb); }
+  }, [open, info]);
+
+  const onPickFile = (f: File | null) => {
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    setThumb(url);
+  };
+
+  const canSave = name.trim().length > 0;
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Pencil className="h-5 w-5 text-indigo-600" /> Tùy chỉnh thông tin lớp
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Khối</div>
+              <div className="text-sm font-bold text-slate-800 mt-0.5">Lớp {info.lop}</div>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Môn</div>
+              <div className="text-sm font-bold text-slate-800 mt-0.5">{info.subjectsTaught.join(", ")}</div>
+            </div>
+            <div className="col-span-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Cách đăng ký học sinh</div>
+              <div className="text-sm font-bold text-slate-800 mt-0.5">Qua mã lớp <span className="font-mono">{info.code}</span></div>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500 -mt-1">Không thể chỉnh sửa Khối, Môn và cách thức đăng ký học sinh.</p>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Tên lớp <span className="text-rose-500">*</span></label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Mô tả</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-200 resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Ảnh đại diện</label>
+            <div className="flex items-center gap-3">
+              <div className="h-24 w-32 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 shrink-0">
+                <img src={thumb} alt="thumb" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onPickFile(e.target.files?.[0] ?? null)}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                >
+                  <ImageIcon className="h-4 w-4" /> Đổi ảnh đại diện
+                </button>
+                <p className="text-[11px] text-slate-500 mt-1">Định dạng JPG/PNG, dung lượng &lt; 2MB.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-end gap-2 pt-3 border-t">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:underline">Huỷ</button>
+          <button
+            disabled={!canSave}
+            onClick={() => canSave && onSave({ ...info, name: name.trim(), description: description.trim(), thumb })}
+            className={`px-5 py-2 text-sm font-semibold rounded-lg ${canSave ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}
+          >
+            Lưu thay đổi
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
