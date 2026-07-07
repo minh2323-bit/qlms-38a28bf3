@@ -286,10 +286,12 @@ function SubmittedRow({ task }: { task: Task }) {
 }
 
 /* ------------ UI helpers ------------ */
-function TopTab({ active, label, count, onClick, tone }: { active: boolean; label: string; count: number; onClick: () => void; tone: "amber" | "emerald" }) {
+function TopTab({ active, label, count, onClick, tone }: { active: boolean; label: string; count: number; onClick: () => void; tone: "amber" | "emerald" | "indigo" }) {
   const toneCls = tone === "amber"
     ? "bg-amber-100 text-amber-700 border-amber-200"
-    : "bg-emerald-100 text-emerald-700 border-emerald-200";
+    : tone === "emerald"
+      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+      : "bg-indigo-100 text-indigo-700 border-indigo-200";
   return (
     <button
       onClick={onClick}
@@ -305,29 +307,14 @@ function TopTab({ active, label, count, onClick, tone }: { active: boolean; labe
   );
 }
 
-function FilterChips<T extends string>({
-  value, onChange, items,
-}: { value: T; onChange: (v: T) => void; items: Array<{ key: T; label: string }> }) {
-  return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {items.map((it) => (
-        <button
-          key={it.key}
-          onClick={() => onChange(it.key)}
-          className={`px-3 py-1.5 rounded-full text-[13px] font-semibold border transition ${
-            value === it.key
-              ? "bg-indigo-600 text-white border-indigo-600"
-              : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:text-indigo-700"
-          }`}
-        >
-          {it.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function SubjectSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
+function SubjectSelect({
+  value, onChange, options, labelFor,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  labelFor?: (k: string) => string;
+}) {
   return (
     <div className="relative">
       <select
@@ -335,9 +322,10 @@ function SubjectSelect({ value, onChange, options }: { value: string; onChange: 
         onChange={(e) => onChange(e.target.value)}
         className="appearance-none pl-4 pr-9 py-2 text-sm rounded-full border border-slate-200 bg-white text-slate-700 font-semibold hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
       >
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+        {options.map((o) => <option key={o} value={o}>{labelFor ? labelFor(o) : o}</option>)}
       </select>
       <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
     </div>
   );
 }
+
