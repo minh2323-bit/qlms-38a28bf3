@@ -59,10 +59,10 @@ function parseDue(dueAt: string): number {
 const isOverdue = (t: Task) => parseDue(t.dueAt) < Date.now();
 
 /* ------------ Page ------------ */
-type Tab = "chua-lam" | "da-nop";
+type Tab = "all" | "chua-lam" | "da-nop";
 
 function Page() {
-  const [tab, setTab] = useState<Tab>("chua-lam");
+  const [tab, setTab] = useState<Tab>("all");
   const [subject, setSubject] = useState<string>("Tất cả các môn");
   const [dueFilter, setDueFilter] = useState<"all" | "not-overdue" | "overdue">("all");
   const [gradedFilter, setGradedFilter] = useState<"all" | "da-cham" | "chua-cham">("all");
@@ -96,6 +96,27 @@ function Page() {
     );
   }, [daNop, subject, gradedFilter]);
 
+  const statusOptions =
+    tab === "chua-lam"
+      ? [
+          { key: "all", label: `Tất cả (${counts.chuaLam})` },
+          { key: "not-overdue", label: `Chưa quá hạn (${counts.chuaLam - counts.overdue})` },
+          { key: "overdue", label: `Quá hạn nộp (${counts.overdue})` },
+        ]
+      : tab === "da-nop"
+      ? [
+          { key: "all", label: `Tất cả (${counts.daNop + counts.daCham})` },
+          { key: "da-cham", label: `Đã chấm (${counts.daCham})` },
+          { key: "chua-cham", label: `Chưa chấm (${counts.daNop})` },
+        ]
+      : null;
+
+  const statusValue = tab === "chua-lam" ? dueFilter : tab === "da-nop" ? gradedFilter : "all";
+  const setStatusValue = (v: string) => {
+    if (tab === "chua-lam") setDueFilter(v as any);
+    else if (tab === "da-nop") setGradedFilter(v as any);
+  };
+
   return (
     <AppShell role="student">
       <section className="bg-white rounded-2xl border shadow-sm">
@@ -104,60 +125,74 @@ function Page() {
           <h2 className="text-xl font-bold text-slate-800">Nhiệm vụ, bài tập</h2>
         </div>
 
-        {/* Summary tabs strip (image 2/3 header) */}
+        {/* Row 1: top tabs */}
         <div className="px-6 pt-4 flex items-center gap-2 flex-wrap border-b">
+          <TopTab active={tab === "all"}      label="Tất cả"    count={counts.all} onClick={() => setTab("all")} tone="indigo" />
           <TopTab active={tab === "chua-lam"} label="Chưa làm" count={counts.chuaLam} onClick={() => setTab("chua-lam")} tone="amber" />
           <TopTab active={tab === "da-nop"}   label="Đã nộp"   count={counts.daNop + counts.daCham} onClick={() => setTab("da-nop")} tone="emerald" />
-          <div className="ml-auto">
-            <SubjectSelect value={subject} onChange={setSubject} options={SUBJECTS} />
-          </div>
+        </div>
+
+        {/* Row 2: filters */}
+        <div className="px-6 pt-4 flex items-center gap-2 flex-wrap">
+          <SubjectSelect value={subject} onChange={setSubject} options={SUBJECTS} />
+          {statusOptions && (
+            <SubjectSelect
+              value={statusValue}
+              onChange={setStatusValue}
+              options={statusOptions.map((o) => o.key)}
+              labelFor={(k) => statusOptions.find((o) => o.key === k)?.label ?? k}
+            />
+          )}
         </div>
 
         <div className="p-6 space-y-4">
-          {tab === "chua-lam" ? (
-            <>
-              <FilterChips
-                value={dueFilter}
-                onChange={(v) => setDueFilter(v as any)}
-                items={[
-                  { key: "all", label: `Tất cả (${counts.chuaLam})` },
-                  { key: "not-overdue", label: `Chưa quá hạn (${counts.chuaLam - counts.overdue})` },
-                  { key: "overdue", label: `Quá hạn nộp (${counts.overdue})` },
-                ]}
-              />
-              {filteredChuaLam.length === 0 ? (
+          {tab === "chua-lam" && (
+            filteredChuaLam.length === 0 ? (
+              <p className="text-sm text-slate-500 italic">Không có bài tập phù hợp.</p>
+            ) : (
+              <ul className="space-y-3">
+                {filteredChuaLam.map((t) => <TodoRow key={t.id} task={t} overdue={t._overdue} />)}
+              </ul>
+            )
+          )}
+          {tab === "da-nop" && (
+            filteredDaNop.length === 0 ? (
+              <p className="text-sm text-slate-500 italic">Không có bài nộp phù hợp.</p>
+            ) : (
+              <ul className="space-y-3">
+                {filteredDaNop.map((t) => <SubmittedRow key={t.id} task={t} />)}
+              </ul>
+            )
+          )}
+          {tab === "all" && (
+            <div className="space-y-6">
+              {filteredChuaLam.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold text-amber-700 uppercase tracking-wide">Chưa làm ({filteredChuaLam.length})</h3>
+                  <ul className="space-y-3">
+                    {filteredChuaLam.map((t) => <TodoRow key={t.id} task={t} overdue={t._overdue} />)}
+                  </ul>
+                </div>
+              )}
+              {filteredDaNop.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-bold text-emerald-700 uppercase tracking-wide">Đã nộp ({filteredDaNop.length})</h3>
+                  <ul className="space-y-3">
+                    {filteredDaNop.map((t) => <SubmittedRow key={t.id} task={t} />)}
+                  </ul>
+                </div>
+              )}
+              {filteredChuaLam.length === 0 && filteredDaNop.length === 0 && (
                 <p className="text-sm text-slate-500 italic">Không có bài tập phù hợp.</p>
-              ) : (
-                <ul className="space-y-3">
-                  {filteredChuaLam.map((t) => <TodoRow key={t.id} task={t} overdue={t._overdue} />)}
-                </ul>
               )}
-            </>
-          ) : (
-            <>
-              <FilterChips
-                value={gradedFilter}
-                onChange={(v) => setGradedFilter(v as any)}
-                items={[
-                  { key: "all", label: `Tất cả (${counts.daNop + counts.daCham})` },
-                  { key: "da-cham", label: `Đã chấm (${counts.daCham})` },
-                  { key: "chua-cham", label: `Chưa chấm (${counts.daNop})` },
-                ]}
-              />
-              {filteredDaNop.length === 0 ? (
-                <p className="text-sm text-slate-500 italic">Không có bài nộp phù hợp.</p>
-              ) : (
-                <ul className="space-y-3">
-                  {filteredDaNop.map((t) => <SubmittedRow key={t.id} task={t} />)}
-                </ul>
-              )}
-            </>
+            </div>
           )}
         </div>
       </section>
     </AppShell>
   );
 }
+
 
 /* ------------ Rows ------------ */
 function TodoRow({ task, overdue }: { task: Task; overdue: boolean }) {
@@ -251,10 +286,12 @@ function SubmittedRow({ task }: { task: Task }) {
 }
 
 /* ------------ UI helpers ------------ */
-function TopTab({ active, label, count, onClick, tone }: { active: boolean; label: string; count: number; onClick: () => void; tone: "amber" | "emerald" }) {
+function TopTab({ active, label, count, onClick, tone }: { active: boolean; label: string; count: number; onClick: () => void; tone: "amber" | "emerald" | "indigo" }) {
   const toneCls = tone === "amber"
     ? "bg-amber-100 text-amber-700 border-amber-200"
-    : "bg-emerald-100 text-emerald-700 border-emerald-200";
+    : tone === "emerald"
+      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+      : "bg-indigo-100 text-indigo-700 border-indigo-200";
   return (
     <button
       onClick={onClick}
@@ -270,29 +307,14 @@ function TopTab({ active, label, count, onClick, tone }: { active: boolean; labe
   );
 }
 
-function FilterChips<T extends string>({
-  value, onChange, items,
-}: { value: T; onChange: (v: T) => void; items: Array<{ key: T; label: string }> }) {
-  return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {items.map((it) => (
-        <button
-          key={it.key}
-          onClick={() => onChange(it.key)}
-          className={`px-3 py-1.5 rounded-full text-[13px] font-semibold border transition ${
-            value === it.key
-              ? "bg-indigo-600 text-white border-indigo-600"
-              : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:text-indigo-700"
-          }`}
-        >
-          {it.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function SubjectSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
+function SubjectSelect({
+  value, onChange, options, labelFor,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  labelFor?: (k: string) => string;
+}) {
   return (
     <div className="relative">
       <select
@@ -300,9 +322,10 @@ function SubjectSelect({ value, onChange, options }: { value: string; onChange: 
         onChange={(e) => onChange(e.target.value)}
         className="appearance-none pl-4 pr-9 py-2 text-sm rounded-full border border-slate-200 bg-white text-slate-700 font-semibold hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
       >
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+        {options.map((o) => <option key={o} value={o}>{labelFor ? labelFor(o) : o}</option>)}
       </select>
       <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
     </div>
   );
 }
+
