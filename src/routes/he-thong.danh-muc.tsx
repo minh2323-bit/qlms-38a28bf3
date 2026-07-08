@@ -222,11 +222,27 @@ function MonHocPanel() {
         </div>
       </div>
 
+      {/* Sort confirm bar */}
+      {sortMode && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
+          <div className="text-sm text-amber-800">
+            Kéo thả để sắp xếp lại thứ tự các môn học, sau đó nhấn <b>Xác nhận</b>.
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={cancelSort}>Hủy</Button>
+            <Button onClick={confirmSort} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Check className="h-4 w-4 mr-1.5" /> Xác nhận
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-indigo-700 hover:bg-indigo-700">
+              {sortMode && <TableHead className="text-white w-10"></TableHead>}
               <TableHead className="text-white text-center w-14">STT</TableHead>
               <TableHead className="text-white w-12">
                 <Checkbox checked={allChecked} onCheckedChange={toggleAll} />
@@ -242,7 +258,19 @@ function MonHocPanel() {
           </TableHeader>
           <TableBody>
             {filtered.map((r, idx) => (
-              <TableRow key={r.id} className="hover:bg-slate-50">
+              <TableRow
+                key={r.id}
+                draggable={sortMode}
+                onDragStart={() => onDragStart(r.id)}
+                onDragOver={(e) => sortMode && onDragOver(e, r.id)}
+                onDragEnd={() => setDragId(null)}
+                className={`hover:bg-slate-50 ${sortMode ? "cursor-move" : ""} ${dragId === r.id ? "opacity-50" : ""}`}
+              >
+                {sortMode && (
+                  <TableCell className="text-slate-400">
+                    <GripVertical className="h-4 w-4" />
+                  </TableCell>
+                )}
                 <TableCell className="text-center">{idx + 1}</TableCell>
                 <TableCell>
                   <Checkbox checked={selected.has(r.id)} onCheckedChange={() => toggleOne(r.id)} />
@@ -274,7 +302,7 @@ function MonHocPanel() {
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-slate-500 py-8">
+                <TableCell colSpan={sortMode ? 10 : 9} className="text-center text-slate-500 py-8">
                   Không có môn học phù hợp.
                 </TableCell>
               </TableRow>
