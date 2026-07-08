@@ -403,7 +403,7 @@ function Step1(props: {
             <Info className="h-4 w-4 mt-0.5 shrink-0" />
             <div>
               <b>Khối</b> và <b>Môn</b> đã được tự động điền theo {fromHint ? fromHint : "lớp học"}.
-              Bạn chỉ cần chọn <b>Đơn vị kiến thức</b> phù hợp.
+              Bạn chỉ cần chọn <b>Chương mục</b> và <b>Bài học</b> phù hợp.
             </div>
           </div>
         )}
@@ -417,7 +417,7 @@ function Step1(props: {
           />
         </Field>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <Field label="Khối" required>
             <Select
               value={khoi}
@@ -436,14 +436,31 @@ function Step1(props: {
               disabled={lockGradeSubject || !khoi}
             />
           </Field>
-          <Field label="Đơn vị kiến thức" required>
-            <UnitCheckboxDropdown
-              tree={tree}
+          <Field label="Chương mục" required>
+            <select
+              value={chapterId}
+              onChange={(e) => setChapterId(e.target.value)}
               disabled={!mon}
-              value={unitId ? unitId.split(",").filter(Boolean) : []}
-              onChange={(ids) => setUnitId(ids.join(","))}
-              placeholder={!mon ? "— Chọn môn trước —" : "— Chọn đơn vị kiến thức —"}
-            />
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
+            >
+              <option value="">{!mon ? "— Chọn môn trước —" : "— Chọn chương mục —"}</option>
+              {tree.map((c) => (
+                <option key={c.id} value={c.id}>{c.title}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Bài học" required>
+            <select
+              value={unitId}
+              onChange={(e) => setUnitId(e.target.value)}
+              disabled={!chapterId}
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
+            >
+              <option value="">{!chapterId ? "— Chọn chương trước —" : "— Chọn bài học —"}</option>
+              {unitOptions.map((u) => (
+                <option key={u.id} value={u.id}>{u.title}</option>
+              ))}
+            </select>
           </Field>
         </div>
 
