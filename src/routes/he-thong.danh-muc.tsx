@@ -176,8 +176,12 @@ function MonHocPanel() {
         <button className="p-2 rounded-lg border text-slate-600 hover:bg-slate-50" title="Cột">
           <Columns3 className="h-4 w-4" />
         </button>
-        <Button variant="outline" className="border-sky-500 text-sky-600 hover:bg-sky-50">
-          <Search className="h-4 w-4 mr-1.5" /> Tìm kiếm
+        <Button
+          variant="outline"
+          onClick={enterSort}
+          className={`border-sky-500 text-sky-600 hover:bg-sky-50 ${sortMode ? "bg-sky-50" : ""}`}
+        >
+          <ArrowUpDown className="h-4 w-4 mr-1.5" /> Sắp xếp
         </Button>
         <Button variant="outline" className="border-sky-500 text-sky-600 hover:bg-sky-50">
           <RefreshCcw className="h-4 w-4 mr-1.5" /> Lấy dữ liệu từ hệ thống
