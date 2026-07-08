@@ -11,7 +11,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Search, Filter, FilterX, Columns3, Pencil, Download, Trash2, Database, RefreshCcw,
+  Search, Filter, FilterX, Columns3, Pencil, Download, Trash2, Database, RefreshCcw, ArrowUpDown, Check, GripVertical,
 } from "lucide-react";
 
 export const Route = createFileRoute("/he-thong/danh-muc")({
