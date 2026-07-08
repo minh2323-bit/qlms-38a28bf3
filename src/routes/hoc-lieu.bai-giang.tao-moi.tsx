@@ -270,8 +270,9 @@ function CreateLessonPage() {
         {step === 1 && (
           <Step1
             title={title} setTitle={setTitle}
-            khoi={khoi} setKhoi={(v) => { setKhoi(v); setUnitId(""); }}
-            mon={mon}   setMon={(v) => { setMon(v); setUnitId(""); }}
+            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitId(""); }}
+            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitId(""); }}
+            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitId(""); }}
             unitId={unitId} setUnitId={setUnitId}
             tree={tree}
             coverMode={coverMode} setCoverMode={setCoverMode}
