@@ -352,6 +352,7 @@ function Step1(props: {
   title: string; setTitle: (v: string) => void;
   khoi: string; setKhoi: (v: string) => void;
   mon: string; setMon: (v: string) => void;
+  chapterId: string; setChapterId: (v: string) => void;
   unitId: string; setUnitId: (v: string) => void;
   tree: ReturnType<typeof getKnowledgeTree>;
   coverMode: "link" | "file"; setCoverMode: (v: "link" | "file") => void;
@@ -366,10 +367,14 @@ function Step1(props: {
   fromHint?: string;
 }) {
   const {
-    title, setTitle, khoi, setKhoi, mon, setMon, unitId, setUnitId, tree,
+    title, setTitle, khoi, setKhoi, mon, setMon,
+    chapterId, setChapterId, unitId, setUnitId, tree,
     coverMode, setCoverMode, coverLink, setCoverLink, coverFileName, coverDataUrl,
     fileRef, onPickFile, canCreate, onCreate, lockGradeSubject, fromHint,
   } = props;
+
+  const chapter = tree.find((c) => c.id === chapterId);
+  const unitOptions = chapter?.units ?? [];
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm">
