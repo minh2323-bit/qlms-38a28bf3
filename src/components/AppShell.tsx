@@ -69,7 +69,7 @@ const TEACHER_NAV: NavItem[] = [
     icon: Settings,
     label: "Hệ thống",
     submenu: [
-      { icon: BookOpen, label: "Môn học" },
+      { icon: BookOpen, label: "Danh mục", to: "/he-thong/danh-muc" },
       { icon: Brain, label: "Định danh kiến thức" },
       { icon: UserCog, label: "Tài khoản Người dùng" },
       { icon: UsersRound, label: "Tài khoản học sinh" },
