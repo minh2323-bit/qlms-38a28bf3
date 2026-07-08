@@ -135,14 +135,15 @@ function MonHocPanel() {
     });
   };
 
+  const source = sortMode ? sortDraft : rows;
   const filtered = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    return rows.filter((r) => {
+    return source.filter((r) => {
       if (grade !== "all" && r.grade !== grade) return false;
       if (kw && !r.name.toLowerCase().includes(kw)) return false;
       return true;
     });
-  }, [rows, grade, q]);
+  }, [source, grade, q]);
 
   const allChecked = filtered.length > 0 && filtered.every((r) => selected.has(r.id));
   const toggleAll = () => {
