@@ -106,6 +106,34 @@ function MonHocPanel() {
   const [grade, setGrade] = useState<string>("all");
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [sortMode, setSortMode] = useState(false);
+  const [sortDraft, setSortDraft] = useState<Subject[]>([]);
+  const [dragId, setDragId] = useState<string | null>(null);
+
+  const enterSort = () => {
+    setSortDraft(rows);
+    setSortMode(true);
+  };
+  const confirmSort = () => {
+    setRows(sortDraft);
+    setSortMode(false);
+  };
+  const cancelSort = () => setSortMode(false);
+
+  const onDragStart = (id: string) => setDragId(id);
+  const onDragOver = (e: React.DragEvent, overId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setSortDraft((prev) => {
+      const from = prev.findIndex((r) => r.id === dragId);
+      const to = prev.findIndex((r) => r.id === overId);
+      if (from < 0 || to < 0) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
 
   const filtered = useMemo(() => {
     const kw = q.trim().toLowerCase();
