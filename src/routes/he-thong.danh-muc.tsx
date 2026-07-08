@@ -11,7 +11,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Search, Filter, FilterX, Columns3, Pencil, Download, Trash2, Database, RefreshCcw,
+  Search, Filter, FilterX, Columns3, Pencil, Download, Trash2, Database, RefreshCcw, ArrowUpDown, Check, GripVertical,
 } from "lucide-react";
 
 export const Route = createFileRoute("/he-thong/danh-muc")({
@@ -106,15 +106,44 @@ function MonHocPanel() {
   const [grade, setGrade] = useState<string>("all");
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [sortMode, setSortMode] = useState(false);
+  const [sortDraft, setSortDraft] = useState<Subject[]>([]);
+  const [dragId, setDragId] = useState<string | null>(null);
 
+  const enterSort = () => {
+    setSortDraft(rows);
+    setSortMode(true);
+  };
+  const confirmSort = () => {
+    setRows(sortDraft);
+    setSortMode(false);
+  };
+  const cancelSort = () => setSortMode(false);
+
+  const onDragStart = (id: string) => setDragId(id);
+  const onDragOver = (e: React.DragEvent, overId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setSortDraft((prev) => {
+      const from = prev.findIndex((r) => r.id === dragId);
+      const to = prev.findIndex((r) => r.id === overId);
+      if (from < 0 || to < 0) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
+  const source = sortMode ? sortDraft : rows;
   const filtered = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    return rows.filter((r) => {
+    return source.filter((r) => {
       if (grade !== "all" && r.grade !== grade) return false;
       if (kw && !r.name.toLowerCase().includes(kw)) return false;
       return true;
     });
-  }, [rows, grade, q]);
+  }, [source, grade, q]);
 
   const allChecked = filtered.length > 0 && filtered.every((r) => selected.has(r.id));
   const toggleAll = () => {
@@ -147,8 +176,12 @@ function MonHocPanel() {
         <button className="p-2 rounded-lg border text-slate-600 hover:bg-slate-50" title="Cột">
           <Columns3 className="h-4 w-4" />
         </button>
-        <Button variant="outline" className="border-sky-500 text-sky-600 hover:bg-sky-50">
-          <Search className="h-4 w-4 mr-1.5" /> Tìm kiếm
+        <Button
+          variant="outline"
+          onClick={enterSort}
+          className={`border-sky-500 text-sky-600 hover:bg-sky-50 ${sortMode ? "bg-sky-50" : ""}`}
+        >
+          <ArrowUpDown className="h-4 w-4 mr-1.5" /> Sắp xếp
         </Button>
         <Button variant="outline" className="border-sky-500 text-sky-600 hover:bg-sky-50">
           <RefreshCcw className="h-4 w-4 mr-1.5" /> Lấy dữ liệu từ hệ thống
@@ -189,11 +222,27 @@ function MonHocPanel() {
         </div>
       </div>
 
+      {/* Sort confirm bar */}
+      {sortMode && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
+          <div className="text-sm text-amber-800">
+            Kéo thả để sắp xếp lại thứ tự các môn học, sau đó nhấn <b>Xác nhận</b>.
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={cancelSort}>Hủy</Button>
+            <Button onClick={confirmSort} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Check className="h-4 w-4 mr-1.5" /> Xác nhận
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-indigo-700 hover:bg-indigo-700">
+              {sortMode && <TableHead className="text-white w-10"></TableHead>}
               <TableHead className="text-white text-center w-14">STT</TableHead>
               <TableHead className="text-white w-12">
                 <Checkbox checked={allChecked} onCheckedChange={toggleAll} />
@@ -209,7 +258,19 @@ function MonHocPanel() {
           </TableHeader>
           <TableBody>
             {filtered.map((r, idx) => (
-              <TableRow key={r.id} className="hover:bg-slate-50">
+              <TableRow
+                key={r.id}
+                draggable={sortMode}
+                onDragStart={() => onDragStart(r.id)}
+                onDragOver={(e) => sortMode && onDragOver(e, r.id)}
+                onDragEnd={() => setDragId(null)}
+                className={`hover:bg-slate-50 ${sortMode ? "cursor-move" : ""} ${dragId === r.id ? "opacity-50" : ""}`}
+              >
+                {sortMode && (
+                  <TableCell className="text-slate-400">
+                    <GripVertical className="h-4 w-4" />
+                  </TableCell>
+                )}
                 <TableCell className="text-center">{idx + 1}</TableCell>
                 <TableCell>
                   <Checkbox checked={selected.has(r.id)} onCheckedChange={() => toggleOne(r.id)} />
@@ -241,7 +302,7 @@ function MonHocPanel() {
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-slate-500 py-8">
+                <TableCell colSpan={sortMode ? 10 : 9} className="text-center text-slate-500 py-8">
                   Không có môn học phù hợp.
                 </TableCell>
               </TableRow>
