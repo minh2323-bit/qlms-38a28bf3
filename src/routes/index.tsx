@@ -1067,6 +1067,7 @@ function LessonPanel({
   );
 
   const [adding, setAdding] = useState<null | { kind: MaterialKind; label: string }>(null);
+  const [confirmRemove, setConfirmRemove] = useState<null | Material>(null);
 
   const onDragStart = (e: React.DragEvent, mId: string) => {
     e.dataTransfer.setData("mId", mId);
