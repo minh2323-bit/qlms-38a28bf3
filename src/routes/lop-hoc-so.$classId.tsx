@@ -1821,7 +1821,8 @@ function AddTestModal({
   // (1) Info
   const [name, setName] = useState("");
   const [subject, setSubject] = useState(classInfo.subject);
-  const [unitIds, setUnitIds] = useState<string[]>([]);
+  const [chapterId, setChapterId] = useState("");
+  const [unitId, setUnitId] = useState("");
   const [gradeType, setGradeType] = useState<"none" | "h1">("h1");
 
   // (2) Config
