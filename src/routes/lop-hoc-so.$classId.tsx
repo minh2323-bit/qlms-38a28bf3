@@ -1887,7 +1887,7 @@ function AddTestModal({
 
   const canCreate =
     name.trim().length > 0 &&
-    unitIds.length > 0 &&
+    !!chapterId && !!unitId &&
     !!scale &&
     duration > 0 &&
     startAt.trim().length > 0 &&
