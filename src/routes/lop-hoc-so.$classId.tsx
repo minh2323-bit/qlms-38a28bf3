@@ -1846,7 +1846,8 @@ function AddTestModal({
     if (!open) return;
     setName("");
     setSubject(classInfo.subject);
-    setUnitIds([]);
+    setChapterId("");
+    setUnitId("");
     setGradeType("h1");
     setScaleOptions([10, 100]);
     setScale("10");
