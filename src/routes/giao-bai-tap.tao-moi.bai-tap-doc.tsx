@@ -300,14 +300,14 @@ function Page() {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Khối <span className="text-rose-500">*</span></label>
-                <Select value={grade} onValueChange={(v) => { setGrade(v); setKlass(""); }}>
+                <Select value={grade} onValueChange={(v) => { setGrade(v); setKlass(""); setChapterId(""); setUnitId(""); }}>
                   <SelectTrigger><SelectValue placeholder="Chọn khối" /></SelectTrigger>
                   <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Môn <span className="text-rose-500">*</span></label>
-                <Select value={subject} onValueChange={setSubject}>
+                <Select value={subject} onValueChange={(v) => { setSubject(v); setChapterId(""); setUnitId(""); }}>
                   <SelectTrigger><SelectValue placeholder="Chọn môn" /></SelectTrigger>
                   <SelectContent>{SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
@@ -323,12 +323,27 @@ function Page() {
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-semibold text-slate-700 mb-1 block">Định danh kiến thức <span className="text-rose-500">*</span></label>
-              <Select value={unit} onValueChange={setUnit}>
-                <SelectTrigger><SelectValue placeholder="Chọn đơn vị kiến thức" /></SelectTrigger>
-                <SelectContent>{KNOWLEDGE_UNITS.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Chương/Chủ đề <span className="text-rose-500">*</span></label>
+                <Select value={chapterId} onValueChange={(v) => { setChapterId(v); setUnitId(""); }} disabled={!subject}>
+                  <SelectTrigger><SelectValue placeholder={!subject ? "Chọn môn trước" : "Chọn chương/chủ đề"} /></SelectTrigger>
+                  <SelectContent>
+                    {tree.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Bài học <span className="text-rose-500">*</span></label>
+                <Select value={unitId} onValueChange={setUnitId} disabled={!chapterId}>
+                  <SelectTrigger><SelectValue placeholder={!chapterId ? "Chọn chương trước" : "Chọn bài học"} /></SelectTrigger>
+                  <SelectContent>
+                    {(tree.find((c) => c.id === chapterId)?.units ?? []).map((u) => (
+                      <SelectItem key={u.id} value={u.id}>{u.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
