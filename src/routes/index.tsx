@@ -1346,6 +1346,36 @@ function LessonPanel({
           onPick={(target) => doMoveOrCopy(target, moveOpen)}
         />
       )}
+
+      <Dialog open={!!confirmRemove} onOpenChange={(o) => !o && setConfirmRemove(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Trash2 className="h-5 w-5 text-rose-500" /> Gỡ nội dung khỏi tiết học
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Bạn xác nhận gỡ nội dung <b>{confirmRemove?.title}</b> khỏi Tiết học trên Lịch báo giảng.
+            Nội dung này vẫn sẽ hiển thị trong Lớp học.
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" size="sm" onClick={() => setConfirmRemove(null)}>Hủy</Button>
+            <Button
+              size="sm"
+              className="bg-rose-600 hover:bg-rose-700"
+              onClick={() => {
+                if (confirmRemove) {
+                  removeMaterial(confirmRemove.id);
+                  toast.success("Đã gỡ nội dung khỏi tiết học");
+                }
+                setConfirmRemove(null);
+              }}
+            >
+              Gỡ bỏ
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }
