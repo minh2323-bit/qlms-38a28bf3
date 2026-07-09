@@ -14,6 +14,7 @@ import {
   Upload, Link as LinkIcon, FileText, Video, X, Search,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 export const Route = createFileRoute("/giao-bai-tap/tao-moi/bai-tap-doc")({
   head: () => ({ meta: [{ title: "Tạo bài tập đọc - Tìm hiểu" }] }),
