@@ -437,7 +437,8 @@ function Page() {
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
   const [klass, setKlass] = useState("");
-  const [unit, setUnit] = useState("");
+  const [chapterId, setChapterId] = useState("");
+  const [unitId, setUnitId] = useState("");
   const [assignedAt, setAssignedAt] = useState("");
   const [assignedTime, setAssignedTime] = useState("08:00");
   const [dueAt, setDueAt] = useState("");
@@ -446,7 +447,8 @@ function Page() {
   const [opts, setOpts] = useState({
     lateSubmit: false, showScore: true, showAnswers: false, exportGrade: false,
   });
-  const step1Valid = title.trim() && grade && subject && klass && unit && assignedAt && dueAt && scale;
+  const tree = useMemo(() => getKnowledgeTree(grade, subject), [grade, subject]);
+  const step1Valid = title.trim() && grade && subject && klass && chapterId && unitId && assignedAt && dueAt && scale;
 
   // Step 2
   const [questions, setQuestions] = useState<Question[]>([]);
