@@ -140,7 +140,8 @@ function Page() {
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
   const [klass, setKlass] = useState("");
-  const [unit, setUnit] = useState("");
+  const [chapterId, setChapterId] = useState("");
+  const [unitId, setUnitId] = useState("");
   const [assignedAt, setAssignedAt] = useState("");
   const [assignedTime, setAssignedTime] = useState("08:00");
   const [dueAt, setDueAt] = useState("");
@@ -152,8 +153,9 @@ function Page() {
     showAnswers: false,
     exportGrade: false,
   });
+  const tree = useMemo(() => getKnowledgeTree(grade, subject), [grade, subject]);
 
-  const step1Valid = title.trim() && grade && subject && klass && unit &&
+  const step1Valid = title.trim() && grade && subject && klass && chapterId && unitId &&
     assignedAt && dueAt && scale;
 
   // Step 2
