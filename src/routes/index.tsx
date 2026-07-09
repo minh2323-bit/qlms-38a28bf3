@@ -1295,8 +1295,12 @@ function LessonPanel({
                           </div>
                         </div>
                         {!editMode && (
-                          <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
-                            <FileCheck2 className="h-3 w-3" />
+                          <button
+                            onClick={() => setConfirmRemove(m)}
+                            title="Gỡ bỏ khỏi tiết học"
+                            className="h-6 w-6 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center shrink-0 transition"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         )}
                       </li>
