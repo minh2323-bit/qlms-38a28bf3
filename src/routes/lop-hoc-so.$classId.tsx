@@ -1821,7 +1821,8 @@ function AddTestModal({
   // (1) Info
   const [name, setName] = useState("");
   const [subject, setSubject] = useState(classInfo.subject);
-  const [unitIds, setUnitIds] = useState<string[]>([]);
+  const [chapterId, setChapterId] = useState("");
+  const [unitId, setUnitId] = useState("");
   const [gradeType, setGradeType] = useState<"none" | "h1">("h1");
 
   // (2) Config
@@ -1845,7 +1846,8 @@ function AddTestModal({
     if (!open) return;
     setName("");
     setSubject(classInfo.subject);
-    setUnitIds([]);
+    setChapterId("");
+    setUnitId("");
     setGradeType("h1");
     setScaleOptions([10, 100]);
     setScale("10");
@@ -1885,7 +1887,7 @@ function AddTestModal({
 
   const canCreate =
     name.trim().length > 0 &&
-    unitIds.length > 0 &&
+    !!chapterId && !!unitId &&
     !!scale &&
     duration > 0 &&
     startAt.trim().length > 0 &&
@@ -1948,12 +1950,12 @@ function AddTestModal({
                   className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Môn</label>
                   <select
                     value={subject}
-                    onChange={(e) => { setSubject(e.target.value); setUnitIds([]); }}
+                    onChange={(e) => { setSubject(e.target.value); setChapterId(""); setUnitId(""); }}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
                   >
                     {(classInfo.subjectsTaught ?? [classInfo.subject]).map((s) => (
@@ -1963,14 +1965,34 @@ function AddTestModal({
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">
-                    Đơn vị kiến thức <span className="text-rose-500">*</span>
+                    Chương/Chủ đề <span className="text-rose-500">*</span>
                   </label>
-                  <MultiUnitSelect
-                    tree={tree}
-                    value={unitIds}
-                    onChange={setUnitIds}
-                    placeholder="— Chọn đơn vị kiến thức —"
-                  />
+                  <select
+                    value={chapterId}
+                    onChange={(e) => { setChapterId(e.target.value); setUnitId(""); }}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white"
+                  >
+                    <option value="">— Chọn chương —</option>
+                    {tree.map((c) => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">
+                    Bài học <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={unitId}
+                    onChange={(e) => setUnitId(e.target.value)}
+                    disabled={!chapterId}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white disabled:bg-slate-50 disabled:text-slate-400"
+                  >
+                    <option value="">{!chapterId ? "— Chọn chương trước —" : "— Chọn bài học —"}</option>
+                    {(tree.find((c) => c.id === chapterId)?.units ?? []).map((u) => (
+                      <option key={u.id} value={u.id}>{u.title}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>

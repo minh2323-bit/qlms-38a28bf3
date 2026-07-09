@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
   Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
-  Video, FileType2, Move, Copy, Database,
+  Video, FileType2, Move, Copy, Database, Trash2, BellRing,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
 import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree } from "@/lib/knowledge-tree";
 import {
-  useMaterials, addMaterial, moveMaterials, copyMaterials, type Material, type MaterialKind,
+  useMaterials, addMaterial, moveMaterials, copyMaterials, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
 import {
   useLiveClasses, PERIOD_TIMES, formatTimeRange, isLiveEnded, isEvening,
@@ -1067,6 +1067,7 @@ function LessonPanel({
   );
 
   const [adding, setAdding] = useState<null | { kind: MaterialKind; label: string }>(null);
+  const [confirmRemove, setConfirmRemove] = useState<null | Material>(null);
 
   const onDragStart = (e: React.DragEvent, mId: string) => {
     e.dataTransfer.setData("mId", mId);
@@ -1171,6 +1172,7 @@ function LessonPanel({
               <DropdownMenuItem onClick={() => quickAdd("doc", "Học liệu")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
               <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài kiểm tra")}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
               <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài tập")}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => quickAdd("doc", "Lời nhắc")}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -1293,8 +1295,12 @@ function LessonPanel({
                           </div>
                         </div>
                         {!editMode && (
-                          <button className="h-5 w-5 rounded-full border border-indigo-300 text-indigo-700 flex items-center justify-center hover:bg-indigo-100 shrink-0">
-                            <FileCheck2 className="h-3 w-3" />
+                          <button
+                            onClick={() => setConfirmRemove(m)}
+                            title="Gỡ bỏ khỏi tiết học"
+                            className="h-6 w-6 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center shrink-0 transition"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         )}
                       </li>
@@ -1340,6 +1346,36 @@ function LessonPanel({
           onPick={(target) => doMoveOrCopy(target, moveOpen)}
         />
       )}
+
+      <Dialog open={!!confirmRemove} onOpenChange={(o) => !o && setConfirmRemove(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Trash2 className="h-5 w-5 text-rose-500" /> Gỡ nội dung khỏi tiết học
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Bạn xác nhận gỡ nội dung <b>{confirmRemove?.title}</b> khỏi Tiết học trên Lịch báo giảng.
+            Nội dung này vẫn sẽ hiển thị trong Lớp học.
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" size="sm" onClick={() => setConfirmRemove(null)}>Hủy</Button>
+            <Button
+              size="sm"
+              className="bg-rose-600 hover:bg-rose-700"
+              onClick={() => {
+                if (confirmRemove) {
+                  removeMaterial(confirmRemove.id);
+                  toast.success("Đã gỡ nội dung khỏi tiết học");
+                }
+                setConfirmRemove(null);
+              }}
+            >
+              Gỡ bỏ
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }
