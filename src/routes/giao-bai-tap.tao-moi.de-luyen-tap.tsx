@@ -17,6 +17,7 @@ import {
   CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 export const Route = createFileRoute("/giao-bai-tap/tao-moi/de-luyen-tap")({
   head: () => ({ meta: [{ title: "Tạo đề luyện tập" }] }),
