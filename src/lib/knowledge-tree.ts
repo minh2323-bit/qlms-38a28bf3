@@ -146,6 +146,33 @@ export const KNOWLEDGE_TREE_G3: KnowledgeChapter[] = [
   },
 ];
 
+/** Cây kiến thức Khối 4 – Tiếng Việt (Kết nối tri thức). */
+export const KNOWLEDGE_TREE_TV4: KnowledgeChapter[] = [
+  {
+    id: "tv4-ch1",
+    title: "Chủ đề 1: Mỗi người một vẻ",
+    units: [
+      { id: "tv4-b1",  title: "Bài 1: Điều kì diệu – Danh từ – Đoạn văn và câu chủ đề", week: 1 },
+      { id: "tv4-b2",  title: "Bài 2: Thi nhạc – Đoạn văn nêu ý kiến – Tôi và bạn",     week: 1 },
+      { id: "tv4-b3",  title: "Bài 3: Anh em sinh đôi – Danh từ chung, danh từ riêng",   week: 2 },
+      { id: "tv4-b4",  title: "Bài 4: Công chúa và người dẫn chuyện – Đọc mở rộng",     week: 2 },
+      { id: "tv4-b5",  title: "Bài 5: Thần lằn xanh và tắc kè – Luyện tập về danh từ",  week: 3 },
+      { id: "tv4-b6",  title: "Bài 6: Nghệ sĩ trống – Báo cáo thảo luận nhóm – Bốn anh tài", week: 3 },
+      { id: "tv4-b7",  title: "Bài 7: Những bức chân dung – Quy tắc viết tên cơ quan, tổ chức", week: 4 },
+      { id: "tv4-b8",  title: "Bài 8: Ôn tập giữa học kì I",                              week: 4 },
+    ],
+  },
+  {
+    id: "tv4-ch2",
+    title: "Chủ đề 2: Trải nghiệm và khám phá",
+    units: [
+      { id: "tv4-b9",  title: "Bài 9: Bầu trời trong quả trứng – Động từ – Bài văn thuật lại một sự việc", week: 5 },
+      { id: "tv4-b10", title: "Bài 10: Tiếng nói của cỏ cây – Trải nghiệm đáng nhớ",   week: 5 },
+      { id: "tv4-b11", title: "Bài 11: Tập làm văn – Luyện tập về động từ – Viết bài văn thuật lại một sự việc", week: 6 },
+    ],
+  },
+];
+
 /** Map nhãn Khối/Môn → key chuẩn. */
 function normalizeGrade(grade: string | number): string {
   return String(grade).replace(/[^0-9]/g, "");
@@ -161,9 +188,15 @@ function normalizeSubject(subject: string): string {
 export function getKnowledgeTree(grade: string | number, subject: string): KnowledgeChapter[] {
   const g = normalizeGrade(grade);
   const s = normalizeSubject(subject);
-  if (s !== "toan") return [];
-  if (g === "4") return KNOWLEDGE_TREE;
-  if (g === "3") return KNOWLEDGE_TREE_G3;
+  if (s === "toan") {
+    if (g === "4") return KNOWLEDGE_TREE;
+    if (g === "3") return KNOWLEDGE_TREE_G3;
+    return [];
+  }
+  if (s === "tv") {
+    if (g === "4") return KNOWLEDGE_TREE_TV4;
+    return [];
+  }
   return [];
 }
 
@@ -173,7 +206,8 @@ export function getTreeForClass(classLop: string, subject: string): KnowledgeCha
 }
 
 /** Tổng hợp tất cả cây để tra cứu cross-grade. */
-const ALL_TREES: KnowledgeChapter[][] = [KNOWLEDGE_TREE, KNOWLEDGE_TREE_G3];
+const ALL_TREES: KnowledgeChapter[][] = [KNOWLEDGE_TREE, KNOWLEDGE_TREE_G3, KNOWLEDGE_TREE_TV4];
+
 
 export function getUnit(unitId: string): KnowledgeUnit | undefined {
   for (const tree of ALL_TREES) {
