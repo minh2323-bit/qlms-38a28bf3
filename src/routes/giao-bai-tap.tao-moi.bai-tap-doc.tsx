@@ -408,30 +408,49 @@ function Page() {
 
         {/* ============ STEP 2 ============ */}
         {step === 2 && (
-          <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-800">Nội dung bài tập</h2>
-              <div className="text-xs text-slate-500">
-                Tổng điểm câu hỏi phải bằng 10 cho mỗi nội dung.
-              </div>
+          <div className="space-y-4">
+            {/* Box: Nhập nội dung bài tập */}
+            <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-3">
+              <h2 className="text-base font-bold text-slate-800">Nhập nội dung bài tập</h2>
+              <Input
+                value={taskContent}
+                onChange={(e) => setTaskContent(e.target.value)}
+                placeholder="VD: Đọc kỹ 2 văn bản dưới đây rồi trả lời các câu hỏi."
+              />
             </div>
 
-            <div className="grid grid-cols-12 gap-4">
-              {/* Left: contents list */}
-              <div className="col-span-5 border rounded-xl p-3 space-y-2 bg-slate-50/60">
-                <div className="flex items-center justify-between px-1">
-                  <div className="text-sm font-semibold text-slate-700">Nội dung đọc</div>
-                  <Button size="sm" variant="outline" onClick={addContent} className="gap-1">
-                    <Plus className="h-4 w-4" /> Thêm
-                  </Button>
+            {/* Box: Nội dung bài tập */}
+            <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-4 flex-wrap">
+                  <h2 className="text-base font-bold text-slate-800">Nội dung bài tập</h2>
+                  <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                    <Checkbox checked={graded} onCheckedChange={(v) => setGraded(!!v)} />
+                    <span>Lấy điểm cho bài tập này</span>
+                  </label>
                 </div>
+                {graded && (
+                  <div className={`text-sm font-bold px-3 py-1.5 rounded border ${
+                    totalScore === 10 ? "text-emerald-700 border-emerald-200 bg-emerald-50"
+                    : "text-amber-700 border-amber-200 bg-amber-50"}`}>
+                    {totalScore}/10
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-slate-500">
+                {graded
+                  ? `Tổng điểm của ${totalQuestions} câu hỏi trên tất cả nội dung phải bằng 10.`
+                  : "Bài tập không tính điểm — học sinh chỉ cần hoàn thành."}
+              </div>
+
+              {/* Horizontal list of contents */}
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {contents.map((c, i) => {
                   const active = c.id === activeContentId;
-                  const cScore = c.questions.reduce((s, q) => s + q.score, 0);
                   return (
                     <div key={c.id}
                       onClick={() => setActiveContentId(c.id)}
-                      className={`rounded-lg border p-3 cursor-pointer transition ${
+                      className={`shrink-0 w-64 rounded-lg border p-3 cursor-pointer transition ${
                         active ? "border-indigo-500 bg-white ring-2 ring-indigo-100"
                         : "border-slate-200 bg-white hover:border-indigo-300"}`}>
                       <div className="flex items-center justify-between gap-2">
@@ -447,6 +466,7 @@ function Page() {
                           onChange={(e) => updateContent(c.id, { name: e.target.value })}
                           placeholder="Tên tài liệu"
                           className="h-8 text-sm"
+                          onClick={(e) => e.stopPropagation()}
                         />
                         <div className="flex items-center gap-2">
                           {c.kind === "file" ? (
@@ -466,24 +486,29 @@ function Page() {
                               onChange={(e) => updateContent(c.id, { url: e.target.value })}
                               placeholder="Dán link (doc/video)"
                               className="h-8 text-sm"
+                              onClick={(e) => e.stopPropagation()}
                             />
                           )}
                         </div>
-                        <div className="flex items-center justify-between text-[11px] text-slate-500">
-                          <span>{c.questions.length} câu hỏi</span>
-                          <span className={cScore === 10 ? "text-emerald-600 font-semibold" : "text-amber-600"}>
-                            {cScore}/10
-                          </span>
+                        <div className="text-[11px] text-slate-500">
+                          {c.questions.length} câu hỏi
                         </div>
                       </div>
                     </div>
                   );
                 })}
+                <button
+                  onClick={addContent}
+                  className="shrink-0 w-40 rounded-lg border-2 border-dashed border-slate-300 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 flex flex-col items-center justify-center gap-1 py-6"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span className="text-sm font-medium">Thêm nội dung</span>
+                </button>
                 <input type="file" ref={fileInputRef} className="hidden" onChange={onPickFile} />
               </div>
 
-              {/* Right: questions for active content */}
-              <div className="col-span-7 border rounded-xl p-4 space-y-3">
+              {/* Questions for active content (below) */}
+              <div className="border rounded-xl p-4 space-y-3 bg-slate-50/40">
                 {!activeContent ? (
                   <div className="text-sm text-slate-500 text-center py-10">Chọn 1 nội dung để thêm câu hỏi</div>
                 ) : (
@@ -495,50 +520,45 @@ function Page() {
                           {activeContent.name || "(Chưa đặt tên)"}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`text-sm font-bold px-2 py-1 rounded border ${
-                          totalScore === 10 ? "text-emerald-700 border-emerald-200 bg-emerald-50"
-                          : "text-amber-700 border-amber-200 bg-amber-50"}`}>
-                          {totalScore}/10
-                        </div>
-                        <Select onValueChange={(v) => addQuestion(v as QKind)}>
-                          <SelectTrigger className="w-[190px] h-9">
-                            <div className="flex items-center gap-1 text-sm">
-                              <Plus className="h-4 w-4" /> <SelectValue placeholder="Thêm câu hỏi" />
-                            </div>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="single">{Q_LABEL.single}</SelectItem>
-                            <SelectItem value="multi">{Q_LABEL.multi}</SelectItem>
-                            <SelectItem value="essay">{Q_LABEL.essay}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <Select onValueChange={(v) => addQuestion(v as QKind)}>
+                        <SelectTrigger className="w-[190px] h-9">
+                          <div className="flex items-center gap-1 text-sm">
+                            <Plus className="h-4 w-4" /> <SelectValue placeholder="Thêm câu hỏi" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="single">{Q_LABEL.single}</SelectItem>
+                          <SelectItem value="multi">{Q_LABEL.multi}</SelectItem>
+                          <SelectItem value="essay">{Q_LABEL.essay}</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     {activeContent.questions.length === 0 && (
-                      <div className="text-sm text-slate-400 text-center py-8 border-2 border-dashed rounded-lg">
+                      <div className="text-sm text-slate-400 text-center py-8 border-2 border-dashed rounded-lg bg-white">
                         Chưa có câu hỏi. Chọn loại câu hỏi để thêm.
                       </div>
                     )}
 
                     <div className="space-y-3">
                       {activeContent.questions.map((q, qi) => (
-                        <div key={q.id} className="border rounded-lg p-3 space-y-2 bg-slate-50/40">
+                        <div key={q.id} className="border rounded-lg p-3 space-y-2 bg-white">
                           <div className="flex items-center justify-between">
                             <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">
                               Câu {qi + 1} · {Q_LABEL[q.kind]}
                             </Badge>
                             <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-1 text-xs">
-                                <Input
-                                  type="number" min={0} max={10} step={0.5}
-                                  value={q.score}
-                                  onChange={(e) => updateQuestion(q.id, { score: Number(e.target.value) })}
-                                  className="h-8 w-16"
-                                />
-                                <span className="text-slate-500">/10</span>
-                              </div>
+                              {graded && (
+                                <div className="flex items-center gap-1 text-xs">
+                                  <Input
+                                    type="number" min={0} max={10} step={0.5}
+                                    value={q.score}
+                                    onChange={(e) => updateQuestion(q.id, { score: Number(e.target.value) })}
+                                    className="h-8 w-16"
+                                  />
+                                  <span className="text-slate-500">điểm</span>
+                                </div>
+                              )}
                               <button onClick={() => removeQuestion(q.id)}
                                 className="text-slate-400 hover:text-rose-600">
                                 <Trash2 className="h-4 w-4" />
@@ -594,26 +614,29 @@ function Page() {
                   </>
                 )}
               </div>
-            </div>
 
-            <div className="flex items-center justify-between pt-3 border-t">
-              <Button variant="ghost" onClick={() => setStep(1)}>
-                <ArrowLeft className="h-4 w-4 mr-1" /> Quay lại
-              </Button>
-              <div className="flex items-center gap-3">
-                {!step2Valid && (
-                  <span className="text-xs text-amber-600">
-                    Mỗi nội dung cần có tên, câu hỏi và tổng điểm = 10.
-                  </span>
-                )}
-                <Button onClick={() => setStep(3)} disabled={!step2Valid}
-                  className="bg-indigo-700 hover:bg-indigo-800 text-white">
-                  Tiếp theo
+              <div className="flex items-center justify-between pt-3 border-t">
+                <Button variant="ghost" onClick={() => setStep(1)}>
+                  <ArrowLeft className="h-4 w-4 mr-1" /> Quay lại
                 </Button>
+                <div className="flex items-center gap-3">
+                  {!step2Valid && (
+                    <span className="text-xs text-amber-600">
+                      {graded
+                        ? "Mỗi nội dung cần có tên & câu hỏi, tổng điểm tất cả câu = 10."
+                        : "Mỗi nội dung cần có tên và ít nhất 1 câu hỏi."}
+                    </span>
+                  )}
+                  <Button onClick={() => setStep(3)} disabled={!step2Valid}
+                    className="bg-indigo-700 hover:bg-indigo-800 text-white">
+                    Tiếp theo
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         )}
+
 
         {/* ============ STEP 3 ============ */}
         {step === 3 && (
