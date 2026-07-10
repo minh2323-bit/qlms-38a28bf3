@@ -159,22 +159,23 @@ function Page() {
     assignedAt && dueAt && scale;
 
   // Step 2
+  const [taskContent, setTaskContent] = useState("");
+  const [graded, setGraded] = useState(true);
   const [contents, setContents] = useState<ContentItem[]>([
     { id: `c-${Date.now()}`, name: "", kind: "file", questions: [] },
   ]);
   const [activeContentId, setActiveContentId] = useState<string>(contents[0].id);
   const activeContent = contents.find((c) => c.id === activeContentId);
 
+  // Tổng điểm dùng chung cho TẤT CẢ câu hỏi trên tất cả nội dung (phải = 10 nếu chấm điểm)
   const totalScore = useMemo(
-    () => (activeContent?.questions.reduce((s, q) => s + (q.score || 0), 0) ?? 0),
-    [activeContent],
+    () => contents.reduce((s, c) => s + c.questions.reduce((ss, q) => ss + (q.score || 0), 0), 0),
+    [contents],
   );
+  const totalQuestions = contents.reduce((s, c) => s + c.questions.length, 0);
   const allContentsHaveQuestions = contents.every((c) => c.name && c.questions.length > 0);
-  const allScoresValid = contents.every(
-    (c) => c.questions.length === 0 ||
-      c.questions.reduce((s, q) => s + (q.score || 0), 0) === 10,
-  );
-  const step2Valid = allContentsHaveQuestions && allScoresValid;
+  const step2Valid = allContentsHaveQuestions && (!graded || totalScore === 10);
+
 
   // Step 3
   const [pickedClass, setPickedClass] = useState<string>("");
