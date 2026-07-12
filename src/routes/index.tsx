@@ -1401,14 +1401,33 @@ function LessonPanel({
 }
 
 function PickLessonModal({
-  mode, count, weekIdx, grid, excludeLessonId, onCancel, onPick,
+  mode, count, weekIdx, grid, excludeLessonId, onCancel, onPickMany,
 }: {
   mode: "move" | "copy"; count: number;
   weekIdx: number; grid: WeekGrid; excludeLessonId: string;
-  onCancel: () => void; onPick: (lesson: Lesson) => void;
+  onCancel: () => void; onPickMany: (lessons: Lesson[]) => void;
 }) {
   const title = mode === "move" ? "Di chuyển học liệu" : "Tạo bản sao học liệu";
   const week = grid[weekIdx] ?? [];
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const togglePick = (occ: Lesson) => {
+    if (mode === "move") { onPickMany([occ]); return; }
+    setPicked((prev) => {
+      const n = new Set(prev);
+      if (n.has(occ.id)) n.delete(occ.id); else n.add(occ.id);
+      return n;
+    });
+  };
+  const confirmCopy = () => {
+    const lessons: Lesson[] = [];
+    for (let p = 1; p <= 10; p++) {
+      for (let di = 0; di < 7; di++) {
+        const occ = week[di]?.[p];
+        if (occ && picked.has(occ.id)) lessons.push(occ);
+      }
+    }
+    if (lessons.length) onPickMany(lessons);
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden">
@@ -1416,7 +1435,9 @@ function PickLessonModal({
           <div>
             <h3 className="text-base font-bold text-slate-800">{title}</h3>
             <p className="text-xs text-slate-500">
-              Chọn tiết đích trên Lịch báo giảng cho <b>{count}</b> học liệu đã chọn.
+              {mode === "copy"
+                ? <>Chọn <b>một hoặc nhiều tiết</b> đích để tạo bản sao <b>{count}</b> học liệu đã chọn.</>
+                : <>Chọn tiết đích trên Lịch báo giảng cho <b>{count}</b> học liệu đã chọn.</>}
             </p>
           </div>
           <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
@@ -1444,18 +1465,22 @@ function PickLessonModal({
                       </div>
                     );
                   }
+                  const isPicked = picked.has(occ.id);
                   return (
                     <button
                       key={di}
                       disabled={isSelf}
-                      onClick={() => onPick(occ)}
+                      onClick={() => togglePick(occ)}
                       className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
                         isSelf
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
-                          : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer`
+                          : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer ${isPicked ? "ring-2 ring-indigo-500" : ""}`
                       }`}
                     >
-                      <div className="font-semibold">{occ.class} · {occ.subject}</div>
+                      <div className="font-semibold flex items-center justify-between gap-1">
+                        <span>{occ.class} · {occ.subject}</span>
+                        {mode === "copy" && !isSelf && isPicked && <span className="text-indigo-600">✓</span>}
+                      </div>
                       <div className="truncate">{occ.topic}</div>
                       {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
                     </button>
@@ -1465,8 +1490,13 @@ function PickLessonModal({
             ))}
           </div>
         </div>
-        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end">
+        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
+          {mode === "copy" && (
+            <Button size="sm" disabled={!picked.size} onClick={confirmCopy}>
+              Tạo bản sao ({picked.size})
+            </Button>
+          )}
         </div>
       </div>
     </div>
