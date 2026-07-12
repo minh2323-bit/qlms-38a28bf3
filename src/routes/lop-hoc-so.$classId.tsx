@@ -1632,7 +1632,7 @@ function TestsSection({ classInfo }: { classInfo: ClassInfo }) {
 
 /* ============================ Task/Test pickers ============================ */
 
-function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
   const opts = [
     { key: "practice", label: "Đề luyện tập", desc: "Tự tạo đề luyện tập với 6 dạng câu hỏi.",
