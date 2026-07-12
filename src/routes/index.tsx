@@ -38,6 +38,7 @@ import {
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
 import { WEEKS, DAY_DATES } from "@/lib/school-weeks";
+import { AddMaterialModal, TaskPickerDialog, TestPickerDialog, type ClassInfo } from "@/routes/lop-hoc-so.$classId";
 
 
 export const Route = createFileRoute("/")({
@@ -1067,7 +1068,25 @@ function LessonPanel({
   );
 
   const [adding, setAdding] = useState<null | { kind: MaterialKind; label: string }>(null);
+  const [addMatOpen, setAddMatOpen] = useState<null | "lesson" | "material" | "exercise">(null);
+  const [taskPickerOpen, setTaskPickerOpen] = useState(false);
+  const [testPickerOpen, setTestPickerOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<null | Material>(null);
+
+  // ClassInfo synth cho các popup dùng chung với Lớp học số
+  const classInfoForModal: ClassInfo = useMemo(() => ({
+    id: `lbg-${lesson.class}`,
+    name: `Lớp ${lesson.class}`,
+    code: `LH-${lesson.class}`,
+    students: 40,
+    teacher: "Giáo viên",
+    thumb: "",
+    description: "",
+    lop: lesson.class,
+    subject: lesson.subject,
+    status: "deployed",
+    subjectsTaught: [lesson.subject],
+  }), [lesson.class, lesson.subject]);
 
   const onDragStart = (e: React.DragEvent, mId: string) => {
     e.dataTransfer.setData("mId", mId);
@@ -1119,15 +1138,16 @@ function LessonPanel({
     return next;
   });
 
-  const doMoveOrCopy = (target: Lesson, mode: "move" | "copy") => {
+  const doMoveOrCopyMany = (targets: Lesson[], mode: "move" | "copy") => {
     const ids = Array.from(selected);
-    const payload = { classRealId: target.class, subject: target.subject, unitId: target.unitId };
+    if (!targets.length || !ids.length) { setMoveOpen(null); return; }
     if (mode === "move") {
-      moveMaterials(ids, payload);
+      const target = targets[0];
+      moveMaterials(ids, { classRealId: target.class, subject: target.subject, unitId: target.unitId });
       toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
     } else {
-      copyMaterials(ids, payload);
-      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
+      targets.forEach((t) => copyMaterials(ids, { classRealId: t.class, subject: t.subject, unitId: t.unitId }));
+      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang ${targets.length} tiết`);
     }
     setSelected(new Set());
     setMoveOpen(null);
@@ -1157,21 +1177,12 @@ function LessonPanel({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem asChild>
-                <Link
-                  to="/hoc-lieu/bai-giang/tao-moi"
-                  search={{
-                    khoi: `Lớp ${String(lesson.class).replace(/[^0-9]/g, "")}`,
-                    mon: lesson.subject,
-                    from: `tiết ${lesson.class} – ${lesson.subject}`,
-                  }}
-                >
-                  <Presentation className="h-4 w-4 mr-2" />Bài giảng
-                </Link>
+              <DropdownMenuItem onClick={() => setAddMatOpen("lesson")}>
+                <Presentation className="h-4 w-4 mr-2" />Bài giảng
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => quickAdd("doc", "Học liệu")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài kiểm tra")}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => quickAdd("exercise", "Bài tập")}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAddMatOpen("material")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTestPickerOpen(true)}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTaskPickerOpen(true)}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
               <DropdownMenuItem onClick={() => quickAdd("doc", "Lời nhắc")}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -1312,18 +1323,6 @@ function LessonPanel({
           );
         })}
 
-        {editMode && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-            <p className="text-xs text-amber-800 font-medium mb-2">
-              Lịch tuần này — kéo học liệu và thả vào tiết bất kỳ để chuyển:
-            </p>
-            <MiniWeek
-              weekIdx={weekIdx} grid={grid}
-              classFilter={lesson.class}
-              onDropToSlot={onDropToSlot}
-            />
-          </div>
-        )}
       </div>
 
       {adding && (
@@ -1335,6 +1334,27 @@ function LessonPanel({
         />
       )}
 
+      {addMatOpen && (
+        <AddMaterialModal
+          mode={addMatOpen}
+          classInfo={classInfoForModal}
+          onClose={() => setAddMatOpen(null)}
+          onSubmit={(m) => {
+            addMaterial({
+              classRealId: lesson.class,
+              subject: lesson.subject,
+              origin: "schedule",
+              ...m,
+            });
+            setAddMatOpen(null);
+            toast.success("Đã thêm – đã đồng bộ Lớp học số & Lịch báo giảng");
+          }}
+        />
+      )}
+
+      <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
+      <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
+
       {moveOpen && (
         <PickLessonModal
           mode={moveOpen}
@@ -1343,7 +1363,7 @@ function LessonPanel({
           grid={grid}
           excludeLessonId={lesson.id}
           onCancel={() => setMoveOpen(null)}
-          onPick={(target) => doMoveOrCopy(target, moveOpen)}
+          onPickMany={(targets) => doMoveOrCopyMany(targets, moveOpen)}
         />
       )}
 
@@ -1381,14 +1401,33 @@ function LessonPanel({
 }
 
 function PickLessonModal({
-  mode, count, weekIdx, grid, excludeLessonId, onCancel, onPick,
+  mode, count, weekIdx, grid, excludeLessonId, onCancel, onPickMany,
 }: {
   mode: "move" | "copy"; count: number;
   weekIdx: number; grid: WeekGrid; excludeLessonId: string;
-  onCancel: () => void; onPick: (lesson: Lesson) => void;
+  onCancel: () => void; onPickMany: (lessons: Lesson[]) => void;
 }) {
   const title = mode === "move" ? "Di chuyển học liệu" : "Tạo bản sao học liệu";
   const week = grid[weekIdx] ?? [];
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const togglePick = (occ: Lesson) => {
+    if (mode === "move") { onPickMany([occ]); return; }
+    setPicked((prev) => {
+      const n = new Set(prev);
+      if (n.has(occ.id)) n.delete(occ.id); else n.add(occ.id);
+      return n;
+    });
+  };
+  const confirmCopy = () => {
+    const lessons: Lesson[] = [];
+    for (let p = 1; p <= 10; p++) {
+      for (let di = 0; di < 7; di++) {
+        const occ = week[di]?.[p];
+        if (occ && picked.has(occ.id)) lessons.push(occ);
+      }
+    }
+    if (lessons.length) onPickMany(lessons);
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden">
@@ -1396,7 +1435,9 @@ function PickLessonModal({
           <div>
             <h3 className="text-base font-bold text-slate-800">{title}</h3>
             <p className="text-xs text-slate-500">
-              Chọn tiết đích trên Lịch báo giảng cho <b>{count}</b> học liệu đã chọn.
+              {mode === "copy"
+                ? <>Chọn <b>một hoặc nhiều tiết</b> đích để tạo bản sao <b>{count}</b> học liệu đã chọn.</>
+                : <>Chọn tiết đích trên Lịch báo giảng cho <b>{count}</b> học liệu đã chọn.</>}
             </p>
           </div>
           <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
@@ -1424,18 +1465,22 @@ function PickLessonModal({
                       </div>
                     );
                   }
+                  const isPicked = picked.has(occ.id);
                   return (
                     <button
                       key={di}
                       disabled={isSelf}
-                      onClick={() => onPick(occ)}
+                      onClick={() => togglePick(occ)}
                       className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
                         isSelf
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
-                          : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer`
+                          : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer ${isPicked ? "ring-2 ring-indigo-500" : ""}`
                       }`}
                     >
-                      <div className="font-semibold">{occ.class} · {occ.subject}</div>
+                      <div className="font-semibold flex items-center justify-between gap-1">
+                        <span>{occ.class} · {occ.subject}</span>
+                        {mode === "copy" && !isSelf && isPicked && <span className="text-indigo-600">✓</span>}
+                      </div>
                       <div className="truncate">{occ.topic}</div>
                       {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
                     </button>
@@ -1445,8 +1490,13 @@ function PickLessonModal({
             ))}
           </div>
         </div>
-        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end">
+        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
+          {mode === "copy" && (
+            <Button size="sm" disabled={!picked.size} onClick={confirmCopy}>
+              Tạo bản sao ({picked.size})
+            </Button>
+          )}
         </div>
       </div>
     </div>

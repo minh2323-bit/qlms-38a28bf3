@@ -49,7 +49,7 @@ export const Route = createFileRoute("/lop-hoc-so/$classId")({
 /* ============================ Mock class info ============================ */
 
 type ClassStatus = "draft" | "deployed";
-type ClassInfo = {
+export type ClassInfo = {
   id: string; name: string; code: string; students: number;
   teacher: string; thumb: string; description: string;
   /** real class id used for sync with lịch báo giảng */
@@ -739,7 +739,7 @@ const COMPLETION_OPTIONS = [
   { value: "manual",   label: "Học sinh tự click Hoàn thành" },
 ];
 
-function AddMaterialModal({
+export function AddMaterialModal({
   mode, classInfo, onClose, onSubmit,
 }: {
   mode: "lesson" | "material" | "exercise";
@@ -1632,7 +1632,7 @@ function TestsSection({ classInfo }: { classInfo: ClassInfo }) {
 
 /* ============================ Task/Test pickers ============================ */
 
-function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
   const opts = [
     { key: "practice", label: "Đề luyện tập", desc: "Tự tạo đề luyện tập với 6 dạng câu hỏi.",
@@ -1674,7 +1674,7 @@ function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
-function TestPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function TestPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
   const opts = [
     { key: "bank", label: "Thêm từ Kho đề kiểm tra", desc: "Chọn đề có sẵn từ kho đề kiểm tra của bạn.",
