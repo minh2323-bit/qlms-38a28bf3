@@ -1674,7 +1674,7 @@ export function TaskPickerDialog({ open, onClose }: { open: boolean; onClose: ()
   );
 }
 
-function TestPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function TestPickerDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
   const opts = [
     { key: "bank", label: "Thêm từ Kho đề kiểm tra", desc: "Chọn đề có sẵn từ kho đề kiểm tra của bạn.",
