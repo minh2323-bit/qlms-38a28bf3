@@ -1068,7 +1068,25 @@ function LessonPanel({
   );
 
   const [adding, setAdding] = useState<null | { kind: MaterialKind; label: string }>(null);
+  const [addMatOpen, setAddMatOpen] = useState<null | "lesson" | "material" | "exercise">(null);
+  const [taskPickerOpen, setTaskPickerOpen] = useState(false);
+  const [testPickerOpen, setTestPickerOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<null | Material>(null);
+
+  // ClassInfo synth cho các popup dùng chung với Lớp học số
+  const classInfoForModal: ClassInfo = useMemo(() => ({
+    id: `lbg-${lesson.class}`,
+    name: `Lớp ${lesson.class}`,
+    code: `LH-${lesson.class}`,
+    students: 40,
+    teacher: "Giáo viên",
+    thumb: "",
+    description: "",
+    lop: lesson.class,
+    subject: lesson.subject,
+    status: "deployed",
+    subjectsTaught: [lesson.subject],
+  }), [lesson.class, lesson.subject]);
 
   const onDragStart = (e: React.DragEvent, mId: string) => {
     e.dataTransfer.setData("mId", mId);
