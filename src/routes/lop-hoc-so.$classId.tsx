@@ -739,7 +739,7 @@ const COMPLETION_OPTIONS = [
   { value: "manual",   label: "Học sinh tự click Hoàn thành" },
 ];
 
-function AddMaterialModal({
+export function AddMaterialModal({
   mode, classInfo, onClose, onSubmit,
 }: {
   mode: "lesson" | "material" | "exercise";
