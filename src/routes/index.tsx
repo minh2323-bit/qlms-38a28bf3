@@ -38,6 +38,7 @@ import {
 } from "@/lib/live-class-store";
 import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
 import { WEEKS, DAY_DATES } from "@/lib/school-weeks";
+import { AddMaterialModal, TaskPickerDialog, TestPickerDialog, type ClassInfo } from "@/routes/lop-hoc-so.$classId";
 
 
 export const Route = createFileRoute("/")({
