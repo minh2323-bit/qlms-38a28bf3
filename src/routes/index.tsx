@@ -1138,15 +1138,16 @@ function LessonPanel({
     return next;
   });
 
-  const doMoveOrCopy = (target: Lesson, mode: "move" | "copy") => {
+  const doMoveOrCopyMany = (targets: Lesson[], mode: "move" | "copy") => {
     const ids = Array.from(selected);
-    const payload = { classRealId: target.class, subject: target.subject, unitId: target.unitId };
+    if (!targets.length || !ids.length) { setMoveOpen(null); return; }
     if (mode === "move") {
-      moveMaterials(ids, payload);
+      const target = targets[0];
+      moveMaterials(ids, { classRealId: target.class, subject: target.subject, unitId: target.unitId });
       toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
     } else {
-      copyMaterials(ids, payload);
-      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
+      targets.forEach((t) => copyMaterials(ids, { classRealId: t.class, subject: t.subject, unitId: t.unitId }));
+      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang ${targets.length} tiết`);
     }
     setSelected(new Set());
     setMoveOpen(null);
