@@ -1322,18 +1322,6 @@ function LessonPanel({
           );
         })}
 
-        {editMode && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-            <p className="text-xs text-amber-800 font-medium mb-2">
-              Lịch tuần này — kéo học liệu và thả vào tiết bất kỳ để chuyển:
-            </p>
-            <MiniWeek
-              weekIdx={weekIdx} grid={grid}
-              classFilter={lesson.class}
-              onDropToSlot={onDropToSlot}
-            />
-          </div>
-        )}
       </div>
 
       {adding && (
@@ -1345,6 +1333,27 @@ function LessonPanel({
         />
       )}
 
+      {addMatOpen && (
+        <AddMaterialModal
+          mode={addMatOpen}
+          classInfo={classInfoForModal}
+          onClose={() => setAddMatOpen(null)}
+          onSubmit={(m) => {
+            addMaterial({
+              classRealId: lesson.class,
+              subject: lesson.subject,
+              origin: "schedule",
+              ...m,
+            });
+            setAddMatOpen(null);
+            toast.success("Đã thêm – đã đồng bộ Lớp học số & Lịch báo giảng");
+          }}
+        />
+      )}
+
+      <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
+      <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
+
       {moveOpen && (
         <PickLessonModal
           mode={moveOpen}
@@ -1353,7 +1362,7 @@ function LessonPanel({
           grid={grid}
           excludeLessonId={lesson.id}
           onCancel={() => setMoveOpen(null)}
-          onPick={(target) => doMoveOrCopy(target, moveOpen)}
+          onPickMany={(targets) => doMoveOrCopyMany(targets, moveOpen)}
         />
       )}
 
