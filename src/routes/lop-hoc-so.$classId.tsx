@@ -49,7 +49,7 @@ export const Route = createFileRoute("/lop-hoc-so/$classId")({
 /* ============================ Mock class info ============================ */
 
 type ClassStatus = "draft" | "deployed";
-type ClassInfo = {
+export type ClassInfo = {
   id: string; name: string; code: string; students: number;
   teacher: string; thumb: string; description: string;
   /** real class id used for sync with lịch báo giảng */
