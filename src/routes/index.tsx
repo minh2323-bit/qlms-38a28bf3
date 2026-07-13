@@ -1465,7 +1465,7 @@ function PickLessonModal({
   const now = new Date();
   const minDeadline = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
-  const isDeadlineKind = (m: Material) => m.kind === "exercise" || m.kind === "test";
+  const isDeadlineKind = (m: Material) => m.kind === "exercise";
 
   const confirmCopy = () => {
     const ovs: Array<{ srcId: string; target: { classRealId: string; subject: string; unitId: string }; title?: string; deadline?: string }> = [];
