@@ -1138,20 +1138,26 @@ function LessonPanel({
     return next;
   });
 
-  const doMoveOrCopyMany = (targets: Lesson[], mode: "move" | "copy") => {
+  const doMove = (target: Lesson) => {
     const ids = Array.from(selected);
-    if (!targets.length || !ids.length) { setMoveOpen(null); return; }
-    if (mode === "move") {
-      const target = targets[0];
-      moveMaterials(ids, { classRealId: target.class, subject: target.subject, unitId: target.unitId });
-      toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
-    } else {
-      targets.forEach((t) => copyMaterials(ids, { classRealId: t.class, subject: t.subject, unitId: t.unitId }));
-      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang ${targets.length} tiết`);
-    }
+    if (!ids.length) { setMoveOpen(null); return; }
+    moveMaterials(ids, { classRealId: target.class, subject: target.subject, unitId: target.unitId });
+    toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
     setSelected(new Set());
     setMoveOpen(null);
   };
+
+  const doCopyWithOverrides = (
+    ovs: Array<{ srcId: string; target: { classRealId: string; subject: string; unitId: string }; title?: string; deadline?: string }>,
+  ) => {
+    if (!ovs.length) { setMoveOpen(null); return; }
+    copyMaterialsWithOverrides(ovs);
+    const nTargets = new Set(ovs.map((o) => `${o.target.classRealId}|${o.target.subject}|${o.target.unitId}`)).size;
+    toast.success(`Đã tạo bản sao sang ${nTargets} tiết`);
+    setSelected(new Set());
+    setMoveOpen(null);
+  };
+
 
   return (
     <aside className="w-[340px] shrink-0 border-l bg-slate-50/60 flex flex-col animate-in slide-in-from-right-4 duration-200">
