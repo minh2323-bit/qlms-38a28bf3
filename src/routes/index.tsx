@@ -1364,14 +1364,17 @@ function LessonPanel({
       {moveOpen && (
         <PickLessonModal
           mode={moveOpen}
-          count={selected.size}
+          sourceLesson={lesson}
+          sourceMaterials={materials.filter((m) => selected.has(m.id))}
           weekIdx={weekIdx}
           grid={grid}
           excludeLessonId={lesson.id}
           onCancel={() => setMoveOpen(null)}
-          onPickMany={(targets) => doMoveOrCopyMany(targets, moveOpen)}
+          onMove={doMove}
+          onCopy={doCopyWithOverrides}
         />
       )}
+
 
       <Dialog open={!!confirmRemove} onOpenChange={(o) => !o && setConfirmRemove(null)}>
         <DialogContent className="max-w-md">
