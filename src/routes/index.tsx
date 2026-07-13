@@ -381,7 +381,7 @@ function TeacherHome() {
                 className="gap-2"
               >
                 <BookMarked className="h-4 w-4" />
-                Cây kiến thức
+                Chủ đề & Bài học
               </Button>
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
