@@ -739,7 +739,7 @@ function KnowledgeTree({
   return (
     <div className="w-72 shrink-0 border-r bg-slate-50/60 p-4 space-y-3 animate-in slide-in-from-left-4 duration-200">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-700">Cây kiến thức</span>
+        <span className="text-sm font-semibold text-slate-700">Chủ đề & Bài học</span>
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
