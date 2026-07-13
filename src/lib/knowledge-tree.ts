@@ -210,8 +210,9 @@ export function getUnit(unitId: string): KnowledgeUnit | undefined {
 }
 
 export function getUnitTitle(unitId: string): string {
-  return getUnit(unitId)?.title ?? unitId;
+  return getUnit(unitId)?.title ?? LEGACY_UNIT_TITLES[unitId] ?? unitId;
 }
+
 
 export function getChapterOfUnit(unitId: string): KnowledgeChapter | undefined {
   for (const tree of ALL_TREES) {
