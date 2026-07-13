@@ -30,7 +30,7 @@ import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
 import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree } from "@/lib/knowledge-tree";
 import {
-  useMaterials, addMaterial, moveMaterials, copyMaterials, removeMaterial, type Material, type MaterialKind,
+  useMaterials, addMaterial, moveMaterials, copyMaterialsWithOverrides, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
 import {
   useLiveClasses, PERIOD_TIMES, formatTimeRange, isLiveEnded, isEvening,
@@ -381,7 +381,7 @@ function TeacherHome() {
                 className="gap-2"
               >
                 <BookMarked className="h-4 w-4" />
-                Cây kiến thức
+                Chủ đề & Bài học
               </Button>
               <div className="flex items-center gap-3">
                 <h2 className="text-xl font-bold text-slate-800">Lịch báo giảng</h2>
@@ -739,7 +739,7 @@ function KnowledgeTree({
   return (
     <div className="w-72 shrink-0 border-r bg-slate-50/60 p-4 space-y-3 animate-in slide-in-from-left-4 duration-200">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-700">Cây kiến thức</span>
+        <span className="text-sm font-semibold text-slate-700">Chủ đề & Bài học</span>
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
@@ -1138,20 +1138,26 @@ function LessonPanel({
     return next;
   });
 
-  const doMoveOrCopyMany = (targets: Lesson[], mode: "move" | "copy") => {
+  const doMove = (target: Lesson) => {
     const ids = Array.from(selected);
-    if (!targets.length || !ids.length) { setMoveOpen(null); return; }
-    if (mode === "move") {
-      const target = targets[0];
-      moveMaterials(ids, { classRealId: target.class, subject: target.subject, unitId: target.unitId });
-      toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
-    } else {
-      targets.forEach((t) => copyMaterials(ids, { classRealId: t.class, subject: t.subject, unitId: t.unitId }));
-      toast.success(`Đã tạo bản sao ${ids.length} học liệu sang ${targets.length} tiết`);
-    }
+    if (!ids.length) { setMoveOpen(null); return; }
+    moveMaterials(ids, { classRealId: target.class, subject: target.subject, unitId: target.unitId });
+    toast.success(`Đã di chuyển ${ids.length} học liệu sang tiết ${target.class} – ${target.topic}`);
     setSelected(new Set());
     setMoveOpen(null);
   };
+
+  const doCopyWithOverrides = (
+    ovs: Array<{ srcId: string; target: { classRealId: string; subject: string; unitId: string }; title?: string; deadline?: string }>,
+  ) => {
+    if (!ovs.length) { setMoveOpen(null); return; }
+    copyMaterialsWithOverrides(ovs);
+    const nTargets = new Set(ovs.map((o) => `${o.target.classRealId}|${o.target.subject}|${o.target.unitId}`)).size;
+    toast.success(`Đã tạo bản sao sang ${nTargets} tiết`);
+    setSelected(new Set());
+    setMoveOpen(null);
+  };
+
 
   return (
     <aside className="w-[340px] shrink-0 border-l bg-slate-50/60 flex flex-col animate-in slide-in-from-right-4 duration-200">
@@ -1358,14 +1364,17 @@ function LessonPanel({
       {moveOpen && (
         <PickLessonModal
           mode={moveOpen}
-          count={selected.size}
+          sourceLesson={lesson}
+          sourceMaterials={materials.filter((m) => selected.has(m.id))}
           weekIdx={weekIdx}
           grid={grid}
           excludeLessonId={lesson.id}
           onCancel={() => setMoveOpen(null)}
-          onPickMany={(targets) => doMoveOrCopyMany(targets, moveOpen)}
+          onMove={doMove}
+          onCopy={doCopyWithOverrides}
         />
       )}
+
 
       <Dialog open={!!confirmRemove} onOpenChange={(o) => !o && setConfirmRemove(null)}>
         <DialogContent className="max-w-md">
@@ -1401,100 +1410,253 @@ function LessonPanel({
 }
 
 function PickLessonModal({
-  mode, count, weekIdx, grid, excludeLessonId, onCancel, onPickMany,
+  mode, sourceLesson, sourceMaterials, weekIdx, grid, excludeLessonId, onCancel, onMove, onCopy,
 }: {
-  mode: "move" | "copy"; count: number;
+  mode: "move" | "copy";
+  sourceLesson: Lesson;
+  sourceMaterials: Material[];
   weekIdx: number; grid: WeekGrid; excludeLessonId: string;
-  onCancel: () => void; onPickMany: (lessons: Lesson[]) => void;
+  onCancel: () => void;
+  onMove: (target: Lesson) => void;
+  onCopy: (ovs: Array<{ srcId: string; target: { classRealId: string; subject: string; unitId: string }; title?: string; deadline?: string }>) => void;
 }) {
   const title = mode === "move" ? "Di chuyển học liệu" : "Tạo bản sao học liệu";
   const week = grid[weekIdx] ?? [];
-  const [picked, setPicked] = useState<Set<string>>(new Set());
-  const togglePick = (occ: Lesson) => {
-    if (mode === "move") { onPickMany([occ]); return; }
-    setPicked((prev) => {
-      const n = new Set(prev);
-      if (n.has(occ.id)) n.delete(occ.id); else n.add(occ.id);
-      return n;
-    });
-  };
-  const confirmCopy = () => {
-    const lessons: Lesson[] = [];
+  const [pickedIds, setPickedIds] = useState<string[]>([]); // preserve pick order
+  // overrides[targetLessonId][srcMaterialId] = { title, deadline }
+  const [overrides, setOverrides] = useState<Record<string, Record<string, { title: string; deadline: string }>>>({});
+
+  const pickedLessons: Lesson[] = useMemo(() => {
+    const map = new Map<string, Lesson>();
     for (let p = 1; p <= 10; p++) {
       for (let di = 0; di < 7; di++) {
         const occ = week[di]?.[p];
-        if (occ && picked.has(occ.id)) lessons.push(occ);
+        if (occ) map.set(occ.id, occ);
       }
     }
-    if (lessons.length) onPickMany(lessons);
+    return pickedIds.map((id) => map.get(id)).filter(Boolean) as Lesson[];
+  }, [pickedIds, week]);
+
+  // ensure overrides is initialized for each picked target × material
+  useEffect(() => {
+    if (mode !== "copy") return;
+    setOverrides((prev) => {
+      const next: Record<string, Record<string, { title: string; deadline: string }>> = { ...prev };
+      for (const t of pickedLessons) {
+        next[t.id] = next[t.id] ?? {};
+        for (const m of sourceMaterials) {
+          if (!next[t.id][m.id]) {
+            next[t.id][m.id] = { title: m.title, deadline: m.deadline ?? "" };
+          }
+        }
+      }
+      // drop targets no longer picked
+      const alive = new Set(pickedLessons.map((l) => l.id));
+      for (const k of Object.keys(next)) if (!alive.has(k)) delete next[k];
+      return next;
+    });
+  }, [pickedLessons, sourceMaterials, mode]);
+
+  const togglePick = (occ: Lesson) => {
+    if (mode === "move") { onMove(occ); return; }
+    setPickedIds((prev) => (prev.includes(occ.id) ? prev.filter((x) => x !== occ.id) : [...prev, occ.id]));
   };
+
+  const now = new Date();
+  const minDeadline = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+  const isDeadlineKind = (m: Material) => m.kind === "exercise";
+
+  const confirmCopy = () => {
+    const ovs: Array<{ srcId: string; target: { classRealId: string; subject: string; unitId: string }; title?: string; deadline?: string }> = [];
+    for (const t of pickedLessons) {
+      for (const m of sourceMaterials) {
+        const o = overrides[t.id]?.[m.id];
+        ovs.push({
+          srcId: m.id,
+          target: { classRealId: t.class, subject: t.subject, unitId: t.unitId },
+          title: o?.title,
+          deadline: isDeadlineKind(m) ? (o?.deadline || undefined) : undefined,
+        });
+      }
+    }
+    if (ovs.length) onCopy(ovs);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between px-5 py-3 border-b">
           <div>
             <h3 className="text-base font-bold text-slate-800">{title}</h3>
             <p className="text-xs text-slate-500">
               {mode === "copy"
-                ? <>Chọn <b>một hoặc nhiều tiết</b> đích để tạo bản sao <b>{count}</b> học liệu đã chọn.</>
-                : <>Chọn tiết đích trên Lịch báo giảng cho <b>{count}</b> học liệu đã chọn.</>}
+                ? <>Chọn <b>một hoặc nhiều tiết đích</b> để tạo bản sao <b>{sourceMaterials.length}</b> học liệu.</>
+                : <>Chọn tiết đích trên Lịch báo giảng cho <b>{sourceMaterials.length}</b> học liệu đã chọn.</>}
             </p>
           </div>
           <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-5 overflow-x-auto">
-          <div className="min-w-[720px]">
-            <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
-              <div />
-              {DAYS.map((d) => (
-                <div key={d} className="text-xs font-semibold text-center text-slate-600">{d}</div>
-              ))}
-            </div>
-            {[1,2,3,4,5].map((p) => (
-              <div key={p} className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
-                <div className="text-xs font-semibold text-slate-500 flex items-center justify-center bg-slate-50 rounded">Tiết {p}</div>
-                {DAYS.map((_, di) => {
-                  const occ = week[di]?.[p];
-                  const isSelf = occ?.id === excludeLessonId;
-                  if (!occ) {
-                    return (
-                      <div key={di} className="h-14 rounded border border-dashed border-slate-200 bg-slate-50/50 text-[10px] text-slate-300 flex items-center justify-center">
-                        Trống
+
+        <div className="overflow-y-auto flex-1">
+          {/* Source panel */}
+          {mode === "copy" && (
+            <div className="px-5 pt-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70">
+                <div className="px-4 py-2 border-b bg-white/70 rounded-t-xl">
+                  <div className="text-xs font-semibold text-slate-500 uppercase">Tiết gốc</div>
+                  <div className="text-sm font-bold text-slate-800">
+                    {sourceLesson.class} · {sourceLesson.subject} — {sourceLesson.topic}
+                  </div>
+                </div>
+                <div className="divide-y">
+                  {sourceMaterials.map((m) => (
+                    <div key={m.id} className="px-4 py-2 flex items-center gap-3 text-xs">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-slate-800 truncate">{m.title}</div>
+                        {m.meta && <div className="text-slate-500 truncate">{m.meta}</div>}
                       </div>
-                    );
-                  }
-                  const isPicked = picked.has(occ.id);
-                  return (
-                    <button
-                      key={di}
-                      disabled={isSelf}
-                      onClick={() => togglePick(occ)}
-                      className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
-                        isSelf
-                          ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
-                          : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer ${isPicked ? "ring-2 ring-indigo-500" : ""}`
-                      }`}
-                    >
-                      <div className="font-semibold flex items-center justify-between gap-1">
-                        <span>{occ.class} · {occ.subject}</span>
-                        {mode === "copy" && !isSelf && isPicked && <span className="text-indigo-600">✓</span>}
+                      <div className="text-slate-500">
+                        Hạn:&nbsp;
+                        <span className="font-medium text-slate-700">
+                          {isDeadlineKind(m) ? (m.deadline || "Không có") : "—"}
+                        </span>
                       </div>
-                      <div className="truncate">{occ.topic}</div>
-                      {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
-                    </button>
-                  );
-                })}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+
+              {/* Target editable rows */}
+              {pickedLessons.length > 0 && (
+                <div className="mt-4">
+                  <div className="text-xs font-semibold text-slate-600 uppercase mb-2">
+                    Tiết đích tạo bản sao ({pickedLessons.length})
+                  </div>
+                  <div className="space-y-3">
+                    {pickedLessons.map((t) => (
+                      <div key={t.id} className="rounded-xl border border-indigo-200 bg-white">
+                        <div className="px-4 py-2 border-b bg-indigo-50/60 rounded-t-xl flex items-center justify-between">
+                          <div className="text-sm font-bold text-slate-800">
+                            {t.class} · {t.subject} — {t.topic}
+                          </div>
+                          <button
+                            onClick={() => setPickedIds((prev) => prev.filter((x) => x !== t.id))}
+                            className="text-xs text-rose-600 hover:underline"
+                          >
+                            Bỏ chọn
+                          </button>
+                        </div>
+                        <div className="divide-y">
+                          {sourceMaterials.map((m) => {
+                            const o = overrides[t.id]?.[m.id] ?? { title: m.title, deadline: m.deadline ?? "" };
+                            return (
+                              <div key={m.id} className="px-4 py-2 grid grid-cols-1 md:grid-cols-[1fr_220px] gap-2 items-center">
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-slate-500 mb-1">Tên bài tập</label>
+                                  <Input
+                                    value={o.title}
+                                    onChange={(e) =>
+                                      setOverrides((prev) => ({
+                                        ...prev,
+                                        [t.id]: { ...prev[t.id], [m.id]: { ...o, title: e.target.value } },
+                                      }))
+                                    }
+                                    className="h-9 text-sm"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-slate-500 mb-1">Hạn nộp</label>
+                                  {isDeadlineKind(m) ? (
+                                    <Input
+                                      type="datetime-local"
+                                      value={o.deadline}
+                                      min={minDeadline}
+                                      onChange={(e) =>
+                                        setOverrides((prev) => ({
+                                          ...prev,
+                                          [t.id]: { ...prev[t.id], [m.id]: { ...o, deadline: e.target.value } },
+                                        }))
+                                      }
+                                      className="h-9 text-sm"
+                                    />
+                                  ) : (
+                                    <div className="h-9 flex items-center text-xs text-slate-400 italic">Không áp dụng</div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Week grid for picking targets */}
+          <div className="p-5">
+            <div className="text-xs font-semibold text-slate-600 uppercase mb-2">
+              {mode === "copy" ? "Chọn tiết đích trên tuần này" : "Chọn tiết đích"}
+            </div>
+            <div className="overflow-x-auto">
+              <div className="min-w-[720px]">
+                <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+                  <div />
+                  {DAYS.map((d) => (
+                    <div key={d} className="text-xs font-semibold text-center text-slate-600">{d}</div>
+                  ))}
+                </div>
+                {[1,2,3,4,5].map((p) => (
+                  <div key={p} className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+                    <div className="text-xs font-semibold text-slate-500 flex items-center justify-center bg-slate-50 rounded">Tiết {p}</div>
+                    {DAYS.map((_, di) => {
+                      const occ = week[di]?.[p];
+                      const isSelf = occ?.id === excludeLessonId;
+                      if (!occ) {
+                        return (
+                          <div key={di} className="h-14 rounded border border-dashed border-slate-200 bg-slate-50/50 text-[10px] text-slate-300 flex items-center justify-center">
+                            Trống
+                          </div>
+                        );
+                      }
+                      const isPicked = pickedIds.includes(occ.id);
+                      return (
+                        <button
+                          key={di}
+                          disabled={isSelf}
+                          onClick={() => togglePick(occ)}
+                          className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
+                            isSelf
+                              ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                              : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer ${isPicked ? "ring-2 ring-indigo-500" : ""}`
+                          }`}
+                        >
+                          <div className="font-semibold flex items-center justify-between gap-1">
+                            <span>{occ.class} · {occ.subject}</span>
+                            {mode === "copy" && !isSelf && isPicked && <span className="text-indigo-600">✓</span>}
+                          </div>
+                          <div className="truncate">{occ.topic}</div>
+                          {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+
         <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
           {mode === "copy" && (
-            <Button size="sm" disabled={!picked.size} onClick={confirmCopy}>
-              Tạo bản sao ({picked.size})
+            <Button size="sm" disabled={!pickedLessons.length} onClick={confirmCopy}>
+              Tạo bản sao ({pickedLessons.length} tiết × {sourceMaterials.length} học liệu)
             </Button>
           )}
         </div>
@@ -1502,6 +1664,7 @@ function PickLessonModal({
     </div>
   );
 }
+
 
 function QuickAddModal({
   label, defaultUnitId, onCancel, onSubmit,

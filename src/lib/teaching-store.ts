@@ -10,9 +10,12 @@ export type Material = {
   kind: MaterialKind;
   title: string;
   meta?: string;         // e.g. "24 slide", "10 câu", "12:35"
+  /** Hạn nộp (chỉ áp dụng cho bài tập/kiểm tra). ISO datetime string, ví dụ "2026-05-28T20:00". */
+  deadline?: string;
   /** where this was created from, useful for toast feedback */
   origin?: "class" | "schedule" | "seed";
 };
+
 
 type Listener = () => void;
 
@@ -174,6 +177,40 @@ export function copyMaterials(ids: string[], target: { classRealId: string; subj
     emit();
   }
 }
+
+/**
+ * Sao chép có ghi đè tên/hạn nộp cho từng bản sao.
+ * `overrides` là mảng {srcId, target, title, deadline?} — mỗi phần tử là 1 bản sao.
+ */
+export function copyMaterialsWithOverrides(
+  overrides: Array<{
+    srcId: string;
+    target: { classRealId: string; subject: string; unitId: string };
+    title?: string;
+    deadline?: string;
+  }>,
+) {
+  if (!overrides.length) return;
+  const bySrc = new Map(materials.map((m) => [m.id, m] as const));
+  const clones: Material[] = [];
+  for (const o of overrides) {
+    const src = bySrc.get(o.srcId);
+    if (!src) continue;
+    clones.push({
+      ...src,
+      ...o.target,
+      id: uid(),
+      title: o.title?.trim() ? o.title.trim() : src.title,
+      deadline: o.deadline ?? src.deadline,
+      origin: "class",
+    });
+  }
+  if (clones.length) {
+    materials = [...materials, ...clones];
+    emit();
+  }
+}
+
 
 /* ---------- Subscribe / hook ---------- */
 export function subscribe(l: Listener) {
