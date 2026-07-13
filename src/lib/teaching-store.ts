@@ -10,9 +10,12 @@ export type Material = {
   kind: MaterialKind;
   title: string;
   meta?: string;         // e.g. "24 slide", "10 câu", "12:35"
+  /** Hạn nộp (chỉ áp dụng cho bài tập/kiểm tra). ISO datetime string, ví dụ "2026-05-28T20:00". */
+  deadline?: string;
   /** where this was created from, useful for toast feedback */
   origin?: "class" | "schedule" | "seed";
 };
+
 
 type Listener = () => void;
 
