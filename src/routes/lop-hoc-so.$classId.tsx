@@ -369,6 +369,19 @@ function ClassDetailPage() {
 
         <div className="mt-5 space-y-3">
 
+          {scheduleGroup && (
+            <GroupRow
+              group={scheduleGroup}
+              reorder={false}
+              expanded={isOpen(scheduleGroup.unitId)}
+              onToggle={() => setExpanded((s) => ({ ...s, [scheduleGroup.unitId]: !isOpen(scheduleGroup.unitId) }))}
+              onDragStart={() => {}}
+              onDragOver={() => {}}
+              onDrop={() => {}}
+              dragging={false}
+            />
+          )}
+
           {orderedGroups.map((g) => (
             <GroupRow
               key={g.unitId}
