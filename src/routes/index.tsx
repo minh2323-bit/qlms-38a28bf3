@@ -1486,13 +1486,13 @@ function PickLessonModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between px-5 py-3 border-b">
+        <div className="flex items-center justify-between px-5 py-3 border-b shrink-0">
           <div>
             <h3 className="text-base font-bold text-slate-800">{title}</h3>
             <p className="text-xs text-slate-500">
               {mode === "copy"
-                ? <>Chọn <b>một hoặc nhiều tiết đích</b> để tạo bản sao <b>{sourceMaterials.length}</b> học liệu.</>
-                : <>Chọn tiết đích trên Lịch báo giảng cho <b>{sourceMaterials.length}</b> học liệu đã chọn.</>}
+                ? <>Chọn <b>một hoặc nhiều tiết đích</b> để tạo bản sao <b>{sourceMaterials.length}</b> nội dung.</>
+                : <>Chọn tiết đích trên Lịch báo giảng cho <b>{sourceMaterials.length}</b> nội dung đã chọn.</>}
             </p>
           </div>
           <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
@@ -1500,163 +1500,169 @@ function PickLessonModal({
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-1">
-          {/* Source panel */}
-          {mode === "copy" && (
-            <div className="px-5 pt-4">
-              <div className="rounded-xl border border-slate-200 bg-slate-50/70">
-                <div className="px-4 py-2 border-b bg-white/70 rounded-t-xl">
-                  <div className="text-xs font-semibold text-slate-500 uppercase">Tiết gốc</div>
-                  <div className="text-sm font-bold text-slate-800">
-                    {sourceLesson.class} · {sourceLesson.subject} — {sourceLesson.topic}
-                  </div>
-                </div>
-                <div className="divide-y">
-                  {sourceMaterials.map((m) => (
-                    <div key={m.id} className="px-4 py-2 flex items-center gap-3 text-xs">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-slate-800 truncate">{m.title}</div>
-                        {m.meta && <div className="text-slate-500 truncate">{m.meta}</div>}
-                      </div>
-                      <div className="text-slate-500">
-                        Hạn:&nbsp;
-                        <span className="font-medium text-slate-700">
-                          {isDeadlineKind(m) ? (m.deadline || "Không có") : "—"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Target editable rows */}
-              {pickedLessons.length > 0 && (
-                <div className="mt-4">
-                  <div className="text-xs font-semibold text-slate-600 uppercase mb-2">
-                    Tiết đích tạo bản sao ({pickedLessons.length})
-                  </div>
-                  <div className="space-y-3">
-                    {pickedLessons.map((t) => (
-                      <div key={t.id} className="rounded-xl border border-indigo-200 bg-white">
-                        <div className="px-4 py-2 border-b bg-indigo-50/60 rounded-t-xl flex items-center justify-between">
-                          <div className="text-sm font-bold text-slate-800">
-                            {t.class} · {t.subject} — {t.topic}
-                          </div>
-                          <button
-                            onClick={() => setPickedIds((prev) => prev.filter((x) => x !== t.id))}
-                            className="text-xs text-rose-600 hover:underline"
-                          >
-                            Bỏ chọn
-                          </button>
-                        </div>
-                        <div className="divide-y">
-                          {sourceMaterials.map((m) => {
-                            const o = overrides[t.id]?.[m.id] ?? { title: m.title, deadline: m.deadline ?? "" };
-                            return (
-                              <div key={m.id} className="px-4 py-2 grid grid-cols-1 md:grid-cols-[1fr_220px] gap-2 items-center">
-                                <div>
-                                  <label className="block text-[11px] font-semibold text-slate-500 mb-1">Tên bài tập</label>
-                                  <Input
-                                    value={o.title}
-                                    onChange={(e) =>
-                                      setOverrides((prev) => ({
-                                        ...prev,
-                                        [t.id]: { ...prev[t.id], [m.id]: { ...o, title: e.target.value } },
-                                      }))
-                                    }
-                                    className="h-9 text-sm"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-[11px] font-semibold text-slate-500 mb-1">Hạn nộp</label>
-                                  {isDeadlineKind(m) ? (
-                                    <Input
-                                      type="datetime-local"
-                                      value={o.deadline}
-                                      min={minDeadline}
-                                      onChange={(e) =>
-                                        setOverrides((prev) => ({
-                                          ...prev,
-                                          [t.id]: { ...prev[t.id], [m.id]: { ...o, deadline: e.target.value } },
-                                        }))
-                                      }
-                                      className="h-9 text-sm"
-                                    />
-                                  ) : (
-                                    <div className="h-9 flex items-center text-xs text-slate-400 italic">Không áp dụng</div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Week grid for picking targets */}
-          <div className="p-5">
-            <div className="text-xs font-semibold text-slate-600 uppercase mb-2">
-              {mode === "copy" ? "Chọn tiết đích trên tuần này" : "Chọn tiết đích"}
-            </div>
-            <div className="overflow-x-auto">
-              <div className="min-w-[720px]">
-                <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
-                  <div />
-                  {DAYS.map((d) => (
-                    <div key={d} className="text-xs font-semibold text-center text-slate-600">{d}</div>
-                  ))}
-                </div>
-                {[1,2,3,4,5].map((p) => (
-                  <div key={p} className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
-                    <div className="text-xs font-semibold text-slate-500 flex items-center justify-center bg-slate-50 rounded">Tiết {p}</div>
-                    {DAYS.map((_, di) => {
-                      const occ = week[di]?.[p];
-                      const isSelf = occ?.id === excludeLessonId;
-                      if (!occ) {
-                        return (
-                          <div key={di} className="h-14 rounded border border-dashed border-slate-200 bg-slate-50/50 text-[10px] text-slate-300 flex items-center justify-center">
-                            Trống
-                          </div>
-                        );
-                      }
-                      const isPicked = pickedIds.includes(occ.id);
-                      return (
-                        <button
-                          key={di}
-                          disabled={isSelf}
-                          onClick={() => togglePick(occ)}
-                          className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
-                            isSelf
-                              ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
-                              : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer ${isPicked ? "ring-2 ring-indigo-500" : ""}`
-                          }`}
-                        >
-                          <div className="font-semibold flex items-center justify-between gap-1">
-                            <span>{occ.class} · {occ.subject}</span>
-                            {mode === "copy" && !isSelf && isPicked && <span className="text-indigo-600">✓</span>}
-                          </div>
-                          <div className="truncate">{occ.topic}</div>
-                          {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
-                        </button>
-                      );
-                    })}
-                  </div>
+        {/* STICKY: Week grid for picking targets */}
+        <div className="px-5 pt-4 pb-3 border-b bg-white shrink-0">
+          <div className="text-xs font-semibold text-slate-600 uppercase mb-2">
+            Chọn tiết đích trên tuần này
+          </div>
+          <div className="overflow-x-auto">
+            <div className="min-w-[720px]">
+              <div className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+                <div />
+                {DAYS.map((d) => (
+                  <div key={d} className="text-xs font-semibold text-center text-slate-600">{d}</div>
                 ))}
               </div>
+              {[1,2,3,4,5].map((p) => (
+                <div key={p} className="grid grid-cols-[60px_repeat(7,minmax(0,1fr))] gap-1 mb-1">
+                  <div className="text-xs font-semibold text-slate-500 flex items-center justify-center bg-slate-50 rounded">Tiết {p}</div>
+                  {DAYS.map((_, di) => {
+                    const occ = week[di]?.[p];
+                    const isSelf = occ?.id === excludeLessonId;
+                    if (!occ) {
+                      return (
+                        <div key={di} className="h-14 rounded border border-dashed border-slate-200 bg-slate-50/50 text-[10px] text-slate-300 flex items-center justify-center">
+                          Trống
+                        </div>
+                      );
+                    }
+                    const isPicked = pickedIds.includes(occ.id);
+                    return (
+                      <button
+                        key={di}
+                        disabled={isSelf}
+                        onClick={() => togglePick(occ)}
+                        className={`h-14 rounded border p-1.5 text-left text-[11px] transition ${
+                          isSelf
+                            ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                            : `${CLASS_COLORS[occ.class]} hover:ring-2 hover:ring-indigo-400 cursor-pointer ${isPicked ? "ring-2 ring-indigo-500" : ""}`
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center justify-between gap-1">
+                          <span>{occ.class} · {occ.subject}</span>
+                          {mode === "copy" && !isSelf && isPicked && <span className="text-indigo-600">✓</span>}
+                        </div>
+                        <div className="truncate">{occ.topic}</div>
+                        {isSelf && <div className="text-[9px] italic">Tiết hiện tại</div>}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2">
+        {/* SCROLL: Source + target clones list */}
+        <div className="overflow-y-auto flex-1 px-5 py-4">
+          {/* Source panel — view only in both modes */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/70">
+            <div className="px-4 py-2 border-b bg-white/70 rounded-t-xl">
+              <div className="text-xs font-semibold text-slate-500 uppercase">Tiết gốc</div>
+              <div className="text-sm font-bold text-slate-800">
+                {sourceLesson.class} · {sourceLesson.subject} — {sourceLesson.topic}
+              </div>
+            </div>
+            <div className="divide-y">
+              {sourceMaterials.map((m) => (
+                <div key={m.id} className="px-4 py-2 flex items-center gap-3 text-xs">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-slate-800 truncate">{m.title}</div>
+                    {m.meta && <div className="text-slate-500 truncate">{m.meta}</div>}
+                  </div>
+                  {isDeadlineKind(m) && (
+                    <div className="text-slate-500">
+                      Hạn:&nbsp;<span className="font-medium text-slate-700">{m.deadline || "Không có"}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* COPY: editable rows per target */}
+          {mode === "copy" && pickedLessons.length > 0 && (
+            <div className="mt-4">
+              <div className="text-xs font-semibold text-slate-600 uppercase mb-2">
+                Bản sao sẽ tạo ({pickedLessons.length} tiết)
+              </div>
+              <div className="space-y-3">
+                {pickedLessons.map((t) => (
+                  <div key={t.id} className="rounded-xl border border-indigo-200 bg-white">
+                    <div className="px-4 py-2 border-b bg-indigo-50/60 rounded-t-xl flex items-center justify-between">
+                      <div className="text-sm font-bold text-slate-800">
+                        {t.class} · {t.subject} — {t.topic}
+                      </div>
+                      <button
+                        onClick={() => setPickedIds((prev) => prev.filter((x) => x !== t.id))}
+                        className="text-xs text-rose-600 hover:underline"
+                      >
+                        Bỏ chọn
+                      </button>
+                    </div>
+                    <div className="divide-y">
+                      {sourceMaterials.map((m) => {
+                        const editable = isDeadlineKind(m);
+                        const o = overrides[t.id]?.[m.id] ?? { title: m.title, deadline: m.deadline ?? "" };
+                        if (!editable) {
+                          return (
+                            <div key={m.id} className="px-4 py-2 flex items-center gap-3 text-xs">
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-slate-800 truncate">{m.title}</div>
+                                {m.meta && <div className="text-slate-500 truncate">{m.meta}</div>}
+                              </div>
+                              <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                Không chỉnh sửa
+                              </span>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={m.id} className="px-4 py-2 grid grid-cols-1 md:grid-cols-[1fr_220px] gap-2 items-center">
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-500 mb-1">Tên bài tập</label>
+                              <Input
+                                value={o.title}
+                                onChange={(e) =>
+                                  setOverrides((prev) => ({
+                                    ...prev,
+                                    [t.id]: { ...prev[t.id], [m.id]: { ...o, title: e.target.value } },
+                                  }))
+                                }
+                                className="h-9 text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-500 mb-1">Hạn nộp</label>
+                              <Input
+                                type="datetime-local"
+                                value={o.deadline}
+                                min={minDeadline}
+                                onChange={(e) =>
+                                  setOverrides((prev) => ({
+                                    ...prev,
+                                    [t.id]: { ...prev[t.id], [m.id]: { ...o, deadline: e.target.value } },
+                                  }))
+                                }
+                                className="h-9 text-sm"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="px-5 py-3 border-t bg-slate-50 flex justify-end gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={onCancel}>Hủy</Button>
           {mode === "copy" && (
             <Button size="sm" disabled={!pickedLessons.length} onClick={confirmCopy}>
-              Tạo bản sao ({pickedLessons.length} tiết × {sourceMaterials.length} học liệu)
+              Tạo bản sao ({pickedLessons.length} tiết × {sourceMaterials.length} nội dung)
             </Button>
           )}
         </div>
