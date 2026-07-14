@@ -103,23 +103,32 @@ function ClassDetailPage() {
   );
 
 
-  // Group by unitId → sections
+  // Group by unitId → sections. Schedule-origin items sit in a dedicated group.
   type Group = { unitId: string; title: string; items: Material[] };
+  const scheduleGroup: Group | null = useMemo(() => {
+    const items = classMaterials.filter((m) => m.origin === "schedule");
+    if (!items.length) return null;
+    return { unitId: "_from_schedule", title: "Nội dung thêm từ Lịch báo giảng", items };
+  }, [classMaterials]);
+
   const groups: Group[] = useMemo(() => {
     const map = new Map<string, Group>();
-    classMaterials.forEach((m) => {
-      const key = m.unitId || "_misc";
-      if (!map.has(key)) {
-        map.set(key, {
-          unitId: key,
-          title: key === "_misc" ? "Học liệu khác" : getUnitTitle(key),
-          items: [],
-        });
-      }
-      map.get(key)!.items.push(m);
-    });
+    classMaterials
+      .filter((m) => m.origin !== "schedule")
+      .forEach((m) => {
+        const key = m.unitId || "_misc";
+        if (!map.has(key)) {
+          map.set(key, {
+            unitId: key,
+            title: key === "_misc" ? "Học liệu khác" : getUnitTitle(key),
+            items: [],
+          });
+        }
+        map.get(key)!.items.push(m);
+      });
     return Array.from(map.values());
   }, [classMaterials]);
+
 
   const [order, setOrder] = useState<string[] | null>(null);
   const orderedGroups = useMemo(() => {
@@ -321,12 +330,6 @@ function ClassDetailPage() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setLiveOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-            >
-              <Video className="h-4 w-4" /> Tạo lớp học trực tuyến
-            </button>
-            <button
               onClick={() => toast.message("Thêm chủ đề / Mục lục (demo)")}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             >
@@ -359,15 +362,25 @@ function ClassDetailPage() {
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setTaskPickerOpen(true)}>
                   <ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Thêm bài tập
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => setTestPickerOpen(true)}>
-                  <FileCheck2 className="h-4 w-4 mr-2 text-rose-500" /> Thêm bài kiểm tra
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
         <div className="mt-5 space-y-3">
+
+          {scheduleGroup && (
+            <GroupRow
+              group={scheduleGroup}
+              reorder={false}
+              expanded={isOpen(scheduleGroup.unitId)}
+              onToggle={() => setExpanded((s) => ({ ...s, [scheduleGroup.unitId]: !isOpen(scheduleGroup.unitId) }))}
+              onDragStart={() => {}}
+              onDragOver={() => {}}
+              onDrop={() => {}}
+              dragging={false}
+            />
+          )}
 
           {orderedGroups.map((g) => (
             <GroupRow
@@ -415,18 +428,31 @@ function ClassDetailPage() {
       {/* Bài kiểm tra */}
       <TestsSection classInfo={info} />
 
-      {/* Lớp học trực tuyến (đã tạo) */}
-      {classLive.length > 0 && (
-        <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
-          <div className="mb-3">
+      {/* Lớp học trực tuyến */}
+      <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+        <div className="mb-3 flex items-start justify-between gap-3 flex-wrap">
+          <div>
             <h2 className="text-lg font-bold text-slate-800">Lớp học trực tuyến</h2>
             <p className="text-sm text-slate-500 mt-0.5">
               Danh sách phòng học trực tuyến của lớp — đã đồng bộ với Lịch báo giảng.
             </p>
           </div>
+          <button
+            onClick={() => setLiveOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+          >
+            <Video className="h-4 w-4" /> Tạo lớp học trực tuyến
+          </button>
+        </div>
+        {classLive.length > 0 ? (
           <LiveClassesSection items={classLive} />
-        </section>
-      )}
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-6 text-center text-sm text-slate-500">
+            Chưa có phòng học trực tuyến nào. Bấm <b>Tạo lớp học trực tuyến</b> để bắt đầu.
+          </div>
+        )}
+      </section>
+
 
       {/* Hồ sơ giáo dục */}
       <EducationRecordsSection className={info.name} />
