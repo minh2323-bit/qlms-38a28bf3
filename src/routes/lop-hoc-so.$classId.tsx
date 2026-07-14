@@ -321,12 +321,6 @@ function ClassDetailPage() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setLiveOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-            >
-              <Video className="h-4 w-4" /> Tạo lớp học trực tuyến
-            </button>
-            <button
               onClick={() => toast.message("Thêm chủ đề / Mục lục (demo)")}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             >
@@ -358,9 +352,6 @@ function ClassDetailPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setTaskPickerOpen(true)}>
                   <ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Thêm bài tập
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => setTestPickerOpen(true)}>
-                  <FileCheck2 className="h-4 w-4 mr-2 text-rose-500" /> Thêm bài kiểm tra
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
