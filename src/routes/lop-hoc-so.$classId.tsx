@@ -103,23 +103,32 @@ function ClassDetailPage() {
   );
 
 
-  // Group by unitId → sections
+  // Group by unitId → sections. Schedule-origin items sit in a dedicated group.
   type Group = { unitId: string; title: string; items: Material[] };
+  const scheduleGroup: Group | null = useMemo(() => {
+    const items = classMaterials.filter((m) => m.origin === "schedule");
+    if (!items.length) return null;
+    return { unitId: "_from_schedule", title: "Nội dung thêm từ Lịch báo giảng", items };
+  }, [classMaterials]);
+
   const groups: Group[] = useMemo(() => {
     const map = new Map<string, Group>();
-    classMaterials.forEach((m) => {
-      const key = m.unitId || "_misc";
-      if (!map.has(key)) {
-        map.set(key, {
-          unitId: key,
-          title: key === "_misc" ? "Học liệu khác" : getUnitTitle(key),
-          items: [],
-        });
-      }
-      map.get(key)!.items.push(m);
-    });
+    classMaterials
+      .filter((m) => m.origin !== "schedule")
+      .forEach((m) => {
+        const key = m.unitId || "_misc";
+        if (!map.has(key)) {
+          map.set(key, {
+            unitId: key,
+            title: key === "_misc" ? "Học liệu khác" : getUnitTitle(key),
+            items: [],
+          });
+        }
+        map.get(key)!.items.push(m);
+      });
     return Array.from(map.values());
   }, [classMaterials]);
+
 
   const [order, setOrder] = useState<string[] | null>(null);
   const orderedGroups = useMemo(() => {
