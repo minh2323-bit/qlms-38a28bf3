@@ -1220,7 +1220,7 @@ function LessonPanel({
           className="gap-1 w-full"
           onClick={() => setEditMode((v) => !v)}
         >
-          <Pencil className="h-4 w-4" /> {editMode ? "Xong sắp xếp" : "Sửa / Sắp xếp lại"}
+          <Pencil className="h-4 w-4" /> {editMode ? "Xong" : "Di chuyển/Tạo bản sao học liệu"}
         </Button>
       </div>
 
