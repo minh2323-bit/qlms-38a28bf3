@@ -451,6 +451,7 @@ function TeacherHome() {
                   liveBySlot={liveBySlot}
                   eveningByDay={eveningByDay}
                   onPickLive={(lc) => setActiveLive(lc)}
+                  onAssignLessons={(id) => setAssignForLessonId(id)}
                 />
                 <Legend2 />
               </div>
