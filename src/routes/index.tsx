@@ -1085,7 +1085,165 @@ function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => voi
   );
 }
 
-function Legend2() {
+/* ----- Assign Lessons Modal ----- */
+function AssignLessonsModal({
+  lesson, onClose, onSave,
+}: {
+  lesson: Lesson;
+  onClose: () => void;
+  onSave: (ids: string[]) => void;
+}) {
+  const tree = useMemo(() => getTreeForClass(lesson.class, lesson.subject), [lesson.class, lesson.subject]);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(lesson.assignedUnitIds));
+  const toggle = (id: string) => setSelected((s) => {
+    const next = new Set(s);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Gán bài học – {lesson.class} · {lesson.subject}</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-slate-500 -mt-2">
+          Tên tiết PPCT: <b>{lesson.topic}</b>. Chọn các bài học sẽ được dạy trong tiết này.
+        </p>
+        <div className="mt-3 space-y-4">
+          {tree.length === 0 && (
+            <div className="text-sm text-slate-500 italic">Chưa có mục lục SGK cho khối/môn này.</div>
+          )}
+          {tree.map((ch) => (
+            <div key={ch.id} className="rounded-lg border border-slate-200">
+              <div className="px-3 py-2 bg-slate-50 border-b text-sm font-semibold text-slate-700">{ch.title}</div>
+              <ul className="p-2 space-y-1">
+                {ch.units.map((u) => (
+                  <li key={u.id}>
+                    <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                      <Checkbox
+                        checked={selected.has(u.id)}
+                        onCheckedChange={() => toggle(u.id)}
+                      />
+                      <span className="text-sm text-slate-700">{u.title}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>Hủy</Button>
+          <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => onSave(Array.from(selected))}>
+            Hoàn thành ({selected.size})
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ----- Lecture Source Modal (Thêm bài giảng: mới / kho) ----- */
+function LectureSourceModal({
+  onClose, onPickNew, onPickLibrary,
+}: {
+  onClose: () => void;
+  onPickNew: () => void;
+  onPickLibrary: () => void;
+}) {
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Thêm bài giảng</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <button
+            onClick={onPickNew}
+            className="rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 p-5 text-left transition"
+          >
+            <div className="h-10 w-10 rounded-lg bg-indigo-100 text-indigo-700 inline-flex items-center justify-center mb-2">
+              <Plus className="h-5 w-5" />
+            </div>
+            <div className="font-semibold text-slate-800">Thêm mới</div>
+            <div className="text-xs text-slate-500 mt-1">Tạo bài giảng mới với các bước như trong lớp học số.</div>
+          </button>
+          <button
+            onClick={onPickLibrary}
+            className="rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 p-5 text-left transition"
+          >
+            <div className="h-10 w-10 rounded-lg bg-emerald-100 text-emerald-700 inline-flex items-center justify-center mb-2">
+              <Library className="h-5 w-5" />
+            </div>
+            <div className="font-semibold text-slate-800">Thêm từ Kho bài giảng</div>
+            <div className="text-xs text-slate-500 mt-1">Chọn bài giảng có sẵn trong kho của bạn.</div>
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ----- Lecture Library Picker ----- */
+type LibraryLecture = { id: string; title: string; subject: string; khoi: string; thumb: string; meta?: string };
+function LectureLibraryPickerModal({
+  items, onClose, onConfirm,
+}: {
+  items: LibraryLecture[];
+  onClose: () => void;
+  onConfirm: (picked: LibraryLecture[]) => void;
+}) {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [q, setQ] = useState("");
+  const filtered = items.filter((i) => i.title.toLowerCase().includes(q.toLowerCase()));
+  const toggle = (id: string) => setSelected((s) => {
+    const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n;
+  });
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Chọn từ Kho bài giảng</DialogTitle>
+        </DialogHeader>
+        <Input placeholder="Tìm bài giảng..." value={q} onChange={(e) => setQ(e.target.value)} className="mb-3" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {filtered.map((it) => {
+            const picked = selected.has(it.id);
+            return (
+              <button
+                key={it.id}
+                onClick={() => toggle(it.id)}
+                className={`text-left rounded-xl border-2 overflow-hidden transition ${picked ? "border-indigo-600 ring-2 ring-indigo-200" : "border-slate-200 hover:border-indigo-300"}`}
+              >
+                <div className="relative">
+                  <img src={it.thumb} alt={it.title} className="w-full h-24 object-cover" />
+                  {picked && (
+                    <span className="absolute top-1.5 right-1.5 bg-indigo-600 text-white rounded-full h-6 w-6 inline-flex items-center justify-center text-xs">✓</span>
+                  )}
+                </div>
+                <div className="p-2">
+                  <div className="font-semibold text-sm text-slate-800 line-clamp-2">{it.title}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">{it.khoi} · {it.subject}</div>
+                </div>
+              </button>
+            );
+          })}
+          {filtered.length === 0 && <div className="col-span-full text-sm text-slate-500 italic py-6 text-center">Không có bài giảng nào phù hợp.</div>}
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>Hủy</Button>
+          <Button
+            className="bg-indigo-700 hover:bg-indigo-800"
+            disabled={selected.size === 0}
+            onClick={() => onConfirm(items.filter((i) => selected.has(i.id)))}
+          >
+            Xác nhận ({selected.size})
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
   return (
     <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-slate-600">
       <span className="font-semibold mr-1">Chú thích lớp:</span>
