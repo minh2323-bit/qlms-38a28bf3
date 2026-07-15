@@ -28,7 +28,7 @@ import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
-import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree } from "@/lib/knowledge-tree";
+import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree, getUnitTitle as getUnitTitleSafe, getTreeForClass } from "@/lib/knowledge-tree";
 import {
   useMaterials, addMaterial, moveMaterials, copyMaterialsWithOverrides, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
