@@ -279,6 +279,7 @@ function TeacherHome() {
   const [focusUnit, setFocusUnit] = useState<string | null>(null);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [activeLive, setActiveLive] = useState<LiveClass | null>(null);
+  const [assignForLessonId, setAssignForLessonId] = useState<string | null>(null);
 
   const liveAll = useLiveClasses();
   // map slot key "w-d-p" -> live class (respecting class filter)
