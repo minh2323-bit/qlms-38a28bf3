@@ -28,7 +28,16 @@ import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
-import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree } from "@/lib/knowledge-tree";
+import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree, getUnitTitle as getUnitTitleSafe, getTreeForClass } from "@/lib/knowledge-tree";
+
+const LIBRARY_LECTURES = [
+  { id: "lib-1", title: "Số có sáu chữ số. Số 1 000 000", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=60", meta: "24 slide" },
+  { id: "lib-2", title: "Hàng và lớp", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=400&q=60", meta: "18 slide" },
+  { id: "lib-3", title: "So sánh các số có nhiều chữ số", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=400&q=60", meta: "20 slide" },
+  { id: "lib-4", title: "Ôn tập các số đến 100 000", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=60", meta: "16 slide" },
+  { id: "lib-5", title: "Bảng nhân 7", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=60", meta: "12 slide" },
+  { id: "lib-6", title: "Chu vi hình chữ nhật", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?w=400&q=60", meta: "14 slide" },
+];
 import {
   useMaterials, addMaterial, moveMaterials, copyMaterialsWithOverrides, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
@@ -69,12 +78,14 @@ const CLASS_COLORS: Record<ClassId, string> = {
 type Lesson = {
   id: string; class: ClassId; subject: "Toán";
   topic: string; unitId: string;
+  /** Danh sách bài học (chủ đề) đã gán cho tiết PPCT này. */
+  assignedUnitIds: string[];
 };
 
 type WeekGrid = Record<number, Record<number, Record<number, Lesson | null>>>;
 
 const makeLesson = (id: string, c: ClassId, topic: string, unitId: string): Lesson =>
-  ({ id, class: c, subject: "Toán", topic, unitId });
+  ({ id, class: c, subject: "Toán", topic, unitId, assignedUnitIds: [unitId] });
 
 // WEEKS + DAY_DATES nay được sinh từ src/lib/school-weeks.ts (bắt đầu 5/9 hằng năm).
 const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
@@ -277,6 +288,7 @@ function TeacherHome() {
   const [focusUnit, setFocusUnit] = useState<string | null>(null);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [activeLive, setActiveLive] = useState<LiveClass | null>(null);
+  const [assignForLessonId, setAssignForLessonId] = useState<string | null>(null);
 
   const liveAll = useLiveClasses();
   // map slot key "w-d-p" -> live class (respecting class filter)
@@ -448,6 +460,7 @@ function TeacherHome() {
                   liveBySlot={liveBySlot}
                   eveningByDay={eveningByDay}
                   onPickLive={(lc) => setActiveLive(lc)}
+                  onAssignLessons={(id) => setAssignForLessonId(id)}
                 />
                 <Legend2 />
               </div>
@@ -470,6 +483,35 @@ function TeacherHome() {
           {activeLive && (
             <LiveClassPopup live={activeLive} onClose={() => setActiveLive(null)} />
           )}
+          {assignForLessonId && (() => {
+            let target: Lesson | null = null;
+            let pos: { w: number; d: number; p: number } | null = null;
+            for (const [wk, days] of Object.entries(grid)) {
+              for (const [d, periods] of Object.entries(days)) {
+                for (const [p, l] of Object.entries(periods)) {
+                  if (l && l.id === assignForLessonId) {
+                    target = l;
+                    pos = { w: Number(wk), d: Number(d), p: Number(p) };
+                  }
+                }
+              }
+            }
+            if (!target || !pos) return null;
+            return (
+              <AssignLessonsModal
+                lesson={target}
+                onClose={() => setAssignForLessonId(null)}
+                onSave={(ids) => {
+                  const next: WeekGrid = JSON.parse(JSON.stringify(grid));
+                  const cur = next[pos!.w]?.[pos!.d]?.[pos!.p];
+                  if (cur) cur.assignedUnitIds = ids;
+                  setGrid(next);
+                  setAssignForLessonId(null);
+                  toast.success("Đã cập nhật bài học cho tiết");
+                }}
+              />
+            );
+          })()}
       </>
     </AppShell>
 
@@ -807,7 +849,7 @@ function KnowledgeTree({
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
   week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
-  liveBySlot, eveningByDay, onPickLive,
+  liveBySlot, eveningByDay, onPickLive, onAssignLessons,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
@@ -815,6 +857,7 @@ function ScheduleGrid({
   liveBySlot: Map<string, LiveClass>;
   eveningByDay: Map<string, LiveClass[]>;
   onPickLive: (lc: LiveClass) => void;
+  onAssignLessons: (lessonId: string) => void;
 }) {
   const morning = [1, 2, 3, 4, 5];
   const afternoon = [6, 7, 8, 9, 10];
@@ -829,26 +872,44 @@ function ScheduleGrid({
 
   const renderCell = (d: number, p: number, afternoonBg: boolean) => {
     const l = cellFor(d, p);
-    const isFocus = l && focusUnit && l.unitId === focusUnit;
+    const isFocus = l && focusUnit && l.assignedUnitIds.includes(focusUnit);
     const isActive = l && activeLessonId === l.id;
     const live = liveBySlot.get(`${week}-${d}-${p}`);
     return (
       <td key={d} className={`border border-slate-200 p-1 align-top h-10 ${afternoonBg ? "bg-purple-50/30" : ""}`}>
         {l && (
-          <button
-            onClick={() => onPickLesson(l.id)}
+          <div
             className={`w-full text-left p-2 rounded-md text-[13px] leading-snug transition ${
               CLASS_COLORS[l.class]
             } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
-              isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
+              isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow"
             }`}
           >
-            <div className="font-bold text-[13px]">{l.class}</div>
-            <div className="text-[13px] opacity-80">Toán</div>
-            <div className="truncate font-medium text-[13px]">
-              <span className="opacity-70">Nội dung:</span> {l.topic}
+            <button onClick={() => onPickLesson(l.id)} className="w-full text-left">
+              <div className="font-bold text-[13px]">{l.class} - Toán</div>
+              <div className="truncate text-[12px]">
+                <span className="opacity-70">Tên tiết PPCT:</span> {l.topic}
+              </div>
+            </button>
+            <div className="mt-1 flex flex-wrap gap-1 items-center">
+              {l.assignedUnitIds.map((uid) => (
+                <span
+                  key={uid}
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-600/90 text-white max-w-[130px] truncate"
+                  title={getUnitTitleSafe(uid)}
+                >
+                  {getUnitTitleSafe(uid)}
+                </span>
+              ))}
+              <button
+                onClick={(e) => { e.stopPropagation(); onAssignLessons(l.id); }}
+                className="inline-flex items-center justify-center h-4 w-4 rounded bg-white/70 hover:bg-white text-indigo-700 border border-indigo-300"
+                title="Gán bài học"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
             </div>
-          </button>
+          </div>
         )}
         {live && (
           <button
@@ -1033,6 +1094,166 @@ function LiveClassPopup({ live, onClose }: { live: LiveClass; onClose: () => voi
   );
 }
 
+/* ----- Assign Lessons Modal ----- */
+function AssignLessonsModal({
+  lesson, onClose, onSave,
+}: {
+  lesson: Lesson;
+  onClose: () => void;
+  onSave: (ids: string[]) => void;
+}) {
+  const tree = useMemo(() => getTreeForClass(lesson.class, lesson.subject), [lesson.class, lesson.subject]);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(lesson.assignedUnitIds));
+  const toggle = (id: string) => setSelected((s) => {
+    const next = new Set(s);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Gán bài học – {lesson.class} · {lesson.subject}</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-slate-500 -mt-2">
+          Tên tiết PPCT: <b>{lesson.topic}</b>. Chọn các bài học sẽ được dạy trong tiết này.
+        </p>
+        <div className="mt-3 space-y-4">
+          {tree.length === 0 && (
+            <div className="text-sm text-slate-500 italic">Chưa có mục lục SGK cho khối/môn này.</div>
+          )}
+          {tree.map((ch) => (
+            <div key={ch.id} className="rounded-lg border border-slate-200">
+              <div className="px-3 py-2 bg-slate-50 border-b text-sm font-semibold text-slate-700">{ch.title}</div>
+              <ul className="p-2 space-y-1">
+                {ch.units.map((u) => (
+                  <li key={u.id}>
+                    <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                      <Checkbox
+                        checked={selected.has(u.id)}
+                        onCheckedChange={() => toggle(u.id)}
+                      />
+                      <span className="text-sm text-slate-700">{u.title}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>Hủy</Button>
+          <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => onSave(Array.from(selected))}>
+            Hoàn thành ({selected.size})
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ----- Lecture Source Modal (Thêm bài giảng: mới / kho) ----- */
+function LectureSourceModal({
+  onClose, onPickNew, onPickLibrary,
+}: {
+  onClose: () => void;
+  onPickNew: () => void;
+  onPickLibrary: () => void;
+}) {
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Thêm bài giảng</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <button
+            onClick={onPickNew}
+            className="rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 p-5 text-left transition"
+          >
+            <div className="h-10 w-10 rounded-lg bg-indigo-100 text-indigo-700 inline-flex items-center justify-center mb-2">
+              <Plus className="h-5 w-5" />
+            </div>
+            <div className="font-semibold text-slate-800">Thêm mới</div>
+            <div className="text-xs text-slate-500 mt-1">Tạo bài giảng mới với các bước như trong lớp học số.</div>
+          </button>
+          <button
+            onClick={onPickLibrary}
+            className="rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 p-5 text-left transition"
+          >
+            <div className="h-10 w-10 rounded-lg bg-emerald-100 text-emerald-700 inline-flex items-center justify-center mb-2">
+              <Library className="h-5 w-5" />
+            </div>
+            <div className="font-semibold text-slate-800">Thêm từ Kho bài giảng</div>
+            <div className="text-xs text-slate-500 mt-1">Chọn bài giảng có sẵn trong kho của bạn.</div>
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ----- Lecture Library Picker ----- */
+type LibraryLecture = { id: string; title: string; subject: string; khoi: string; thumb: string; meta?: string };
+function LectureLibraryPickerModal({
+  items, onClose, onConfirm,
+}: {
+  items: LibraryLecture[];
+  onClose: () => void;
+  onConfirm: (picked: LibraryLecture[]) => void;
+}) {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [q, setQ] = useState("");
+  const filtered = items.filter((i) => i.title.toLowerCase().includes(q.toLowerCase()));
+  const toggle = (id: string) => setSelected((s) => {
+    const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n;
+  });
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Chọn từ Kho bài giảng</DialogTitle>
+        </DialogHeader>
+        <Input placeholder="Tìm bài giảng..." value={q} onChange={(e) => setQ(e.target.value)} className="mb-3" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {filtered.map((it) => {
+            const picked = selected.has(it.id);
+            return (
+              <button
+                key={it.id}
+                onClick={() => toggle(it.id)}
+                className={`text-left rounded-xl border-2 overflow-hidden transition ${picked ? "border-indigo-600 ring-2 ring-indigo-200" : "border-slate-200 hover:border-indigo-300"}`}
+              >
+                <div className="relative">
+                  <img src={it.thumb} alt={it.title} className="w-full h-24 object-cover" />
+                  {picked && (
+                    <span className="absolute top-1.5 right-1.5 bg-indigo-600 text-white rounded-full h-6 w-6 inline-flex items-center justify-center text-xs">✓</span>
+                  )}
+                </div>
+                <div className="p-2">
+                  <div className="font-semibold text-sm text-slate-800 line-clamp-2">{it.title}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">{it.khoi} · {it.subject}</div>
+                </div>
+              </button>
+            );
+          })}
+          {filtered.length === 0 && <div className="col-span-full text-sm text-slate-500 italic py-6 text-center">Không có bài giảng nào phù hợp.</div>}
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>Hủy</Button>
+          <Button
+            className="bg-indigo-700 hover:bg-indigo-800"
+            disabled={selected.size === 0}
+            onClick={() => onConfirm(items.filter((i) => selected.has(i.id)))}
+          >
+            Xác nhận ({selected.size})
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function Legend2() {
   return (
     <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-slate-600">
@@ -1072,6 +1293,8 @@ function LessonPanel({
   const [taskPickerOpen, setTaskPickerOpen] = useState(false);
   const [testPickerOpen, setTestPickerOpen] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState<null | Material>(null);
+  const [lectureSourceOpen, setLectureSourceOpen] = useState(false);
+  const [libraryPickerOpen, setLibraryPickerOpen] = useState(false);
 
   // ClassInfo synth cho các popup dùng chung với Lớp học số
   const classInfoForModal: ClassInfo = useMemo(() => ({
@@ -1183,7 +1406,7 @@ function LessonPanel({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setAddMatOpen("lesson")}>
+              <DropdownMenuItem onClick={() => setLectureSourceOpen(true)}>
                 <Presentation className="h-4 w-4 mr-2" />Bài giảng
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setAddMatOpen("material")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
@@ -1358,8 +1581,38 @@ function LessonPanel({
         />
       )}
 
+      {lectureSourceOpen && (
+        <LectureSourceModal
+          onClose={() => setLectureSourceOpen(false)}
+          onPickNew={() => { setLectureSourceOpen(false); setAddMatOpen("lesson"); }}
+          onPickLibrary={() => { setLectureSourceOpen(false); setLibraryPickerOpen(true); }}
+        />
+      )}
+      {libraryPickerOpen && (
+        <LectureLibraryPickerModal
+          items={LIBRARY_LECTURES}
+          onClose={() => setLibraryPickerOpen(false)}
+          onConfirm={(picked) => {
+            for (const p of picked) {
+              addMaterial({
+                classRealId: lesson.class,
+                subject: lesson.subject,
+                unitId: lesson.unitId,
+                kind: "slide",
+                title: p.title,
+                meta: p.meta,
+                origin: "schedule",
+              });
+            }
+            setLibraryPickerOpen(false);
+            toast.success(`Đã thêm ${picked.length} bài giảng từ Kho`);
+          }}
+        />
+      )}
+
       <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
       <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
+
 
       {moveOpen && (
         <PickLessonModal

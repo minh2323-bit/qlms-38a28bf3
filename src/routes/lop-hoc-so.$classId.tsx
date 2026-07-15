@@ -724,6 +724,20 @@ function GroupRow({
           {group.items.length === 0 && (
             <li className="pl-12 pr-4 py-3 text-sm text-slate-400 italic">Chưa có học liệu trong bài giảng này.</li>
           )}
+          <li className="pl-12 pr-4 py-2 border-t border-dashed border-slate-200 bg-slate-50/50">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:text-indigo-900">
+                  <Plus className="h-4 w-4" /> Thêm nội dung vào chủ đề này
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem className="cursor-pointer"><Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Bài giảng</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer"><BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Học liệu</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer"><ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Bài tập</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </li>
         </ul>
       )}
     </div>
