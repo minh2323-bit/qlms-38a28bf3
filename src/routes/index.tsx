@@ -29,6 +29,15 @@ import qlmsLogo from "@/assets/qlms-logo.png";
 import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
 import { KNOWLEDGE_TREE, getChapterOfUnit, getKnowledgeTree, getUnitTitle as getUnitTitleSafe, getTreeForClass } from "@/lib/knowledge-tree";
+
+const LIBRARY_LECTURES = [
+  { id: "lib-1", title: "Số có sáu chữ số. Số 1 000 000", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=60", meta: "24 slide" },
+  { id: "lib-2", title: "Hàng và lớp", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=400&q=60", meta: "18 slide" },
+  { id: "lib-3", title: "So sánh các số có nhiều chữ số", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=400&q=60", meta: "20 slide" },
+  { id: "lib-4", title: "Ôn tập các số đến 100 000", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=60", meta: "16 slide" },
+  { id: "lib-5", title: "Bảng nhân 7", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=60", meta: "12 slide" },
+  { id: "lib-6", title: "Chu vi hình chữ nhật", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?w=400&q=60", meta: "14 slide" },
+];
 import {
   useMaterials, addMaterial, moveMaterials, copyMaterialsWithOverrides, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
