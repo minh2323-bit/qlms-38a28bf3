@@ -809,7 +809,7 @@ function KnowledgeTree({
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
   week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
-  liveBySlot, eveningByDay, onPickLive,
+  liveBySlot, eveningByDay, onPickLive, onAssignLessons,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
@@ -817,6 +817,7 @@ function ScheduleGrid({
   liveBySlot: Map<string, LiveClass>;
   eveningByDay: Map<string, LiveClass[]>;
   onPickLive: (lc: LiveClass) => void;
+  onAssignLessons: (lessonId: string) => void;
 }) {
   const morning = [1, 2, 3, 4, 5];
   const afternoon = [6, 7, 8, 9, 10];
@@ -831,26 +832,44 @@ function ScheduleGrid({
 
   const renderCell = (d: number, p: number, afternoonBg: boolean) => {
     const l = cellFor(d, p);
-    const isFocus = l && focusUnit && l.unitId === focusUnit;
+    const isFocus = l && focusUnit && l.assignedUnitIds.includes(focusUnit);
     const isActive = l && activeLessonId === l.id;
     const live = liveBySlot.get(`${week}-${d}-${p}`);
     return (
       <td key={d} className={`border border-slate-200 p-1 align-top h-10 ${afternoonBg ? "bg-purple-50/30" : ""}`}>
         {l && (
-          <button
-            onClick={() => onPickLesson(l.id)}
+          <div
             className={`w-full text-left p-2 rounded-md text-[13px] leading-snug transition ${
               CLASS_COLORS[l.class]
             } ${isFocus ? "ring-2 ring-yellow-400 animate-pulse shadow-lg scale-[1.02]" : ""} ${
-              isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow hover:-translate-y-0.5"
+              isActive ? "ring-2 ring-indigo-700 shadow-md" : "hover:shadow"
             }`}
           >
-            <div className="font-bold text-[13px]">{l.class}</div>
-            <div className="text-[13px] opacity-80">Toán</div>
-            <div className="truncate font-medium text-[13px]">
-              <span className="opacity-70">Nội dung:</span> {l.topic}
+            <button onClick={() => onPickLesson(l.id)} className="w-full text-left">
+              <div className="font-bold text-[13px]">{l.class} - Toán</div>
+              <div className="truncate text-[12px]">
+                <span className="opacity-70">Tên tiết PPCT:</span> {l.topic}
+              </div>
+            </button>
+            <div className="mt-1 flex flex-wrap gap-1 items-center">
+              {l.assignedUnitIds.map((uid) => (
+                <span
+                  key={uid}
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-600/90 text-white max-w-[130px] truncate"
+                  title={getUnitTitleSafe(uid)}
+                >
+                  {getUnitTitleSafe(uid)}
+                </span>
+              ))}
+              <button
+                onClick={(e) => { e.stopPropagation(); onAssignLessons(l.id); }}
+                className="inline-flex items-center justify-center h-4 w-4 rounded bg-white/70 hover:bg-white text-indigo-700 border border-indigo-300"
+                title="Gán bài học"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
             </div>
-          </button>
+          </div>
         )}
         {live && (
           <button
