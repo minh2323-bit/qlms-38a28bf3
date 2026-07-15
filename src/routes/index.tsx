@@ -69,12 +69,14 @@ const CLASS_COLORS: Record<ClassId, string> = {
 type Lesson = {
   id: string; class: ClassId; subject: "Toán";
   topic: string; unitId: string;
+  /** Danh sách bài học (chủ đề) đã gán cho tiết PPCT này. */
+  assignedUnitIds: string[];
 };
 
 type WeekGrid = Record<number, Record<number, Record<number, Lesson | null>>>;
 
 const makeLesson = (id: string, c: ClassId, topic: string, unitId: string): Lesson =>
-  ({ id, class: c, subject: "Toán", topic, unitId });
+  ({ id, class: c, subject: "Toán", topic, unitId, assignedUnitIds: [unitId] });
 
 // WEEKS + DAY_DATES nay được sinh từ src/lib/school-weeks.ts (bắt đầu 5/9 hằng năm).
 const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
