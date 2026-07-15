@@ -1572,8 +1572,38 @@ function LessonPanel({
         />
       )}
 
+      {lectureSourceOpen && (
+        <LectureSourceModal
+          onClose={() => setLectureSourceOpen(false)}
+          onPickNew={() => { setLectureSourceOpen(false); setAddMatOpen("lesson"); }}
+          onPickLibrary={() => { setLectureSourceOpen(false); setLibraryPickerOpen(true); }}
+        />
+      )}
+      {libraryPickerOpen && (
+        <LectureLibraryPickerModal
+          items={LIBRARY_LECTURES}
+          onClose={() => setLibraryPickerOpen(false)}
+          onConfirm={(picked) => {
+            for (const p of picked) {
+              addMaterial({
+                classRealId: lesson.class,
+                subject: lesson.subject,
+                unitId: lesson.unitId,
+                kind: "slide",
+                title: p.title,
+                meta: p.meta,
+                origin: "schedule",
+              });
+            }
+            setLibraryPickerOpen(false);
+            toast.success(`Đã thêm ${picked.length} bài giảng từ Kho`);
+          }}
+        />
+      )}
+
       <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
       <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
+
 
       {moveOpen && (
         <PickLessonModal
