@@ -1397,7 +1397,7 @@ function LessonPanel({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setAddMatOpen("lesson")}>
+              <DropdownMenuItem onClick={() => setLectureSourceOpen(true)}>
                 <Presentation className="h-4 w-4 mr-2" />Bài giảng
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setAddMatOpen("material")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
