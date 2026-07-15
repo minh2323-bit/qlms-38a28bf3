@@ -474,6 +474,35 @@ function TeacherHome() {
           {activeLive && (
             <LiveClassPopup live={activeLive} onClose={() => setActiveLive(null)} />
           )}
+          {assignForLessonId && (() => {
+            let target: Lesson | null = null;
+            let pos: { w: number; d: number; p: number } | null = null;
+            for (const [wk, days] of Object.entries(grid)) {
+              for (const [d, periods] of Object.entries(days)) {
+                for (const [p, l] of Object.entries(periods)) {
+                  if (l && l.id === assignForLessonId) {
+                    target = l;
+                    pos = { w: Number(wk), d: Number(d), p: Number(p) };
+                  }
+                }
+              }
+            }
+            if (!target || !pos) return null;
+            return (
+              <AssignLessonsModal
+                lesson={target}
+                onClose={() => setAssignForLessonId(null)}
+                onSave={(ids) => {
+                  const next: WeekGrid = JSON.parse(JSON.stringify(grid));
+                  const cur = next[pos!.w]?.[pos!.d]?.[pos!.p];
+                  if (cur) cur.assignedUnitIds = ids;
+                  setGrid(next);
+                  setAssignForLessonId(null);
+                  toast.success("Đã cập nhật bài học cho tiết");
+                }}
+              />
+            );
+          })()}
       </>
     </AppShell>
 
