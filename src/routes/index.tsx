@@ -1244,6 +1244,8 @@ function LectureLibraryPickerModal({
     </Dialog>
   );
 }
+
+function Legend2() {
   return (
     <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-slate-600">
       <span className="font-semibold mr-1">Chú thích lớp:</span>
