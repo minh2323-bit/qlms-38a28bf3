@@ -1,58 +1,55 @@
-## Mục tiêu
-1. Đảm bảo click vào card lớp học → mở trang chi tiết tương ứng (trang `/lop-hoc-so/$classId` đã có sẵn, nhưng đang dùng mock cứng — sẽ wire thẳng dữ liệu lớp đang click).
-2. Tạo liên kết **2 chiều** giữa **Lớp học số** (trong `/lop-hoc-so`) và **Lịch báo giảng** (trong `/`) theo cặp khoá `(Lớp thực, Môn, Đơn vị kiến thức)` — gọi tắt là `unitKey`.
+# Plan: LBG lesson tagging + lecture source picker + per-chapter add button
 
-## Kiến trúc dữ liệu chia sẻ
+## 1. LBG lesson cards (`src/routes/index.tsx`)
 
-Tạo một store đơn giản (React Context + `useSyncExternalStore`, không cần backend), giữ in-memory cho demo:
+Change teacher timetable cards from showing "Nội dung" (unit title) to showing **assigned lesson tags**.
 
-```text
-src/lib/teaching-store.ts
-  - ClassRoom { id, name, lop ("4A"), subject ("Toán"), ... }
-  - Material   { id, unitId, classRealId ("4A"), subject, kind, title, meta }
-  - schedule   { weekIdx, day, period, lesson { classRealId, subject, unitId, topic } }
+- Extend the schedule lesson type with `assignedUnitIds: string[]` (in-memory state, no persistence change beyond current store).
+- New cards render:
+  - Line 1: `Lớp - Môn` (unchanged).
+  - Line 2: `Tên tiết PPCT: {name}` (teacher-entered, unchanged).
+  - Line 3: horizontal wrap of **lesson tags** (one colored pill per assigned lesson) + a small `+` button.
+- On fresh timetable creation, `assignedUnitIds` is empty — no tag row, just the `+`.
+- Clicking `+` opens **AssignLessonsModal**:
+  - Lists `getTreeForClass(classLop, subject)` grouped by chapter, each lesson has a checkbox.
+  - Pre-checks currently assigned units.
+  - "Hoàn thành" writes back the selection.
+- Each tag has an inline `×` for quick removal.
+- Tag color: single shared token (indigo/violet pill) — "cùng màu" per user.
 
-  API:
-    listMaterialsByClass(classRoomId)
-    listMaterialsByUnit(classRealId, subject, unitId)
-    addMaterial(material)        // emit để cả 2 trang nghe
-    removeMaterial(id)
-    subscribe(listener)
-```
+## 2. "Thêm bài giảng" source picker (`src/routes/index.tsx` + reuse from `lop-hoc-so.$classId.tsx`)
 
-- Lớp học số có field `lop` (4A...) + `subject` (Toán/Tiếng Việt) — đã có sẵn trong `CLASSES_SEED`.
-- Lịch báo giảng có `Lesson { class, subject, unitId }` — đã có sẵn.
-- `unitKey = ${classRealId}|${subject}|${unitId}` là khoá đồng bộ.
+When teacher opens a schedule slot side panel and clicks **Thêm nội dung mới → Bài giảng**, show a new **LectureSourceModal** with two choice boxes:
 
-## Thay đổi cụ thể
+- **Thêm mới** → opens the existing `AddMaterialModal` (lecture flow) already exported from `lop-hoc-so.$classId.tsx`.
+- **Thêm từ Kho bài giảng** → opens **LectureLibraryPickerModal**:
+  - Grid of lecture cards from the teacher's library (reuse the data source used by `hoc-lieu.bai-giang.index.tsx`; if it's local seed, import it or expose a `listLibraryLectures()` helper).
+  - Multi-select via card checkbox overlay.
+  - "Xác nhận" → clones each selected lecture into the current slot's `(class, subject, unit)` via `addMaterial` with `origin: "schedule"`.
 
-### 1. `src/lib/teaching-store.ts` (mới)
-- Khởi tạo store từ seed hiện có (MATERIALS_SEED + lessons cũ).
-- Expose hook `useTeachingStore()`.
+Học liệu / Bài tập / Bài kiểm tra / Lời nhắc entries keep their current single-flow behavior.
 
-### 2. `src/routes/lop-hoc-so.$classId.tsx`
-- Đọc `info` từ store thay vì `CLASS_DB` cứng (fallback CLASS_DB nếu chưa có).
-- Trong dropdown **Thêm bài giảng / Thêm học liệu / Thêm bài tập**: mở mini-modal cho chọn:
-  - Bài/Đơn vị kiến thức (lấy từ `KNOWLEDGE_TREE` — sẽ tách ra `src/lib/knowledge-tree.ts` để dùng chung)
-  - Tiêu đề + meta
-  → gọi `store.addMaterial({ classRealId: info.lop, subject: info.subject, unitId, ... })`.
-- Khi thêm xong: học liệu xuất hiện trong list lớp + toast "Đã đồng bộ sang Lịch báo giảng".
-- Vì cùng `unitId`, mọi tiết lịch khớp đơn vị đó (cùng lớp 4A, môn Toán) sẽ tự thấy học liệu mới trong `LessonPanel`.
+## 3. Per-chapter "+" in "Nội dung lớp học" (`src/routes/lop-hoc-so.$classId.tsx`)
 
-### 3. `src/routes/index.tsx` (Lịch báo giảng)
-- `LessonPanel` (đang đọc `MATERIALS_SEED[lesson.unitId]`) → đổi sang `useTeachingStore().listMaterialsByUnit(lesson.class, lesson.subject, lesson.unitId)`.
-- Trong panel đó, nút **+ Thêm học liệu** sẽ gọi `store.addMaterial({...})` với `classRealId = lesson.class, subject = lesson.subject, unitId = lesson.unitId`.
-- Học liệu mới này lập tức xuất hiện trong **trang chi tiết lớp học số** tương ứng (vd: Lớp 4A – Toán) như một mục "bài giảng" thuộc đơn vị/chương đó.
-- Nếu lớp số chưa có "lesson section" cho `unitId` đó → tự tạo section mới (tên = tên unit từ KNOWLEDGE_TREE) và bỏ học liệu vào.
+Inside the class content section, each chapter group currently lists its materials. Add a final row inside each chapter:
 
-### 4. `src/lib/knowledge-tree.ts` (mới, tách ra)
-- Move `KNOWLEDGE_TREE` ra dùng chung cho cả index + class-detail (form chọn chương/bài khi thêm học liệu).
+- A dashed `+` row button labeled "Thêm nội dung vào chủ đề này".
+- Click opens **ChapterAddContentModal** with 3 tile choices: **Bài giảng / Học liệu / Bài tập**.
+- Each tile routes into the existing add-flow for that kind, pre-scoping the target chapter/unit context (default `unitId` = first unit of that chapter; teacher can still change inside the form).
 
-## Phạm vi không thay đổi
-- Toàn bộ layout, màu, navigation hiện tại giữ nguyên.
-- Mock data hiện tại được nạp vào store khi khởi động — UI không đổi lần load đầu.
-- Chưa có persistence (reload mất). Nếu cần lưu, tôi sẽ thêm localStorage trong bước phụ.
+The top-level "Thêm nội dung" dropdown in the section header stays as is (already pruned of Bài kiểm tra).
 
-## Câu hỏi xác nhận trước khi build
-1. **Khoá liên kết**: dùng cặp `(lớp thực, môn, unitId)` để khớp lớp số ↔ lịch (đề xuất trên) — OK?
-2. Trang chi tiết lớp học hiện tại đã có đủ các phần bạn yêu cầu (banner, mã lớp + copy, số học sinh, GV, ảnh nền, mô tả, 2 nút + dropdown 3 lựa chọn, list bài giảng/học liệu, kéo thả sắp xếp). Bạn có muốn tôi **giữ nguyên thiết kế** và chỉ wire dữ liệu thật, hay điều chỉnh thêm gì không?
+## Technical notes
+
+- No schema/store migrations required; `assignedUnitIds` lives on the schedule lesson object already stored in module-scope state inside `index.tsx`. Persistence layer is unchanged.
+- Lesson tags reuse existing `Badge` component with `variant="secondary"` + a fixed tailwind class for the shared color.
+- Lecture library data: if `hoc-lieu.bai-giang.index.tsx` currently holds an inline seed array, extract it into `src/lib/lecture-library.ts` (new) so both the library page and the picker modal share it.
+- All new modals are added to `src/routes/index.tsx` (LBG) and `src/routes/lop-hoc-so.$classId.tsx` respectively — no new route files.
+
+## Out of scope (ask before doing)
+
+- Persisting `assignedUnitIds` to any backend.
+- Reworking the class detail chapter grouping algorithm itself.
+- Changing how existing "unit" tagging on materials works.
+
+Confirm and I'll implement all three parts in one pass.
