@@ -913,6 +913,51 @@ function Page() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Xem trước đề luyện tập</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
+              <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên đề)"}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <PrevItem label="Chương/Chủ đề" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
+              <PrevItem label="Bài học" value={tree.find((c) => c.id === chapterId)?.units.find((u) => u.id === unitId)?.title || "—"} />
+              <PrevItem label="Ngày giao" value={`${assignedAt || "—"} ${assignedTime}`} />
+              <PrevItem label="Hạn nộp" value={`${dueAt || "—"} ${dueTime}`} />
+              <PrevItem label="Thang điểm" value={`${scale} điểm`} />
+              <PrevItem label="Số câu hỏi" value={`${questions.length} câu · ${totalScore} điểm`} />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase mb-1">Lớp học gán</div>
+              <div className="flex flex-wrap gap-1.5">
+                {assignedClasses.size === 0
+                  ? <span className="text-slate-400 text-sm">— chưa chọn —</span>
+                  : Array.from(assignedClasses).map((c) => <Badge key={c} variant="secondary">{c}</Badge>)}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Đóng</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+
+function PrevItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border bg-white px-3 py-2">
+      <div className="text-[11px] uppercase text-slate-500">{label}</div>
+      <div className="text-sm font-semibold text-slate-800">{value}</div>
+    </div>
+  );
+}
+
