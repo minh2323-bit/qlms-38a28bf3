@@ -859,10 +859,17 @@ function Page() {
                   <span className="text-sm text-slate-600">
                     Đã chọn <b className="text-indigo-700">{pickedStudents.size}</b> học sinh
                   </span>
+                  <Button variant="outline" onClick={() => toast.success("Đã lưu nháp bài tập")}>
+                    <Save className="h-4 w-4 mr-1" /> Lưu nháp
+                  </Button>
+                  <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                    <Eye className="h-4 w-4 mr-1" /> Xem trước
+                  </Button>
                   <Button onClick={submit} disabled={!step3Valid}
                     className="bg-indigo-700 hover:bg-indigo-800 text-white">Thêm bài tập</Button>
                 </div>
               </div>
+
             </div>
           </div>
         )}
