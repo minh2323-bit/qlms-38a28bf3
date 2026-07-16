@@ -11,9 +11,11 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2, Search,
-  Database, Upload, PenLine, ChevronDown, X,
+  Database, Upload, PenLine, ChevronDown, X, Eye, Save,
   CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2,
 } from "lucide-react";
 import { toast } from "sonner";
