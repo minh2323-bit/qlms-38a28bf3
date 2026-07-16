@@ -10,10 +10,15 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2,
-  Upload, Link as LinkIcon, FileText, Video, X, Search,
+  Upload, Link as LinkIcon, FileText, Video, X, Search, Eye, Save, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
+
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 export const Route = createFileRoute("/giao-bai-tap/tao-moi/bai-tap-doc")({
@@ -31,6 +36,13 @@ const CLASSES_BY_GRADE: Record<string, string[]> = {
   "5": ["5A", "5B"],
   "2": ["2A", "2B"],
 };
+const ASSIGN_CLASS_OPTIONS = [
+  "Lớp Toán 4A - Cô Hoa",
+  "Lớp Toán 4B - Cô Hoa",
+  "Lớp Tiếng Việt 4A - Cô Lan",
+  "Lớp bổ túc Toán 4",
+  "Lớp ôn thi HSG Tiếng Anh",
+];
 const KNOWLEDGE_UNITS = [
   "Số tự nhiên",
   "Phân số",
@@ -142,6 +154,9 @@ function Page() {
   const [klass, setKlass] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [unitId, setUnitId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [assignPickerOpen, setAssignPickerOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [assignedAt, setAssignedAt] = useState("");
   const [assignedTime, setAssignedTime] = useState("08:00");
   const [dueAt, setDueAt] = useState("");
@@ -346,6 +361,47 @@ function Page() {
                 </Select>
               </div>
             </div>
+
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp học gán <span className="text-rose-500">*</span></label>
+              <Popover open={assignPickerOpen} onOpenChange={setAssignPickerOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border border-slate-200 bg-white hover:bg-slate-50"
+                  >
+                    <span className={assignedClasses.size ? "text-slate-800" : "text-slate-400"}>
+                      {assignedClasses.size
+                        ? Array.from(assignedClasses).join(", ")
+                        : "Chọn lớp học để gán bài tập"}
+                    </span>
+                    <ChevronDown className="h-4 w-4 text-slate-400" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                  <ul className="max-h-64 overflow-auto">
+                    {ASSIGN_CLASS_OPTIONS.map((c) => (
+                      <li key={c}>
+                        <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                          <Checkbox
+                            checked={assignedClasses.has(c)}
+                            onCheckedChange={() => {
+                              setAssignedClasses((prev) => {
+                                const nxt = new Set(prev);
+                                if (nxt.has(c)) nxt.delete(c); else nxt.add(c);
+                                return nxt;
+                              });
+                            }}
+                          />
+                          <span className="text-sm text-slate-700">{c}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </PopoverContent>
+              </Popover>
+            </div>
+
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -743,6 +799,12 @@ function Page() {
                   <span className="text-sm text-slate-600">
                     Đã chọn <b className="text-indigo-700">{pickedStudents.size}</b> học sinh
                   </span>
+                  <Button variant="outline" onClick={() => toast.success("Đã lưu nháp bài tập")}>
+                    <Save className="h-4 w-4 mr-1" /> Lưu nháp
+                  </Button>
+                  <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                    <Eye className="h-4 w-4 mr-1" /> Xem trước
+                  </Button>
                   <Button onClick={submit} disabled={!step3Valid}
                     className="bg-indigo-700 hover:bg-indigo-800 text-white">
                     Thêm bài tập
@@ -753,6 +815,67 @@ function Page() {
           </div>
         )}
       </div>
+
+      {/* Preview modal */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Xem trước bài tập</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
+              <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên bài tập)"}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Info2 label="Chương/Chủ đề" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
+              <Info2 label="Bài học" value={tree.find((c) => c.id === chapterId)?.units.find((u) => u.id === unitId)?.title || "—"} />
+              <Info2 label="Ngày giao" value={`${assignedAt || "—"} ${assignedTime}`} />
+              <Info2 label="Hạn nộp" value={`${dueAt || "—"} ${dueTime}`} />
+              <Info2 label="Thang điểm" value={`${scale} điểm`} />
+              <Info2 label="Số học sinh" value={`${pickedStudents.size} học sinh`} />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase mb-1">Lớp học gán</div>
+              <div className="flex flex-wrap gap-1.5">
+                {assignedClasses.size === 0
+                  ? <span className="text-slate-400 text-sm">— chưa chọn —</span>
+                  : Array.from(assignedClasses).map((c) => (
+                      <Badge key={c} variant="secondary">{c}</Badge>
+                    ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase mb-1">Nội dung ({contents.length})</div>
+              <ul className="space-y-1.5">
+                {contents.map((c, i) => (
+                  <li key={c.id} className="flex items-center justify-between rounded-lg border bg-slate-50 px-3 py-2">
+                    <span className="text-sm font-semibold text-slate-800">
+                      {i + 1}. {c.name || `Tài liệu ${i + 1}`}
+                    </span>
+                    <span className="text-xs text-slate-500">{c.questions.length} câu hỏi</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Đóng</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+
+function Info2({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border bg-white px-3 py-2">
+      <div className="text-[11px] uppercase text-slate-500">{label}</div>
+      <div className="text-sm font-semibold text-slate-800">{value}</div>
+    </div>
+  );
+}
+

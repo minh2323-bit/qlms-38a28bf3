@@ -4,12 +4,17 @@ import {
   Info, ListChecks, Users, Check, ChevronRight, ArrowLeft, X,
   Plus, Trash2, Eye, SquarePen, Upload, Link as LinkIcon,
   FileText, Video, Presentation as PresentationIcon, ClipboardList, Gamepad2,
-  ChevronDown, Share2, Globe2,
+  ChevronDown, Share2, Globe2, Save,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 type CreateLessonSearch = { khoi?: string; mon?: string; from?: string; edit?: string; title?: string; unitId?: string };
@@ -224,6 +229,7 @@ function CreateLessonPage() {
   const [filterGrade, setFilterGrade] = useState("4");
   const [filterClass, setFilterClass] = useState("4A");
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const onCreateShell = () => {
     if (!canCreate) return;
@@ -331,18 +337,87 @@ function CreateLessonPage() {
                 Tiếp tục <ChevronRight className="h-4 w-4" />
               </button>
             ) : (
-              <button
-                onClick={onFinish}
-                disabled={regMode === "admin" && selectedStudents.size === 0}
-                className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
-              >
-                <Check className="h-4 w-4" /> Hoàn tất tạo bài giảng
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toast.success("Đã lưu nháp bài giảng")}
+                  className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+                >
+                  <Save className="h-4 w-4" /> Lưu nháp
+                </button>
+                <button
+                  onClick={() => setPreviewOpen(true)}
+                  className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+                >
+                  <Eye className="h-4 w-4" /> Xem trước
+                </button>
+                <button
+                  onClick={onFinish}
+                  disabled={regMode === "admin" && selectedStudents.size === 0}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                >
+                  <Check className="h-4 w-4" /> Hoàn tất tạo bài giảng
+                </button>
+              </div>
             )}
           </div>
         )}
+
+        {/* Preview modal */}
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-indigo-700">Xem trước bài giảng</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-start gap-3 rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
+                <div className="h-20 w-32 rounded-lg overflow-hidden border bg-white flex items-center justify-center text-slate-400 text-xs shrink-0">
+                  {coverDataUrl
+                    ? <img src={coverDataUrl} alt="cover" className="w-full h-full object-cover" />
+                    : coverLink
+                      ? <img src={coverLink} alt="cover" className="w-full h-full object-cover" />
+                      : <span>Ảnh đại diện</span>}
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên)"}</div>
+                  <div className="text-xs text-slate-500 mt-1">{khoi || "—"} · {mon || "—"}</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <PreviewCell label="Chương mục" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
+                <PreviewCell label="Bài học" value={tree.find((c) => c.id === chapterId)?.units.find((u) => u.id === unitId)?.title || "—"} />
+                <PreviewCell label="Số chủ đề" value={`${topics.length}`} />
+                <PreviewCell label="Số học liệu" value={`${materials.length}`} />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-slate-500 uppercase mb-1">Danh sách chủ đề</div>
+                <ul className="space-y-1.5">
+                  {topics.length === 0
+                    ? <li className="text-sm text-slate-400">— chưa có chủ đề —</li>
+                    : topics.map((t, i) => (
+                        <li key={t.id} className="rounded-lg border bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800">
+                          {i + 1}. {t.name}
+                        </li>
+                      ))}
+                </ul>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setPreviewOpen(false)}>Đóng</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </>
     </AppShell>
+  );
+}
+
+function PreviewCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border bg-white px-3 py-2">
+      <div className="text-[11px] uppercase text-slate-500">{label}</div>
+      <div className="text-sm font-semibold text-slate-800">{value}</div>
+    </div>
   );
 }
 
