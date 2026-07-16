@@ -412,6 +412,15 @@ function CreateLessonPage() {
   );
 }
 
+function PreviewCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border bg-white px-3 py-2">
+      <div className="text-[11px] uppercase text-slate-500">{label}</div>
+      <div className="text-sm font-semibold text-slate-800">{value}</div>
+    </div>
+  );
+}
+
 /* ============================ Step 1 ============================ */
 
 function Step1(props: {
