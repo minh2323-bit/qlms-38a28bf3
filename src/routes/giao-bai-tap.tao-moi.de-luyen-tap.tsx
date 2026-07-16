@@ -614,6 +614,42 @@ function Page() {
               </div>
             </div>
 
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp học gán <span className="text-rose-500">*</span></label>
+              <Popover open={assignPickerOpen} onOpenChange={setAssignPickerOpen}>
+                <PopoverTrigger asChild>
+                  <button type="button" className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border border-slate-200 bg-white hover:bg-slate-50">
+                    <span className={assignedClasses.size ? "text-slate-800" : "text-slate-400"}>
+                      {assignedClasses.size ? Array.from(assignedClasses).join(", ") : "Chọn lớp học để gán bài tập"}
+                    </span>
+                    <ChevronDown className="h-4 w-4 text-slate-400" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                  <ul className="max-h-64 overflow-auto">
+                    {ASSIGN_CLASS_OPTIONS.map((c) => (
+                      <li key={c}>
+                        <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                          <Checkbox
+                            checked={assignedClasses.has(c)}
+                            onCheckedChange={() => {
+                              setAssignedClasses((prev) => {
+                                const nxt = new Set(prev);
+                                if (nxt.has(c)) nxt.delete(c); else nxt.add(c);
+                                return nxt;
+                              });
+                            }}
+                          />
+                          <span className="text-sm text-slate-700">{c}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Ngày giao <span className="text-rose-500">*</span></label>
