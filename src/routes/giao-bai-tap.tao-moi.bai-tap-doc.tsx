@@ -799,6 +799,12 @@ function Page() {
                   <span className="text-sm text-slate-600">
                     Đã chọn <b className="text-indigo-700">{pickedStudents.size}</b> học sinh
                   </span>
+                  <Button variant="outline" onClick={() => toast.success("Đã lưu nháp bài tập")}>
+                    <Save className="h-4 w-4 mr-1" /> Lưu nháp
+                  </Button>
+                  <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                    <Eye className="h-4 w-4 mr-1" /> Xem trước
+                  </Button>
                   <Button onClick={submit} disabled={!step3Valid}
                     className="bg-indigo-700 hover:bg-indigo-800 text-white">
                     Thêm bài tập
@@ -809,6 +815,67 @@ function Page() {
           </div>
         )}
       </div>
+
+      {/* Preview modal */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Xem trước bài tập</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
+              <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên bài tập)"}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Info2 label="Chương/Chủ đề" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
+              <Info2 label="Bài học" value={tree.find((c) => c.id === chapterId)?.units.find((u) => u.id === unitId)?.title || "—"} />
+              <Info2 label="Ngày giao" value={`${assignedAt || "—"} ${assignedTime}`} />
+              <Info2 label="Hạn nộp" value={`${dueAt || "—"} ${dueTime}`} />
+              <Info2 label="Thang điểm" value={`${scale} điểm`} />
+              <Info2 label="Số học sinh" value={`${pickedStudents.size} học sinh`} />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase mb-1">Lớp học gán</div>
+              <div className="flex flex-wrap gap-1.5">
+                {assignedClasses.size === 0
+                  ? <span className="text-slate-400 text-sm">— chưa chọn —</span>
+                  : Array.from(assignedClasses).map((c) => (
+                      <Badge key={c} variant="secondary">{c}</Badge>
+                    ))}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase mb-1">Nội dung ({contents.length})</div>
+              <ul className="space-y-1.5">
+                {contents.map((c, i) => (
+                  <li key={c.id} className="flex items-center justify-between rounded-lg border bg-slate-50 px-3 py-2">
+                    <span className="text-sm font-semibold text-slate-800">
+                      {i + 1}. {c.name || `Tài liệu ${i + 1}`}
+                    </span>
+                    <span className="text-xs text-slate-500">{c.questions.length} câu hỏi</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Đóng</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+
+function Info2({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border bg-white px-3 py-2">
+      <div className="text-[11px] uppercase text-slate-500">{label}</div>
+      <div className="text-sm font-semibold text-slate-800">{value}</div>
+    </div>
+  );
+}
+
