@@ -229,6 +229,7 @@ function CreateLessonPage() {
   const [filterGrade, setFilterGrade] = useState("4");
   const [filterClass, setFilterClass] = useState("4A");
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const onCreateShell = () => {
     if (!canCreate) return;
