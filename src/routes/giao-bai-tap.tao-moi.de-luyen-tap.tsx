@@ -36,6 +36,13 @@ const CLASSES_BY_GRADE: Record<string, string[]> = {
   "4": ["4A", "4B", "4C", "4D"],
   "5": ["5A", "5B"],
 };
+const ASSIGN_CLASS_OPTIONS = [
+  "Lớp Toán 4A - Cô Hoa",
+  "Lớp Toán 4B - Cô Hoa",
+  "Lớp Tiếng Việt 4A - Cô Lan",
+  "Lớp bổ túc Toán 4",
+  "Lớp ôn thi HSG Tiếng Anh",
+];
 const KNOWLEDGE_UNITS = [
   "Số tự nhiên", "Phân số", "Đọc hiểu văn bản", "Tập làm văn", "Đại lượng & đo lường",
 ];
