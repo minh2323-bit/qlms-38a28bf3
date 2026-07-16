@@ -395,7 +395,7 @@ function CreateLessonPage() {
                     ? <li className="text-sm text-slate-400">— chưa có chủ đề —</li>
                     : topics.map((t, i) => (
                         <li key={t.id} className="rounded-lg border bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800">
-                          {i + 1}. {t.title}
+                          {i + 1}. {t.name}
                         </li>
                       ))}
                 </ul>
