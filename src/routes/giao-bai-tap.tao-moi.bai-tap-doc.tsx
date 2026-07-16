@@ -10,10 +10,15 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2,
-  Upload, Link as LinkIcon, FileText, Video, X, Search,
+  Upload, Link as LinkIcon, FileText, Video, X, Search, Eye, Save, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
+
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 export const Route = createFileRoute("/giao-bai-tap/tao-moi/bai-tap-doc")({
