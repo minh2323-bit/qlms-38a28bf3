@@ -4,12 +4,17 @@ import {
   Info, ListChecks, Users, Check, ChevronRight, ArrowLeft, X,
   Plus, Trash2, Eye, SquarePen, Upload, Link as LinkIcon,
   FileText, Video, Presentation as PresentationIcon, ClipboardList, Gamepad2,
-  ChevronDown, Share2, Globe2,
+  ChevronDown, Share2, Globe2, Save,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 type CreateLessonSearch = { khoi?: string; mon?: string; from?: string; edit?: string; title?: string; unitId?: string };
