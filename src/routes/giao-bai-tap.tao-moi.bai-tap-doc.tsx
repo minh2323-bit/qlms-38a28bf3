@@ -154,6 +154,9 @@ function Page() {
   const [klass, setKlass] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [unitId, setUnitId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [assignPickerOpen, setAssignPickerOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [assignedAt, setAssignedAt] = useState("");
   const [assignedTime, setAssignedTime] = useState("08:00");
   const [dueAt, setDueAt] = useState("");
