@@ -443,7 +443,9 @@ function Step1(props: {
   khoi: string; setKhoi: (v: string) => void;
   mon: string; setMon: (v: string) => void;
   chapterId: string; setChapterId: (v: string) => void;
-  unitId: string; setUnitId: (v: string) => void;
+  unitIds: string[]; setUnitIds: (v: string[]) => void;
+  assignedClasses: Set<string>; setAssignedClasses: React.Dispatch<React.SetStateAction<Set<string>>>;
+  rule: string; setRule: (v: string) => void;
   tree: ReturnType<typeof getKnowledgeTree>;
   coverMode: "link" | "file"; setCoverMode: (v: "link" | "file") => void;
   coverLink: string; setCoverLink: (v: string) => void;
@@ -458,13 +460,30 @@ function Step1(props: {
 }) {
   const {
     title, setTitle, khoi, setKhoi, mon, setMon,
-    chapterId, setChapterId, unitId, setUnitId, tree,
+    chapterId, setChapterId, unitIds, setUnitIds,
+    assignedClasses, setAssignedClasses, rule, setRule, tree,
     coverMode, setCoverMode, coverLink, setCoverLink, coverFileName, coverDataUrl,
     fileRef, onPickFile, canCreate, onCreate, lockGradeSubject, fromHint,
   } = props;
 
   const chapter = tree.find((c) => c.id === chapterId);
   const unitOptions = chapter?.units ?? [];
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [unitOpen, setUnitOpen] = useState(false);
+  const unitRef = useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!unitOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (unitRef.current && !unitRef.current.contains(e.target as Node)) setUnitOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [unitOpen]);
+
+  const toggleUnit = (id: string) => {
+    if (unitIds.includes(id)) setUnitIds(unitIds.filter((x) => x !== id));
+    else setUnitIds([...unitIds, id]);
+  };
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm">
@@ -493,7 +512,7 @@ function Step1(props: {
             <Info className="h-4 w-4 mt-0.5 shrink-0" />
             <div>
               <b>Khối</b> và <b>Môn</b> đã được tự động điền theo {fromHint ? fromHint : "lớp học"}.
-              Bạn chỉ cần chọn <b>Chương mục</b> và <b>Bài học</b> phù hợp.
+              Bạn chỉ cần chọn <b>Chương/Chủ đề</b> và <b>Bài học</b> phù hợp.
             </div>
           </div>
         )}
@@ -526,33 +545,108 @@ function Step1(props: {
               disabled={lockGradeSubject || !khoi}
             />
           </Field>
-          <Field label="Chương mục" required>
+          <Field label="Chương/Chủ đề">
             <select
               value={chapterId}
               onChange={(e) => setChapterId(e.target.value)}
               disabled={!mon}
               className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
             >
-              <option value="">{!mon ? "— Chọn môn trước —" : "— Chọn chương mục —"}</option>
+              <option value="">{!mon ? "— Chọn môn trước —" : "— Chọn chương/chủ đề —"}</option>
               {tree.map((c) => (
                 <option key={c.id} value={c.id}>{c.title}</option>
               ))}
             </select>
           </Field>
-          <Field label="Bài học" required>
+          <Field label="Bài học">
+            <div className="relative" ref={unitRef}>
+              <button
+                type="button"
+                disabled={!chapterId}
+                onClick={() => setUnitOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300 disabled:bg-slate-50 disabled:text-slate-400"
+              >
+                <span className={unitIds.length === 0 ? "text-slate-400 truncate" : "text-slate-700 truncate"}>
+                  {!chapterId
+                    ? "— Chọn chương trước —"
+                    : unitIds.length === 0
+                      ? "— Chọn bài học —"
+                      : `Đã chọn ${unitIds.length} bài học`}
+                </span>
+                <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+              </button>
+              {unitOpen && chapterId && (
+                <div className="absolute z-40 mt-1 w-full max-h-64 overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg py-1">
+                  {unitOptions.map((u) => {
+                    const checked = unitIds.includes(u.id);
+                    return (
+                      <label key={u.id} className="flex items-start gap-2 px-3 py-2 text-sm hover:bg-indigo-50/50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleUnit(u.id)}
+                          className="mt-0.5 h-4 w-4 accent-indigo-600"
+                        />
+                        <span className="text-slate-700">{u.title}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Lớp học gán">
+            <Popover open={assignOpen} onOpenChange={setAssignOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300"
+                >
+                  <span className={assignedClasses.size ? "text-slate-700 truncate" : "text-slate-400"}>
+                    {assignedClasses.size
+                      ? Array.from(assignedClasses).join(", ")
+                      : "Chọn lớp học để gán bài giảng"}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                <ul className="max-h-64 overflow-auto">
+                  {ASSIGN_CLASS_OPTIONS.map((c) => (
+                    <li key={c}>
+                      <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                        <Checkbox
+                          checked={assignedClasses.has(c)}
+                          onCheckedChange={() => {
+                            setAssignedClasses((prev) => {
+                              const nxt = new Set(prev);
+                              if (nxt.has(c)) nxt.delete(c); else nxt.add(c);
+                              return nxt;
+                            });
+                          }}
+                        />
+                        <span className="text-sm text-slate-700">{c}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </PopoverContent>
+            </Popover>
+          </Field>
+          <Field label="Quy luật nội dung">
             <select
-              value={unitId}
-              onChange={(e) => setUnitId(e.target.value)}
-              disabled={!chapterId}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
+              value={rule}
+              onChange={(e) => setRule(e.target.value)}
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
             >
-              <option value="">{!chapterId ? "— Chọn chương trước —" : "— Chọn bài học —"}</option>
-              {unitOptions.map((u) => (
-                <option key={u.id} value={u.id}>{u.title}</option>
-              ))}
+              {RULE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </Field>
         </div>
+
 
         <Field label="Ảnh đại diện" required>
           <div className="space-y-3">
