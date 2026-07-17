@@ -802,7 +802,7 @@ function Page() {
                   <Button variant="outline" onClick={() => toast.success("Đã lưu nháp bài tập")}>
                     <Save className="h-4 w-4 mr-1" /> Lưu nháp
                   </Button>
-                  <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                  <Button onClick={() => setPreviewOpen(true)} className="bg-sky-600 hover:bg-sky-700 text-white">
                     <Eye className="h-4 w-4 mr-1" /> Xem trước
                   </Button>
                   <Button onClick={submit} disabled={!step3Valid}
