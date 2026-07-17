@@ -350,7 +350,7 @@ function Page() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Bài học <span className="text-rose-500">*</span></label>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Bài học</label>
                 <Select value={unitId} onValueChange={setUnitId} disabled={!chapterId}>
                   <SelectTrigger><SelectValue placeholder={!chapterId ? "Chọn chương trước" : "Chọn bài học"} /></SelectTrigger>
                   <SelectContent>
