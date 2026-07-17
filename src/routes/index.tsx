@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
   Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
-  Video, FileType2, Move, Copy, Database, Trash2, BellRing,
+  Video, FileType2, Move, Copy, Database, Trash2, BellRing, Minus,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
