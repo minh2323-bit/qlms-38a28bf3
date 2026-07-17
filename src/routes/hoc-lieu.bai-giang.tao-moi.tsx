@@ -205,7 +205,9 @@ function CreateLessonPage() {
   const [khoi, setKhoi] = useState(prefilledKhoi);
   const [mon, setMon] = useState(prefilledMon);
   const [chapterId, setChapterId] = useState("");
-  const [unitId, setUnitId] = useState(search.unitId ?? "");
+  const [unitIds, setUnitIds] = useState<string[]>(search.unitId ? [search.unitId] : []);
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [rule, setRule] = useState(RULE_OPTIONS[0].value);
   const [coverMode, setCoverMode] = useState<"link" | "file">("link");
   const [coverLink, setCoverLink] = useState("");
   const [coverFileName, setCoverFileName] = useState("");
@@ -219,7 +221,7 @@ function CreateLessonPage() {
   );
 
   const canCreate =
-    title.trim().length > 0 && !!khoi && !!mon && !!chapterId && !!unitId &&
+    title.trim().length > 0 && !!khoi && !!mon &&
     ((coverMode === "link" && coverLink.trim()) || (coverMode === "file" && coverFileName));
 
   const [lessonCreated, setLessonCreated] = useState(false);
