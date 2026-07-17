@@ -236,8 +236,7 @@ function CreateLessonPage() {
   const [newTopic, setNewTopic] = useState("");
 
   // Step 3
-  const [regMode, setRegMode] = useState<RegMode>("self-approve");
-  const [rule, setRule] = useState(RULE_OPTIONS[0].value);
+  const [regMode, setRegMode] = useState<RegMode>("admin");
   const [filterGrade, setFilterGrade] = useState("4");
   const [filterClass, setFilterClass] = useState("4A");
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
