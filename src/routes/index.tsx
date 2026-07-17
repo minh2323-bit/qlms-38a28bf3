@@ -895,19 +895,35 @@ function ScheduleGrid({
               {l.assignedUnitIds.map((uid) => (
                 <span
                   key={uid}
-                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-600/90 text-white max-w-[130px] truncate"
+                  className="inline-flex items-center gap-1 pl-1.5 pr-1 py-0.5 rounded text-[10px] font-medium bg-indigo-600/90 text-white max-w-[130px]"
                   title={getUnitTitleSafe(uid)}
                 >
-                  {getUnitTitleSafe(uid)}
+                  <span className="truncate">{getUnitTitleSafe(uid)}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const cur = lessons.find((x) => x.id === l.id);
+                      if (cur) {
+                        cur.assignedUnitIds = cur.assignedUnitIds.filter((u) => u !== uid);
+                        bump();
+                      }
+                    }}
+                    className="inline-flex items-center justify-center h-3.5 w-3.5 rounded-full bg-white/25 hover:bg-white/40 shrink-0"
+                    title="Gỡ bài học"
+                  >
+                    <Minus className="h-2.5 w-2.5" />
+                  </button>
                 </span>
               ))}
-              <button
-                onClick={(e) => { e.stopPropagation(); onAssignLessons(l.id); }}
-                className="inline-flex items-center justify-center h-4 w-4 rounded bg-white/70 hover:bg-white text-indigo-700 border border-indigo-300"
-                title="Gán bài học"
-              >
-                <Plus className="h-3 w-3" />
-              </button>
+              {l.assignedUnitIds.length < 5 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onAssignLessons(l.id); }}
+                  className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-400 hover:bg-amber-500 text-white shadow ring-2 ring-white"
+                  title="Thêm bài học"
+                >
+                  <Plus className="h-3 w-3" strokeWidth={3} />
+                </button>
+              )}
             </div>
           </div>
         )}
