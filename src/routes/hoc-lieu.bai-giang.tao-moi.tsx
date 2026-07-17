@@ -13,9 +13,19 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { getKnowledgeTree } from "@/lib/knowledge-tree";
+import { getKnowledgeTree, getUnitTitle } from "@/lib/knowledge-tree";
+
+const ASSIGN_CLASS_OPTIONS = [
+  "Lớp Toán 4A - Cô Hoa",
+  "Lớp Toán 4B - Cô Hoa",
+  "Lớp Tiếng Việt 4A - Cô Lan",
+  "Lớp bổ túc Toán 4",
+  "Lớp ôn thi HSG Tiếng Anh",
+];
 
 type CreateLessonSearch = { khoi?: string; mon?: string; from?: string; edit?: string; title?: string; unitId?: string };
 
