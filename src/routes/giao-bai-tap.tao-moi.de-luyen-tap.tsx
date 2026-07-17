@@ -593,7 +593,7 @@ function Page() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Chương/Chủ đề <span className="text-rose-500">*</span></label>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Chương/Chủ đề</label>
                 <Select value={chapterId} onValueChange={(v) => { setChapterId(v); setUnitId(""); }} disabled={!subject}>
                   <SelectTrigger><SelectValue placeholder={!subject ? "Chọn môn trước" : "Chọn chương/chủ đề"} /></SelectTrigger>
                   <SelectContent>
