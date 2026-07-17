@@ -901,14 +901,7 @@ function ScheduleGrid({
                 >
                   <span className="truncate">{getUnitTitleSafe(uid)}</span>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const cur = lessons.find((x) => x.id === l.id);
-                      if (cur) {
-                        cur.assignedUnitIds = cur.assignedUnitIds.filter((u) => u !== uid);
-                        bump();
-                      }
-                    }}
+                    onClick={(e) => { e.stopPropagation(); onRemoveUnit(l.id, uid); }}
                     className="inline-flex items-center justify-center h-3.5 w-3.5 rounded-full bg-white/25 hover:bg-white/40 shrink-0"
                     title="Gỡ bài học"
                   >
