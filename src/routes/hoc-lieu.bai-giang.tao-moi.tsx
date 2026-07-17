@@ -326,7 +326,6 @@ function CreateLessonPage() {
         {step === 3 && (
           <Step3
             regMode={regMode} setRegMode={setRegMode}
-            rule={rule} setRule={setRule}
             filterGrade={filterGrade} setFilterGrade={setFilterGrade}
             filterClass={filterClass} setFilterClass={setFilterClass}
             selected={selectedStudents} setSelected={setSelectedStudents}
