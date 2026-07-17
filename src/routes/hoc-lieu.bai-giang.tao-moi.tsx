@@ -13,9 +13,19 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { getKnowledgeTree } from "@/lib/knowledge-tree";
+import { getKnowledgeTree, getUnitTitle } from "@/lib/knowledge-tree";
+
+const ASSIGN_CLASS_OPTIONS = [
+  "Lớp Toán 4A - Cô Hoa",
+  "Lớp Toán 4B - Cô Hoa",
+  "Lớp Tiếng Việt 4A - Cô Lan",
+  "Lớp bổ túc Toán 4",
+  "Lớp ôn thi HSG Tiếng Anh",
+];
 
 type CreateLessonSearch = { khoi?: string; mon?: string; from?: string; edit?: string; title?: string; unitId?: string };
 
@@ -195,7 +205,9 @@ function CreateLessonPage() {
   const [khoi, setKhoi] = useState(prefilledKhoi);
   const [mon, setMon] = useState(prefilledMon);
   const [chapterId, setChapterId] = useState("");
-  const [unitId, setUnitId] = useState(search.unitId ?? "");
+  const [unitIds, setUnitIds] = useState<string[]>(search.unitId ? [search.unitId] : []);
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [rule, setRule] = useState(RULE_OPTIONS[0].value);
   const [coverMode, setCoverMode] = useState<"link" | "file">("link");
   const [coverLink, setCoverLink] = useState("");
   const [coverFileName, setCoverFileName] = useState("");
@@ -209,7 +221,7 @@ function CreateLessonPage() {
   );
 
   const canCreate =
-    title.trim().length > 0 && !!khoi && !!mon && !!chapterId && !!unitId &&
+    title.trim().length > 0 && !!khoi && !!mon &&
     ((coverMode === "link" && coverLink.trim()) || (coverMode === "file" && coverFileName));
 
   const [lessonCreated, setLessonCreated] = useState(false);
@@ -224,8 +236,7 @@ function CreateLessonPage() {
   const [newTopic, setNewTopic] = useState("");
 
   // Step 3
-  const [regMode, setRegMode] = useState<RegMode>("self-approve");
-  const [rule, setRule] = useState(RULE_OPTIONS[0].value);
+  const [regMode, setRegMode] = useState<RegMode>("admin");
   const [filterGrade, setFilterGrade] = useState("4");
   const [filterClass, setFilterClass] = useState("4A");
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
@@ -276,10 +287,12 @@ function CreateLessonPage() {
         {step === 1 && (
           <Step1
             title={title} setTitle={setTitle}
-            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitId(""); }}
-            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitId(""); }}
-            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitId(""); }}
-            unitId={unitId} setUnitId={setUnitId}
+            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
+            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
+            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
+            unitIds={unitIds} setUnitIds={setUnitIds}
+            assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+            rule={rule} setRule={setRule}
             tree={tree}
             coverMode={coverMode} setCoverMode={setCoverMode}
             coverLink={coverLink} setCoverLink={setCoverLink}
@@ -313,7 +326,6 @@ function CreateLessonPage() {
         {step === 3 && (
           <Step3
             regMode={regMode} setRegMode={setRegMode}
-            rule={rule} setRule={setRule}
             filterGrade={filterGrade} setFilterGrade={setFilterGrade}
             filterClass={filterClass} setFilterClass={setFilterClass}
             selected={selectedStudents} setSelected={setSelectedStudents}
@@ -346,7 +358,7 @@ function CreateLessonPage() {
                 </button>
                 <button
                   onClick={() => setPreviewOpen(true)}
-                  className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700 inline-flex items-center gap-1.5"
                 >
                   <Eye className="h-4 w-4" /> Xem trước
                 </button>
@@ -383,8 +395,10 @@ function CreateLessonPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <PreviewCell label="Chương mục" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
-                <PreviewCell label="Bài học" value={tree.find((c) => c.id === chapterId)?.units.find((u) => u.id === unitId)?.title || "—"} />
+                <PreviewCell label="Chương/Chủ đề" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
+                <PreviewCell label="Bài học" value={unitIds.length ? unitIds.map(getUnitTitle).join(", ") : "—"} />
+                <PreviewCell label="Lớp học gán" value={assignedClasses.size ? Array.from(assignedClasses).join(", ") : "—"} />
+                <PreviewCell label="Quy luật nội dung" value={RULE_OPTIONS.find((o) => o.value === rule)?.label || "—"} />
                 <PreviewCell label="Số chủ đề" value={`${topics.length}`} />
                 <PreviewCell label="Số học liệu" value={`${materials.length}`} />
               </div>
@@ -428,7 +442,9 @@ function Step1(props: {
   khoi: string; setKhoi: (v: string) => void;
   mon: string; setMon: (v: string) => void;
   chapterId: string; setChapterId: (v: string) => void;
-  unitId: string; setUnitId: (v: string) => void;
+  unitIds: string[]; setUnitIds: (v: string[]) => void;
+  assignedClasses: Set<string>; setAssignedClasses: React.Dispatch<React.SetStateAction<Set<string>>>;
+  rule: string; setRule: (v: string) => void;
   tree: ReturnType<typeof getKnowledgeTree>;
   coverMode: "link" | "file"; setCoverMode: (v: "link" | "file") => void;
   coverLink: string; setCoverLink: (v: string) => void;
@@ -443,13 +459,30 @@ function Step1(props: {
 }) {
   const {
     title, setTitle, khoi, setKhoi, mon, setMon,
-    chapterId, setChapterId, unitId, setUnitId, tree,
+    chapterId, setChapterId, unitIds, setUnitIds,
+    assignedClasses, setAssignedClasses, rule, setRule, tree,
     coverMode, setCoverMode, coverLink, setCoverLink, coverFileName, coverDataUrl,
     fileRef, onPickFile, canCreate, onCreate, lockGradeSubject, fromHint,
   } = props;
 
   const chapter = tree.find((c) => c.id === chapterId);
   const unitOptions = chapter?.units ?? [];
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [unitOpen, setUnitOpen] = useState(false);
+  const unitRef = useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!unitOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (unitRef.current && !unitRef.current.contains(e.target as Node)) setUnitOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [unitOpen]);
+
+  const toggleUnit = (id: string) => {
+    if (unitIds.includes(id)) setUnitIds(unitIds.filter((x) => x !== id));
+    else setUnitIds([...unitIds, id]);
+  };
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm">
@@ -478,7 +511,7 @@ function Step1(props: {
             <Info className="h-4 w-4 mt-0.5 shrink-0" />
             <div>
               <b>Khối</b> và <b>Môn</b> đã được tự động điền theo {fromHint ? fromHint : "lớp học"}.
-              Bạn chỉ cần chọn <b>Chương mục</b> và <b>Bài học</b> phù hợp.
+              Bạn chỉ cần chọn <b>Chương/Chủ đề</b> và <b>Bài học</b> phù hợp.
             </div>
           </div>
         )}
@@ -511,33 +544,108 @@ function Step1(props: {
               disabled={lockGradeSubject || !khoi}
             />
           </Field>
-          <Field label="Chương mục" required>
+          <Field label="Chương/Chủ đề">
             <select
               value={chapterId}
               onChange={(e) => setChapterId(e.target.value)}
               disabled={!mon}
               className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
             >
-              <option value="">{!mon ? "— Chọn môn trước —" : "— Chọn chương mục —"}</option>
+              <option value="">{!mon ? "— Chọn môn trước —" : "— Chọn chương/chủ đề —"}</option>
               {tree.map((c) => (
                 <option key={c.id} value={c.id}>{c.title}</option>
               ))}
             </select>
           </Field>
-          <Field label="Bài học" required>
+          <Field label="Bài học">
+            <div className="relative" ref={unitRef}>
+              <button
+                type="button"
+                disabled={!chapterId}
+                onClick={() => setUnitOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300 disabled:bg-slate-50 disabled:text-slate-400"
+              >
+                <span className={unitIds.length === 0 ? "text-slate-400 truncate" : "text-slate-700 truncate"}>
+                  {!chapterId
+                    ? "— Chọn chương trước —"
+                    : unitIds.length === 0
+                      ? "— Chọn bài học —"
+                      : `Đã chọn ${unitIds.length} bài học`}
+                </span>
+                <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+              </button>
+              {unitOpen && chapterId && (
+                <div className="absolute z-40 mt-1 w-full max-h-64 overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg py-1">
+                  {unitOptions.map((u) => {
+                    const checked = unitIds.includes(u.id);
+                    return (
+                      <label key={u.id} className="flex items-start gap-2 px-3 py-2 text-sm hover:bg-indigo-50/50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleUnit(u.id)}
+                          className="mt-0.5 h-4 w-4 accent-indigo-600"
+                        />
+                        <span className="text-slate-700">{u.title}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Lớp học gán">
+            <Popover open={assignOpen} onOpenChange={setAssignOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300"
+                >
+                  <span className={assignedClasses.size ? "text-slate-700 truncate" : "text-slate-400"}>
+                    {assignedClasses.size
+                      ? Array.from(assignedClasses).join(", ")
+                      : "Chọn lớp học để gán bài giảng"}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                <ul className="max-h-64 overflow-auto">
+                  {ASSIGN_CLASS_OPTIONS.map((c) => (
+                    <li key={c}>
+                      <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                        <Checkbox
+                          checked={assignedClasses.has(c)}
+                          onCheckedChange={() => {
+                            setAssignedClasses((prev) => {
+                              const nxt = new Set(prev);
+                              if (nxt.has(c)) nxt.delete(c); else nxt.add(c);
+                              return nxt;
+                            });
+                          }}
+                        />
+                        <span className="text-sm text-slate-700">{c}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </PopoverContent>
+            </Popover>
+          </Field>
+          <Field label="Quy luật nội dung">
             <select
-              value={unitId}
-              onChange={(e) => setUnitId(e.target.value)}
-              disabled={!chapterId}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-50 disabled:text-slate-400"
+              value={rule}
+              onChange={(e) => setRule(e.target.value)}
+              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
             >
-              <option value="">{!chapterId ? "— Chọn chương trước —" : "— Chọn bài học —"}</option>
-              {unitOptions.map((u) => (
-                <option key={u.id} value={u.id}>{u.title}</option>
-              ))}
+              {RULE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </Field>
         </div>
+
 
         <Field label="Ảnh đại diện" required>
           <div className="space-y-3">
@@ -931,13 +1039,12 @@ function VideoSource() {
 
 function Step3(props: {
   regMode: RegMode; setRegMode: (v: RegMode) => void;
-  rule: string; setRule: (v: string) => void;
   filterGrade: string; setFilterGrade: (v: string) => void;
   filterClass: string; setFilterClass: (v: string) => void;
   selected: Set<string>; setSelected: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
   const {
-    regMode, setRegMode, rule, setRule,
+    regMode, setRegMode,
     filterGrade, setFilterGrade, filterClass, setFilterClass,
     selected, setSelected,
   } = props;
@@ -969,7 +1076,7 @@ function Step3(props: {
     <section className="space-y-5">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5">
         <h2 className="text-base font-bold text-slate-800 mb-4">Cấu hình bài giảng</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="max-w-lg">
           <Field label="Hình thức đăng ký">
             <select
               value={regMode}
@@ -984,17 +1091,9 @@ function Step3(props: {
               {REG_OPTIONS.find((o) => o.value === regMode)?.desc}
             </p>
           </Field>
-          <Field label="Quy luật nội dung">
-            <select
-              value={rule}
-              onChange={(e) => setRule(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            >
-              {RULE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </Field>
         </div>
       </div>
+
 
       {regMode === "admin" && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5">

@@ -6,7 +6,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, Plus, Search, X,
   FileText, Presentation, ListChecks, BookOpenCheck, Pencil,
   Bell, BookMarked, Users, FileCheck2, Library, Trophy, TrendingUp,
-  Video, FileType2, Move, Copy, Database, Trash2, BellRing,
+  Video, FileType2, Move, Copy, Database, Trash2, BellRing, Minus,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -461,6 +461,20 @@ function TeacherHome() {
                   eveningByDay={eveningByDay}
                   onPickLive={(lc) => setActiveLive(lc)}
                   onAssignLessons={(id) => setAssignForLessonId(id)}
+                  onRemoveUnit={(lessonId, unitId) => {
+                    const next: WeekGrid = JSON.parse(JSON.stringify(grid));
+                    for (const wk of Object.keys(next)) {
+                      for (const d of Object.keys(next[Number(wk)])) {
+                        for (const p of Object.keys(next[Number(wk)][Number(d)])) {
+                          const l = next[Number(wk)][Number(d)][Number(p)];
+                          if (l && l.id === lessonId) {
+                            l.assignedUnitIds = l.assignedUnitIds.filter((u) => u !== unitId);
+                          }
+                        }
+                      }
+                    }
+                    setGrid(next);
+                  }}
                 />
                 <Legend2 />
               </div>
@@ -849,7 +863,7 @@ function KnowledgeTree({
 /* ----- Schedule Grid ----- */
 function ScheduleGrid({
   week, grid, classFilter, focusUnit, onPickLesson, activeLessonId,
-  liveBySlot, eveningByDay, onPickLive, onAssignLessons,
+  liveBySlot, eveningByDay, onPickLive, onAssignLessons, onRemoveUnit,
 }: {
   week: number; grid: WeekGrid; classFilter: "ALL" | ClassId;
   focusUnit: string | null; onPickLesson: (id: string) => void;
@@ -858,6 +872,7 @@ function ScheduleGrid({
   eveningByDay: Map<string, LiveClass[]>;
   onPickLive: (lc: LiveClass) => void;
   onAssignLessons: (lessonId: string) => void;
+  onRemoveUnit: (lessonId: string, unitId: string) => void;
 }) {
   const morning = [1, 2, 3, 4, 5];
   const afternoon = [6, 7, 8, 9, 10];
@@ -895,19 +910,28 @@ function ScheduleGrid({
               {l.assignedUnitIds.map((uid) => (
                 <span
                   key={uid}
-                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-600/90 text-white max-w-[130px] truncate"
+                  className="inline-flex items-center gap-1 pl-1.5 pr-1 py-0.5 rounded text-[10px] font-medium bg-indigo-600/90 text-white max-w-[130px]"
                   title={getUnitTitleSafe(uid)}
                 >
-                  {getUnitTitleSafe(uid)}
+                  <span className="truncate">{getUnitTitleSafe(uid)}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onRemoveUnit(l.id, uid); }}
+                    className="inline-flex items-center justify-center h-3.5 w-3.5 rounded-full bg-white/25 hover:bg-white/40 shrink-0"
+                    title="Gỡ bài học"
+                  >
+                    <Minus className="h-2.5 w-2.5" />
+                  </button>
                 </span>
               ))}
-              <button
-                onClick={(e) => { e.stopPropagation(); onAssignLessons(l.id); }}
-                className="inline-flex items-center justify-center h-4 w-4 rounded bg-white/70 hover:bg-white text-indigo-700 border border-indigo-300"
-                title="Gán bài học"
-              >
-                <Plus className="h-3 w-3" />
-              </button>
+              {l.assignedUnitIds.length < 5 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onAssignLessons(l.id); }}
+                  className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-400 hover:bg-amber-500 text-white shadow ring-2 ring-white"
+                  title="Thêm bài học"
+                >
+                  <Plus className="h-3 w-3" strokeWidth={3} />
+                </button>
+              )}
             </div>
           </div>
         )}

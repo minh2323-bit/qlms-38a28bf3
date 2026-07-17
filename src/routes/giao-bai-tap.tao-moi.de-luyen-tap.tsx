@@ -593,7 +593,7 @@ function Page() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Chương/Chủ đề <span className="text-rose-500">*</span></label>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Chương/Chủ đề</label>
                 <Select value={chapterId} onValueChange={(v) => { setChapterId(v); setUnitId(""); }} disabled={!subject}>
                   <SelectTrigger><SelectValue placeholder={!subject ? "Chọn môn trước" : "Chọn chương/chủ đề"} /></SelectTrigger>
                   <SelectContent>
@@ -602,7 +602,7 @@ function Page() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Bài học <span className="text-rose-500">*</span></label>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Bài học</label>
                 <Select value={unitId} onValueChange={setUnitId} disabled={!chapterId}>
                   <SelectTrigger><SelectValue placeholder={!chapterId ? "Chọn chương trước" : "Chọn bài học"} /></SelectTrigger>
                   <SelectContent>
@@ -615,7 +615,7 @@ function Page() {
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp học gán <span className="text-rose-500">*</span></label>
+              <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp học gán</label>
               <Popover open={assignPickerOpen} onOpenChange={setAssignPickerOpen}>
                 <PopoverTrigger asChild>
                   <button type="button" className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border border-slate-200 bg-white hover:bg-slate-50">
@@ -862,7 +862,7 @@ function Page() {
                   <Button variant="outline" onClick={() => toast.success("Đã lưu nháp bài tập")}>
                     <Save className="h-4 w-4 mr-1" /> Lưu nháp
                   </Button>
-                  <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                  <Button onClick={() => setPreviewOpen(true)} className="bg-sky-600 hover:bg-sky-700 text-white">
                     <Eye className="h-4 w-4 mr-1" /> Xem trước
                   </Button>
                   <Button onClick={submit} disabled={!step3Valid}
