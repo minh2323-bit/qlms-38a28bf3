@@ -396,8 +396,10 @@ function CreateLessonPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <PreviewCell label="Chương mục" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
-                <PreviewCell label="Bài học" value={tree.find((c) => c.id === chapterId)?.units.find((u) => u.id === unitId)?.title || "—"} />
+                <PreviewCell label="Chương/Chủ đề" value={tree.find((c) => c.id === chapterId)?.title || "—"} />
+                <PreviewCell label="Bài học" value={unitIds.length ? unitIds.map(getUnitTitle).join(", ") : "—"} />
+                <PreviewCell label="Lớp học gán" value={assignedClasses.size ? Array.from(assignedClasses).join(", ") : "—"} />
+                <PreviewCell label="Quy luật nội dung" value={RULE_OPTIONS.find((o) => o.value === rule)?.label || "—"} />
                 <PreviewCell label="Số chủ đề" value={`${topics.length}`} />
                 <PreviewCell label="Số học liệu" value={`${materials.length}`} />
               </div>
