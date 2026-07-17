@@ -287,10 +287,12 @@ function CreateLessonPage() {
         {step === 1 && (
           <Step1
             title={title} setTitle={setTitle}
-            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitId(""); }}
-            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitId(""); }}
-            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitId(""); }}
-            unitId={unitId} setUnitId={setUnitId}
+            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
+            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
+            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
+            unitIds={unitIds} setUnitIds={setUnitIds}
+            assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+            rule={rule} setRule={setRule}
             tree={tree}
             coverMode={coverMode} setCoverMode={setCoverMode}
             coverLink={coverLink} setCoverLink={setCoverLink}
