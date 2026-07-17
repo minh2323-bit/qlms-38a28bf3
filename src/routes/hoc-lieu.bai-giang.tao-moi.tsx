@@ -1039,13 +1039,12 @@ function VideoSource() {
 
 function Step3(props: {
   regMode: RegMode; setRegMode: (v: RegMode) => void;
-  rule: string; setRule: (v: string) => void;
   filterGrade: string; setFilterGrade: (v: string) => void;
   filterClass: string; setFilterClass: (v: string) => void;
   selected: Set<string>; setSelected: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
   const {
-    regMode, setRegMode, rule, setRule,
+    regMode, setRegMode,
     filterGrade, setFilterGrade, filterClass, setFilterClass,
     selected, setSelected,
   } = props;
@@ -1077,7 +1076,7 @@ function Step3(props: {
     <section className="space-y-5">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5">
         <h2 className="text-base font-bold text-slate-800 mb-4">Cấu hình bài giảng</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="max-w-lg">
           <Field label="Hình thức đăng ký">
             <select
               value={regMode}
@@ -1092,17 +1091,9 @@ function Step3(props: {
               {REG_OPTIONS.find((o) => o.value === regMode)?.desc}
             </p>
           </Field>
-          <Field label="Quy luật nội dung">
-            <select
-              value={rule}
-              onChange={(e) => setRule(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            >
-              {RULE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </Field>
         </div>
       </div>
+
 
       {regMode === "admin" && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5">
