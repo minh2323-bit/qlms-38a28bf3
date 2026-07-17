@@ -363,7 +363,7 @@ function Page() {
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp học gán <span className="text-rose-500">*</span></label>
+              <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp học gán</label>
               <Popover open={assignPickerOpen} onOpenChange={setAssignPickerOpen}>
                 <PopoverTrigger asChild>
                   <button
