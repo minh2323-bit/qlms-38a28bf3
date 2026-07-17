@@ -359,7 +359,7 @@ function CreateLessonPage() {
                 </button>
                 <button
                   onClick={() => setPreviewOpen(true)}
-                  className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700 inline-flex items-center gap-1.5"
                 >
                   <Eye className="h-4 w-4" /> Xem trước
                 </button>
