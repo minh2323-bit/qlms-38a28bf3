@@ -556,6 +556,9 @@ function Step1(props: {
                 <option key={c.id} value={c.id}>{c.title}</option>
               ))}
             </select>
+            <p className="text-[11px] italic text-slate-500 mt-1">
+              Vui lòng chọn Chủ đề và Bài học để bài giảng có thể hiển thị với tiết học tương ứng trên Lịch báo giảng.
+            </p>
           </Field>
           <Field label="Bài học">
             <div className="relative" ref={unitRef}>
