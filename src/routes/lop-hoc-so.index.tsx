@@ -286,6 +286,13 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, onE
 
       <div className="h-24 bg-slate-100 overflow-hidden relative">
         <img src={c.thumb} alt={c.name} loading="lazy" className="w-full h-full object-cover" />
+        {c.homeroom && (
+          <div className="absolute top-1.5 left-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 text-white text-[10px] font-semibold px-2 py-0.5 shadow">
+              Lớp chủ nhiệm
+            </span>
+          </div>
+        )}
         <div className="absolute top-1.5 right-1.5">
           <StatusTag status={c.status} />
         </div>
