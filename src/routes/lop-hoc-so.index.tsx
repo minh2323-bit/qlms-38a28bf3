@@ -37,11 +37,11 @@ type ClassRow = {
   baiGiang: number; hocLieu: number; hocSinh: number;
   thumb: string;
   status: ClassStatus;
+  homeroom?: boolean;
 };
 
 const CLASSES_SEED: ClassRow[] = [
-  { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
-  { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", lop: "4A", subject: "Tiếng Việt", baiGiang: 12, hocLieu: 14, hocSinh: 40, thumb: thumbLop4A, status: "deployed" },
+  { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", lop: "4A", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4A, status: "deployed", homeroom: true },
   { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", lop: "3D", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop3D, status: "deployed" },
   { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A, status: "deployed" },
   { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B, status: "draft" },
