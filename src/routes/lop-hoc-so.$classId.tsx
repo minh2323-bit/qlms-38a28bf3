@@ -751,9 +751,9 @@ function GroupRow({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem className="cursor-pointer"><Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Bài giảng</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer"><BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Học liệu</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer"><ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Bài tập</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={onAddLecture}><Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Bài giảng</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={onAddMaterial}><BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Học liệu</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={onAddExercise}><ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Bài tập</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </li>
