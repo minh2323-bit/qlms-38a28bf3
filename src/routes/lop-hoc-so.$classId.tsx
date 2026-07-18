@@ -223,14 +223,22 @@ function ClassDetailPage() {
                 </button>
               </div>
 
-              <button
-                onClick={() => toast.message("Mở danh sách học sinh (demo)")}
-                className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium"
-                title="Xem danh sách học sinh"
-              >
-                <Users className="h-4 w-4" />
-                {info.students} học sinh
-              </button>
+              {info.homeroom ? (
+                <Link
+                  to="/lop-hoc-so/$classId/hoc-sinh"
+                  params={{ classId: info.id }}
+                  className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium"
+                  title="Xem danh sách học sinh"
+                >
+                  <Users className="h-4 w-4" />
+                  {info.students} học sinh
+                </Link>
+              ) : (
+                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5 font-medium">
+                  <Users className="h-4 w-4" />
+                  {info.students} học sinh
+                </div>
+              )}
 
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
                 <span className="opacity-90">Giáo viên:</span>
