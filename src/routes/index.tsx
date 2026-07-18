@@ -521,6 +521,49 @@ function TeacherHome() {
               />
             );
           })()}
+
+          <Dialog open={!!confirmRemove} onOpenChange={(o) => !o && setConfirmRemove(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Gỡ bài học khỏi tiết</DialogTitle>
+              </DialogHeader>
+              <p className="text-sm text-slate-600">
+                Bạn xác nhận sẽ xóa Bài học này khỏi tiết học.<br />
+                Các học liệu gắn với Bài học này cũng sẽ được gỡ khỏi tiết học.
+              </p>
+              <div className="mt-4 flex items-center justify-end gap-2">
+                <button
+                  onClick={() => setConfirmRemove(null)}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:underline"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => {
+                    if (!confirmRemove) return;
+                    const { lessonId, unitId } = confirmRemove;
+                    const next: WeekGrid = JSON.parse(JSON.stringify(grid));
+                    for (const wk of Object.keys(next)) {
+                      for (const d of Object.keys(next[Number(wk)])) {
+                        for (const p of Object.keys(next[Number(wk)][Number(d)])) {
+                          const l = next[Number(wk)][Number(d)][Number(p)];
+                          if (l && l.id === lessonId) {
+                            l.assignedUnitIds = l.assignedUnitIds.filter((u) => u !== unitId);
+                          }
+                        }
+                      }
+                    }
+                    setGrid(next);
+                    setConfirmRemove(null);
+                    toast.success("Đã gỡ bài học khỏi tiết");
+                  }}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700"
+                >
+                  Xác nhận &amp; Đóng
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
       </>
     </AppShell>
 
