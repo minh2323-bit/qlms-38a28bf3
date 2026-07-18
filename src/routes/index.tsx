@@ -469,20 +469,7 @@ function TeacherHome() {
                   eveningByDay={eveningByDay}
                   onPickLive={(lc) => setActiveLive(lc)}
                   onAssignLessons={(id) => setAssignForLessonId(id)}
-                  onRemoveUnit={(lessonId, unitId) => {
-                    const next: WeekGrid = JSON.parse(JSON.stringify(grid));
-                    for (const wk of Object.keys(next)) {
-                      for (const d of Object.keys(next[Number(wk)])) {
-                        for (const p of Object.keys(next[Number(wk)][Number(d)])) {
-                          const l = next[Number(wk)][Number(d)][Number(p)];
-                          if (l && l.id === lessonId) {
-                            l.assignedUnitIds = l.assignedUnitIds.filter((u) => u !== unitId);
-                          }
-                        }
-                      }
-                    }
-                    setGrid(next);
-                  }}
+                  onRemoveUnit={(lessonId, unitId) => setConfirmRemove({ lessonId, unitId })}
                 />
                 <Legend2 />
               </div>
