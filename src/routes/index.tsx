@@ -38,6 +38,13 @@ const LIBRARY_LECTURES = [
   { id: "lib-5", title: "Bảng nhân 7", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=60", meta: "12 slide" },
   { id: "lib-6", title: "Chu vi hình chữ nhật", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?w=400&q=60", meta: "14 slide" },
 ];
+const MATERIAL_LIBRARY = [
+  { id: "mlib-1", title: "Phiếu bài tập – Ôn tập số tự nhiên", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=60", meta: "12 câu" },
+  { id: "mlib-2", title: "Tài liệu: Hàng và lớp", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=60", meta: "8 trang" },
+  { id: "mlib-3", title: "Video: So sánh số có nhiều chữ số", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=400&q=60", meta: "10:22" },
+  { id: "mlib-4", title: "Đề khảo sát đầu năm", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=60", meta: "10 câu" },
+  { id: "mlib-5", title: "Hướng dẫn giải toán có lời văn", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=400&q=60", meta: "6 trang" },
+];
 import {
   useMaterials, addMaterial, moveMaterials, copyMaterialsWithOverrides, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
@@ -1126,23 +1133,45 @@ function AssignLessonsModal({
   onClose: () => void;
   onSave: (ids: string[]) => void;
 }) {
+  const MAX_SELECT = 5;
   const tree = useMemo(() => getTreeForClass(lesson.class, lesson.subject), [lesson.class, lesson.subject]);
   const [selected, setSelected] = useState<Set<string>>(() => new Set(lesson.assignedUnitIds));
   const toggle = (id: string) => setSelected((s) => {
     const next = new Set(s);
-    if (next.has(id)) next.delete(id); else next.add(id);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      if (next.size >= MAX_SELECT) {
+        toast.error(`Tối đa ${MAX_SELECT} bài học cho mỗi tiết`);
+        return s;
+      }
+      next.add(id);
+    }
     return next;
   });
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Gán bài học – {lesson.class} · {lesson.subject}</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-slate-500 -mt-2">
-          Tên tiết PPCT: <b>{lesson.topic}</b>. Chọn các bài học sẽ được dạy trong tiết này.
-        </p>
-        <div className="mt-3 space-y-4">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0">
+        <div className="sticky top-0 z-10 bg-white border-b px-5 pt-4 pb-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <DialogHeader className="p-0">
+                <DialogTitle className="text-base">Gán bài học – {lesson.class} · {lesson.subject}</DialogTitle>
+              </DialogHeader>
+              <p className="text-sm text-slate-500 mt-1">Tên tiết PPCT: <b>{lesson.topic}</b></p>
+              <p className="text-[12px] text-slate-500 italic mt-1 leading-relaxed">
+                Hãy chọn các bài học trong sách Kết nối tri thức gắn với tiết học này. Các bài giảng/Học liệu/Bài tập mà bạn đã tạo sẽ được đồng bộ hóa trên tiết học theo bài học.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={onClose}>Hủy</Button>
+              <Button size="sm" className="bg-indigo-700 hover:bg-indigo-800" onClick={() => onSave(Array.from(selected))}>
+                Hoàn thành ({selected.size}/{MAX_SELECT})
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="overflow-y-auto px-5 py-4 space-y-4">
           {tree.length === 0 && (
             <div className="text-sm text-slate-500 italic">Chưa có mục lục SGK cho khối/môn này.</div>
           )}
@@ -1150,26 +1179,25 @@ function AssignLessonsModal({
             <div key={ch.id} className="rounded-lg border border-slate-200">
               <div className="px-3 py-2 bg-slate-50 border-b text-sm font-semibold text-slate-700">{ch.title}</div>
               <ul className="p-2 space-y-1">
-                {ch.units.map((u) => (
-                  <li key={u.id}>
-                    <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
-                      <Checkbox
-                        checked={selected.has(u.id)}
-                        onCheckedChange={() => toggle(u.id)}
-                      />
-                      <span className="text-sm text-slate-700">{u.title}</span>
-                    </label>
-                  </li>
-                ))}
+                {ch.units.map((u) => {
+                  const isChecked = selected.has(u.id);
+                  const disabled = !isChecked && selected.size >= MAX_SELECT;
+                  return (
+                    <li key={u.id}>
+                      <label className={`flex items-center gap-2 px-2 py-1.5 rounded ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-50 cursor-pointer"}`}>
+                        <Checkbox
+                          checked={isChecked}
+                          disabled={disabled}
+                          onCheckedChange={() => toggle(u.id)}
+                        />
+                        <span className="text-sm text-slate-700">{u.title}</span>
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Hủy</Button>
-          <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => onSave(Array.from(selected))}>
-            Hoàn thành ({selected.size})
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -1179,16 +1207,26 @@ function AssignLessonsModal({
 /* ----- Lecture Source Modal (Thêm bài giảng: mới / kho) ----- */
 function LectureSourceModal({
   onClose, onPickNew, onPickLibrary,
+  title = "Thêm bài giảng",
+  newLabel = "Thêm mới",
+  newHint = "Tạo bài giảng mới với các bước như trong lớp học số.",
+  libraryLabel = "Thêm từ Kho bài giảng",
+  libraryHint = "Chọn bài giảng có sẵn trong kho của bạn.",
 }: {
   onClose: () => void;
   onPickNew: () => void;
   onPickLibrary: () => void;
+  title?: string;
+  newLabel?: string;
+  newHint?: string;
+  libraryLabel?: string;
+  libraryHint?: string;
 }) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Thêm bài giảng</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 mt-2">
           <button
@@ -1198,8 +1236,8 @@ function LectureSourceModal({
             <div className="h-10 w-10 rounded-lg bg-indigo-100 text-indigo-700 inline-flex items-center justify-center mb-2">
               <Plus className="h-5 w-5" />
             </div>
-            <div className="font-semibold text-slate-800">Thêm mới</div>
-            <div className="text-xs text-slate-500 mt-1">Tạo bài giảng mới với các bước như trong lớp học số.</div>
+            <div className="font-semibold text-slate-800">{newLabel}</div>
+            <div className="text-xs text-slate-500 mt-1">{newHint}</div>
           </button>
           <button
             onClick={onPickLibrary}
@@ -1208,8 +1246,8 @@ function LectureSourceModal({
             <div className="h-10 w-10 rounded-lg bg-emerald-100 text-emerald-700 inline-flex items-center justify-center mb-2">
               <Library className="h-5 w-5" />
             </div>
-            <div className="font-semibold text-slate-800">Thêm từ Kho bài giảng</div>
-            <div className="text-xs text-slate-500 mt-1">Chọn bài giảng có sẵn trong kho của bạn.</div>
+            <div className="font-semibold text-slate-800">{libraryLabel}</div>
+            <div className="text-xs text-slate-500 mt-1">{libraryHint}</div>
           </button>
         </div>
       </DialogContent>
@@ -1221,10 +1259,16 @@ function LectureSourceModal({
 type LibraryLecture = { id: string; title: string; subject: string; khoi: string; thumb: string; meta?: string };
 function LectureLibraryPickerModal({
   items, onClose, onConfirm,
+  title = "Chọn từ Kho bài giảng",
+  searchPlaceholder = "Tìm bài giảng...",
+  emptyText = "Không có bài giảng nào phù hợp.",
 }: {
   items: LibraryLecture[];
   onClose: () => void;
   onConfirm: (picked: LibraryLecture[]) => void;
+  title?: string;
+  searchPlaceholder?: string;
+  emptyText?: string;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [q, setQ] = useState("");
@@ -1236,9 +1280,9 @@ function LectureLibraryPickerModal({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Chọn từ Kho bài giảng</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <Input placeholder="Tìm bài giảng..." value={q} onChange={(e) => setQ(e.target.value)} className="mb-3" />
+        <Input placeholder={searchPlaceholder} value={q} onChange={(e) => setQ(e.target.value)} className="mb-3" />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {filtered.map((it) => {
             const picked = selected.has(it.id);
@@ -1261,7 +1305,7 @@ function LectureLibraryPickerModal({
               </button>
             );
           })}
-          {filtered.length === 0 && <div className="col-span-full text-sm text-slate-500 italic py-6 text-center">Không có bài giảng nào phù hợp.</div>}
+          {filtered.length === 0 && <div className="col-span-full text-sm text-slate-500 italic py-6 text-center">{emptyText}</div>}
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>Hủy</Button>
@@ -1319,6 +1363,8 @@ function LessonPanel({
   const [confirmRemove, setConfirmRemove] = useState<null | Material>(null);
   const [lectureSourceOpen, setLectureSourceOpen] = useState(false);
   const [libraryPickerOpen, setLibraryPickerOpen] = useState(false);
+  const [materialSourceOpen, setMaterialSourceOpen] = useState(false);
+  const [materialLibraryOpen, setMaterialLibraryOpen] = useState(false);
 
   // ClassInfo synth cho các popup dùng chung với Lớp học số
   const classInfoForModal: ClassInfo = useMemo(() => ({
@@ -1433,7 +1479,7 @@ function LessonPanel({
               <DropdownMenuItem onClick={() => setLectureSourceOpen(true)}>
                 <Presentation className="h-4 w-4 mr-2" />Bài giảng
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setAddMatOpen("material")}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setMaterialSourceOpen(true)}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTestPickerOpen(true)}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTaskPickerOpen(true)}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
               <DropdownMenuItem onClick={() => quickAdd("doc", "Lời nhắc")}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
@@ -1630,6 +1676,43 @@ function LessonPanel({
             }
             setLibraryPickerOpen(false);
             toast.success(`Đã thêm ${picked.length} bài giảng từ Kho`);
+          }}
+        />
+      )}
+
+      {materialSourceOpen && (
+        <LectureSourceModal
+          title="Thêm học liệu"
+          newLabel="Thêm học liệu mới"
+          newHint="Tạo học liệu mới với các bước như trong lớp học số."
+          libraryLabel="Thêm từ Kho học liệu"
+          libraryHint="Chọn học liệu có sẵn trong kho của bạn."
+          onClose={() => setMaterialSourceOpen(false)}
+          onPickNew={() => { setMaterialSourceOpen(false); setAddMatOpen("material"); }}
+          onPickLibrary={() => { setMaterialSourceOpen(false); setMaterialLibraryOpen(true); }}
+        />
+      )}
+      {materialLibraryOpen && (
+        <LectureLibraryPickerModal
+          items={MATERIAL_LIBRARY}
+          title="Chọn từ Kho học liệu"
+          searchPlaceholder="Tìm học liệu..."
+          emptyText="Không có học liệu nào phù hợp."
+          onClose={() => setMaterialLibraryOpen(false)}
+          onConfirm={(picked) => {
+            for (const p of picked) {
+              addMaterial({
+                classRealId: lesson.class,
+                subject: lesson.subject,
+                unitId: lesson.unitId,
+                kind: "doc",
+                title: p.title,
+                meta: p.meta,
+                origin: "schedule",
+              });
+            }
+            setMaterialLibraryOpen(false);
+            toast.success(`Đã thêm ${picked.length} học liệu từ Kho`);
           }}
         />
       )}

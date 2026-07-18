@@ -237,7 +237,7 @@ function ClassDetailPage() {
               </div>
 
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
-                <span className="opacity-90">Môn:</span>
+                <span className="opacity-90">Môn dạy:</span>
                 <span className="font-semibold">{info.subjectsTaught.join(", ")}</span>
               </div>
             </div>
@@ -550,7 +550,7 @@ function EditClassModal({
               <div className="text-sm font-bold text-slate-800 mt-0.5">Lớp {info.lop}</div>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase text-slate-500">Môn</div>
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Môn dạy</div>
               <div className="text-sm font-bold text-slate-800 mt-0.5">{info.subjectsTaught.join(", ")}</div>
             </div>
             <div className="col-span-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
@@ -558,7 +558,7 @@ function EditClassModal({
               <div className="text-sm font-bold text-slate-800 mt-0.5">Qua mã lớp <span className="font-mono">{info.code}</span></div>
             </div>
           </div>
-          <p className="text-[11px] text-slate-500 -mt-1">Không thể chỉnh sửa Khối, Môn và cách thức đăng ký học sinh.</p>
+          <p className="text-[11px] text-slate-500 -mt-1">Không thể chỉnh sửa Khối, Môn dạy và cách thức đăng ký học sinh.</p>
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Tên lớp <span className="text-rose-500">*</span></label>

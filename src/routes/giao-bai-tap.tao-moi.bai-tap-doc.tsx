@@ -348,6 +348,9 @@ function Page() {
                     {tree.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
                   </SelectContent>
                 </Select>
+                <p className="text-[11px] italic text-slate-500 mt-1">
+                  Vui lòng chọn Chủ đề và Bài học để bài tập có thể hiển thị với tiết học tương ứng trên Lịch báo giảng.
+                </p>
               </div>
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Bài học</label>
