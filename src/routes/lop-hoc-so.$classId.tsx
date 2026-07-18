@@ -57,11 +57,12 @@ export type ClassInfo = {
   subject: string;
   status: ClassStatus;
   subjectsTaught: string[];
+  homeroom?: boolean;
 };
 
 const CLASS_DB: Record<string, ClassInfo> = {
-  c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"] },
-  c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"] },
+  c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"], homeroom: true },
+  c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"], homeroom: true },
   c3: { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp học dành riêng cho lớp 3D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3D", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Đạo đức"] },
   c4: { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", code: "LH-3A-2526", students: 38, teacher: "Cô Lê Thu Hà", thumb: thumbLop3A, description: "Lớp học dành riêng cho lớp 3A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt"] },
   c5: { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", code: "LH-3B-2526", students: 42, teacher: "Thầy Phạm Văn Nam", thumb: thumbLop3B, description: "Lớp học dành riêng cho lớp 3B. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3B", subject: "Toán", status: "draft", subjectsTaught: ["Toán", "Khoa học"] },
@@ -222,14 +223,22 @@ function ClassDetailPage() {
                 </button>
               </div>
 
-              <button
-                onClick={() => toast.message("Mở danh sách học sinh (demo)")}
-                className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium"
-                title="Xem danh sách học sinh"
-              >
-                <Users className="h-4 w-4" />
-                {info.students} học sinh
-              </button>
+              {info.homeroom ? (
+                <Link
+                  to="/lop-hoc-so/$classId/hoc-sinh"
+                  params={{ classId: info.id }}
+                  className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium"
+                  title="Xem danh sách học sinh"
+                >
+                  <Users className="h-4 w-4" />
+                  {info.students} học sinh
+                </Link>
+              ) : (
+                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5 font-medium">
+                  <Users className="h-4 w-4" />
+                  {info.students} học sinh
+                </div>
+              )}
 
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
                 <span className="opacity-90">Giáo viên:</span>
@@ -379,6 +388,9 @@ function ClassDetailPage() {
               onDragOver={() => {}}
               onDrop={() => {}}
               dragging={false}
+              onAddLecture={() => navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`, mon: selectedSubject, from: `lớp ${info.lop} – ${selectedSubject}` } })}
+              onAddMaterial={() => setAddOpen({ kind: "material" })}
+              onAddExercise={() => setTaskPickerOpen(true)}
             />
           )}
 
@@ -393,6 +405,9 @@ function ClassDetailPage() {
               onDragOver={onDragOver}
               onDrop={onDrop}
               dragging={dragId === g.unitId}
+              onAddLecture={() => navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`, mon: selectedSubject, from: `lớp ${info.lop} – ${selectedSubject}` } })}
+              onAddMaterial={() => setAddOpen({ kind: "material" })}
+              onAddExercise={() => setTaskPickerOpen(true)}
             />
           ))}
           {orderedGroups.length === 0 && (
@@ -625,6 +640,7 @@ function EditClassModal({
 
 function GroupRow({
   group, reorder, expanded, onToggle, onDragStart, onDragOver, onDrop, dragging,
+  onAddLecture, onAddMaterial, onAddExercise,
 }: {
   group: { unitId: string; title: string; items: Material[] };
   reorder: boolean;
@@ -634,6 +650,9 @@ function GroupRow({
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (overId: string) => void;
   dragging: boolean;
+  onAddLecture: () => void;
+  onAddMaterial: () => void;
+  onAddExercise: () => void;
 }) {
   const { classId } = Route.useParams();
   const completed = useCompletion();
@@ -732,9 +751,9 @@ function GroupRow({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem className="cursor-pointer"><Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Bài giảng</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer"><BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Học liệu</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer"><ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Bài tập</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={onAddLecture}><Presentation className="h-4 w-4 mr-2 text-indigo-500" /> Bài giảng</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={onAddMaterial}><BookOpen className="h-4 w-4 mr-2 text-emerald-500" /> Học liệu</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={onAddExercise}><ClipboardList className="h-4 w-4 mr-2 text-amber-500" /> Bài tập</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </li>
