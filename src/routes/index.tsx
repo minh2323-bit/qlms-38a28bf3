@@ -1673,6 +1673,43 @@ function LessonPanel({
         />
       )}
 
+      {materialSourceOpen && (
+        <LectureSourceModal
+          title="Thêm học liệu"
+          newLabel="Thêm học liệu mới"
+          newHint="Tạo học liệu mới với các bước như trong lớp học số."
+          libraryLabel="Thêm từ Kho học liệu"
+          libraryHint="Chọn học liệu có sẵn trong kho của bạn."
+          onClose={() => setMaterialSourceOpen(false)}
+          onPickNew={() => { setMaterialSourceOpen(false); setAddMatOpen("material"); }}
+          onPickLibrary={() => { setMaterialSourceOpen(false); setMaterialLibraryOpen(true); }}
+        />
+      )}
+      {materialLibraryOpen && (
+        <LectureLibraryPickerModal
+          items={MATERIAL_LIBRARY}
+          title="Chọn từ Kho học liệu"
+          searchPlaceholder="Tìm học liệu..."
+          emptyText="Không có học liệu nào phù hợp."
+          onClose={() => setMaterialLibraryOpen(false)}
+          onConfirm={(picked) => {
+            for (const p of picked) {
+              addMaterial({
+                classRealId: lesson.class,
+                subject: lesson.subject,
+                unitId: lesson.unitId,
+                kind: "doc",
+                title: p.title,
+                meta: p.meta,
+                origin: "schedule",
+              });
+            }
+            setMaterialLibraryOpen(false);
+            toast.success(`Đã thêm ${picked.length} học liệu từ Kho`);
+          }}
+        />
+      )}
+
       <TaskPickerDialog open={taskPickerOpen} onClose={() => setTaskPickerOpen(false)} />
       <TestPickerDialog open={testPickerOpen} onClose={() => setTestPickerOpen(false)} />
 
