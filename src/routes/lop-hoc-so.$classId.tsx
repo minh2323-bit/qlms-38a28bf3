@@ -640,6 +640,7 @@ function EditClassModal({
 
 function GroupRow({
   group, reorder, expanded, onToggle, onDragStart, onDragOver, onDrop, dragging,
+  onAddLecture, onAddMaterial, onAddExercise,
 }: {
   group: { unitId: string; title: string; items: Material[] };
   reorder: boolean;
@@ -649,6 +650,9 @@ function GroupRow({
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (overId: string) => void;
   dragging: boolean;
+  onAddLecture: () => void;
+  onAddMaterial: () => void;
+  onAddExercise: () => void;
 }) {
   const { classId } = Route.useParams();
   const completed = useCompletion();
