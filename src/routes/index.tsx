@@ -1200,16 +1200,26 @@ function AssignLessonsModal({
 /* ----- Lecture Source Modal (Thêm bài giảng: mới / kho) ----- */
 function LectureSourceModal({
   onClose, onPickNew, onPickLibrary,
+  title = "Thêm bài giảng",
+  newLabel = "Thêm mới",
+  newHint = "Tạo bài giảng mới với các bước như trong lớp học số.",
+  libraryLabel = "Thêm từ Kho bài giảng",
+  libraryHint = "Chọn bài giảng có sẵn trong kho của bạn.",
 }: {
   onClose: () => void;
   onPickNew: () => void;
   onPickLibrary: () => void;
+  title?: string;
+  newLabel?: string;
+  newHint?: string;
+  libraryLabel?: string;
+  libraryHint?: string;
 }) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Thêm bài giảng</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 mt-2">
           <button
@@ -1219,8 +1229,8 @@ function LectureSourceModal({
             <div className="h-10 w-10 rounded-lg bg-indigo-100 text-indigo-700 inline-flex items-center justify-center mb-2">
               <Plus className="h-5 w-5" />
             </div>
-            <div className="font-semibold text-slate-800">Thêm mới</div>
-            <div className="text-xs text-slate-500 mt-1">Tạo bài giảng mới với các bước như trong lớp học số.</div>
+            <div className="font-semibold text-slate-800">{newLabel}</div>
+            <div className="text-xs text-slate-500 mt-1">{newHint}</div>
           </button>
           <button
             onClick={onPickLibrary}
@@ -1229,8 +1239,8 @@ function LectureSourceModal({
             <div className="h-10 w-10 rounded-lg bg-emerald-100 text-emerald-700 inline-flex items-center justify-center mb-2">
               <Library className="h-5 w-5" />
             </div>
-            <div className="font-semibold text-slate-800">Thêm từ Kho bài giảng</div>
-            <div className="text-xs text-slate-500 mt-1">Chọn bài giảng có sẵn trong kho của bạn.</div>
+            <div className="font-semibold text-slate-800">{libraryLabel}</div>
+            <div className="text-xs text-slate-500 mt-1">{libraryHint}</div>
           </button>
         </div>
       </DialogContent>
