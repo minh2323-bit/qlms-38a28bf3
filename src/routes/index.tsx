@@ -1252,10 +1252,16 @@ function LectureSourceModal({
 type LibraryLecture = { id: string; title: string; subject: string; khoi: string; thumb: string; meta?: string };
 function LectureLibraryPickerModal({
   items, onClose, onConfirm,
+  title = "Chọn từ Kho bài giảng",
+  searchPlaceholder = "Tìm bài giảng...",
+  emptyText = "Không có bài giảng nào phù hợp.",
 }: {
   items: LibraryLecture[];
   onClose: () => void;
   onConfirm: (picked: LibraryLecture[]) => void;
+  title?: string;
+  searchPlaceholder?: string;
+  emptyText?: string;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [q, setQ] = useState("");
@@ -1267,9 +1273,9 @@ function LectureLibraryPickerModal({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Chọn từ Kho bài giảng</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <Input placeholder="Tìm bài giảng..." value={q} onChange={(e) => setQ(e.target.value)} className="mb-3" />
+        <Input placeholder={searchPlaceholder} value={q} onChange={(e) => setQ(e.target.value)} className="mb-3" />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {filtered.map((it) => {
             const picked = selected.has(it.id);
