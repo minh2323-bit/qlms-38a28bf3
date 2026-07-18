@@ -388,6 +388,9 @@ function ClassDetailPage() {
               onDragOver={() => {}}
               onDrop={() => {}}
               dragging={false}
+              onAddLecture={() => navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`, mon: selectedSubject, from: `lớp ${info.lop} – ${selectedSubject}` } })}
+              onAddMaterial={() => setAddOpen({ kind: "material" })}
+              onAddExercise={() => setTaskPickerOpen(true)}
             />
           )}
 
@@ -402,6 +405,9 @@ function ClassDetailPage() {
               onDragOver={onDragOver}
               onDrop={onDrop}
               dragging={dragId === g.unitId}
+              onAddLecture={() => navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { khoi: `Lớp ${info.lop.replace(/[^0-9]/g, "")}`, mon: selectedSubject, from: `lớp ${info.lop} – ${selectedSubject}` } })}
+              onAddMaterial={() => setAddOpen({ kind: "material" })}
+              onAddExercise={() => setTaskPickerOpen(true)}
             />
           ))}
           {orderedGroups.length === 0 && (
