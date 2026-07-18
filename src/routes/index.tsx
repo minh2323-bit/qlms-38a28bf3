@@ -1126,23 +1126,45 @@ function AssignLessonsModal({
   onClose: () => void;
   onSave: (ids: string[]) => void;
 }) {
+  const MAX_SELECT = 5;
   const tree = useMemo(() => getTreeForClass(lesson.class, lesson.subject), [lesson.class, lesson.subject]);
   const [selected, setSelected] = useState<Set<string>>(() => new Set(lesson.assignedUnitIds));
   const toggle = (id: string) => setSelected((s) => {
     const next = new Set(s);
-    if (next.has(id)) next.delete(id); else next.add(id);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      if (next.size >= MAX_SELECT) {
+        toast.error(`Tối đa ${MAX_SELECT} bài học cho mỗi tiết`);
+        return s;
+      }
+      next.add(id);
+    }
     return next;
   });
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Gán bài học – {lesson.class} · {lesson.subject}</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-slate-500 -mt-2">
-          Tên tiết PPCT: <b>{lesson.topic}</b>. Chọn các bài học sẽ được dạy trong tiết này.
-        </p>
-        <div className="mt-3 space-y-4">
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0">
+        <div className="sticky top-0 z-10 bg-white border-b px-5 pt-4 pb-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <DialogHeader className="p-0">
+                <DialogTitle className="text-base">Gán bài học – {lesson.class} · {lesson.subject}</DialogTitle>
+              </DialogHeader>
+              <p className="text-sm text-slate-500 mt-1">Tên tiết PPCT: <b>{lesson.topic}</b></p>
+              <p className="text-[12px] text-slate-500 italic mt-1 leading-relaxed">
+                Hãy chọn các bài học trong sách Kết nối tri thức gắn với tiết học này. Các bài giảng/Học liệu/Bài tập mà bạn đã tạo sẽ được đồng bộ hóa trên tiết học theo bài học.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={onClose}>Hủy</Button>
+              <Button size="sm" className="bg-indigo-700 hover:bg-indigo-800" onClick={() => onSave(Array.from(selected))}>
+                Hoàn thành ({selected.size}/{MAX_SELECT})
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="overflow-y-auto px-5 py-4 space-y-4">
           {tree.length === 0 && (
             <div className="text-sm text-slate-500 italic">Chưa có mục lục SGK cho khối/môn này.</div>
           )}
@@ -1150,26 +1172,25 @@ function AssignLessonsModal({
             <div key={ch.id} className="rounded-lg border border-slate-200">
               <div className="px-3 py-2 bg-slate-50 border-b text-sm font-semibold text-slate-700">{ch.title}</div>
               <ul className="p-2 space-y-1">
-                {ch.units.map((u) => (
-                  <li key={u.id}>
-                    <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
-                      <Checkbox
-                        checked={selected.has(u.id)}
-                        onCheckedChange={() => toggle(u.id)}
-                      />
-                      <span className="text-sm text-slate-700">{u.title}</span>
-                    </label>
-                  </li>
-                ))}
+                {ch.units.map((u) => {
+                  const isChecked = selected.has(u.id);
+                  const disabled = !isChecked && selected.size >= MAX_SELECT;
+                  return (
+                    <li key={u.id}>
+                      <label className={`flex items-center gap-2 px-2 py-1.5 rounded ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-50 cursor-pointer"}`}>
+                        <Checkbox
+                          checked={isChecked}
+                          disabled={disabled}
+                          onCheckedChange={() => toggle(u.id)}
+                        />
+                        <span className="text-sm text-slate-700">{u.title}</span>
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Hủy</Button>
-          <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => onSave(Array.from(selected))}>
-            Hoàn thành ({selected.size})
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
