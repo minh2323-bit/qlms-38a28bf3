@@ -1298,7 +1298,7 @@ function LectureLibraryPickerModal({
               </button>
             );
           })}
-          {filtered.length === 0 && <div className="col-span-full text-sm text-slate-500 italic py-6 text-center">Không có bài giảng nào phù hợp.</div>}
+          {filtered.length === 0 && <div className="col-span-full text-sm text-slate-500 italic py-6 text-center">{emptyText}</div>}
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>Hủy</Button>
