@@ -38,6 +38,13 @@ const LIBRARY_LECTURES = [
   { id: "lib-5", title: "Bảng nhân 7", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=60", meta: "12 slide" },
   { id: "lib-6", title: "Chu vi hình chữ nhật", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?w=400&q=60", meta: "14 slide" },
 ];
+const MATERIAL_LIBRARY = [
+  { id: "mlib-1", title: "Phiếu bài tập – Ôn tập số tự nhiên", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=60", meta: "12 câu" },
+  { id: "mlib-2", title: "Tài liệu: Hàng và lớp", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=60", meta: "8 trang" },
+  { id: "mlib-3", title: "Video: So sánh số có nhiều chữ số", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=400&q=60", meta: "10:22" },
+  { id: "mlib-4", title: "Đề khảo sát đầu năm", subject: "Toán", khoi: "Khối 4", thumb: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=60", meta: "10 câu" },
+  { id: "mlib-5", title: "Hướng dẫn giải toán có lời văn", subject: "Toán", khoi: "Khối 3", thumb: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=400&q=60", meta: "6 trang" },
+];
 import {
   useMaterials, addMaterial, moveMaterials, copyMaterialsWithOverrides, removeMaterial, type Material, type MaterialKind,
 } from "@/lib/teaching-store";
