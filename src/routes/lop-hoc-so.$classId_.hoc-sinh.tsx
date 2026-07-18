@@ -4,7 +4,7 @@ import { ArrowLeft, Search, KeyRound, RefreshCw, FileDown, Columns3 } from "luci
 import { AppShell } from "@/components/AppShell";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/lop-hoc-so/$classId/hoc-sinh")({
+export const Route = createFileRoute("/lop-hoc-so/$classId_/hoc-sinh")({
   head: () => ({
     meta: [
       { title: "Danh sách học sinh – LMS Giáo viên" },
