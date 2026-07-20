@@ -139,16 +139,17 @@ export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" 
                 <div className="bg-white border border-slate-200 rounded-xl shadow-lg py-2 w-56 animate-in fade-in slide-in-from-left-2 duration-150">
                   {it.submenu.map((s) => {
                     const subCls = "w-full px-3 py-2 flex items-center gap-2 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition";
+                    const inner = (
+                      <>
+                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
+                        <span className="flex-1">{s.label}</span>
+                        {s.highlight && <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-400 shrink-0" />}
+                      </>
+                    );
                     return s.to ? (
-                      <Link key={s.label} to={s.to} className={subCls}>
-                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
-                        <span>{s.label}</span>
-                      </Link>
+                      <Link key={s.label} to={s.to} className={subCls}>{inner}</Link>
                     ) : (
-                      <button key={s.label} className={subCls}>
-                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
-                        <span>{s.label}</span>
-                      </button>
+                      <button key={s.label} className={subCls}>{inner}</button>
                     );
                   })}
                 </div>
