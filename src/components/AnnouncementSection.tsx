@@ -348,7 +348,7 @@ function CreateAnnouncementModal({
             Huỷ
           </button>
           <button
-            onClick={() => canSubmit && onSubmit({ audience, content: content.trim() })}
+            onClick={() => canSubmit && onSubmit({ audience: audienceLabel, content: content.trim() })}
             disabled={!canSubmit}
             className={`px-5 py-2 text-sm font-semibold rounded-lg inline-flex items-center gap-1.5 ${
               canSubmit ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"
