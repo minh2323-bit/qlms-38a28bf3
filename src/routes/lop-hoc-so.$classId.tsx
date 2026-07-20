@@ -597,19 +597,23 @@ function EditClassModal({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase text-slate-500">Khối</div>
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Lớp hành chính</div>
               <div className="text-sm font-bold text-slate-800 mt-0.5">Lớp {info.lop}</div>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Sĩ số</div>
+              <div className="text-sm font-bold text-slate-800 mt-0.5">40</div>
+            </div>
+            <div className="col-span-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
               <div className="text-[11px] font-semibold uppercase text-slate-500">Môn dạy</div>
               <div className="text-sm font-bold text-slate-800 mt-0.5">{info.subjectsTaught.join(", ")}</div>
             </div>
             <div className="col-span-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase text-slate-500">Cách đăng ký học sinh</div>
-              <div className="text-sm font-bold text-slate-800 mt-0.5">Qua mã lớp <span className="font-mono">{info.code}</span></div>
+              <div className="text-[11px] font-semibold uppercase text-slate-500">Mã lớp học</div>
+              <div className="text-sm font-bold text-slate-800 mt-0.5"><span className="font-mono">{info.code}</span></div>
             </div>
           </div>
-          <p className="text-[11px] text-slate-500 -mt-1">Không thể chỉnh sửa Khối, Môn dạy và cách thức đăng ký học sinh.</p>
+          <p className="text-[11px] text-slate-500 -mt-1">Không thể chỉnh sửa Lớp hành chính, Sĩ số, Môn dạy và Mã lớp học.</p>
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Tên lớp <span className="text-rose-500">*</span></label>
