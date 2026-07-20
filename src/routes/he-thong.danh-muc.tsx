@@ -768,7 +768,7 @@ function BaiHocPanel() {
               );
             })}
             {filtered.length === 0 && (
-              <TableRow><TableCell colSpan={11} className="text-center text-slate-500 py-8">Không có bài học phù hợp.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={sortMode ? 12 : 11} className="text-center text-slate-500 py-8">Không có bài học phù hợp.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
