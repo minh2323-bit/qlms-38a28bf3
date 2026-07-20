@@ -687,3 +687,39 @@ function LessonsTable({
     </div>
   );
 }
+
+function AddLectureSourceModal({ onClose, onPickNew }: { onClose: () => void; onPickNew: () => void }) {
+  const options = [
+    { key: "new", title: "Thêm bài giảng mới", desc: "Tạo bài giảng từ đầu theo flow chuẩn", Icon: Plus, color: "text-indigo-600", bg: "bg-indigo-50", onClick: onPickNew },
+    { key: "hanoi", title: "Thêm từ HanoiStudy", desc: "Chọn bài giảng đã duyệt trên kho HanoiStudy", Icon: Globe2, color: "text-violet-600", bg: "bg-violet-50", onClick: onClose },
+    { key: "school", title: "Thêm từ Kho học liệu chia sẻ nội bộ trường", desc: "Sao chép từ kho học liệu do các giáo viên trong trường chia sẻ", Icon: Building2, color: "text-sky-600", bg: "bg-sky-50", onClick: onClose },
+  ];
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+          <h3 className="text-base font-bold text-slate-800">Thêm bài giảng mới</h3>
+          <button onClick={onClose} className="p-1 rounded hover:bg-slate-100 text-slate-500"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {options.map((o) => {
+            const Icon = o.Icon;
+            return (
+              <button
+                key={o.key}
+                onClick={o.onClick}
+                className="text-left rounded-2xl border border-slate-200 bg-white p-4 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col gap-2"
+              >
+                <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${o.bg} ${o.color}`}>
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="text-sm font-semibold text-slate-800">{o.title}</span>
+                <span className="text-xs text-slate-500 leading-relaxed">{o.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
