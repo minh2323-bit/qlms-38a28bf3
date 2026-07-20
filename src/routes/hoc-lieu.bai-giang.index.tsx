@@ -250,15 +250,17 @@ function LessonsPage() {
             <div className="flex-1 min-w-0">
               {lessonView === "grid" ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <Link
-                    to="/hoc-lieu/bai-giang/tao-moi"
+                  <button
+                    type="button"
+                    onClick={() => setAddSourceOpen(true)}
                     className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[220px]"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
                       <Plus className="h-6 w-6 text-indigo-600" />
                     </div>
                     <p className="mt-3 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
-                  </Link>
+                  </button>
+
 
                   {filteredLessons.map((l) => (
                     <LessonCardView
