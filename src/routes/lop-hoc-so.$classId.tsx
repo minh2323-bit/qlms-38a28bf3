@@ -89,6 +89,7 @@ function ClassDetailPage() {
   const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
   const [status, setStatus] = useState<ClassStatus>(info.status);
   const [locked, setLocked] = useState<boolean>(false);
+  const [confirmAction, setConfirmAction] = useState<null | "deploy" | "lock" | "unlock">(null);
 
   const allMaterials = useMaterials();
   const classMaterials = useMemo(
