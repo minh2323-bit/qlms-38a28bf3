@@ -38,6 +38,7 @@ type ClassRow = {
   thumb: string;
   status: ClassStatus;
   homeroom?: boolean;
+  userCreated?: boolean;
 };
 
 const CLASSES_SEED: ClassRow[] = [
@@ -46,7 +47,7 @@ const CLASSES_SEED: ClassRow[] = [
   { id: "c4", name: "Lớp 3A Năm học 2025 - 2026", lop: "3A", subject: "Toán", baiGiang: 12, hocLieu: 18, hocSinh: 38, thumb: thumbLop3A, status: "deployed" },
   { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", lop: "3B", subject: "Toán", baiGiang: 14, hocLieu: 16, hocSinh: 42, thumb: thumbLop3B, status: "draft" },
   { id: "c6", name: "Lớp 3C Năm học 2025 - 2026", lop: "3C", subject: "Toán", baiGiang: 13, hocLieu: 14, hocSinh: 39, thumb: thumbLop3C, status: "deployed" },
-  { id: "c7", name: "Lớp 4B, 4C, 4D Năm học 2025 - 2026", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview, status: "draft" },
+  { id: "c7", name: "Lớp 4B, 4C, 4D Năm học 2025 - 2026", lop: "4B, 4C, 4D", subject: "Toán", baiGiang: 16, hocLieu: 17, hocSinh: 41, thumb: thumbLop4BReview, status: "draft", userCreated: true },
   { id: "c8", name: "Lớp 4C Năm học 2025 - 2026", lop: "4C", subject: "Toán", baiGiang: 15, hocLieu: 15, hocSinh: 40, thumb: thumbLop4C, status: "deployed" },
 ];
 
@@ -315,9 +316,11 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, onE
               <DropdownMenuItem className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2 text-sky-500" /> Tạo bản sao
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer text-rose-600">
-                <Trash2 className="h-4 w-4 mr-2" /> Xóa lớp học
-              </DropdownMenuItem>
+              {c.userCreated && (
+                <DropdownMenuItem className="cursor-pointer text-rose-600">
+                  <Trash2 className="h-4 w-4 mr-2" /> Xóa lớp học
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -409,6 +412,7 @@ function CreateClassModal({
     hocSinh: totalStudents,
     thumb: coverUrl || thumbLop4A,
     status,
+    userCreated: true,
   });
 
   const onPickImage = (e: React.ChangeEvent<HTMLInputElement>) => {

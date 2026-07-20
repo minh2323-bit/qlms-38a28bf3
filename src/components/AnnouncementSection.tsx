@@ -15,7 +15,11 @@ type Props = {
   teacherName: string;
 };
 
-const AUDIENCES = ["Tất cả học viên", "Nhóm 3-ICT", "Nhóm Olympic", "Tổ trưởng tổ học tập"];
+const STUDENTS_IN_CLASS = [
+  "Lê Bảo An", "Ngô Bảo An", "Phạm Phương Mỹ An", "Phạm Vũ Bình An",
+  "Nguyễn Thị Hà Anh", "Phạm Linh Anh", "Trịnh Đức Thiên Ân", "Ngô Bảo Bình",
+  "Trần Khánh Chi", "Lê Minh Đức",
+];
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
@@ -197,10 +201,17 @@ function CreateAnnouncementModal({
   onClose: () => void;
   onSubmit: (data: { audience: string; content: string }) => void;
 }) {
-  const [audience, setAudience] = useState(AUDIENCES[0]);
+  const [audienceMode, setAudienceMode] = useState<"all" | "custom">("all");
+  const [pickedStudents, setPickedStudents] = useState<Set<string>>(new Set());
+  const [allowReply, setAllowReply] = useState<"allow" | "deny">("allow");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [content, setContent] = useState("");
 
-  const canSubmit = content.trim().length > 0;
+  const audienceLabel = audienceMode === "all"
+    ? "Tất cả học sinh"
+    : `${pickedStudents.size} học sinh được chọn`;
+
+  const canSubmit = content.trim().length > 0 && (audienceMode === "all" || pickedStudents.size > 0);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
@@ -216,26 +227,83 @@ function CreateAnnouncementModal({
         </div>
 
         <div className="px-6 py-5 space-y-4 overflow-y-auto">
-          {/* Top: audience + nút tất cả học viên */}
-          <div className="flex items-center gap-2 flex-wrap bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+          {/* Audience selector */}
+          <div className="flex items-start gap-2 flex-wrap bg-slate-50 rounded-lg px-3 py-2.5 border border-slate-200">
             <div className="relative">
               <select
-                value={audience}
-                onChange={(e) => setAudience(e.target.value)}
+                value={audienceMode}
+                onChange={(e) => { setAudienceMode(e.target.value as "all" | "custom"); setPickerOpen(false); }}
                 className="appearance-none pl-3 pr-8 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200"
               >
-                {AUDIENCES.map((a) => <option key={a} value={a}>{a}</option>)}
+                <option value="all">Tất cả học sinh</option>
+                <option value="custom">Chọn đối tượng riêng</option>
               </select>
               <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
-            <button
-              type="button"
-              onClick={() => setAudience("Tất cả học viên")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full border border-sky-300 bg-white text-sky-700 hover:bg-sky-50"
-            >
-              <Users className="h-4 w-4" /> Tất cả học viên
-            </button>
+
+            {audienceMode === "custom" && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen((v) => !v)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md border border-sky-300 bg-white text-sky-700 hover:bg-sky-50"
+                >
+                  <Users className="h-4 w-4" /> {audienceLabel}
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </button>
+                {pickerOpen && (
+                  <div className="absolute z-10 mt-1.5 w-72 rounded-lg border border-slate-200 bg-white shadow-lg p-2 max-h-72 overflow-y-auto">
+                    <div className="text-xs font-semibold text-slate-500 px-2 py-1">Danh sách học sinh trong lớp</div>
+                    <ul className="space-y-0.5">
+                      {STUDENTS_IN_CLASS.map((name) => {
+                        const checked = pickedStudents.has(name);
+                        return (
+                          <li key={name}>
+                            <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 text-sm cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {
+                                  setPickedStudents((s) => {
+                                    const n = new Set(s);
+                                    if (n.has(name)) n.delete(name); else n.add(name);
+                                    return n;
+                                  });
+                                }}
+                              />
+                              <span className="text-slate-700">{name}</span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="flex justify-end pt-2 border-t mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setPickerOpen(false)}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                      >
+                        Xác nhận
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="relative ml-auto">
+              <select
+                value={allowReply}
+                onChange={(e) => setAllowReply(e.target.value as "allow" | "deny")}
+                className="appearance-none pl-3 pr-8 py-1.5 text-sm rounded-md border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              >
+                <option value="allow">Cho phép học sinh phản hồi</option>
+                <option value="deny">Không cho phép phản hồi</option>
+              </select>
+              <ChevronDown className="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </div>
           </div>
+
 
           {/* Editor */}
           <div className="border border-indigo-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-200">
@@ -280,7 +348,7 @@ function CreateAnnouncementModal({
             Huỷ
           </button>
           <button
-            onClick={() => canSubmit && onSubmit({ audience, content: content.trim() })}
+            onClick={() => canSubmit && onSubmit({ audience: audienceLabel, content: content.trim() })}
             disabled={!canSubmit}
             className={`px-5 py-2 text-sm font-semibold rounded-lg inline-flex items-center gap-1.5 ${
               canSubmit ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"
