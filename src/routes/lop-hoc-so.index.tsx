@@ -307,9 +307,6 @@ function ClassCard({ c, selectMode, selected, onToggleSelect, onEnterSelect, onE
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="cursor-pointer" onClick={onEnterSelect}>
-                <CheckSquare className="h-4 w-4 mr-2 text-indigo-500" /> Chọn nhiều
-              </DropdownMenuItem>
               {onEdit && (
                 <DropdownMenuItem className="cursor-pointer" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
                   <Pencil className="h-4 w-4 mr-2 text-emerald-500" /> Sửa
