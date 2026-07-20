@@ -4,7 +4,7 @@ import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
   ClipboardList, Video, Building2, School, Landmark,
-  Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag,
+  Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
@@ -14,7 +14,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-type SubItem = { icon: typeof Home; label: string; to?: string };
+type SubItem = { icon: typeof Home; label: string; to?: string; highlight?: boolean };
 type NavItem = {
   icon: typeof Home;
   label: string;
@@ -39,11 +39,11 @@ const TEACHER_NAV: NavItem[] = [
     icon: BookOpen,
     label: "Học liệu\n& Bài kiểm tra",
     submenu: [
-      { icon: Tag, label: "Học liệu bản quyền" },
+      { icon: Tag, label: "Học liệu bản quyền", highlight: true },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
       { icon: UsersRound, label: "Học liệu chia sẻ nội bộ" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/hoc-lieu/ngan-hang-cau-hoi" },
-      { icon: ListChecks, label: "Đề kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
+      { icon: ListChecks, label: "Đề & Bài kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
 
     ],
   },
@@ -72,11 +72,7 @@ const TEACHER_NAV: NavItem[] = [
     label: "Hệ thống",
     submenu: [
       { icon: BookOpen, label: "Danh mục", to: "/he-thong/danh-muc" },
-      { icon: Brain, label: "Định danh kiến thức" },
-      { icon: UserCog, label: "Tài khoản Người dùng" },
-      { icon: UsersRound, label: "Tài khoản học sinh" },
-      { icon: SlidersHorizontal, label: "Cấu hình hệ thống" },
-      { icon: Trophy, label: "Mức độ nhận thức" },
+      { icon: HardDrive, label: "Quản lý dung lượng" },
     ],
   },
 ];
@@ -92,7 +88,7 @@ const STUDENT_NAV: NavItem[] = [
       { icon: Video, label: "Lớp học trực tuyến", to: "/hoc-sinh/lop-truc-tuyen" },
     ],
   },
-  { icon: Sparkles, label: "Học liệu\ntăng cường", to: "/hoc-sinh/hoc-lieu" },
+  { icon: Sparkles, label: "Học liệu\ntự ôn tập", to: "/hoc-sinh/hoc-lieu" },
   {
     icon: FolderKanban,
     label: "Kỳ thi",
