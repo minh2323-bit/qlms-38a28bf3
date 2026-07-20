@@ -41,6 +41,7 @@ const STUDENTS: Student[] = [
 function StudentsPage() {
   const { classId } = Route.useParams();
   const navigate = useNavigate();
+  const isHomeroom = classId === "c1" || classId === "c2";
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Set<number>>(new Set());
 
