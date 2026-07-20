@@ -60,7 +60,7 @@ const TYPE_LABEL: Record<QType, string> = {
   essay: "Tự luận",
   truefalse: "Đúng - Sai",
   drag: "Kéo thả",
-  fill: "Điền từ vào chỗ trống",
+  fill: "Điền khuyết",
   match: "Nối",
 };
 
