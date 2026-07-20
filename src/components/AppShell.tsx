@@ -41,8 +41,10 @@ const TEACHER_NAV: NavItem[] = [
     submenu: [
       { icon: Tag, label: "Học liệu bản quyền" },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
+      { icon: UsersRound, label: "Học liệu chia sẻ nội bộ" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/hoc-lieu/ngan-hang-cau-hoi" },
       { icon: ListChecks, label: "Đề kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
+
     ],
   },
   {
