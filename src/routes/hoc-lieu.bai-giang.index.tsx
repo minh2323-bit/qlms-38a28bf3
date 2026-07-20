@@ -263,10 +263,11 @@ function LessonsPage() {
                   </button>
 
 
-                  {filteredLessons.map((l) => (
+                  {filteredLessons.map((l, idx) => (
                     <LessonCardView
                       key={l.title + l.author}
                       l={l}
+                      idx={idx}
                       selectMode={lessonSelectMode}
                       selected={selectedLessons.has(l.title + l.author)}
                       onToggleSelect={() => toggleLessonSel(l.title + l.author)}
