@@ -212,7 +212,14 @@ function ClassDetailPage() {
 
         <div className="grid md:grid-cols-[1fr_280px] gap-6 p-6 md:p-8">
           <div className="text-white pt-10 md:pt-0">
-            <h1 className="text-2xl md:text-3xl font-bold leading-tight">{info.name}</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl md:text-3xl font-bold leading-tight">{info.name}</h1>
+              {info.homeroom && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide bg-amber-400 text-amber-950 px-2.5 py-1 rounded-full shadow">
+                  Lớp chủ nhiệm
+                </span>
+              )}
+            </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
@@ -223,23 +230,19 @@ function ClassDetailPage() {
                 </button>
               </div>
 
-              {info.homeroom ? (
-                <Link
-                  to="/lop-hoc-so/$classId/hoc-sinh"
-                  params={{ classId: info.id }}
-                  className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium"
-                  title="Xem danh sách học sinh"
-                >
-                  <Users className="h-4 w-4" />
-                  {info.students} học sinh
-                </Link>
-              ) : (
-                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5 font-medium">
-                  <Users className="h-4 w-4" />
-                  {info.students} học sinh
-                </div>
-              )}
+              <Link
+                to="/lop-hoc-so/$classId/hoc-sinh"
+                params={{ classId: info.id }}
+                className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium ring-1 ring-white/40 hover:ring-white/70 transition"
+                title="Xem danh sách học sinh"
+              >
+                <Users className="h-4 w-4" />
+                {info.students} học sinh
+                <ChevronRight className="h-3.5 w-3.5 opacity-90" />
+              </Link>
+            </div>
 
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
                 <span className="opacity-90">Giáo viên:</span>
                 <span className="font-semibold">{info.teacher}</span>
@@ -261,17 +264,14 @@ function ClassDetailPage() {
             <div className="mt-5 flex items-center gap-2 flex-wrap">
               {status === "draft" ? (
                 <button
-                  onClick={() => { setStatus("deployed"); toast.success("Đã triển khai lớp học"); }}
+                  onClick={() => setConfirmAction("deploy")}
                   className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow"
                 >
                   <Check className="h-4 w-4" /> Triển khai lớp học
                 </button>
               ) : (
                 <button
-                  onClick={() => {
-                    setLocked((v) => !v);
-                    toast.success(locked ? "Đã mở khóa lớp học" : "Đã khóa lớp học");
-                  }}
+                  onClick={() => setConfirmAction(locked ? "unlock" : "lock")}
                   className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg shadow ${
                     locked
                       ? "bg-white text-indigo-700 hover:bg-slate-100"
