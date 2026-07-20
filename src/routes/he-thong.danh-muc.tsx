@@ -424,12 +424,33 @@ function ChuongHocPanel() {
   const [subject, setSubject] = useState("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [openAdd, setOpenAdd] = useState(false);
+  const [sortMode, setSortMode] = useState(false);
+  const [sortDraft, setSortDraft] = useState<Chapter[]>([]);
+  const [dragId, setDragId] = useState<string | null>(null);
 
-  const filtered = useMemo(() => rows.filter((r) => {
+  const enterSort = () => { setSortDraft(rows); setSortMode(true); };
+  const confirmSort = () => { setRows(sortDraft); setSortMode(false); };
+  const cancelSort = () => setSortMode(false);
+  const onDragOver = (e: React.DragEvent, overId: string) => {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+    setSortDraft((prev) => {
+      const from = prev.findIndex((r) => r.id === dragId);
+      const to = prev.findIndex((r) => r.id === overId);
+      if (from < 0 || to < 0) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
+  const source = sortMode ? sortDraft : rows;
+  const filtered = useMemo(() => source.filter((r) => {
     if (grade !== "all" && r.grade !== grade) return false;
     if (subject !== "all" && r.subject !== subject) return false;
     return true;
-  }), [rows, grade, subject]);
+  }), [source, grade, subject]);
 
   const allChecked = filtered.length > 0 && filtered.every((r) => selected.has(r.id));
   const toggleAll = () => {
@@ -449,7 +470,7 @@ function ChuongHocPanel() {
 
   return (
     <div className="space-y-3">
-      <ActionBar onAdd={() => setOpenAdd(true)} />
+      <ActionBar onAdd={() => setOpenAdd(true)} showSort onSort={enterSort} sortMode={sortMode} />
 
       <FilterRow>
         <Select value={grade} onValueChange={setGrade}>
@@ -468,24 +489,45 @@ function ChuongHocPanel() {
         </Select>
       </FilterRow>
 
+      {sortMode && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
+          <div className="text-sm text-amber-800">Kéo thả để sắp xếp lại thứ tự, sau đó nhấn <b>Xác nhận</b>.</div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={cancelSort}>Hủy</Button>
+            <Button onClick={confirmSort} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Check className="h-4 w-4 mr-1.5" /> Xác nhận
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-indigo-700 hover:bg-indigo-700">
+              {sortMode && <TableHead className="text-white w-10"></TableHead>}
               <TableHead className="text-white text-center w-14">STT</TableHead>
-              <TableHead className="text-white w-12"><Checkbox checked={allChecked} onCheckedChange={toggleAll} /></TableHead>
-              <TableHead className="text-white w-16">Sửa</TableHead>
-              <TableHead className="text-white">Khối</TableHead>
-              <TableHead className="text-white">Môn học</TableHead>
-              <TableHead className="text-white text-right">Mã chương mục</TableHead>
-              <TableHead className="text-white">Tên chương mục</TableHead>
+              <TableHead className="text-white text-center w-12"><Checkbox checked={allChecked} onCheckedChange={toggleAll} /></TableHead>
+              <TableHead className="text-white text-center w-16">Sửa</TableHead>
+              <TableHead className="text-white text-center">Khối</TableHead>
+              <TableHead className="text-white text-center">Môn học</TableHead>
+              <TableHead className="text-white text-center">Mã chương mục</TableHead>
+              <TableHead className="text-white text-center">Tên chương mục</TableHead>
               <TableHead className="text-white text-center bg-indigo-800">Hiển thị</TableHead>
               <TableHead className="text-white text-center bg-indigo-800">Nguồn</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((r, idx) => (
-              <TableRow key={r.id} className="hover:bg-slate-50">
+              <TableRow
+                key={r.id}
+                draggable={sortMode}
+                onDragStart={() => setDragId(r.id)}
+                onDragOver={(e) => sortMode && onDragOver(e, r.id)}
+                onDragEnd={() => setDragId(null)}
+                className={`hover:bg-slate-50 ${sortMode ? "cursor-move" : ""} ${dragId === r.id ? "opacity-50" : ""}`}
+              >
+                {sortMode && <TableCell className="text-slate-400"><GripVertical className="h-4 w-4" /></TableCell>}
                 <TableCell className="text-center">{idx + 1}</TableCell>
                 <TableCell><Checkbox checked={selected.has(r.id)} onCheckedChange={() => toggleOne(r.id)} /></TableCell>
                 <TableCell>
@@ -502,7 +544,7 @@ function ChuongHocPanel() {
               </TableRow>
             ))}
             {filtered.length === 0 && (
-              <TableRow><TableCell colSpan={9} className="text-center text-slate-500 py-8">Không có chương học phù hợp.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={sortMode ? 10 : 9} className="text-center text-slate-500 py-8">Không có chương học phù hợp.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
