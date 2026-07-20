@@ -497,6 +497,9 @@ function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterS
           {share.hanoi === "pending" && (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Hanoi Study: Chờ sở duyệt</span>
           )}
+          {share.hanoi === "rejected" && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">Hanoi Study: Sở từ chối duyệt</span>
+          )}
         </div>
         {isShared ? (
           <button
