@@ -263,10 +263,11 @@ function LessonsPage() {
                   </button>
 
 
-                  {filteredLessons.map((l) => (
+                  {filteredLessons.map((l, idx) => (
                     <LessonCardView
                       key={l.title + l.author}
                       l={l}
+                      idx={idx}
                       selectMode={lessonSelectMode}
                       selected={selectedLessons.has(l.title + l.author)}
                       onToggleSelect={() => toggleLessonSel(l.title + l.author)}
@@ -391,12 +392,31 @@ export function slugifyLesson(s: string): string {
     .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect }: { l: LessonCard } & SelectProps) {
+type ShareState = {
+  community: boolean;
+  internal: boolean;
+  hanoi: "none" | "pending" | "approved";
+};
+
+function initialShareFor(l: LessonCard, idx: number): ShareState {
+  if (!l.approved) return { community: false, internal: false, hanoi: "none" };
+  const mod = idx % 4;
+  if (mod === 0) return { community: false, internal: false, hanoi: "none" };
+  if (mod === 1) return { community: false, internal: true, hanoi: "none" };
+  if (mod === 2) return { community: true, internal: true, hanoi: "pending" };
+  return { community: true, internal: true, hanoi: "approved" };
+}
+
+const HANOI_LOGIN_URL = "https://id.hanoi.edu.vn/dang-nhap?returnUrl=%2Fconnect%2Fauthorize%3Fresponse_type%3Dcode%26client_id%3Dbaselms_web%26redirect_uri%3Dhttps%253A%252F%252Fstudy.hanoi.edu.vn%252Fauth%252Fsignin%26scope%3Dopenid%2Bprofile%2Bemail%2Bphone%2Bcitizen_id%2Boffline_access%2Blms_base_api%26state%3DX-Yf-EEi_g6tfZ1w-ThReuyRNQ3iZQ6Az3YetJ3LrOw%26nonce%3DkSEw6BawJe5n8jkhF-DGPPH2NVzdCDPivh_4cwJjvU4%26code_challenge%3D67mhSg7btdaEjH6g0VpXGwS88ekOks2VhhMnwmNqYrc%26code_challenge_method%3DS256";
+
+function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterSelect }: { l: LessonCard; idx: number } & SelectProps) {
   const navigate = useNavigate();
-  const [shareState, setShareState] = useState<"noi-bo" | "hanoi" | "none">(l.shared);
-  const canShare = l.approved && shareState !== "hanoi";
-  const isShared = shareState === "hanoi";
+  const [share, setShare] = useState<ShareState>(() => initialShareFor(l, idx));
+  const [shareOpen, setShareOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const isShared = share.community || share.internal || share.hanoi !== "none";
   const slug = slugifyLesson(l.title);
+
   const handleCardClick = (e: React.MouseEvent) => {
     if (selectMode) { onToggleSelect(); return; }
     const target = e.target as HTMLElement;
@@ -464,36 +484,186 @@ function LessonCardView({ l, selectMode, selected, onToggleSelect, onEnterSelect
           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${l.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
             {l.approved ? "Đã duyệt" : "Chờ duyệt"}
           </span>
-          {shareState === "noi-bo" && (
+          {share.community && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">Chia sẻ cộng đồng</span>
+          )}
+          {share.internal && (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">Chia sẻ nội bộ</span>
           )}
-          {shareState === "hanoi" && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Đã chia sẻ Hanoi Study</span>
+          {share.hanoi === "approved" && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Chia sẻ Hanoi Study</span>
+          )}
+          {share.hanoi === "pending" && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Hanoi Study: Chờ sở duyệt</span>
           )}
         </div>
         {isShared ? (
-          <div className="mt-3 space-y-1.5">
-            <div className="text-center text-xs font-semibold text-slate-500">Chờ Sở Duyệt</div>
-            <button
-              onClick={(e) => { e.stopPropagation(); setShareState("noi-bo"); }}
-              className="w-full py-2 rounded-lg text-sm font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition"
-            >
-              Thu hồi
-            </button>
-          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); setStatusOpen(true); }}
+            className="mt-3 w-full py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition"
+          >
+            Theo dõi trạng thái chia sẻ
+          </button>
         ) : (
           <button
-            disabled={!canShare}
-            onClick={(e) => { e.stopPropagation(); if (canShare) setShareState("hanoi"); }}
+            disabled={!l.approved}
+            onClick={(e) => { e.stopPropagation(); if (l.approved) setShareOpen(true); }}
             className={`mt-3 w-full py-2 rounded-lg text-sm font-semibold transition ${
-              canShare
+              l.approved
                 ? "bg-indigo-600 text-white hover:bg-indigo-700"
                 : "bg-slate-200 text-slate-500 cursor-not-allowed"
             }`}
           >
-            Chia sẻ lên Hanoi Study
+            Chia sẻ
           </button>
         )}
+      </div>
+
+      {shareOpen && (
+        <ShareLessonModal
+          title={l.title}
+          initial={share}
+          onClose={() => setShareOpen(false)}
+          onSubmit={(next) => {
+            const withPending: ShareState = {
+              ...next,
+              hanoi: next.hanoi !== "none" ? next.hanoi : (share.hanoi === "none" ? "none" : share.hanoi),
+            };
+            // If user just enabled hanoi, mark as pending
+            const finalState: ShareState = {
+              community: next.community,
+              internal: next.internal,
+              hanoi: next.hanoi === "none" ? "none" : (share.hanoi === "approved" ? "approved" : "pending"),
+            };
+            void withPending;
+            setShare(finalState);
+            setShareOpen(false);
+          }}
+        />
+      )}
+
+      {statusOpen && (
+        <ShareStatusModal
+          title={l.title}
+          state={share}
+          onClose={() => setStatusOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ShareLessonModal({ title, initial, onClose, onSubmit }: {
+  title: string;
+  initial: ShareState;
+  onClose: () => void;
+  onSubmit: (next: { community: boolean; internal: boolean; hanoi: "none" | "pending" | "approved" }) => void;
+}) {
+  const [community, setCommunity] = useState(initial.community);
+  const [internal, setInternal] = useState(initial.internal);
+  const [hanoi, setHanoi] = useState(initial.hanoi !== "none");
+  const canSubmit = community || internal || hanoi;
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="px-6 py-4 border-b flex items-center justify-between">
+          <h2 className="text-lg font-bold text-sky-700 uppercase">Chia sẻ bài giảng</h2>
+          <button onClick={onClose} className="p-1.5 rounded hover:bg-slate-100 text-slate-500"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="px-6 py-5 space-y-4">
+          <p className="text-sm font-semibold text-slate-700">Thao tác này sẽ thực hiện các công việc sau:</p>
+
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={community} onChange={(e) => setCommunity(e.target.checked)} className="mt-1 h-4 w-4 accent-sky-600" />
+            <div>
+              <div className="text-sm font-bold text-slate-800">Chia sẻ cộng đồng:</div>
+              <ul className="mt-1 text-sm text-slate-600 list-disc pl-5 space-y-1">
+                <li>Chia sẻ bài giảng lên trang <span className="text-sky-600 font-semibold">Hệ thống học và thi trực tuyến</span></li>
+                <li>Toàn bộ người dùng sẽ thấy và xem được bài giảng mà không cần đăng nhập</li>
+                <li>Các đơn vị trường, cấp quản lý sẽ thấy bài giảng được chia sẻ và có thể sao chép về sử dụng tại nội bộ đơn vị</li>
+              </ul>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} className="mt-1 h-4 w-4 accent-sky-600" />
+            <div>
+              <div className="text-sm font-bold text-slate-800">Chia sẻ nội bộ:</div>
+              <ul className="mt-1 text-sm text-slate-600 list-disc pl-5 space-y-1">
+                <li>Bài giảng được chia sẻ và có thể sao chép về sử dụng tại nội bộ đơn vị</li>
+              </ul>
+            </div>
+          </label>
+
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={hanoi} onChange={(e) => setHanoi(e.target.checked)} className="mt-1 h-4 w-4 accent-sky-600" />
+            <div>
+              <div className="text-sm font-bold text-slate-800">Chia sẻ lên HanoiStudy:</div>
+              <ul className="mt-1 text-sm text-slate-600 list-disc pl-5 space-y-1">
+                <li>
+                  Bài giảng sẽ được chia sẻ lên hệ thống{" "}
+                  <a href={HANOI_LOGIN_URL} target="_blank" rel="noreferrer" className="font-bold text-sky-600 hover:underline">Hanoi Study</a>
+                  {" "}của Sở GD &amp; ĐT Thành phố Hà Nội
+                </li>
+                <li>Toàn bộ thông tin bài giảng sẽ được chia sẻ với các trường cùng sử dụng hệ thống</li>
+              </ul>
+            </div>
+          </label>
+
+          <p className="text-xs italic text-slate-500 truncate" title={title}>Bài giảng: {title}</p>
+        </div>
+        <div className="px-6 py-4 border-t bg-slate-50 flex items-center justify-end gap-3">
+          <button onClick={onClose} className="px-5 py-2 text-sm font-semibold rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100">Đóng</button>
+          <button
+            disabled={!canSubmit}
+            onClick={() => onSubmit({ community, internal, hanoi: hanoi ? "pending" : "none" })}
+            className={`px-5 py-2 text-sm font-semibold rounded-lg ${canSubmit ? "bg-sky-600 text-white hover:bg-sky-700" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}
+          >
+            Chia sẻ
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShareStatusModal({ title, state, onClose }: { title: string; state: ShareState; onClose: () => void }) {
+  const rows: { label: string; enabled: boolean; status: string; tone: string }[] = [
+    { label: "Chia sẻ cộng đồng", enabled: state.community, status: state.community ? "Đã chia sẻ thành công" : "Chưa chia sẻ", tone: state.community ? "text-emerald-600" : "text-slate-400" },
+    { label: "Chia sẻ nội bộ", enabled: state.internal, status: state.internal ? "Đã chia sẻ thành công" : "Chưa chia sẻ", tone: state.internal ? "text-emerald-600" : "text-slate-400" },
+    {
+      label: "Chia sẻ lên HanoiStudy",
+      enabled: state.hanoi !== "none",
+      status: state.hanoi === "approved" ? "Đã chia sẻ thành công" : state.hanoi === "pending" ? "Chờ sở duyệt" : "Chưa chia sẻ",
+      tone: state.hanoi === "approved" ? "text-emerald-600" : state.hanoi === "pending" ? "text-amber-600" : "text-slate-400",
+    },
+  ];
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="px-6 py-4 border-b flex items-center justify-between">
+          <h2 className="text-lg font-bold text-sky-700 uppercase">Trạng thái chia sẻ</h2>
+          <button onClick={onClose} className="p-1.5 rounded hover:bg-slate-100 text-slate-500"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="px-6 py-5">
+          <p className="text-sm text-slate-500 mb-4 truncate" title={title}>Bài giảng: <span className="font-semibold text-slate-700">{title}</span></p>
+          <ul className="space-y-3">
+            {rows.map((r) => (
+              <li key={r.label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className={`h-6 w-6 rounded-md border flex items-center justify-center ${r.enabled ? "bg-emerald-500 border-emerald-500 text-white" : "bg-white border-slate-300 text-transparent"}`}>
+                    <Check className="h-4 w-4" strokeWidth={3} />
+                  </span>
+                  <span className="text-sm font-semibold text-slate-800">{r.label}</span>
+                </div>
+                <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="px-6 py-4 border-t bg-slate-50 flex items-center justify-end">
+          <button onClick={onClose} className="px-5 py-2 text-sm font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Đóng</button>
+        </div>
       </div>
     </div>
   );
