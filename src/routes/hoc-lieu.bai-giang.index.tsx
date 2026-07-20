@@ -550,6 +550,13 @@ function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterS
         <ShareStatusModal
           title={l.title}
           state={share}
+          onShareOne={(key) => {
+            setShare((prev) => {
+              if (key === "community") return { ...prev, community: true };
+              if (key === "internal") return { ...prev, internal: true };
+              return { ...prev, hanoi: "pending" };
+            });
+          }}
           onClose={() => setStatusOpen(false)}
         />
       )}
