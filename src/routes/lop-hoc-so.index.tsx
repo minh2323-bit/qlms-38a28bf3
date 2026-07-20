@@ -612,7 +612,9 @@ function CreateClassModal({
                 </button>
                 <button
                   onClick={() => onSubmit(buildRow("deployed"))}
-                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                  disabled={totalStudents === 0}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={totalStudents === 0 ? "Cần chọn ít nhất 1 học sinh" : undefined}
                 >
                   {isEdit ? "Cập nhật" : "Tạo lớp học"}
                 </button>
