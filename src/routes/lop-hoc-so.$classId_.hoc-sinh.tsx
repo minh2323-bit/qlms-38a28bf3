@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Search, KeyRound, RefreshCw, FileDown, Columns3 } from "lucide-react";
+import { ArrowLeft, Search, KeyRound, RefreshCw, FileDown, Eye, EyeOff, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/lop-hoc-so/$classId_/hoc-sinh")({
@@ -38,12 +39,26 @@ const STUDENTS: Student[] = [
   { stt: 10, taiKhoan: "001219099210", hoTen: "Lê Minh Đức",       matKhau: "0175000102", gioiTinh: "Nam", ngaySinh: "12/02/2019", lop: "4A", dienThoai: "0977333444" },
 ];
 
+// Digital classes that are linked to a real class (has "Đồng bộ tài khoản").
+// c7 is "Lớp 4B, 4C, 4D" — a multi-class review class, not linked to a specific real class.
+const CLASSES_WITH_REAL_LINK = new Set(["c1", "c2", "c3", "c4", "c5", "c6", "c8"]);
+
+type PwOption = "manual" | "cccd" | "birthday" | "phone";
+
 function StudentsPage() {
   const { classId } = Route.useParams();
   const navigate = useNavigate();
   const isHomeroom = classId === "c1" || classId === "c2";
+  const hasRealClass = CLASSES_WITH_REAL_LINK.has(classId);
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwOption, setPwOption] = useState<PwOption>("manual");
+  const [pw1, setPw1] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [showPw1, setShowPw1] = useState(false);
+  const [showPw2, setShowPw2] = useState(false);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -64,6 +79,31 @@ function StudentsPage() {
     setSelected(next);
   };
 
+  const openResetPw = () => {
+    if (selected.size === 0) {
+      toast.error("Vui lòng chọn ít nhất 1 học sinh");
+      return;
+    }
+    setPwOption("manual");
+    setPw1(""); setPw2("");
+    setPwOpen(true);
+  };
+
+  const confirmResetPw = () => {
+    if (pwOption === "manual") {
+      if (pw1.length < 8 || !/^[A-Za-z0-9]+$/.test(pw1)) {
+        toast.error("Mật khẩu không hợp lệ. Tối thiểu 8 ký tự, chỉ chứa chữ hoặc số.");
+        return;
+      }
+      if (pw1 !== pw2) {
+        toast.error("Xác nhận mật khẩu không khớp");
+        return;
+      }
+    }
+    setPwOpen(false);
+    toast.success(`Đã cấp lại mật khẩu cho ${selected.size} học sinh`);
+  };
+
   return (
     <AppShell>
       <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
@@ -82,18 +122,17 @@ function StudentsPage() {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-5">
         {/* Top toolbar */}
         <div className="flex items-center justify-end gap-2 flex-wrap">
-          <button className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50" title="Chọn cột">
-            <Columns3 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => toast.success("Đã đồng bộ tài khoản")}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-          >
-            <RefreshCw className="h-4 w-4" /> Đồng bộ tài khoản
-          </button>
+          {hasRealClass && (
+            <button
+              onClick={() => toast.success("Đã đồng bộ tài khoản")}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              <RefreshCw className="h-4 w-4" /> Đồng bộ tài khoản
+            </button>
+          )}
           {isHomeroom && (
             <button
-              onClick={() => toast.success("Đã cấp lại mật khẩu")}
+              onClick={openResetPw}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
             >
               <KeyRound className="h-4 w-4" /> Cấp lại mật khẩu
@@ -169,6 +208,88 @@ function StudentsPage() {
           <ArrowLeft className="h-4 w-4" /> Quay lại chi tiết lớp
         </Link>
       </div>
+
+      {/* Reset password modal */}
+      <Dialog open={pwOpen} onOpenChange={setPwOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-800">Cấp lại mật khẩu</DialogTitle>
+          </DialogHeader>
+
+          <div className="text-sm text-slate-700 space-y-1">
+            <div>Chọn phương án cấp lại mật khẩu :</div>
+            <div>+ Tự nhập → Nhập mật khẩu mới</div>
+            <div>+ Số CCCD → Mật khẩu mới là số CCCD của học sinh</div>
+            <div>+ Ngày sinh → Ví dụ: 02/03/2001 thì mật khẩu sẽ là 02032001</div>
+            <div>+ Số điện thoại: Mật khẩu mới là số điện thoại của học sinh đã đăng ký</div>
+          </div>
+
+          <div className="mt-3">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Tùy chọn cấp mật khẩu</label>
+            <select
+              value={pwOption}
+              onChange={(e) => setPwOption(e.target.value as PwOption)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            >
+              <option value="manual">Tự nhập</option>
+              <option value="cccd">Số CCCD</option>
+              <option value="birthday">Ngày sinh</option>
+              <option value="phone">Số điện thoại</option>
+            </select>
+          </div>
+
+          {pwOption === "manual" && (
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Nhập mật khẩu mới</label>
+                <div className="relative">
+                  <input
+                    type={showPw1 ? "text" : "password"}
+                    value={pw1}
+                    onChange={(e) => setPw1(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  />
+                  <button type="button" onClick={() => setShowPw1((v) => !v)} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-700">
+                    {showPw1 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="mt-1 text-xs italic text-slate-500">
+                  Mật khẩu mới phải bao gồm 8 ký tự . Bao gồm chữ hoặc số và không chứa ký tự đặc biệt
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Xác nhận mật khẩu</label>
+                <div className="relative">
+                  <input
+                    type={showPw2 ? "text" : "password"}
+                    value={pw2}
+                    onChange={(e) => setPw2(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  />
+                  <button type="button" onClick={() => setShowPw2((v) => !v)} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-700">
+                    {showPw2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <button
+              onClick={() => setPwOpen(false)}
+              className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              Hủy
+            </button>
+            <button
+              onClick={confirmResetPw}
+              className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              Xác nhận
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
