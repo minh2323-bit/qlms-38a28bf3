@@ -395,15 +395,16 @@ export function slugifyLesson(s: string): string {
 type ShareState = {
   community: boolean;
   internal: boolean;
-  hanoi: "none" | "pending" | "approved";
+  hanoi: "none" | "pending" | "approved" | "rejected";
 };
 
 function initialShareFor(l: LessonCard, idx: number): ShareState {
   if (!l.approved) return { community: false, internal: false, hanoi: "none" };
-  const mod = idx % 4;
+  const mod = idx % 5;
   if (mod === 0) return { community: false, internal: false, hanoi: "none" };
   if (mod === 1) return { community: false, internal: true, hanoi: "none" };
   if (mod === 2) return { community: true, internal: true, hanoi: "pending" };
+  if (mod === 3) return { community: true, internal: false, hanoi: "rejected" };
   return { community: true, internal: true, hanoi: "approved" };
 }
 
