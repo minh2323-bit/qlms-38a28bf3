@@ -91,12 +91,14 @@ function StudentsPage() {
           >
             <RefreshCw className="h-4 w-4" /> Đồng bộ tài khoản
           </button>
-          <button
-            onClick={() => toast.success("Đã cấp lại mật khẩu")}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-          >
-            <KeyRound className="h-4 w-4" /> Cấp lại mật khẩu
-          </button>
+          {isHomeroom && (
+            <button
+              onClick={() => toast.success("Đã cấp lại mật khẩu")}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+            >
+              <KeyRound className="h-4 w-4" /> Cấp lại mật khẩu
+            </button>
+          )}
           <button
             onClick={() => toast.success("Đang xuất Excel…")}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
