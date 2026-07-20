@@ -521,6 +521,39 @@ function ClassDetailPage() {
         onClose={() => setEditOpen(false)}
         onSave={(next) => { setInfo(next); setEditOpen(false); toast.success("Đã cập nhật thông tin lớp"); }}
       />
+
+      <Dialog open={confirmAction !== null} onOpenChange={(o) => !o && setConfirmAction(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {confirmAction === "deploy" && "Triển khai lớp học"}
+              {confirmAction === "lock" && "Khóa lớp học"}
+              {confirmAction === "unlock" && "Mở khóa lớp học"}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            {confirmAction === "deploy" && (<>Xác nhận Triển khai lớp học <b className="text-slate-900">{info.name}</b>. Từ giờ học sinh đã ghi danh có thể thấy các nội dung, thông báo bạn đăng tải.</>)}
+            {confirmAction === "lock" && (<>Xác nhận Khóa lớp học <b className="text-slate-900">{info.name}</b>. Học sinh sẽ không thể nhìn thấy và tương tác với lớp học.</>)}
+            {confirmAction === "unlock" && (<>Xác nhận Mở khóa lớp học <b className="text-slate-900">{info.name}</b>. Lớp học sẽ lại được thấy và tương tác.</>)}
+          </p>
+          <div className="mt-4 flex items-center justify-end gap-2">
+            <button onClick={() => setConfirmAction(null)} className="px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">Hủy</button>
+            <button
+              onClick={() => {
+                if (confirmAction === "deploy") { setStatus("deployed"); toast.success("Đã triển khai lớp học"); }
+                if (confirmAction === "lock") { setLocked(true); toast.success("Đã khóa lớp học"); }
+                if (confirmAction === "unlock") { setLocked(false); toast.success("Đã mở khóa lớp học"); }
+                setConfirmAction(null);
+              }}
+              className={`px-3 py-2 text-sm font-semibold rounded-lg text-white ${
+                confirmAction === "lock" ? "bg-amber-500 hover:bg-amber-600" : confirmAction === "unlock" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-emerald-500 hover:bg-emerald-600"
+              }`}
+            >
+              Xác nhận
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
