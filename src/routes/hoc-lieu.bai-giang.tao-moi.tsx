@@ -4,7 +4,7 @@ import {
   Info, ListChecks, Users, Check, ChevronRight, ArrowLeft, X,
   Plus, Trash2, Eye, SquarePen, Upload, Link as LinkIcon,
   FileText, Video, Presentation as PresentationIcon, ClipboardList, Gamepad2,
-  ChevronDown, Share2, Globe2, Save,
+  ChevronDown, Share2, Globe2, Save, FolderOpen,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -777,6 +777,9 @@ function Step2(props: {
                 onClick={() => setAddingMaterialAt(topics[0]?.id ?? "t-uncat")}
               >
                 <Plus className="h-4 w-4 mr-2 text-indigo-600" /> Thêm học liệu mới
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <FolderOpen className="h-4 w-4 mr-2 text-amber-600" /> Thêm từ Kho học liệu của tôi
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <Share2 className="h-4 w-4 mr-2 text-sky-600" /> Thêm từ Kho chia sẻ trường

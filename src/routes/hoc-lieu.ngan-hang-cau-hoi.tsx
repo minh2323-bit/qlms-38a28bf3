@@ -60,7 +60,7 @@ const TYPE_LABEL: Record<QType, string> = {
   essay: "Tự luận",
   truefalse: "Đúng - Sai",
   drag: "Kéo thả",
-  fill: "Điền từ vào chỗ trống",
+  fill: "Điền khuyết",
   match: "Nối",
 };
 
@@ -344,8 +344,8 @@ function PickTypeModal({
     { key: "essay", title: "Tự luận", desc: "Học sinh trả lời tự luận", Icon: FileText, bg: "bg-amber-50", color: "text-amber-600" },
     { key: "truefalse", title: "Đúng - Sai", desc: "Chọn Đ hoặc S cho từng mệnh đề", Icon: ToggleLeft, bg: "bg-emerald-50", color: "text-emerald-600" },
     { key: "drag", title: "Kéo thả", desc: "Sắp xếp các mục theo thứ tự", Icon: Move, bg: "bg-sky-50", color: "text-sky-600" },
-    { key: "fill", title: "Điền từ vào chỗ trống", desc: "Điền từ vào chỗ trống", Icon: TextCursorInput, bg: "bg-teal-50", color: "text-teal-600" },
-    { key: "match", title: "Nối", desc: "Nối các cặp tương ứng", Icon: Link2, bg: "bg-rose-50", color: "text-rose-600" },
+    { key: "fill", title: "Điền khuyết", desc: "Điền từ vào chỗ trống", Icon: TextCursorInput, bg: "bg-teal-50", color: "text-teal-600" },
+    { key: "match", title: "Nối", desc: "Nối các đáp án tương ứng", Icon: Link2, bg: "bg-rose-50", color: "text-rose-600" },
   ];
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>

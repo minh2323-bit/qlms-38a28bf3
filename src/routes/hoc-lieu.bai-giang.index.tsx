@@ -5,6 +5,7 @@ import {
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
   SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2, Pencil,
+  X, Building2, Globe2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -88,6 +89,8 @@ function LessonsPage() {
   const [filterOpen, setFilterOpen] = useState(true);
   const [lessonSelectMode, setLessonSelectMode] = useState(false);
   const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set());
+  const [addSourceOpen, setAddSourceOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleLessonSel = (id: string) => setSelectedLessons((s) => {
     const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
@@ -248,15 +251,17 @@ function LessonsPage() {
             <div className="flex-1 min-w-0">
               {lessonView === "grid" ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  <Link
-                    to="/hoc-lieu/bai-giang/tao-moi"
+                  <button
+                    type="button"
+                    onClick={() => setAddSourceOpen(true)}
                     className="group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-4 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40 min-h-[220px]"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm transition group-hover:scale-105">
                       <Plus className="h-6 w-6 text-indigo-600" />
                     </div>
                     <p className="mt-3 text-sm font-semibold text-slate-700">Thêm bài giảng mới</p>
-                  </Link>
+                  </button>
+
 
                   {filteredLessons.map((l) => (
                     <LessonCardView
@@ -281,11 +286,19 @@ function LessonsPage() {
                     setLessonSelectMode(true);
                     setSelectedLessons(allSelected ? new Set() : new Set(ids));
                   }}
+                  onAdd={() => setAddSourceOpen(true)}
                 />
               )}
             </div>
           </div>
         </section>
+
+        {addSourceOpen && (
+          <AddLectureSourceModal
+            onClose={() => setAddSourceOpen(false)}
+            onPickNew={() => { setAddSourceOpen(false); navigate({ to: "/hoc-lieu/bai-giang/tao-moi" }); }}
+          />
+        )}
       </>
     </AppShell>
   );
@@ -531,13 +544,14 @@ function MaterialItem({ item }: { item: string }) {
 }
 
 function LessonsTable({
-  lessons, selectMode, selected, onToggle, onToggleAll,
+  lessons, selectMode, selected, onToggle, onToggleAll, onAdd,
 }: {
   lessons: LessonCard[];
   selectMode: boolean;
   selected: Set<string>;
   onToggle: (id: string) => void;
   onToggleAll: () => void;
+  onAdd: () => void;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const toggleExpand = (key: string) => setExpanded((s) => {
@@ -573,15 +587,16 @@ function LessonsTable({
         <tbody>
           <tr className="border-t border-slate-200 bg-white">
             <td colSpan={8} className="px-4 py-5">
-              <Link
-                to="/hoc-lieu/bai-giang/tao-moi"
+              <button
+                type="button"
+                onClick={onAdd}
                 className="mx-auto flex flex-col items-center justify-center gap-1.5 group w-fit"
               >
                 <span className="h-11 w-11 rounded-full bg-sky-100 border-2 border-sky-300 flex items-center justify-center text-sky-500 group-hover:bg-sky-200 transition">
                   <Plus className="h-6 w-6" strokeWidth={2.5} />
                 </span>
                 <span className="text-sm font-medium text-sky-600">Thêm bài giảng mới</span>
-              </Link>
+              </button>
             </td>
           </tr>
           {lessons.map((l, i) => {
@@ -669,6 +684,42 @@ function LessonsTable({
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function AddLectureSourceModal({ onClose, onPickNew }: { onClose: () => void; onPickNew: () => void }) {
+  const options = [
+    { key: "new", title: "Thêm bài giảng mới", desc: "Tạo bài giảng từ đầu theo flow chuẩn", Icon: Plus, color: "text-indigo-600", bg: "bg-indigo-50", onClick: onPickNew },
+    { key: "hanoi", title: "Thêm từ HanoiStudy", desc: "Chọn bài giảng đã duyệt trên kho HanoiStudy", Icon: Globe2, color: "text-violet-600", bg: "bg-violet-50", onClick: onClose },
+    { key: "school", title: "Thêm từ Kho học liệu chia sẻ nội bộ trường", desc: "Sao chép từ kho học liệu do các giáo viên trong trường chia sẻ", Icon: Building2, color: "text-sky-600", bg: "bg-sky-50", onClick: onClose },
+  ];
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+          <h3 className="text-base font-bold text-slate-800">Thêm bài giảng mới</h3>
+          <button onClick={onClose} className="p-1 rounded hover:bg-slate-100 text-slate-500"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {options.map((o) => {
+            const Icon = o.Icon;
+            return (
+              <button
+                key={o.key}
+                onClick={o.onClick}
+                className="text-left rounded-2xl border border-slate-200 bg-white p-4 hover:border-indigo-400 hover:bg-indigo-50/40 transition flex flex-col gap-2"
+              >
+                <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${o.bg} ${o.color}`}>
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="text-sm font-semibold text-slate-800">{o.title}</span>
+                <span className="text-xs text-slate-500 leading-relaxed">{o.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

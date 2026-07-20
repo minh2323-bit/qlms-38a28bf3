@@ -77,7 +77,7 @@ const Q_LABEL: Record<QKind, string> = {
   multi: "Trắc nghiệm nhiều đáp án",
   essay: "Tự luận",
   drag: "Kéo thả",
-  fill: "Điền từ vào chỗ trống",
+  fill: "Điền khuyết",
   match: "Nối",
 };
 const Q_BADGE: Record<QKind, string> = {
@@ -900,8 +900,8 @@ function Page() {
               { k: "multi", Icon: CheckSquare, color: "text-violet-600 bg-violet-50", desc: "Chọn nhiều phương án đúng" },
               { k: "essay", Icon: FileText, color: "text-amber-600 bg-amber-50", desc: "Học sinh trả lời tự luận" },
               { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Sắp xếp các mục theo thứ tự" },
-              { k: "fill", Icon: TextCursorInput, color: "text-emerald-600 bg-emerald-50", desc: "Điền từ vào chỗ trống" },
-              { k: "match", Icon: Link2, color: "text-rose-600 bg-rose-50", desc: "Nối các cặp tương ứng" },
+              { k: "fill", Icon: TextCursorInput, color: "text-emerald-600 bg-emerald-50", desc: "Điền khuyết" },
+              { k: "match", Icon: Link2, color: "text-rose-600 bg-rose-50", desc: "Nối các đáp án tương ứng" },
             ] as { k: QKind; Icon: typeof CircleDot; color: string; desc: string }[]).map(({ k, Icon, color, desc }) => (
               <button key={k}
                 onClick={() => { setPickerOpen(false); setManualKind(k); }}
