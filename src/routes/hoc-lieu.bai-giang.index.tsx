@@ -5,6 +5,7 @@ import {
   LayoutGrid, List as ListIcon, Plus, Copy, Trash2, Search, ChevronDown,
   Calendar as CalendarIcon, SlidersHorizontal, Share2, FileSpreadsheet, CheckSquare, Check,
   SquarePen, ChevronRight, FileText, Video, ClipboardList, Gamepad2, Pencil,
+  X, Building2, Globe2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
