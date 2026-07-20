@@ -586,15 +586,16 @@ function LessonsTable({
         <tbody>
           <tr className="border-t border-slate-200 bg-white">
             <td colSpan={8} className="px-4 py-5">
-              <Link
-                to="/hoc-lieu/bai-giang/tao-moi"
+              <button
+                type="button"
+                onClick={onAdd}
                 className="mx-auto flex flex-col items-center justify-center gap-1.5 group w-fit"
               >
                 <span className="h-11 w-11 rounded-full bg-sky-100 border-2 border-sky-300 flex items-center justify-center text-sky-500 group-hover:bg-sky-200 transition">
                   <Plus className="h-6 w-6" strokeWidth={2.5} />
                 </span>
                 <span className="text-sm font-medium text-sky-600">Thêm bài giảng mới</span>
-              </Link>
+              </button>
             </td>
           </tr>
           {lessons.map((l, i) => {
