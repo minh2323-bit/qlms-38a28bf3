@@ -779,6 +779,9 @@ function Step2(props: {
                 <Plus className="h-4 w-4 mr-2 text-indigo-600" /> Thêm học liệu mới
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
+                <FolderOpen className="h-4 w-4 mr-2 text-amber-600" /> Thêm từ Kho học liệu của tôi
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <Share2 className="h-4 w-4 mr-2 text-sky-600" /> Thêm từ Kho chia sẻ trường
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
