@@ -41,8 +41,10 @@ const TEACHER_NAV: NavItem[] = [
     submenu: [
       { icon: Tag, label: "Học liệu bản quyền" },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
+      { icon: UsersRound, label: "Học liệu chia sẻ nội bộ" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/hoc-lieu/ngan-hang-cau-hoi" },
       { icon: ListChecks, label: "Đề kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
+
     ],
   },
   {
@@ -52,9 +54,9 @@ const TEACHER_NAV: NavItem[] = [
       { icon: Landmark, label: "Kỳ thi cấp Sở" },
       { icon: Building2, label: "Kỳ thi cấp Xã/Phường" },
       { icon: School, label: "Kỳ thi cấp Trường" },
-      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi" },
-      { icon: Grid3x3, label: "Khung ma trận đề" },
-      { icon: FileCheck2, label: "Ngân hàng đề thi" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi dùng chung" },
+      { icon: FileCheck2, label: "Đề thi & Ma trận đề" },
+
     ],
   },
   {
