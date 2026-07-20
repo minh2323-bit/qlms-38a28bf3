@@ -77,7 +77,7 @@ const Q_LABEL: Record<QKind, string> = {
   multi: "Trắc nghiệm nhiều đáp án",
   essay: "Tự luận",
   drag: "Kéo thả",
-  fill: "Điền từ vào chỗ trống",
+  fill: "Điền khuyết",
   match: "Nối",
 };
 const Q_BADGE: Record<QKind, string> = {
