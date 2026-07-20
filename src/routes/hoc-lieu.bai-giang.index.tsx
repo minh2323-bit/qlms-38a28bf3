@@ -543,13 +543,14 @@ function MaterialItem({ item }: { item: string }) {
 }
 
 function LessonsTable({
-  lessons, selectMode, selected, onToggle, onToggleAll,
+  lessons, selectMode, selected, onToggle, onToggleAll, onAdd,
 }: {
   lessons: LessonCard[];
   selectMode: boolean;
   selected: Set<string>;
   onToggle: (id: string) => void;
   onToggleAll: () => void;
+  onAdd: () => void;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const toggleExpand = (key: string) => setExpanded((s) => {
