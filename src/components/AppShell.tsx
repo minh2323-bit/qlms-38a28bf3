@@ -4,7 +4,7 @@ import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
   ClipboardList, Video, Building2, School, Landmark,
-  Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag,
+  Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
@@ -14,7 +14,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-type SubItem = { icon: typeof Home; label: string; to?: string };
+type SubItem = { icon: typeof Home; label: string; to?: string; highlight?: boolean };
 type NavItem = {
   icon: typeof Home;
   label: string;
@@ -39,11 +39,11 @@ const TEACHER_NAV: NavItem[] = [
     icon: BookOpen,
     label: "Học liệu\n& Bài kiểm tra",
     submenu: [
-      { icon: Tag, label: "Học liệu bản quyền" },
+      { icon: Tag, label: "Học liệu bản quyền", highlight: true },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
       { icon: UsersRound, label: "Học liệu chia sẻ nội bộ" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/hoc-lieu/ngan-hang-cau-hoi" },
-      { icon: ListChecks, label: "Đề kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
+      { icon: ListChecks, label: "Đề & Bài kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
 
     ],
   },
@@ -72,11 +72,7 @@ const TEACHER_NAV: NavItem[] = [
     label: "Hệ thống",
     submenu: [
       { icon: BookOpen, label: "Danh mục", to: "/he-thong/danh-muc" },
-      { icon: Brain, label: "Định danh kiến thức" },
-      { icon: UserCog, label: "Tài khoản Người dùng" },
-      { icon: UsersRound, label: "Tài khoản học sinh" },
-      { icon: SlidersHorizontal, label: "Cấu hình hệ thống" },
-      { icon: Trophy, label: "Mức độ nhận thức" },
+      { icon: HardDrive, label: "Quản lý dung lượng" },
     ],
   },
 ];
@@ -92,7 +88,7 @@ const STUDENT_NAV: NavItem[] = [
       { icon: Video, label: "Lớp học trực tuyến", to: "/hoc-sinh/lop-truc-tuyen" },
     ],
   },
-  { icon: Sparkles, label: "Học liệu\ntăng cường", to: "/hoc-sinh/hoc-lieu" },
+  { icon: Sparkles, label: "Học liệu\ntự ôn tập", to: "/hoc-sinh/hoc-lieu" },
   {
     icon: FolderKanban,
     label: "Kỳ thi",
@@ -143,16 +139,17 @@ export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" 
                 <div className="bg-white border border-slate-200 rounded-xl shadow-lg py-2 w-56 animate-in fade-in slide-in-from-left-2 duration-150">
                   {it.submenu.map((s) => {
                     const subCls = "w-full px-3 py-2 flex items-center gap-2 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition";
+                    const inner = (
+                      <>
+                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
+                        <span className="flex-1">{s.label}</span>
+                        {s.highlight && <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-400 shrink-0" />}
+                      </>
+                    );
                     return s.to ? (
-                      <Link key={s.label} to={s.to} className={subCls}>
-                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
-                        <span>{s.label}</span>
-                      </Link>
+                      <Link key={s.label} to={s.to} className={subCls}>{inner}</Link>
                     ) : (
-                      <button key={s.label} className={subCls}>
-                        <s.icon className="h-4 w-4 text-indigo-600 shrink-0" />
-                        <span>{s.label}</span>
-                      </button>
+                      <button key={s.label} className={subCls}>{inner}</button>
                     );
                   })}
                 </div>
