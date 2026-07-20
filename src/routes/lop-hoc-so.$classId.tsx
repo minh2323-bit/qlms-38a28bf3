@@ -203,12 +203,14 @@ function ClassDetailPage() {
           <ArrowLeft className="h-4 w-4" /> Quay lại
         </button>
 
-        <button
-          onClick={() => setEditOpen(true)}
-          className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-indigo-700 text-sm font-semibold shadow hover:bg-indigo-50"
-        >
-          <Pencil className="h-4 w-4" /> Tùy chỉnh
-        </button>
+        {info.homeroom && (
+          <button
+            onClick={() => setEditOpen(true)}
+            className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-indigo-700 text-sm font-semibold shadow hover:bg-indigo-50"
+          >
+            <Pencil className="h-4 w-4" /> Tùy chỉnh
+          </button>
+        )}
 
 
         <div className="grid md:grid-cols-[1fr_280px] gap-6 p-6 md:p-8">
