@@ -172,23 +172,14 @@ function ActionBar({
 }) {
   return (
     <div className="bg-white border rounded-xl px-4 py-3 flex items-center gap-2 flex-wrap">
-      <button className="p-2 rounded-lg border text-slate-600 hover:bg-slate-50" title="Bộ lọc">
-        <Filter className="h-4 w-4" />
-      </button>
-      <button className="p-2 rounded-lg border text-slate-600 hover:bg-slate-50" title="Xoá bộ lọc">
-        <FilterX className="h-4 w-4" />
-      </button>
       <div className="flex-1" />
-      <button className="p-2 rounded-lg border text-slate-600 hover:bg-slate-50" title="Cột">
-        <Columns3 className="h-4 w-4" />
-      </button>
       {showSort && (
         <Button variant="outline" onClick={onSort} className={`border-sky-500 text-sky-600 hover:bg-sky-50 ${sortMode ? "bg-sky-50" : ""}`}>
           <ArrowUpDown className="h-4 w-4 mr-1.5" /> Sắp xếp
         </Button>
       )}
       <Button variant="outline" className="border-sky-500 text-sky-600 hover:bg-sky-50">
-        <RefreshCcw className="h-4 w-4 mr-1.5" /> Lấy dữ liệu từ hệ thống
+        Lấy dữ liệu từ hệ thống
       </Button>
       {showStandardize && (
         <Button variant="outline" className="border-sky-500 text-sky-600 hover:bg-sky-50">
