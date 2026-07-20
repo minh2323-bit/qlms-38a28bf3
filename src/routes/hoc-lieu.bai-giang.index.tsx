@@ -638,15 +638,55 @@ function ShareLessonModal({ title, initial, onClose, onSubmit }: {
   );
 }
 
-function ShareStatusModal({ title, state, onClose }: { title: string; state: ShareState; onClose: () => void }) {
-  const rows: { label: string; enabled: boolean; status: string; tone: string }[] = [
-    { label: "Chia sẻ cộng đồng", enabled: state.community, status: state.community ? "Đã chia sẻ thành công" : "Chưa chia sẻ", tone: state.community ? "text-emerald-600" : "text-slate-400" },
-    { label: "Chia sẻ nội bộ", enabled: state.internal, status: state.internal ? "Đã chia sẻ thành công" : "Chưa chia sẻ", tone: state.internal ? "text-emerald-600" : "text-slate-400" },
+function ShareStatusModal({ title, state, onShareOne, onClose }: {
+  title: string;
+  state: ShareState;
+  onShareOne: (key: "community" | "internal" | "hanoi") => void;
+  onClose: () => void;
+}) {
+  type Row = {
+    key: "community" | "internal" | "hanoi";
+    label: string;
+    enabled: boolean;
+    status: string;
+    tone: string;
+    action?: { label: string; className: string };
+  };
+  const rows: Row[] = [
     {
+      key: "community",
+      label: "Chia sẻ cộng đồng",
+      enabled: state.community,
+      status: state.community ? "Đã chia sẻ thành công" : "Chưa chia sẻ",
+      tone: state.community ? "text-emerald-600" : "text-slate-400",
+      action: state.community ? undefined : { label: "Chia sẻ ngay", className: "bg-sky-600 hover:bg-sky-700 text-white" },
+    },
+    {
+      key: "internal",
+      label: "Chia sẻ nội bộ",
+      enabled: state.internal,
+      status: state.internal ? "Đã chia sẻ thành công" : "Chưa chia sẻ",
+      tone: state.internal ? "text-emerald-600" : "text-slate-400",
+      action: state.internal ? undefined : { label: "Chia sẻ ngay", className: "bg-sky-600 hover:bg-sky-700 text-white" },
+    },
+    {
+      key: "hanoi",
       label: "Chia sẻ lên HanoiStudy",
-      enabled: state.hanoi !== "none",
-      status: state.hanoi === "approved" ? "Đã chia sẻ thành công" : state.hanoi === "pending" ? "Chờ sở duyệt" : "Chưa chia sẻ",
-      tone: state.hanoi === "approved" ? "text-emerald-600" : state.hanoi === "pending" ? "text-amber-600" : "text-slate-400",
+      enabled: state.hanoi === "approved" || state.hanoi === "pending",
+      status:
+        state.hanoi === "approved" ? "Đã chia sẻ thành công"
+        : state.hanoi === "pending" ? "Chờ sở duyệt"
+        : state.hanoi === "rejected" ? "Sở từ chối duyệt"
+        : "Chưa chia sẻ",
+      tone:
+        state.hanoi === "approved" ? "text-emerald-600"
+        : state.hanoi === "pending" ? "text-amber-600"
+        : state.hanoi === "rejected" ? "text-rose-600"
+        : "text-slate-400",
+      action:
+        state.hanoi === "none" ? { label: "Chia sẻ ngay", className: "bg-sky-600 hover:bg-sky-700 text-white" }
+        : state.hanoi === "rejected" ? { label: "Chia sẻ lại", className: "bg-rose-600 hover:bg-rose-700 text-white" }
+        : undefined,
     },
   ];
   return (
@@ -667,7 +707,17 @@ function ShareStatusModal({ title, state, onClose }: { title: string; state: Sha
                   </span>
                   <span className="text-sm font-semibold text-slate-800">{r.label}</span>
                 </div>
-                <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+                  {r.action && (
+                    <button
+                      onClick={() => onShareOne(r.key)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-md ${r.action.className}`}
+                    >
+                      {r.action.label}
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
