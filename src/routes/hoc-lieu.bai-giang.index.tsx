@@ -88,6 +88,8 @@ function LessonsPage() {
   const [filterOpen, setFilterOpen] = useState(true);
   const [lessonSelectMode, setLessonSelectMode] = useState(false);
   const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set());
+  const [addSourceOpen, setAddSourceOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleLessonSel = (id: string) => setSelectedLessons((s) => {
     const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
