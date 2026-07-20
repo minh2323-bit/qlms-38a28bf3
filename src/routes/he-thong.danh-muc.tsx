@@ -301,12 +301,12 @@ function MonHocPanel() {
             <TableRow className="bg-indigo-700 hover:bg-indigo-700">
               {sortMode && <TableHead className="text-white w-10"></TableHead>}
               <TableHead className="text-white text-center w-14">STT</TableHead>
-              <TableHead className="text-white w-12"><Checkbox checked={allChecked} onCheckedChange={toggleAll} /></TableHead>
-              <TableHead className="text-white w-16">Sửa</TableHead>
-              <TableHead className="text-white">Khối</TableHead>
-              <TableHead className="text-white text-right">Mã môn học</TableHead>
-              <TableHead className="text-white">Mã môn học CSDL</TableHead>
-              <TableHead className="text-white">Tên môn học</TableHead>
+              <TableHead className="text-white text-center w-12"><Checkbox checked={allChecked} onCheckedChange={toggleAll} /></TableHead>
+              <TableHead className="text-white text-center w-16">Sửa</TableHead>
+              <TableHead className="text-white text-center">Khối</TableHead>
+              <TableHead className="text-white text-center">Mã môn học</TableHead>
+              <TableHead className="text-white text-center">Mã môn học CSDL</TableHead>
+              <TableHead className="text-white text-center">Tên môn học</TableHead>
               <TableHead className="text-white text-center bg-indigo-800">Hiển thị</TableHead>
               <TableHead className="text-white text-center bg-indigo-800">Nguồn</TableHead>
             </TableRow>
