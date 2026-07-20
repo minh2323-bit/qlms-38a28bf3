@@ -359,9 +359,21 @@ function CreateClassModal({
 
 
   // Step 2
-  const [pickedClass, setPickedClass] = useState<string>("");
+  const [pickedClass, setPickedClass] = useState<string>(initial?.lop ?? "");
   const [selectedStudents, setSelectedStudents] = useState<Record<string, { name: string; code: string; lop: string }>>({});
   const [studentSearch, setStudentSearch] = useState("");
+
+  // Khi user chọn "Gán lớp học" ở bước 1 → tự đồng bộ lớp và tick full học sinh
+  useEffect(() => {
+    if (!ganLop) return;
+    setPickedClass(ganLop);
+    const list = genStudents(ganLop);
+    setSelectedStudents((prev) => {
+      const next = { ...prev };
+      list.forEach((s) => { next[s.id] = { name: s.name, code: s.code, lop: ganLop }; });
+      return next;
+    });
+  }, [ganLop]);
 
   const students = pickedClass ? genStudents(pickedClass) : [];
   const filteredStudents = students.filter((s) => !studentSearch || s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.code.includes(studentSearch));
