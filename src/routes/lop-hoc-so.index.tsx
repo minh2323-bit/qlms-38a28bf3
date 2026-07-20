@@ -359,9 +359,21 @@ function CreateClassModal({
 
 
   // Step 2
-  const [pickedClass, setPickedClass] = useState<string>("");
+  const [pickedClass, setPickedClass] = useState<string>(initial?.lop ?? "");
   const [selectedStudents, setSelectedStudents] = useState<Record<string, { name: string; code: string; lop: string }>>({});
   const [studentSearch, setStudentSearch] = useState("");
+
+  // Khi user chọn "Gán lớp học" ở bước 1 → tự đồng bộ lớp và tick full học sinh
+  useEffect(() => {
+    if (!ganLop) return;
+    setPickedClass(ganLop);
+    const list = genStudents(ganLop);
+    setSelectedStudents((prev) => {
+      const next = { ...prev };
+      list.forEach((s) => { next[s.id] = { name: s.name, code: s.code, lop: ganLop }; });
+      return next;
+    });
+  }, [ganLop]);
 
   const students = pickedClass ? genStudents(pickedClass) : [];
   const filteredStudents = students.filter((s) => !studentSearch || s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.code.includes(studentSearch));
@@ -451,7 +463,7 @@ function CreateClassModal({
                     onChange={(e) => setGanLop(e.target.value)}
                     className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                   >
-                    <option value="">-- Chọn lớp giáo viên phụ trách --</option>
+                    <option value="">-- Gán lớp học số với 1 lớp học thực tế --</option>
                     {TEACHER_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -493,7 +505,7 @@ function CreateClassModal({
                     onChange={(e) => setPickedClass(e.target.value)}
                     className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                   >
-                    <option value="">-- Chọn lớp giáo viên phụ trách --</option>
+                    <option value="">-- Chọn lớp học có học sinh bạn muốn thêm --</option>
                     {TEACHER_CLASSES.map((c) => <option key={c} value={c}>Lớp {c}</option>)}
                   </select>
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -600,7 +612,9 @@ function CreateClassModal({
                 </button>
                 <button
                   onClick={() => onSubmit(buildRow("deployed"))}
-                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+                  disabled={totalStudents === 0}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={totalStudents === 0 ? "Cần chọn ít nhất 1 học sinh" : undefined}
                 >
                   {isEdit ? "Cập nhật" : "Tạo lớp học"}
                 </button>
