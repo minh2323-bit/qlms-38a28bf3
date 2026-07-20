@@ -285,11 +285,19 @@ function LessonsPage() {
                     setLessonSelectMode(true);
                     setSelectedLessons(allSelected ? new Set() : new Set(ids));
                   }}
+                  onAdd={() => setAddSourceOpen(true)}
                 />
               )}
             </div>
           </div>
         </section>
+
+        {addSourceOpen && (
+          <AddLectureSourceModal
+            onClose={() => setAddSourceOpen(false)}
+            onPickNew={() => { setAddSourceOpen(false); navigate({ to: "/hoc-lieu/bai-giang/tao-moi" }); }}
+          />
+        )}
       </>
     </AppShell>
   );
