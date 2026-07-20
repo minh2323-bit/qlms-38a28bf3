@@ -463,7 +463,7 @@ function CreateClassModal({
                     onChange={(e) => setGanLop(e.target.value)}
                     className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                   >
-                    <option value="">-- Chọn lớp giáo viên phụ trách --</option>
+                    <option value="">-- Gán lớp học số với 1 lớp học thực tế --</option>
                     {TEACHER_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
