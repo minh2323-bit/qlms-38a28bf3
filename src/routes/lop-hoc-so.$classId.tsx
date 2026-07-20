@@ -89,6 +89,7 @@ function ClassDetailPage() {
   const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
   const [status, setStatus] = useState<ClassStatus>(info.status);
   const [locked, setLocked] = useState<boolean>(false);
+  const [confirmAction, setConfirmAction] = useState<null | "deploy" | "lock" | "unlock">(null);
 
   const allMaterials = useMaterials();
   const classMaterials = useMemo(
@@ -212,7 +213,14 @@ function ClassDetailPage() {
 
         <div className="grid md:grid-cols-[1fr_280px] gap-6 p-6 md:p-8">
           <div className="text-white pt-10 md:pt-0">
-            <h1 className="text-2xl md:text-3xl font-bold leading-tight">{info.name}</h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl md:text-3xl font-bold leading-tight">{info.name}</h1>
+              {info.homeroom && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide bg-amber-400 text-amber-950 px-2.5 py-1 rounded-full shadow">
+                  Lớp chủ nhiệm
+                </span>
+              )}
+            </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
@@ -223,23 +231,19 @@ function ClassDetailPage() {
                 </button>
               </div>
 
-              {info.homeroom ? (
-                <Link
-                  to="/lop-hoc-so/$classId/hoc-sinh"
-                  params={{ classId: info.id }}
-                  className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium"
-                  title="Xem danh sách học sinh"
-                >
-                  <Users className="h-4 w-4" />
-                  {info.students} học sinh
-                </Link>
-              ) : (
-                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5 font-medium">
-                  <Users className="h-4 w-4" />
-                  {info.students} học sinh
-                </div>
-              )}
+              <Link
+                to="/lop-hoc-so/$classId/hoc-sinh"
+                params={{ classId: info.id }}
+                className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur rounded-lg px-3 py-1.5 font-medium ring-1 ring-white/40 hover:ring-white/70 transition"
+                title="Xem danh sách học sinh"
+              >
+                <Users className="h-4 w-4" />
+                {info.students} học sinh
+                <ChevronRight className="h-3.5 w-3.5 opacity-90" />
+              </Link>
+            </div>
 
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
               <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur rounded-lg px-3 py-1.5">
                 <span className="opacity-90">Giáo viên:</span>
                 <span className="font-semibold">{info.teacher}</span>
@@ -261,17 +265,14 @@ function ClassDetailPage() {
             <div className="mt-5 flex items-center gap-2 flex-wrap">
               {status === "draft" ? (
                 <button
-                  onClick={() => { setStatus("deployed"); toast.success("Đã triển khai lớp học"); }}
+                  onClick={() => setConfirmAction("deploy")}
                   className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white shadow"
                 >
                   <Check className="h-4 w-4" /> Triển khai lớp học
                 </button>
               ) : (
                 <button
-                  onClick={() => {
-                    setLocked((v) => !v);
-                    toast.success(locked ? "Đã mở khóa lớp học" : "Đã khóa lớp học");
-                  }}
+                  onClick={() => setConfirmAction(locked ? "unlock" : "lock")}
                   className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg shadow ${
                     locked
                       ? "bg-white text-indigo-700 hover:bg-slate-100"
@@ -520,6 +521,39 @@ function ClassDetailPage() {
         onClose={() => setEditOpen(false)}
         onSave={(next) => { setInfo(next); setEditOpen(false); toast.success("Đã cập nhật thông tin lớp"); }}
       />
+
+      <Dialog open={confirmAction !== null} onOpenChange={(o) => !o && setConfirmAction(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {confirmAction === "deploy" && "Triển khai lớp học"}
+              {confirmAction === "lock" && "Khóa lớp học"}
+              {confirmAction === "unlock" && "Mở khóa lớp học"}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            {confirmAction === "deploy" && (<>Xác nhận Triển khai lớp học <b className="text-slate-900">{info.name}</b>. Từ giờ học sinh đã ghi danh có thể thấy các nội dung, thông báo bạn đăng tải.</>)}
+            {confirmAction === "lock" && (<>Xác nhận Khóa lớp học <b className="text-slate-900">{info.name}</b>. Học sinh sẽ không thể nhìn thấy và tương tác với lớp học.</>)}
+            {confirmAction === "unlock" && (<>Xác nhận Mở khóa lớp học <b className="text-slate-900">{info.name}</b>. Lớp học sẽ lại được thấy và tương tác.</>)}
+          </p>
+          <div className="mt-4 flex items-center justify-end gap-2">
+            <button onClick={() => setConfirmAction(null)} className="px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">Hủy</button>
+            <button
+              onClick={() => {
+                if (confirmAction === "deploy") { setStatus("deployed"); toast.success("Đã triển khai lớp học"); }
+                if (confirmAction === "lock") { setLocked(true); toast.success("Đã khóa lớp học"); }
+                if (confirmAction === "unlock") { setLocked(false); toast.success("Đã mở khóa lớp học"); }
+                setConfirmAction(null);
+              }}
+              className={`px-3 py-2 text-sm font-semibold rounded-lg text-white ${
+                confirmAction === "lock" ? "bg-amber-500 hover:bg-amber-600" : confirmAction === "unlock" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-emerald-500 hover:bg-emerald-600"
+              }`}
+            >
+              Xác nhận
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
