@@ -915,7 +915,7 @@ export function AddMaterialModal({
                 const active = kind === k.kind;
                 return (
                   <button
-                    key={k.kind}
+                    key={k.label}
                     type="button"
                     onClick={() => setKind(k.kind)}
                     className={`px-3 py-3 rounded-xl border text-sm font-medium transition flex items-center gap-2 text-left ${
