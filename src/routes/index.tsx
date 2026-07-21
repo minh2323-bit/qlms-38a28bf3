@@ -1400,15 +1400,14 @@ function LessonPanel({
   const [reminderText, setReminderText] = useState("");
 
   const lessonDateLabel = useMemo(() => {
-    const wk = grid[weekIdx] ?? [];
-    for (let d = 0; d < wk.length; d++) {
-      const day = wk[d] ?? {};
-      for (const p of Object.values(day)) {
+    const wk = grid[weekIdx] ?? {};
+    for (const [dStr, day] of Object.entries(wk)) {
+      for (const p of Object.values(day ?? {})) {
         if (p && p.id === lesson.id) {
           const wkInfo = WEEKS.find((w) => w.idx === weekIdx);
           if (!wkInfo) return null;
           const dt = new Date(wkInfo.start);
-          dt.setDate(dt.getDate() + d);
+          dt.setDate(dt.getDate() + Number(dStr));
           return `${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}`;
         }
       }
