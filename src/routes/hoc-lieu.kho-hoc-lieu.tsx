@@ -194,7 +194,8 @@ function KhoHocLieuPage() {
                 <tr className="bg-indigo-700 text-white text-left">
                   <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Tên học liệu</th>
-                  <th className="px-4 py-3 font-semibold whitespace-nowrap">Lớp - Môn</th>
+                  <th className="px-4 py-3 font-semibold whitespace-nowrap">Khối</th>
+                  <th className="px-4 py-3 font-semibold whitespace-nowrap">Môn</th>
                   <th className="px-4 py-3 font-semibold min-w-[200px]">Chủ đề - Bài học</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Thể loại</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Thuộc bài giảng/Khóa học</th>
