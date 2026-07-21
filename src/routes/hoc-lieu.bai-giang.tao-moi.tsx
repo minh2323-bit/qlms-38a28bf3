@@ -18,6 +18,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { getKnowledgeTree, getUnitTitle } from "@/lib/knowledge-tree";
+import {
+  AddMaterialMenuItems, MaterialFormModal, MATERIAL_TYPE_LIST, type MaterialTypeKey,
+} from "@/components/AddMaterialFlow";
 
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
