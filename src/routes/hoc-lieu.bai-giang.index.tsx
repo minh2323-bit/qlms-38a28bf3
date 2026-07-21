@@ -759,11 +759,11 @@ type LessonContent = { topics: LessonTopic[]; materials: string[]; quizzes: stri
 function buildLessonContent(l: LessonCard): LessonContent {
   return {
     topics: [
-      { name: "Khởi động", items: [`Video mở đầu - ${l.title}`, `Slide dẫn nhập - ${l.title}`] },
+      { name: "Khởi động", items: [`Video mở đầu - ${l.title}`, `Bài giảng dẫn nhập - ${l.title}`] },
       { name: "Hình thành kiến thức", items: [`Bài giảng chính - ${l.title}`, `Tài liệu lý thuyết - ${l.title}`, `Video minh họa - ${l.title}`] },
       { name: "Luyện tập", items: [`Phiếu bài tập - ${l.title}`, `Trò chơi tương tác - ${l.title}`] },
     ],
-    materials: [`Tài liệu tham khảo - ${l.title}`, `Slide tổng kết - ${l.title}`],
+    materials: [`Tài liệu tham khảo - ${l.title}`, `Bài giảng tổng kết - ${l.title}`],
     quizzes: [`Bài kiểm tra 15 phút - ${l.title}`],
   };
 }

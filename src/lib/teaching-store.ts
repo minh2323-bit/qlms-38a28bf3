@@ -38,21 +38,21 @@ function uid() {
 const SEED_TEMPLATES: Record<string, { kind: MaterialKind; title: string; meta?: string }[]> = {
   "u3-khainiem": [
     { kind: "syllabus", title: "Tổng quan kiến thức phân số",    meta: "1 trang" },
-    { kind: "slide",    title: "Slide bài giảng – Khái niệm phân số", meta: "24 slide" },
+    { kind: "slide",    title: "Bài giảng – Khái niệm phân số", meta: "24 slide" },
     { kind: "doc",      title: "Tài liệu: Phân số và ý nghĩa",   meta: "8 trang" },
     { kind: "exercise", title: "Phiếu luyện tập phân số",        meta: "12 câu" },
   ],
   "u3-quydong": [
-    { kind: "slide",    title: "Slide – Quy đồng mẫu số",        meta: "18 slide" },
+    { kind: "slide",    title: "Bài giảng – Quy đồng mẫu số",    meta: "18 slide" },
     { kind: "exercise", title: "Bài tập quy đồng mẫu số",        meta: "10 câu" },
   ],
   "u1-sotunhien": [
-    { kind: "slide",    title: "Slide ôn tập số tự nhiên",       meta: "20 slide" },
+    { kind: "slide",    title: "Bài giảng ôn tập số tự nhiên",   meta: "20 slide" },
     { kind: "exercise", title: "Phiếu bài tập số có nhiều chữ số", meta: "12 câu" },
     { kind: "video",    title: "Video: Hàng và lớp",             meta: "12:35" },
   ],
   "u1-lamtron": [
-    { kind: "slide",    title: "Slide – Làm tròn số tự nhiên",   meta: "12 slide" },
+    { kind: "slide",    title: "Bài giảng – Làm tròn số tự nhiên", meta: "12 slide" },
   ],
   "u2-trungbinh": [
     { kind: "doc",      title: "Tài liệu: Tìm số trung bình cộng", meta: "6 trang" },
