@@ -774,13 +774,9 @@ function Step2(props: {
                 <Plus className="h-4 w-4" /> Thêm học liệu <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => setAddingMaterialAt(topics[0]?.id ?? "t-uncat")}
-              >
-                <Plus className="h-4 w-4 mr-2 text-indigo-600" /> Thêm học liệu mới
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-60">
+              <AddMaterialMenuItems onSelect={(k) => setAddingMaterialAt(`__type__:${k}`)} />
+              <div className="my-1 h-px bg-slate-100" />
               <DropdownMenuItem className="cursor-pointer">
                 <FolderOpen className="h-4 w-4 mr-2 text-amber-600" /> Thêm từ Kho học liệu của tôi
               </DropdownMenuItem>
