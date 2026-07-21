@@ -823,12 +823,14 @@ function ItemIcon({ kind }: { kind: MaterialKind }) {
 /* ============================ Add modal ============================ */
 
 const KIND_OPTIONS: { kind: MaterialKind; label: string; metaHint: string; Icon: typeof Video }[] = [
-  { kind: "slide",    label: "Slide bài giảng",   metaHint: "ví dụ: 24 slide", Icon: Presentation },
-  { kind: "video",    label: "Video bài giảng",   metaHint: "ví dụ: 12:35",    Icon: Video },
-  { kind: "doc",      label: "Tài liệu",          metaHint: "ví dụ: 8 trang",  Icon: FileText },
-  { kind: "image",    label: "Hình ảnh",          metaHint: "ví dụ: 1 trang",  Icon: ImageIcon },
-  { kind: "exercise", label: "Bài tập",           metaHint: "ví dụ: 10 câu",   Icon: ClipboardList },
-  { kind: "syllabus", label: "Tổng quan/Mục lục", metaHint: "ví dụ: 1 trang",  Icon: BookOpen },
+  { kind: "video",    label: "Video",                    metaHint: "ví dụ: 12:35",    Icon: Video },
+  { kind: "video",    label: "Video tương tác",          metaHint: "ví dụ: 12:35",    Icon: Video },
+  { kind: "slide",    label: "Slide/Bản trình chiếu",    metaHint: "ví dụ: 24 slide", Icon: Presentation },
+  { kind: "doc",      label: "Tài liệu văn bản",         metaHint: "ví dụ: 8 trang",  Icon: FileText },
+  { kind: "doc",      label: "Nội dung thuần",           metaHint: "ví dụ: 1 trang",  Icon: BookOpen },
+  { kind: "video",    label: "Âm thanh",                 metaHint: "ví dụ: 05:20",    Icon: Video },
+  { kind: "doc",      label: "Scorm",                    metaHint: "gói SCORM",       Icon: FileText },
+  { kind: "doc",      label: "IFrame",                   metaHint: "URL nhúng",       Icon: FileText },
 ];
 
 const COMPLETION_OPTIONS = [
@@ -913,7 +915,7 @@ export function AddMaterialModal({
                 const active = kind === k.kind;
                 return (
                   <button
-                    key={k.kind}
+                    key={k.label}
                     type="button"
                     onClick={() => setKind(k.kind)}
                     className={`px-3 py-3 rounded-xl border text-sm font-medium transition flex items-center gap-2 text-left ${
@@ -988,7 +990,7 @@ export function AddMaterialModal({
                 <div className="grid grid-cols-3 gap-2">
                   {KIND_OPTIONS.map((k) => (
                     <button
-                      key={k.kind}
+                      key={k.label}
                       type="button"
                       onClick={() => setKind(k.kind)}
                       className={`px-2 py-2 rounded-lg border text-xs font-medium transition ${

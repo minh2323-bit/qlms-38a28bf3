@@ -18,6 +18,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { getKnowledgeTree, getUnitTitle } from "@/lib/knowledge-tree";
+import {
+  AddMaterialMenuItems, MaterialFormModal, MATERIAL_TYPE_LIST, type MaterialTypeKey,
+} from "@/components/AddMaterialFlow";
 
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
@@ -771,13 +774,9 @@ function Step2(props: {
                 <Plus className="h-4 w-4" /> Thêm học liệu <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => setAddingMaterialAt(topics[0]?.id ?? "t-uncat")}
-              >
-                <Plus className="h-4 w-4 mr-2 text-indigo-600" /> Thêm học liệu mới
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-60">
+              <AddMaterialMenuItems onSelect={(k) => setAddingMaterialAt(`__type__:${k}`)} />
+              <div className="my-1 h-px bg-slate-100" />
               <DropdownMenuItem className="cursor-pointer">
                 <FolderOpen className="h-4 w-4 mr-2 text-amber-600" /> Thêm từ Kho học liệu của tôi
               </DropdownMenuItem>
@@ -868,7 +867,29 @@ function Step2(props: {
         </div>
       </div>
 
-      {addingMaterialAt && (
+      {addingMaterialAt && addingMaterialAt.startsWith("__type__:") && (
+        <MaterialFormModal
+          type={addingMaterialAt.slice("__type__:".length) as MaterialTypeKey}
+          onClose={() => setAddingMaterialAt(null)}
+          onSaved={(p) => {
+            const meta = MATERIAL_TYPE_LIST.find((t) => t.key === p.type);
+            const legacyType: Material["type"] =
+              p.type === "video" ? "Video"
+                : p.type === "slide" ? "Slide / Bài giảng"
+                : p.type === "interactive" ? "Trò chơi tương tác"
+                : "Tài liệu";
+            setMaterials((s) => [...s, {
+              id: "m-" + Date.now(),
+              name: p.title,
+              type: legacyType,
+              completion: COMPLETION_OPTIONS[0],
+              topicId: topics[0]?.id ?? "t-uncat",
+            }]);
+            setAddingMaterialAt(null);
+          }}
+        />
+      )}
+      {addingMaterialAt && !addingMaterialAt.startsWith("__type__:") && (
         <AddMaterialMiniModal
           topics={topics}
           defaultTopicId={addingMaterialAt}
