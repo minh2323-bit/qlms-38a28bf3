@@ -355,6 +355,8 @@ function CreateClassModal({
   const [tenLop, setTenLop] = useState(initial?.name ?? "");
   const [ganLop, setGanLop] = useState(initial?.lop ?? "");
   const [moTa, setMoTa] = useState("");
+  const [khoi, setKhoi] = useState("");
+  const [mon, setMon] = useState("");
   const [coverUrl, setCoverUrl] = useState<string | null>(initial?.thumb ?? null);
 
 
@@ -481,6 +483,36 @@ function CreateClassModal({
                   placeholder="Mô tả ngắn về lớp học"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
+              </Field>
+              <Field label="Khối">
+                <div className="relative">
+                  <select
+                    value={khoi}
+                    onChange={(e) => setKhoi(e.target.value)}
+                    className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  >
+                    <option value="">-- Chọn khối --</option>
+                    {["Lớp 1", "Lớp 2", "Lớp 3", "Lớp 4", "Lớp 5"].map((k) => (
+                      <option key={k} value={k}>{k}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                </div>
+              </Field>
+              <Field label="Môn">
+                <div className="relative">
+                  <select
+                    value={mon}
+                    onChange={(e) => setMon(e.target.value)}
+                    className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  >
+                    <option value="">-- Chọn môn --</option>
+                    {["Toán", "Tiếng Việt", "Tiếng Anh", "Khoa học", "Lịch sử & Địa lý", "Đạo đức"].map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                </div>
               </Field>
               <div className="col-span-2">
                 <Field label="Ảnh nền">
