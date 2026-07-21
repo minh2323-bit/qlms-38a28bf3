@@ -249,7 +249,34 @@ function KhoHocLieuPage() {
         <section className="mt-4">
           <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
             {/* Table toolbar */}
-            <div className="flex items-center justify-end gap-2 px-4 py-2.5 border-b bg-slate-50">
+            <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b bg-slate-50">
+              <div className="flex items-center gap-2">
+                {selectMode ? (
+                  <>
+                    <span className="text-xs font-semibold text-slate-700">Đã chọn <b>{selected.size}</b></span>
+                    <button
+                      disabled={selected.size === 0}
+                      onClick={bulkDelete}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Xóa
+                    </button>
+                    <button
+                      disabled={selected.size === 0}
+                      onClick={() => setBulkShareOpen(true)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 disabled:opacity-50"
+                    >
+                      <Share2 className="h-3.5 w-3.5" /> Chia sẻ
+                    </button>
+                    <button
+                      onClick={exitSelect}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                    >
+                      Hủy chọn
+                    </button>
+                  </>
+                ) : <span />}
+              </div>
               <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
                 <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất excel
               </button>
