@@ -72,7 +72,7 @@ type Material = {
 };
 
 const MATERIALS: Material[] = [
-  { id: "1", ten: "Slide dẫn nhập - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Nội dung thuần", thuocVe: ["BG: Học về phân số", "KH: Toán nâng cao 4"], ngayTao: "15/09/2025", nguon: "Phùng Thúy Hằng" },
+  { id: "1", ten: "Bài giảng dẫn nhập - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Nội dung thuần", thuocVe: ["BG: Học về phân số", "KH: Toán nâng cao 4"], ngayTao: "15/09/2025", nguon: "Phùng Thúy Hằng" },
   { id: "2", ten: "Video minh họa quy đồng mẫu số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Video", thuocVe: ["BG: Học về phân số"], ngayTao: "16/09/2025", nguon: "Hanoi Study" },
   { id: "3", ten: "Bài kiểm tra 15 phút - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Bài kiểm tra", thuocVe: ["BG: Học về phân số", "BG: Ôn tập giữa kỳ"], ngayTao: "17/09/2025", nguon: "Phùng Thúy Hằng" },
   { id: "4", ten: "Audio đọc mẫu - Tre Việt Nam", khoi: "Lớp 4", mon: "Tiếng Việt", chuDe: "Đọc hiểu văn bản", loai: "Âm thanh", thuocVe: ["BG: Đọc hiểu thơ ca"], ngayTao: "20/09/2025", nguon: "Trần Minh Khôi" },
