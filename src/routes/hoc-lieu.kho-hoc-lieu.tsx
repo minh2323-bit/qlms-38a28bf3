@@ -10,7 +10,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  AddMaterialMenuItems, MaterialFormModal, MATERIAL_TYPE_LIST, type MaterialTypeKey,
+  AddMaterialMenuItems, MATERIAL_TYPE_LIST, type MaterialTypeKey,
 } from "@/components/AddMaterialFlow";
 
 export const Route = createFileRoute("/hoc-lieu/kho-hoc-lieu")({
