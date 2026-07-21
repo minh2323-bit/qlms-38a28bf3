@@ -219,7 +219,8 @@ function KhoHocLieuPage() {
                           {m.ten}
                         </button>
                       </td>
-                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.khoi} - {m.mon}</td>
+                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap font-medium">{m.khoi}</td>
+                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.mon}</td>
                       <td className="px-4 py-3">
                         <div className="text-slate-800 font-medium">{m.chuDe}</div>
                         <div className="text-xs text-slate-500 mt-0.5">Bài: {m.baiHoc}</div>
