@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Search, ChevronDown, Plus, Building2, Globe2,
   FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type, Presentation,
-  MoreVertical, Eye, Pencil, Trash2,
+  MoreVertical, Download, Pencil, Trash2, FileSpreadsheet, X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -26,17 +26,17 @@ export const Route = createFileRoute("/hoc-lieu/kho-hoc-lieu")({
 const MATERIAL_TYPES = MATERIAL_TYPE_LIST.map((t) => t.label);
 type MaterialType = (typeof MATERIAL_TYPES)[number];
 
-const TYPE_META: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string }> = {
-  "Nội dung thuần": { icon: Type, color: "text-slate-600", bg: "bg-slate-100" },
-  "Video": { icon: Video, color: "text-rose-600", bg: "bg-rose-100" },
-  "Video tương tác": { icon: PlayCircle, color: "text-indigo-600", bg: "bg-indigo-100" },
-  "Âm thanh": { icon: Music, color: "text-amber-600", bg: "bg-amber-100" },
-  "Tài liệu văn bản": { icon: FileText, color: "text-sky-600", bg: "bg-sky-100" },
-  "Tài liệu": { icon: FileText, color: "text-sky-600", bg: "bg-sky-100" },
-  "Slide/Bản trình chiếu": { icon: Presentation, color: "text-orange-600", bg: "bg-orange-100" },
-  "Scorm": { icon: FileBox, color: "text-violet-600", bg: "bg-violet-100" },
-  "IFrame": { icon: Code2, color: "text-emerald-600", bg: "bg-emerald-100" },
-  "Bài kiểm tra": { icon: ClipboardList, color: "text-orange-600", bg: "bg-orange-100" },
+const TYPE_META: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string; kind: "video" | "audio" | "pdf" | "other" }> = {
+  "Nội dung thuần": { icon: Type, color: "text-slate-600", bg: "bg-slate-100", kind: "other" },
+  "Video": { icon: Video, color: "text-rose-600", bg: "bg-rose-100", kind: "video" },
+  "Video tương tác": { icon: PlayCircle, color: "text-indigo-600", bg: "bg-indigo-100", kind: "video" },
+  "Âm thanh": { icon: Music, color: "text-amber-600", bg: "bg-amber-100", kind: "audio" },
+  "Tài liệu văn bản": { icon: FileText, color: "text-sky-600", bg: "bg-sky-100", kind: "pdf" },
+  "Tài liệu": { icon: FileText, color: "text-sky-600", bg: "bg-sky-100", kind: "pdf" },
+  "Slide/Bản trình chiếu": { icon: Presentation, color: "text-orange-600", bg: "bg-orange-100", kind: "pdf" },
+  "Scorm": { icon: FileBox, color: "text-violet-600", bg: "bg-violet-100", kind: "other" },
+  "IFrame": { icon: Code2, color: "text-emerald-600", bg: "bg-emerald-100", kind: "other" },
+  "Bài kiểm tra": { icon: ClipboardList, color: "text-orange-600", bg: "bg-orange-100", kind: "other" },
 };
 
 const KHOI_LIST = ["Lớp 3", "Lớp 4", "Lớp 5"];
@@ -61,6 +61,7 @@ type Material = {
   khoi: string;
   mon: string;
   chuDe: string;
+  baiHoc: string;
   loai: MaterialType;
   thuocVe: string[];
   ngayTao: string;
@@ -68,16 +69,16 @@ type Material = {
 };
 
 const MATERIALS: Material[] = [
-  { id: "1", ten: "Bài giảng dẫn nhập - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Nội dung thuần", thuocVe: ["BG: Học về phân số", "KH: Toán nâng cao 4"], ngayTao: "15/09/2025", nguon: "Phùng Thúy Hằng" },
-  { id: "2", ten: "Video minh họa quy đồng mẫu số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Video", thuocVe: ["BG: Học về phân số"], ngayTao: "16/09/2025", nguon: "Hanoi Study" },
-  { id: "3", ten: "Bài kiểm tra 15 phút - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", loai: "Bài kiểm tra", thuocVe: ["BG: Học về phân số", "BG: Ôn tập giữa kỳ"], ngayTao: "17/09/2025", nguon: "Phùng Thúy Hằng" },
-  { id: "4", ten: "Audio đọc mẫu - Tre Việt Nam", khoi: "Lớp 4", mon: "Tiếng Việt", chuDe: "Đọc hiểu văn bản", loai: "Âm thanh", thuocVe: ["BG: Đọc hiểu thơ ca"], ngayTao: "20/09/2025", nguon: "Trần Minh Khôi" },
-  { id: "5", ten: "Tài liệu lý thuyết - Số thập phân", khoi: "Lớp 4", mon: "Toán", chuDe: "Số thập phân", loai: "Tài liệu", thuocVe: ["BG: Số thập phân", "KH: Toán nâng cao 4"], ngayTao: "22/09/2025", nguon: "Phùng Thúy Hằng" },
-  { id: "6", ten: "Trò chơi tương tác - Hình học", khoi: "Lớp 4", mon: "Toán", chuDe: "Hình học phẳng", loai: "Video tương tác", thuocVe: ["BG: Hình học trực quan"], ngayTao: "25/09/2025", nguon: "Hanoi Study" },
-  { id: "7", ten: "Bài Scorm - Đo lường", khoi: "Lớp 4", mon: "Toán", chuDe: "Đo lường", loai: "Scorm", thuocVe: ["BG: Đo lường và đơn vị đo"], ngayTao: "01/10/2025", nguon: "Kho học liệu Sở" },
-  { id: "8", ten: "Khung iframe khảo sát đầu vào", khoi: "Lớp 4", mon: "Toán", chuDe: "Khảo sát", loai: "IFrame", thuocVe: ["KH: Toán nâng cao 4"], ngayTao: "05/10/2025", nguon: "Phùng Thúy Hằng" },
-  { id: "9", ten: "Video bài giảng tỉ số phần trăm", khoi: "Lớp 4", mon: "Toán", chuDe: "Tỉ số phần trăm", loai: "Video", thuocVe: ["BG: Tỉ số phần trăm"], ngayTao: "10/10/2025", nguon: "Lê Thị Hoa" },
-  { id: "10", ten: "Phiếu bài tập tập làm văn", khoi: "Lớp 4", mon: "Tiếng Việt", chuDe: "Tập làm văn miêu tả", loai: "Tài liệu", thuocVe: ["BG: Văn miêu tả"], ngayTao: "12/10/2025", nguon: "Trần Minh Khôi" },
+  { id: "1", ten: "Bài giảng dẫn nhập - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", baiHoc: "Khái niệm phân số", loai: "Nội dung thuần", thuocVe: ["BG: Học về phân số", "KH: Toán nâng cao 4"], ngayTao: "15/09/2025", nguon: "Phùng Thúy Hằng" },
+  { id: "2", ten: "Video minh họa quy đồng mẫu số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", baiHoc: "Quy đồng mẫu số", loai: "Video", thuocVe: ["BG: Học về phân số"], ngayTao: "16/09/2025", nguon: "Hanoi Study (Nguyễn Văn A)" },
+  { id: "3", ten: "Bài kiểm tra 15 phút - Phân số", khoi: "Lớp 4", mon: "Toán", chuDe: "Phân số cơ bản", baiHoc: "Ôn tập phân số", loai: "Bài kiểm tra", thuocVe: ["BG: Học về phân số", "BG: Ôn tập giữa kỳ"], ngayTao: "17/09/2025", nguon: "Phùng Thúy Hằng" },
+  { id: "4", ten: "Audio đọc mẫu - Tre Việt Nam", khoi: "Lớp 4", mon: "Tiếng Việt", chuDe: "Đọc hiểu văn bản", baiHoc: "Tre Việt Nam", loai: "Âm thanh", thuocVe: ["BG: Đọc hiểu thơ ca"], ngayTao: "20/09/2025", nguon: "Trần Minh Khôi" },
+  { id: "5", ten: "Tài liệu lý thuyết - Số thập phân", khoi: "Lớp 4", mon: "Toán", chuDe: "Số thập phân", baiHoc: "Khái niệm số thập phân", loai: "Tài liệu", thuocVe: ["BG: Số thập phân", "KH: Toán nâng cao 4"], ngayTao: "22/09/2025", nguon: "Phùng Thúy Hằng" },
+  { id: "6", ten: "Trò chơi tương tác - Hình học", khoi: "Lớp 4", mon: "Toán", chuDe: "Hình học phẳng", baiHoc: "Hình vuông, hình chữ nhật", loai: "Video tương tác", thuocVe: ["BG: Hình học trực quan"], ngayTao: "25/09/2025", nguon: "Hanoi Study (Lê Minh Tuấn)" },
+  { id: "7", ten: "Bài Scorm - Đo lường", khoi: "Lớp 4", mon: "Toán", chuDe: "Đo lường", baiHoc: "Đơn vị đo độ dài", loai: "Scorm", thuocVe: ["BG: Đo lường và đơn vị đo"], ngayTao: "01/10/2025", nguon: "Kho học liệu Sở" },
+  { id: "8", ten: "Khung iframe khảo sát đầu vào", khoi: "Lớp 4", mon: "Toán", chuDe: "Khảo sát", baiHoc: "Khảo sát năng lực", loai: "IFrame", thuocVe: ["KH: Toán nâng cao 4"], ngayTao: "05/10/2025", nguon: "Phùng Thúy Hằng" },
+  { id: "9", ten: "Video bài giảng tỉ số phần trăm", khoi: "Lớp 4", mon: "Toán", chuDe: "Tỉ số phần trăm", baiHoc: "Khái niệm tỉ số phần trăm", loai: "Video", thuocVe: ["BG: Tỉ số phần trăm"], ngayTao: "10/10/2025", nguon: "Lê Thị Hoa" },
+  { id: "10", ten: "Phiếu bài tập tập làm văn", khoi: "Lớp 4", mon: "Tiếng Việt", chuDe: "Tập làm văn miêu tả", baiHoc: "Tả cây cối", loai: "Tài liệu", thuocVe: ["BG: Văn miêu tả"], ngayTao: "12/10/2025", nguon: "Trần Minh Khôi" },
 ];
 
 function KhoHocLieuPage() {
@@ -87,6 +88,8 @@ function KhoHocLieuPage() {
   const [mon, setMon] = useState("");
   const [chuDe, setChuDe] = useState("");
   const [addType, setAddType] = useState<MaterialTypeKey | null>(null);
+  const [editMaterial, setEditMaterial] = useState<Material | null>(null);
+  const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
 
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
   const chuongOptions = khoi && mon ? CHUONG_BY_MON[`${khoi}-${mon}`] ?? [] : [];
@@ -99,6 +102,10 @@ function KhoHocLieuPage() {
     if (chuDe && m.chuDe !== chuDe) return false;
     return true;
   });
+
+  const editKey: MaterialTypeKey | null = editMaterial
+    ? (MATERIAL_TYPE_LIST.find((t) => t.label === editMaterial.loai)?.key ?? null)
+    : null;
 
   return (
     <AppShell>
@@ -171,14 +178,24 @@ function KhoHocLieuPage() {
 
         {/* Table */}
         <section className="mt-4">
-          <div className="bg-white rounded-2xl border shadow-sm overflow-x-auto">
+          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+            {/* Table toolbar */}
+            <div className="flex items-center justify-end gap-2 px-4 py-2.5 border-b bg-slate-50">
+              <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
+                <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất excel
+              </button>
+              <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
+                <Download className="h-3.5 w-3.5" /> Tải xuống
+              </button>
+            </div>
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-indigo-700 text-white text-left">
                   <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Tên học liệu</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Lớp - Môn</th>
-                  <th className="px-4 py-3 font-semibold">Chủ đề</th>
+                  <th className="px-4 py-3 font-semibold min-w-[200px]">Chủ đề - Bài học</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Thể loại</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Thuộc bài giảng/Khóa học</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Ngày tạo</th>
@@ -194,12 +211,18 @@ function KhoHocLieuPage() {
                     <tr key={m.id} className={`border-t border-slate-200 align-top ${i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
                       <td className="px-3 py-3 text-center text-slate-700 font-semibold">{i + 1}</td>
                       <td className="px-4 py-3">
-                        <button className="font-semibold text-indigo-700 hover:text-indigo-900 text-left">
+                        <button
+                          onClick={() => setViewMaterial(m)}
+                          className="font-semibold text-indigo-700 hover:text-indigo-900 hover:underline text-left"
+                        >
                           {m.ten}
                         </button>
                       </td>
                       <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.khoi} - {m.mon}</td>
-                      <td className="px-4 py-3 text-slate-700">{m.chuDe}</td>
+                      <td className="px-4 py-3">
+                        <div className="text-slate-800 font-medium">{m.chuDe}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">Bài: {m.baiHoc}</div>
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${meta.bg} ${meta.color}`}>
                           <Icon className="h-3.5 w-3.5" />
@@ -230,9 +253,9 @@ function KhoHocLieuPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem className="cursor-pointer">
-                              <Eye className="h-4 w-4 mr-2 text-sky-600" /> Xem trước
+                              <Download className="h-4 w-4 mr-2 text-sky-600" /> Tải xuống
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => setEditMaterial(m)}>
                               <Pencil className="h-4 w-4 mr-2 text-indigo-600" /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer text-rose-600">
@@ -253,11 +276,21 @@ function KhoHocLieuPage() {
                 )}
               </tbody>
             </table>
+            </div>
           </div>
         </section>
 
         {addType && (
           <MaterialFormModal type={addType} onClose={() => setAddType(null)} />
+        )}
+        {editMaterial && editKey && (
+          <MaterialFormModal
+            type={editKey}
+            onClose={() => setEditMaterial(null)}
+          />
+        )}
+        {viewMaterial && (
+          <MaterialViewerModal material={viewMaterial} onClose={() => setViewMaterial(null)} />
         )}
       </>
     </AppShell>
@@ -276,6 +309,83 @@ function FilterSelect({ value, onChange, placeholder, options }: { value: string
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
       <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+    </div>
+  );
+}
+
+function MaterialViewerModal({ material, onClose }: { material: Material; onClose: () => void }) {
+  const meta = TYPE_META[material.loai];
+  const Icon = meta.icon;
+  return (
+    <div className="fixed inset-0 z-[80] bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-3 px-5 py-3 border-b bg-slate-50">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className={`h-8 w-8 rounded-lg inline-flex items-center justify-center ${meta.bg} ${meta.color}`}>
+              <Icon className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-bold text-slate-800 truncate">{material.ten}</h3>
+              <p className="text-xs text-slate-500">{material.chuDe} · {material.baiHoc}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="h-8 w-8 rounded-md hover:bg-slate-100 inline-flex items-center justify-center">
+            <X className="h-4 w-4 text-slate-500" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto p-5 bg-slate-100">
+          {meta.kind === "video" ? (
+            <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
+              <iframe
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                title={material.ten}
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          ) : meta.kind === "audio" ? (
+            <div className="rounded-xl bg-white p-6 flex flex-col items-center gap-4">
+              <div className={`h-20 w-20 rounded-2xl ${meta.bg} ${meta.color} inline-flex items-center justify-center`}>
+                <Music className="h-10 w-10" />
+              </div>
+              <audio controls className="w-full max-w-md">
+                <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_1e1f9c2b1b.mp3" />
+              </audio>
+            </div>
+          ) : meta.kind === "pdf" ? (
+            <div className="bg-white rounded-xl border h-[65vh] p-6 overflow-auto">
+              <h4 className="font-bold text-slate-800 mb-3">{material.ten}</h4>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Nội dung tài liệu ở dạng xem trước trực tuyến. Học sinh có thể lật trang,
+                tìm kiếm nội dung hoặc tải bản đầy đủ để đọc offline.
+              </p>
+              <div className="mt-4 space-y-2 text-sm text-slate-700">
+                <p><b>Chủ đề:</b> {material.chuDe}</p>
+                <p><b>Bài học:</b> {material.baiHoc}</p>
+                <p><b>Tác giả:</b> {material.nguon}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border p-8 text-center text-slate-600">
+              Nội dung {material.loai.toLowerCase()} sẽ được hiển thị tại đây.
+            </div>
+          )}
+        </div>
+        <div className="px-5 py-3 border-t bg-white flex items-center justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 hover:bg-slate-50"
+          >
+            Đóng
+          </button>
+          <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Download className="h-4 w-4" /> Tải xuống
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
