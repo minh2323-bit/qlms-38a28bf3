@@ -446,6 +446,7 @@ function InteractiveVideoForm({
   const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [questions, setQuestions] = useState<SavedQuestion[]>([]);
   const [addQOpen, setAddQOpen] = useState<null | string>(null);
+  const [requireCorrect, setRequireCorrect] = useState(true);
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
@@ -487,23 +488,34 @@ function InteractiveVideoForm({
           </div>
         </div>
 
-        {/* Question section */}
-        <div>
-          <h4 className="text-sm font-bold text-sky-700 mb-2">Thêm câu hỏi tương tác</h4>
+        {/* Interactive questions – right of video */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-bold text-sky-700">Thêm câu hỏi tương tác</h4>
           <QuestionTypeGrid onPick={(k) => setAddQOpen(k)} disabled={!hasSource} />
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox
+              checked={requireCorrect}
+              onCheckedChange={(v) => setRequireCorrect(!!v)}
+            />
+            <span className="font-semibold text-slate-700">
+              Yêu cầu trả lời đúng để ghi nhận hoàn thành học liệu
+            </span>
+          </label>
+          <div>
+            <div className="text-xs font-bold text-slate-800 mb-1.5">Nội dung tương tác</div>
+            <QuestionCardList
+              questions={questions}
+              onRemove={(id) => setQuestions((s) => s.filter((x) => x.id !== id))}
+            />
+          </div>
         </div>
-      </div>
-
-      <div>
-        <h4 className="text-sm font-bold text-slate-800 mb-2">Nội dung tương tác</h4>
-        <QuestionCardList
-          questions={questions}
-          onRemove={(id) => setQuestions((s) => s.filter((x) => x.id !== id))}
-        />
       </div>
 
       <div className="flex justify-end gap-2 pt-2 border-t">
         <Button variant="outline" size="sm" onClick={onClose}>Hủy</Button>
+        <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => toast.info("Xem trước học liệu…")}>
+          <Eye className="h-4 w-4 mr-1" /> Xem trước
+        </Button>
         <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700" onClick={submit}>Lưu học liệu</Button>
       </div>
 
@@ -521,6 +533,7 @@ function InteractiveVideoForm({
     </div>
   );
 }
+
 
 /* ============= Generic form (Slide / Doc / Text / Audio / Scorm / IFrame) ============= */
 
