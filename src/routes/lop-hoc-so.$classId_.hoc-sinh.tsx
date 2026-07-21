@@ -60,6 +60,9 @@ function StudentsPage() {
   const [showPw1, setShowPw1] = useState(false);
   const [showPw2, setShowPw2] = useState(false);
 
+  const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
+  const [unregisterTarget, setUnregisterTarget] = useState<Student | null>(null);
+
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return STUDENTS;
