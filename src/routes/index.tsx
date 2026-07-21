@@ -1515,7 +1515,7 @@ function LessonPanel({
               <DropdownMenuItem onClick={() => setMaterialSourceOpen(true)}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTestPickerOpen(true)}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTaskPickerOpen(true)}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => quickAdd("doc", "Lời nhắc")}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { setReminderText(""); setReminderOpen(true); }}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
