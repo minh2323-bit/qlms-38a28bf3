@@ -1,14 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Search, ChevronDown, Plus, Building2, Globe2,
   FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type, Presentation,
-  MoreVertical, Pencil, Trash2, FileSpreadsheet, X,
+  MoreVertical, Pencil, Trash2, FileSpreadsheet, X, CheckSquare, Share2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  ShareLessonModal, ShareStatusModal, emptyShareState, isShared,
+  type ShareState,
+} from "@/components/ShareModals";
+import { toast } from "sonner";
 import {
   AddMaterialMenuItems, MATERIAL_TYPE_LIST, type MaterialTypeKey,
 } from "@/components/AddMaterialFlow";
