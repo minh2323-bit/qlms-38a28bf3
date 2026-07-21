@@ -82,13 +82,12 @@ const MATERIALS: Material[] = [
 ];
 
 function KhoHocLieuPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [loai, setLoai] = useState<string>("");
   const [khoi, setKhoi] = useState("");
   const [mon, setMon] = useState("");
   const [chuDe, setChuDe] = useState("");
-  const [addType, setAddType] = useState<MaterialTypeKey | null>(null);
-  const [editMaterial, setEditMaterial] = useState<Material | null>(null);
   const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
 
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
@@ -103,9 +102,12 @@ function KhoHocLieuPage() {
     return true;
   });
 
-  const editKey: MaterialTypeKey | null = editMaterial
-    ? (MATERIAL_TYPE_LIST.find((t) => t.label === editMaterial.loai)?.key ?? null)
-    : null;
+  const goAdd = (k: MaterialTypeKey) =>
+    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: k } });
+  const goEdit = (m: Material) => {
+    const key = MATERIAL_TYPE_LIST.find((t) => t.label === m.loai)?.key ?? "doc";
+    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: key } });
+  };
 
   return (
     <AppShell>
