@@ -867,7 +867,29 @@ function Step2(props: {
         </div>
       </div>
 
-      {addingMaterialAt && (
+      {addingMaterialAt && addingMaterialAt.startsWith("__type__:") && (
+        <MaterialFormModal
+          type={addingMaterialAt.slice("__type__:".length) as MaterialTypeKey}
+          onClose={() => setAddingMaterialAt(null)}
+          onSaved={(p) => {
+            const meta = MATERIAL_TYPE_LIST.find((t) => t.key === p.type);
+            const legacyType: Material["type"] =
+              p.type === "video" ? "Video"
+                : p.type === "slide" ? "Slide / Bài giảng"
+                : p.type === "interactive" ? "Trò chơi tương tác"
+                : "Tài liệu";
+            setMaterials((s) => [...s, {
+              id: "m-" + Date.now(),
+              name: p.title,
+              type: legacyType,
+              completion: COMPLETION_OPTIONS[0],
+              topicId: topics[0]?.id ?? "t-uncat",
+            }]);
+            setAddingMaterialAt(null);
+          }}
+        />
+      )}
+      {addingMaterialAt && !addingMaterialAt.startsWith("__type__:") && (
         <AddMaterialMiniModal
           topics={topics}
           defaultTopicId={addingMaterialAt}
