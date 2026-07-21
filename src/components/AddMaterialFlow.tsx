@@ -323,6 +323,7 @@ type SavedQuestion = {
   text: string;
   answers?: QAnswer[];     // for mcq/mcq-multi/tf
   freeText?: string;       // for fill/short/essay/reorder/match
+  diem?: number;
 };
 
 /* ============= Video form ============= */
