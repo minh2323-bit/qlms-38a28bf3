@@ -723,7 +723,14 @@ function ShareStatusModal({ title, state, onShareOne, onClose }: {
                   <span className="text-sm font-semibold text-slate-800">{r.label}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+                  <div className="flex flex-col items-end">
+                    <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+                    {r.status === "Đã chia sẻ thành công" && state.sharedAt[r.key] && (
+                      <span className="text-[11px] italic text-slate-400 mt-0.5">
+                        Chia sẻ lúc {fmtShared(state.sharedAt[r.key]!)}
+                      </span>
+                    )}
+                  </div>
                   {r.action && (
                     <button
                       onClick={() => onShareOne(r.key)}
