@@ -185,7 +185,8 @@ function StudentsPage() {
                 <th className="px-3 py-2 text-left font-semibold">Giới tính</th>
                 <th className="px-3 py-2 text-left font-semibold">Ngày sinh</th>
                 <th className="px-3 py-2 text-left font-semibold">Lớp</th>
-                <th className="px-3 py-2 text-left font-semibold rounded-r-md">Điện thoại liên hệ</th>
+                <th className="px-3 py-2 text-left font-semibold">Điện thoại liên hệ</th>
+                <th className="px-3 py-2 text-center font-semibold rounded-r-md">Hủy đăng ký</th>
               </tr>
             </thead>
             <tbody>
@@ -202,17 +203,27 @@ function StudentsPage() {
                   <td className="px-3 py-2.5">{s.ngaySinh}</td>
                   <td className="px-3 py-2.5">{s.lop}</td>
                   <td className="px-3 py-2.5">{s.dienThoai}</td>
+                  <td className="px-3 py-2.5 text-center">
+                    <button
+                      onClick={() => setUnregisterTarget(s)}
+                      title="Hủy đăng ký học sinh"
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-rose-600 hover:bg-rose-50"
+                    >
+                      <UserMinus className="h-4 w-4" />
+                    </button>
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-3 py-8 text-center text-slate-400 italic">Không có học sinh nào phù hợp.</td>
+                  <td colSpan={10} className="px-3 py-8 text-center text-slate-400 italic">Không có học sinh nào phù hợp.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
+
 
       <div className="mt-4">
         <Link to="/lop-hoc-so/$classId" params={{ classId }} className="text-sm font-medium text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1">
