@@ -778,6 +778,170 @@ function QuestionListSection({
   );
 }
 
+/* ============= Question TABLE section (image-2 style) ============= */
+
+function QuestionTableSection({
+  questions, setQuestions, onOpenAdd, scale,
+}: {
+  questions: SavedQuestion[];
+  setQuestions: React.Dispatch<React.SetStateAction<SavedQuestion[]>>;
+  onOpenAdd: (k: string) => void;
+  scale: number;
+}) {
+  const autoSplit = () => {
+    if (questions.length === 0) return;
+    const per = +(scale / questions.length).toFixed(2);
+    setQuestions((s) => s.map((q) => ({ ...q, diem: per })));
+    toast.success("Đã chia điểm tự động");
+  };
+  const move = (idx: number, dir: -1 | 1) => {
+    setQuestions((s) => {
+      const nxt = [...s];
+      const j = idx + dir;
+      if (j < 0 || j >= nxt.length) return s;
+      [nxt[idx], nxt[j]] = [nxt[j], nxt[idx]];
+      return nxt;
+    });
+  };
+  return (
+    <div className="border-t pt-4 space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => toast.info("Mở ngân hàng câu hỏi")}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-lg"
+        >
+          <Library className="h-3.5 w-3.5" /> Thêm từ ngân hàng
+        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 px-3 py-2 rounded-lg"
+            >
+              <Plus className="h-3.5 w-3.5" /> Thêm mới <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {QUESTION_TYPES.map((q) => {
+              const Icon = q.Icon;
+              return (
+                <DropdownMenuItem
+                  key={q.key}
+                  className="cursor-pointer gap-2"
+                  onSelect={(e) => { e.preventDefault(); onOpenAdd(q.key); }}
+                >
+                  <Icon className="h-4 w-4 text-indigo-600" />
+                  <span>{q.label}</span>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <button
+          type="button"
+          onClick={autoSplit}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 px-3 py-2 rounded-lg"
+        >
+          Chia điểm tự động
+        </button>
+        <span className="text-xs text-slate-500 ml-auto">Tổng thang điểm: <b>{scale}</b></span>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-slate-200">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-slate-600 text-xs">
+            <tr>
+              <th className="px-3 py-2 text-center w-12">STT</th>
+              <th className="px-3 py-2 text-center w-14">Sửa</th>
+              <th className="px-3 py-2 text-left">Tên câu hỏi</th>
+              <th className="px-3 py-2 text-left w-[38%]">Đáp án</th>
+              <th className="px-3 py-2 text-left w-40">Loại câu hỏi</th>
+              <th className="px-3 py-2 text-center w-24">Điểm</th>
+              <th className="px-3 py-2 text-center w-20">Sắp xếp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {questions.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-3 py-6 text-center text-xs italic text-slate-400">
+                  Chưa có câu hỏi nào. Nhấn "Thêm mới" để chọn dạng câu hỏi.
+                </td>
+              </tr>
+            )}
+            {questions.map((q, idx) => (
+              <tr key={q.id} className="border-t border-slate-100 align-top">
+                <td className="px-3 py-3 text-center font-semibold text-slate-700">{idx + 1}</td>
+                <td className="px-3 py-3 text-center">
+                  <button className="h-7 w-7 text-slate-400 hover:text-indigo-600 inline-flex items-center justify-center" title="Sửa">
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                </td>
+                <td className="px-3 py-3 text-slate-800">{q.text}</td>
+                <td className="px-3 py-3">
+                  {q.answers && q.answers.length > 0 ? (
+                    <div className="space-y-1">
+                      {q.answers.map((a, i) => (
+                        <div
+                          key={i}
+                          className={`flex items-center justify-between gap-2 px-2 py-1 rounded text-xs border ${
+                            a.correct ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white"
+                          }`}
+                        >
+                          <span className="truncate">
+                            <span className="font-semibold text-slate-500 mr-1">{String.fromCharCode(65 + i)}.</span>
+                            {a.text || <span className="italic text-slate-400">(trống)</span>}
+                          </span>
+                          {a.correct && <span className="text-[10px] font-semibold text-emerald-700 shrink-0">Đáp án đúng</span>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : q.freeText ? (
+                    <span className="text-xs text-slate-600 whitespace-pre-line">{q.freeText}</span>
+                  ) : (
+                    <span className="text-xs italic text-slate-400">—</span>
+                  )}
+                </td>
+                <td className="px-3 py-3">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    {q.typeLabel}
+                  </span>
+                </td>
+                <td className="px-3 py-3 text-center">
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.25}
+                    value={q.diem ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value === "" ? undefined : Number(e.target.value);
+                      setQuestions((s) => s.map((x) => x.id === q.id ? { ...x, diem: v } : x));
+                    }}
+                    className="w-16 text-center px-2 py-1 text-sm rounded border border-slate-200"
+                  />
+                </td>
+                <td className="px-3 py-3 text-center">
+                  <div className="inline-flex flex-col items-center">
+                    <button onClick={() => move(idx, -1)} className="text-slate-400 hover:text-indigo-600" title="Lên">
+                      <ArrowUpDown className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setQuestions((s) => s.filter((x) => x.id !== q.id))}
+                      className="text-slate-400 hover:text-rose-600 mt-1" title="Xóa"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 /* ============= Add-question sub-modal ============= */
 
 function AddQuestionModal({
