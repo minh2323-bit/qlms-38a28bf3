@@ -1039,15 +1039,12 @@ function AddQuestionModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <Field label="Thời gian hiển thị" required hint="hh:mm:ss – nhập số, dấu ':' cố định">
               <TimeMaskInput value={timeDigits} onChange={setTimeDigits} className="max-w-40" />
             </Field>
-            <label className="inline-flex items-start gap-2 pt-6 text-sm">
-              <Checkbox checked={requireCorrect} onCheckedChange={(v) => setRequireCorrect(!!v)} />
-              <span className="font-semibold text-slate-700">Yêu cầu trả lời đúng để ghi nhận hoàn thành học liệu</span>
-            </label>
           </div>
+
 
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <label className="inline-flex items-center gap-2">
