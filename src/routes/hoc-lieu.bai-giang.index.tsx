@@ -538,18 +538,23 @@ function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterS
           initial={share}
           onClose={() => setShareOpen(false)}
           onSubmit={(next) => {
-            const withPending: ShareState = {
-              ...next,
-              hanoi: next.hanoi !== "none" ? next.hanoi : (share.hanoi === "none" ? "none" : share.hanoi),
-            };
-            // If user just enabled hanoi, mark as pending
-            const finalState: ShareState = {
+            const now = Date.now();
+            const newSharedAt = { ...share.sharedAt };
+            if (next.community && !share.community) newSharedAt.community = now;
+            if (!next.community) delete newSharedAt.community;
+            if (next.internal && !share.internal) newSharedAt.internal = now;
+            if (!next.internal) delete newSharedAt.internal;
+            const finalHanoi: ShareState["hanoi"] =
+              next.hanoi === "none" ? "none" : (share.hanoi === "approved" ? "approved" : "pending");
+            if (finalHanoi === "approved" && !newSharedAt.hanoi) newSharedAt.hanoi = now;
+            if (finalHanoi === "pending" && share.hanoi === "none") newSharedAt.hanoi = now;
+            if (finalHanoi === "none") delete newSharedAt.hanoi;
+            setShare({
               community: next.community,
               internal: next.internal,
-              hanoi: next.hanoi === "none" ? "none" : (share.hanoi === "approved" ? "approved" : "pending"),
-            };
-            void withPending;
-            setShare(finalState);
+              hanoi: finalHanoi,
+              sharedAt: newSharedAt,
+            });
             setShareOpen(false);
           }}
         />
@@ -561,9 +566,10 @@ function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterS
           state={share}
           onShareOne={(key) => {
             setShare((prev) => {
-              if (key === "community") return { ...prev, community: true };
-              if (key === "internal") return { ...prev, internal: true };
-              return { ...prev, hanoi: "pending" };
+              const now = Date.now();
+              if (key === "community") return { ...prev, community: true, sharedAt: { ...prev.sharedAt, community: now } };
+              if (key === "internal") return { ...prev, internal: true, sharedAt: { ...prev.sharedAt, internal: now } };
+              return { ...prev, hanoi: "pending", sharedAt: { ...prev.sharedAt, hanoi: now } };
             });
           }}
           onClose={() => setStatusOpen(false)}
