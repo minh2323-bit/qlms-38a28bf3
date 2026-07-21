@@ -1,13 +1,16 @@
 import { useMemo, useState } from "react";
 import {
   Video, PlayCircle, Presentation, FileText, Type, Music, FileBox, Code2,
-  X, Upload, Plus, Trash2, Eye,
+  X, Upload, Plus, Trash2, Eye, ChevronDown, Pencil, ArrowUpDown,
   ListChecks, MoveHorizontal, GripVertical, PenLine, ArrowLeftRight, Type as TypeIcon,
-  CheckSquare, ToggleLeft, MessageSquare,
+  CheckSquare, ToggleLeft, MessageSquare, Library,
 } from "lucide-react";
 import {
-  DropdownMenuItem,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover, PopoverTrigger, PopoverContent,
+} from "@/components/ui/popover";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -15,6 +18,54 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 import { toast } from "sonner";
+
+const ASSIGN_CLASS_OPTIONS = [
+  "Lớp Toán 4A - Cô Hoa",
+  "Lớp Toán 4B - Cô Hoa",
+  "Lớp Tiếng Việt 4A - Cô Lan",
+  "Lớp bổ túc Toán 4",
+  "Lớp ôn thi HSG Tiếng Anh",
+];
+
+function LopGanSelect({
+  value, onChange,
+}: { value: Set<string>; onChange: (v: Set<string>) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300"
+        >
+          <span className={value.size ? "text-slate-700 truncate" : "text-slate-400"}>
+            {value.size ? Array.from(value).join(", ") : "Chọn lớp học để gán học liệu"}
+          </span>
+          <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+        <ul className="max-h-64 overflow-auto">
+          {ASSIGN_CLASS_OPTIONS.map((c) => (
+            <li key={c}>
+              <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                <Checkbox
+                  checked={value.has(c)}
+                  onCheckedChange={() => {
+                    const nxt = new Set(value);
+                    if (nxt.has(c)) nxt.delete(c); else nxt.add(c);
+                    onChange(nxt);
+                  }}
+                />
+                <span className="text-sm text-slate-700">{c}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 /* ============= Ordered list of material types (SHARED) ============= */
 
