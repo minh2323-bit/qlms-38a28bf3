@@ -545,7 +545,8 @@ function GenericForm({
   const [scale, setScale] = useState(10);
 
   const needsSource = type !== "text";
-  const supportsCompletion = type === "slide" || type === "doc" || type === "audio";
+  const supportsCompletion = type === "slide" || type === "doc" || type === "audio" || type === "text";
+  const textLessons = KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [];
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
@@ -574,6 +575,37 @@ function GenericForm({
             </Field>
             <Field label="Lớp gán">
               <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            <Field label="Khối" required>
+              <SelectInput defaultValue="Lớp 4">
+                <option>Lớp 3</option>
+                <option>Lớp 4</option>
+                <option>Lớp 5</option>
+              </SelectInput>
+            </Field>
+            <Field label="Môn" required>
+              <SelectInput defaultValue="Toán">
+                <option>Toán</option>
+                <option>Tiếng Việt</option>
+              </SelectInput>
+            </Field>
+            <Field label="Chương/Chủ đề">
+              <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
+                <option value="">— Chọn chương/chủ đề —</option>
+                {KNOWLEDGE_TREE.map((c) => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Bài học">
+              <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
+                <option value="">— Chọn bài học —</option>
+                {textLessons.map((u) => (
+                  <option key={u.id} value={u.id}>{u.title}</option>
+                ))}
+              </SelectInput>
             </Field>
           </div>
           <Field label="Nội dung">

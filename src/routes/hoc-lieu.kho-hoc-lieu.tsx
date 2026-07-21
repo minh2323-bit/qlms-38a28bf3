@@ -1,14 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Search, ChevronDown, Plus, Building2, Globe2,
   FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type, Presentation,
-  MoreVertical, Pencil, Trash2, FileSpreadsheet, X,
+  MoreVertical, Pencil, Trash2, FileSpreadsheet, X, CheckSquare, Share2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  ShareLessonModal, ShareStatusModal, emptyShareState, isShared,
+  type ShareState,
+} from "@/components/ShareModals";
+import { toast } from "sonner";
 import {
   AddMaterialMenuItems, MATERIAL_TYPE_LIST, type MaterialTypeKey,
 } from "@/components/AddMaterialFlow";
@@ -89,11 +94,47 @@ function KhoHocLieuPage() {
   const [mon, setMon] = useState("");
   const [chuDe, setChuDe] = useState("");
   const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
+  const [materials, setMaterials] = useState<Material[]>(MATERIALS);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [shares, setShares] = useState<Record<string, ShareState>>(() => {
+    const seed: Record<string, ShareState> = {};
+    MATERIALS.forEach((m, idx) => {
+      const mod = idx % 5;
+      const t = (h: number) => Date.now() - h * 3600_000;
+      if (mod === 1) seed[m.id] = { community: false, internal: true, hanoi: "none", sharedAt: { internal: t(2) } };
+      else if (mod === 2) seed[m.id] = { community: true, internal: true, hanoi: "pending", sharedAt: { community: t(1), internal: t(3), hanoi: t(0) } };
+      else if (mod === 3) seed[m.id] = { community: true, internal: false, hanoi: "rejected", sharedAt: { community: t(2) } };
+      else if (mod === 4) seed[m.id] = { community: true, internal: true, hanoi: "approved", sharedAt: { community: t(4), internal: t(6), hanoi: t(2) } };
+      else seed[m.id] = { ...emptyShareState };
+    });
+    return seed;
+  });
+  const [shareOne, setShareOne] = useState<Material | null>(null);
+  const [shareStatus, setShareStatus] = useState<Material | null>(null);
+  const [bulkShareOpen, setBulkShareOpen] = useState(false);
+
+  const doShare = (ids: string[], next: { community: boolean; internal: boolean; hanoi: "none" | "pending" | "approved" }) => {
+    setShares((prev) => {
+      const nxt = { ...prev };
+      for (const id of ids) {
+        const cur = nxt[id] ?? { ...emptyShareState };
+        const sharedAt = { ...cur.sharedAt };
+        const now = Date.now();
+        if (next.community && !cur.community) sharedAt.community = now;
+        if (next.internal && !cur.internal) sharedAt.internal = now;
+        if (next.hanoi !== "none" && cur.hanoi === "none") sharedAt.hanoi = now;
+        nxt[id] = { community: next.community || cur.community, internal: next.internal || cur.internal, hanoi: next.hanoi !== "none" ? next.hanoi : cur.hanoi, sharedAt };
+      }
+      return nxt;
+    });
+    toast.success(`Đã chia sẻ ${ids.length} học liệu`);
+  };
 
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
   const chuongOptions = khoi && mon ? CHUONG_BY_MON[`${khoi}-${mon}`] ?? [] : [];
 
-  const filtered = MATERIALS.filter((m) => {
+  const filtered = materials.filter((m) => {
     if (search && !m.ten.toLowerCase().includes(search.toLowerCase())) return false;
     if (loai && m.loai !== loai) return false;
     if (khoi && m.khoi !== khoi) return false;
@@ -102,12 +143,38 @@ function KhoHocLieuPage() {
     return true;
   });
 
+  const allSelected = filtered.length > 0 && filtered.every((m) => selected.has(m.id));
+
   const goAdd = (k: MaterialTypeKey) =>
     navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: k } });
   const goEdit = (m: Material) => {
     const key = MATERIAL_TYPE_LIST.find((t) => t.label === m.loai)?.key ?? "doc";
     navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: key } });
   };
+
+  const enterSelect = (id?: string) => {
+    setSelectMode(true);
+    if (id) setSelected(new Set([id]));
+  };
+  const exitSelect = () => { setSelectMode(false); setSelected(new Set()); };
+  const toggleOne = (id: string) => {
+    setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  };
+  const toggleAll = () => {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(filtered.map((m) => m.id)));
+  };
+  const removeOne = (id: string) => {
+    setMaterials((s) => s.filter((m) => m.id !== id));
+    toast.success("Đã xóa học liệu");
+  };
+  const bulkDelete = () => {
+    setMaterials((s) => s.filter((m) => !selected.has(m.id)));
+    toast.success(`Đã xóa ${selected.size} học liệu`);
+    exitSelect();
+  };
+
+
 
   return (
     <AppShell>
@@ -182,7 +249,34 @@ function KhoHocLieuPage() {
         <section className="mt-4">
           <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
             {/* Table toolbar */}
-            <div className="flex items-center justify-end gap-2 px-4 py-2.5 border-b bg-slate-50">
+            <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b bg-slate-50">
+              <div className="flex items-center gap-2">
+                {selectMode ? (
+                  <>
+                    <span className="text-xs font-semibold text-slate-700">Đã chọn <b>{selected.size}</b></span>
+                    <button
+                      disabled={selected.size === 0}
+                      onClick={bulkDelete}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Xóa
+                    </button>
+                    <button
+                      disabled={selected.size === 0}
+                      onClick={() => setBulkShareOpen(true)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 disabled:opacity-50"
+                    >
+                      <Share2 className="h-3.5 w-3.5" /> Chia sẻ
+                    </button>
+                    <button
+                      onClick={exitSelect}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                    >
+                      Hủy chọn
+                    </button>
+                  </>
+                ) : <span />}
+              </div>
               <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
                 <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất excel
               </button>
@@ -192,6 +286,11 @@ function KhoHocLieuPage() {
 
               <thead>
                 <tr className="bg-indigo-700 text-white text-left">
+                  {selectMode && (
+                    <th className="px-3 py-3 w-10 text-center">
+                      <input type="checkbox" checked={allSelected} onChange={toggleAll} className="h-4 w-4 accent-white" />
+                    </th>
+                  )}
                   <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Tên học liệu</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Khối</th>
@@ -210,6 +309,11 @@ function KhoHocLieuPage() {
                   const Icon = meta.icon;
                   return (
                     <tr key={m.id} className={`border-t border-slate-200 align-top ${i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
+                      {selectMode && (
+                        <td className="px-3 py-3 text-center">
+                          <input type="checkbox" checked={selected.has(m.id)} onChange={() => toggleOne(m.id)} className="h-4 w-4 accent-indigo-600" />
+                        </td>
+                      )}
                       <td className="px-3 py-3 text-center text-slate-700 font-semibold">{i + 1}</td>
                       <td className="px-4 py-3">
                         <button
@@ -218,6 +322,15 @@ function KhoHocLieuPage() {
                         >
                           {m.ten}
                         </button>
+                        {isShared(shares[m.id] ?? emptyShareState) && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {shares[m.id]?.community && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">Cộng đồng</span>}
+                            {shares[m.id]?.internal && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">Nội bộ</span>}
+                            {shares[m.id]?.hanoi === "approved" && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Hanoi Study</span>}
+                            {shares[m.id]?.hanoi === "pending" && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Chờ Sở duyệt</span>}
+                            {shares[m.id]?.hanoi === "rejected" && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">Sở từ chối</span>}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-slate-700 whitespace-nowrap font-medium">{m.khoi}</td>
                       <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.mon}</td>
@@ -257,11 +370,20 @@ function KhoHocLieuPage() {
                             <DropdownMenuItem className="cursor-pointer" onClick={() => goEdit(m)}>
                               <Pencil className="h-4 w-4 mr-2 text-indigo-600" /> Chỉnh sửa
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer text-rose-600">
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() => isShared(shares[m.id] ?? emptyShareState) ? setShareStatus(m) : setShareOne(m)}
+                            >
+                              <Share2 className="h-4 w-4 mr-2 text-sky-600" />
+                              {isShared(shares[m.id] ?? emptyShareState) ? "Theo dõi trạng thái chia sẻ" : "Chia sẻ"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => enterSelect(m.id)}>
+                              <CheckSquare className="h-4 w-4 mr-2 text-indigo-600" /> Chọn nhiều
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer text-rose-600" onClick={() => removeOne(m.id)}>
                               <Trash2 className="h-4 w-4 mr-2" /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
-
                         </DropdownMenu>
                       </td>
                     </tr>
@@ -269,7 +391,7 @@ function KhoHocLieuPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="px-4 py-10 text-center text-slate-500 text-sm">
+                    <td colSpan={selectMode ? 11 : 10} className="px-4 py-10 text-center text-slate-500 text-sm">
                       Không tìm thấy học liệu phù hợp với bộ lọc.
                     </td>
                   </tr>
@@ -282,6 +404,41 @@ function KhoHocLieuPage() {
 
         {viewMaterial && (
           <MaterialViewerModal material={viewMaterial} onClose={() => setViewMaterial(null)} />
+        )}
+
+        {shareOne && (
+          <ShareLessonModal
+            title={shareOne.ten}
+            entityLabel="học liệu"
+            initial={shares[shareOne.id] ?? emptyShareState}
+            onClose={() => setShareOne(null)}
+            onSubmit={(next) => { doShare([shareOne.id], next); setShareOne(null); }}
+          />
+        )}
+        {shareStatus && (
+          <ShareStatusModal
+            title={shareStatus.ten}
+            entityLabel="học liệu"
+            state={shares[shareStatus.id] ?? emptyShareState}
+            onShareOne={(k) => {
+              const cur = shares[shareStatus.id] ?? emptyShareState;
+              doShare([shareStatus.id], {
+                community: k === "community" ? true : cur.community,
+                internal: k === "internal" ? true : cur.internal,
+                hanoi: k === "hanoi" ? "pending" : (cur.hanoi === "rejected" ? "none" : cur.hanoi === "pending" || cur.hanoi === "approved" ? cur.hanoi : "none"),
+              });
+            }}
+            onClose={() => setShareStatus(null)}
+          />
+        )}
+        {bulkShareOpen && (
+          <ShareLessonModal
+            title={`${selected.size} học liệu đã chọn`}
+            entityLabel="học liệu"
+            initial={emptyShareState}
+            onClose={() => setBulkShareOpen(false)}
+            onSubmit={(next) => { doShare(Array.from(selected), next); setBulkShareOpen(false); exitSelect(); }}
+          />
         )}
       </>
     </AppShell>
