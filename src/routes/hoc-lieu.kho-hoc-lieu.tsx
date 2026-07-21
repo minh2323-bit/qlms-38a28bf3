@@ -94,6 +94,42 @@ function KhoHocLieuPage() {
   const [mon, setMon] = useState("");
   const [chuDe, setChuDe] = useState("");
   const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
+  const [materials, setMaterials] = useState<Material[]>(MATERIALS);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [shares, setShares] = useState<Record<string, ShareState>>(() => {
+    const seed: Record<string, ShareState> = {};
+    MATERIALS.forEach((m, idx) => {
+      const mod = idx % 5;
+      const t = (h: number) => Date.now() - h * 3600_000;
+      if (mod === 1) seed[m.id] = { community: false, internal: true, hanoi: "none", sharedAt: { internal: t(2) } };
+      else if (mod === 2) seed[m.id] = { community: true, internal: true, hanoi: "pending", sharedAt: { community: t(1), internal: t(3), hanoi: t(0) } };
+      else if (mod === 3) seed[m.id] = { community: true, internal: false, hanoi: "rejected", sharedAt: { community: t(2) } };
+      else if (mod === 4) seed[m.id] = { community: true, internal: true, hanoi: "approved", sharedAt: { community: t(4), internal: t(6), hanoi: t(2) } };
+      else seed[m.id] = { ...emptyShareState };
+    });
+    return seed;
+  });
+  const [shareOne, setShareOne] = useState<Material | null>(null);
+  const [shareStatus, setShareStatus] = useState<Material | null>(null);
+  const [bulkShareOpen, setBulkShareOpen] = useState(false);
+
+  const doShare = (ids: string[], next: { community: boolean; internal: boolean; hanoi: "none" | "pending" | "approved" }) => {
+    setShares((prev) => {
+      const nxt = { ...prev };
+      for (const id of ids) {
+        const cur = nxt[id] ?? { ...emptyShareState };
+        const sharedAt = { ...cur.sharedAt };
+        const now = Date.now();
+        if (next.community && !cur.community) sharedAt.community = now;
+        if (next.internal && !cur.internal) sharedAt.internal = now;
+        if (next.hanoi !== "none" && cur.hanoi === "none") sharedAt.hanoi = now;
+        nxt[id] = { community: next.community || cur.community, internal: next.internal || cur.internal, hanoi: next.hanoi !== "none" ? next.hanoi : cur.hanoi, sharedAt };
+      }
+      return nxt;
+    });
+    toast.success(`Đã chia sẻ ${ids.length} học liệu`);
+  };
 
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
   const chuongOptions = khoi && mon ? CHUONG_BY_MON[`${khoi}-${mon}`] ?? [] : [];
