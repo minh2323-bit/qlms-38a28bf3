@@ -163,17 +163,7 @@ function KhoHocLieuPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {MATERIAL_TYPES.map((t, i) => {
-                  const meta = TYPE_META[t];
-                  const Icon = meta.icon;
-                  return (
-                    <DropdownMenuItem key={t} className="cursor-pointer gap-2">
-                      <span className="text-slate-400 text-xs w-4">{i + 1}.</span>
-                      <Icon className={`h-4 w-4 ${meta.color}`} />
-                      <span>{t}</span>
-                    </DropdownMenuItem>
-                  );
-                })}
+                <AddMaterialMenuItems onSelect={(k) => setAddType(k)} />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
