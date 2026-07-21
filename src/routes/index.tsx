@@ -1396,6 +1396,8 @@ function LessonPanel({
   const [libraryPickerOpen, setLibraryPickerOpen] = useState(false);
   const [materialSourceOpen, setMaterialSourceOpen] = useState(false);
   const [materialLibraryOpen, setMaterialLibraryOpen] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
+  const [reminderText, setReminderText] = useState("");
 
   // ClassInfo synth cho các popup dùng chung với Lớp học số
   const classInfoForModal: ClassInfo = useMemo(() => ({
