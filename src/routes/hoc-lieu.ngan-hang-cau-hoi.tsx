@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Plus, Trash2, Share2, Search, Pencil, X, ChevronDown,
+  Plus, Trash2, Share2, Search, Pencil, X, ChevronDown, MoreHorizontal, Copy,
   CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2, ToggleLeft,
+  Clock3, CheckCircle2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
@@ -36,6 +38,7 @@ export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
 
 type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match";
 type Level = "Nhận biết" | "Thông hiểu" | "Vận dụng" | "Vận dụng cao";
+type ShareStatus = "none" | "pending" | "approved";
 
 type Answer = { text: string; correct: boolean };
 type TFItem = { text: string; correct: boolean };
@@ -49,6 +52,8 @@ type Question = {
   grade?: string;
   subject?: string;
   chapter?: string;
+  lesson?: string;
+  shareStatus?: ShareStatus;
   answers?: Answer[];
   tfTitle?: string;
   tfItems?: TFItem[];
@@ -65,12 +70,24 @@ const TYPE_LABEL: Record<QType, string> = {
 };
 
 const LEVELS: Level[] = ["Nhận biết", "Thông hiểu", "Vận dụng", "Vận dụng cao"];
+const GRADES = ["1", "2", "3", "4", "5"];
+const SUBJECTS = ["Toán", "Tiếng Việt", "Tiếng Anh", "Tự nhiên và Xã hội", "Đạo đức"];
+const REVIEWER_NAME = "Cô Nguyễn Thị Mai (Tổ trưởng tổ Toán)";
+
+/** Look up chapter/lesson labels from KNOWLEDGE_TREE */
+function chapterTitle(id?: string) {
+  return KNOWLEDGE_TREE.find((c) => c.id === id)?.title ?? "";
+}
+function lessonTitle(chapId?: string, lesId?: string) {
+  const ch = KNOWLEDGE_TREE.find((c) => c.id === chapId);
+  return ch?.units.find((u) => u.id === lesId)?.title ?? "";
+}
 
 const SEED: Question[] = [
   {
     id: "q1", content: "Số nào lớn nhất trong các số sau: 3 210, 3 120, 3 201, 3 102?",
     type: "single", level: "Nhận biết", source: "Phùng Thúy Hằng", updatedAt: "12/06/2026",
-    grade: "4", subject: "Toán", chapter: "ch1",
+    grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b1", shareStatus: "approved",
     answers: [
       { text: "3 210", correct: true },
       { text: "3 120", correct: false },
@@ -81,7 +98,7 @@ const SEED: Question[] = [
   {
     id: "q2", content: "Chọn các phân số bằng 1/2:",
     type: "multiple", level: "Thông hiểu", source: "Kho nội bộ · Nguyễn Văn A", updatedAt: "20/05/2026",
-    grade: "4", subject: "Toán",
+    grade: "4", subject: "Toán", chapter: "t4-ch3", lesson: "t4-b11", shareStatus: "pending",
     answers: [
       { text: "2/4", correct: true }, { text: "3/6", correct: true },
       { text: "2/3", correct: false }, { text: "5/10", correct: true },
@@ -90,12 +107,12 @@ const SEED: Question[] = [
   {
     id: "q3", content: "Trình bày cách tìm hai số khi biết tổng và hiệu của chúng.",
     type: "essay", level: "Vận dụng", source: "Phùng Thúy Hằng", updatedAt: "02/06/2026",
-    grade: "4", subject: "Toán",
+    grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b5", shareStatus: "none",
   },
   {
     id: "q4", content: "Các phát biểu sau đúng hay sai?",
     type: "truefalse", level: "Nhận biết", source: "Phùng Thúy Hằng", updatedAt: "28/06/2026",
-    grade: "4", subject: "Toán",
+    grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b3", shareStatus: "none",
     tfTitle: "Xét các mệnh đề về số tự nhiên",
     tfItems: [
       { text: "Số 0 là số tự nhiên bé nhất.", correct: true },
@@ -123,26 +140,58 @@ function TypeIcon({ type }: { type: QType }) {
   return map[type];
 }
 
+function ShareStatusTag({ status }: { status: ShareStatus }) {
+  if (status === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+        <Clock3 className="h-3 w-3" /> Chờ duyệt
+      </span>
+    );
+  }
+  if (status === "approved") {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <CheckCircle2 className="h-3 w-3" /> Đã duyệt
+      </span>
+    );
+  }
+  return null;
+}
+
 function NganHangCauHoiPage() {
   const [items, setItems] = useState<Question[]>(SEED);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [keyword, setKeyword] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterLevel, setFilterLevel] = useState<string>("all");
+  const [filterGrade, setFilterGrade] = useState<string>("all");
+  const [filterSubject, setFilterSubject] = useState<string>("all");
+  const [filterChapter, setFilterChapter] = useState<string>("all");
+  const [filterLesson, setFilterLesson] = useState<string>("all");
 
   const [pickType, setPickType] = useState(false);
   const [fromFile, setFromFile] = useState(false);
   const [creating, setCreating] = useState<QType | null>(null);
   const [viewing, setViewing] = useState<Question | null>(null);
+  const [sharing, setSharing] = useState<Question[] | null>(null);
+
+  const filterLessons = useMemo(
+    () => KNOWLEDGE_TREE.find((c) => c.id === filterChapter)?.units ?? [],
+    [filterChapter],
+  );
 
   const filtered = useMemo(() => {
     return items.filter((q) => {
       if (keyword && !q.content.toLowerCase().includes(keyword.toLowerCase())) return false;
       if (filterType !== "all" && q.type !== filterType) return false;
       if (filterLevel !== "all" && q.level !== filterLevel) return false;
+      if (filterGrade !== "all" && q.grade !== filterGrade) return false;
+      if (filterSubject !== "all" && q.subject !== filterSubject) return false;
+      if (filterChapter !== "all" && q.chapter !== filterChapter) return false;
+      if (filterLesson !== "all" && q.lesson !== filterLesson) return false;
       return true;
     });
-  }, [items, keyword, filterType, filterLevel]);
+  }, [items, keyword, filterType, filterLevel, filterGrade, filterSubject, filterChapter, filterLesson]);
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -162,15 +211,31 @@ function NganHangCauHoiPage() {
     setSelected(new Set());
     toast.success("Đã xóa câu hỏi đã chọn");
   };
-  const shareSelected = () => {
+  const openShareSelected = () => {
     if (selected.size === 0) return toast.error("Chưa chọn câu hỏi nào");
-    toast.success(`Đã chia sẻ ${selected.size} câu hỏi lên kho nội bộ`);
+    setSharing(items.filter((q) => selected.has(q.id)));
   };
 
   const handleCreated = (q: Question) => {
     setItems((prev) => [q, ...prev]);
     setCreating(null);
     toast.success("Đã thêm câu hỏi mới");
+  };
+  const duplicateOne = (q: Question) => {
+    const clone: Question = { ...q, id: `q_${Date.now()}`, updatedAt: today(), shareStatus: "none", content: `${q.content} (bản sao)` };
+    setItems((prev) => [clone, ...prev]);
+    toast.success("Đã nhân bản câu hỏi");
+  };
+  const removeOne = (id: string) => {
+    setItems((prev) => prev.filter((q) => q.id !== id));
+    toast.success("Đã xóa câu hỏi");
+  };
+
+  const confirmShare = (ids: string[]) => {
+    setItems((prev) => prev.map((q) => ids.includes(q.id) ? { ...q, shareStatus: "pending" } : q));
+    setSharing(null);
+    setSelected(new Set());
+    toast.success(`Đã gửi ${ids.length} câu hỏi chờ tổ trưởng duyệt`);
   };
 
   return (
@@ -186,7 +251,7 @@ function NganHangCauHoiPage() {
             <Button variant="outline" onClick={removeSelected} className="gap-1.5">
               <Trash2 className="h-4 w-4" /> Xóa
             </Button>
-            <Button variant="outline" onClick={shareSelected} className="gap-1.5">
+            <Button variant="outline" onClick={openShareSelected} className="gap-1.5">
               <Share2 className="h-4 w-4" /> Chia sẻ
             </Button>
             <DropdownMenu>
@@ -211,8 +276,8 @@ function NganHangCauHoiPage() {
           </div>
         </div>
 
-        {/* Filter */}
-        <div className="p-4 flex flex-wrap items-center gap-3 border-b bg-slate-50/60">
+        {/* Filter row 1: search + type + level */}
+        <div className="px-4 pt-4 flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[220px] max-w-md">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
@@ -243,8 +308,40 @@ function NganHangCauHoiPage() {
           </div>
         </div>
 
+        {/* Filter row 2: khối / môn / chủ đề / bài học */}
+        <div className="p-4 flex flex-wrap items-center gap-3 border-b bg-slate-50/60">
+          <Select value={filterGrade} onValueChange={setFilterGrade}>
+            <SelectTrigger className="w-36 bg-white"><SelectValue placeholder="Khối" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả khối</SelectItem>
+              {GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={filterSubject} onValueChange={setFilterSubject}>
+            <SelectTrigger className="w-44 bg-white"><SelectValue placeholder="Môn" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả môn</SelectItem>
+              {SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={filterChapter} onValueChange={(v) => { setFilterChapter(v); setFilterLesson("all"); }}>
+            <SelectTrigger className="w-64 bg-white"><SelectValue placeholder="Chủ đề" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả chủ đề</SelectItem>
+              {KNOWLEDGE_TREE.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={filterLesson} onValueChange={setFilterLesson} disabled={filterChapter === "all"}>
+            <SelectTrigger className="w-64 bg-white"><SelectValue placeholder="Bài học" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả bài học</SelectItem>
+              {filterLessons.map((u) => <SelectItem key={u.id} value={u.id}>{u.title}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Table */}
-        <div className="p-2">
+        <div className="p-2 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
@@ -255,27 +352,46 @@ function NganHangCauHoiPage() {
                     onCheckedChange={toggleAll}
                   />
                 </TableHead>
-                <TableHead>Câu hỏi</TableHead>
-                <TableHead className="w-52">Loại câu hỏi</TableHead>
-                <TableHead className="w-40">Mức độ nhận thức</TableHead>
-                <TableHead className="w-48">Nguồn</TableHead>
-                <TableHead className="w-36">Ngày cập nhật cuối</TableHead>
+                <TableHead className="min-w-[260px]">Câu hỏi</TableHead>
+                <TableHead className="w-20 text-center">Khối</TableHead>
+                <TableHead className="w-28">Môn</TableHead>
+                <TableHead className="min-w-[220px]">Chủ đề &amp; Bài học</TableHead>
+                <TableHead className="w-48">Loại câu hỏi</TableHead>
+                <TableHead className="w-36">Mức độ</TableHead>
+                <TableHead className="w-44">Nguồn</TableHead>
+                <TableHead className="w-32">Cập nhật</TableHead>
+                <TableHead className="w-16 text-center"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((q, i) => (
-                <TableRow key={q.id} className="hover:bg-indigo-50/40">
+                <TableRow key={q.id} className="hover:bg-indigo-50/40 align-top">
                   <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
                   <TableCell>
                     <Checkbox checked={selected.has(q.id)} onCheckedChange={() => toggle(q.id)} />
                   </TableCell>
                   <TableCell>
-                    <button
-                      onClick={() => setViewing(q)}
-                      className="text-left text-slate-800 hover:text-indigo-700 hover:underline line-clamp-2 cursor-pointer"
-                    >
-                      {q.content}
-                    </button>
+                    <div className="flex items-start gap-2">
+                      <button
+                        onClick={() => setViewing(q)}
+                        className="text-left text-slate-800 hover:text-indigo-700 hover:underline line-clamp-2 cursor-pointer"
+                      >
+                        {q.content}
+                      </button>
+                      {q.shareStatus && q.shareStatus !== "none" && (
+                        <ShareStatusTag status={q.shareStatus} />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center text-sm text-slate-700">{q.grade ? `Khối ${q.grade}` : "—"}</TableCell>
+                  <TableCell className="text-sm text-slate-700">{q.subject ?? "—"}</TableCell>
+                  <TableCell className="text-sm text-slate-700">
+                    {q.chapter ? (
+                      <div className="space-y-0.5">
+                        <div className="font-medium text-slate-800 text-xs leading-snug">{chapterTitle(q.chapter)}</div>
+                        {q.lesson && <div className="text-xs text-slate-500 leading-snug">{lessonTitle(q.chapter, q.lesson)}</div>}
+                      </div>
+                    ) : "—"}
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center gap-1.5 text-sm text-slate-700">
@@ -289,11 +405,32 @@ function NganHangCauHoiPage() {
                   </TableCell>
                   <TableCell className="text-sm text-slate-600">{q.source}</TableCell>
                   <TableCell className="text-sm text-slate-600">{q.updatedAt}</TableCell>
+                  <TableCell className="text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="h-8 w-8 rounded-md hover:bg-slate-100 text-slate-500 inline-flex items-center justify-center">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => setSharing([q])} className="gap-2">
+                          <Share2 className="h-4 w-4" /> Chia sẻ
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => duplicateOne(q)} className="gap-2">
+                          <Copy className="h-4 w-4" /> Nhân bản
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => removeOne(q.id)} className="gap-2 text-rose-600 focus:text-rose-700">
+                          <Trash2 className="h-4 w-4" /> Xóa
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-sm text-slate-500 py-10">
+                  <TableCell colSpan={11} className="text-center text-sm text-slate-500 py-10">
                     Không có câu hỏi phù hợp.
                   </TableCell>
                 </TableRow>
@@ -313,12 +450,21 @@ function NganHangCauHoiPage() {
       {/* From file modal */}
       <FromFileModal open={fromFile} onClose={() => setFromFile(false)} />
 
-      {/* Create modal (single/multiple/truefalse and others fallback single form) */}
+      {/* Create modal */}
       {creating && (
         <CreateQuestionModal
           type={creating}
           onClose={() => setCreating(null)}
           onSave={handleCreated}
+        />
+      )}
+
+      {/* Share confirmation modal */}
+      {sharing && (
+        <ShareQuestionModal
+          questions={sharing}
+          onClose={() => setSharing(null)}
+          onConfirm={confirmShare}
         />
       )}
 
@@ -334,7 +480,7 @@ function NganHangCauHoiPage() {
   );
 }
 
-/* ─────────────────  Pick type modal (ảnh 1)  ───────────────── */
+/* ─────────────────  Pick type modal  ───────────────── */
 function PickTypeModal({
   open, onClose, onPick,
 }: { open: boolean; onClose: () => void; onPick: (t: QType) => void }) {
@@ -373,7 +519,7 @@ function PickTypeModal({
   );
 }
 
-/* ─────────────────  From file modal (ảnh 2)  ───────────────── */
+/* ─────────────────  From file modal  ───────────────── */
 function FromFileModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -406,24 +552,58 @@ function FromFileModal({ open, onClose }: { open: boolean; onClose: () => void }
   );
 }
 
-/* ─────────────────  Create question modal (ảnh 3)  ───────────────── */
+/* ─────────────────  Share question modal  ───────────────── */
+function ShareQuestionModal({
+  questions, onClose, onConfirm,
+}: { questions: Question[]; onClose: () => void; onConfirm: (ids: string[]) => void }) {
+  return (
+    <Dialog open onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-indigo-700">Chia sẻ lên Ngân hàng câu hỏi chung của trường</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 text-sm text-slate-700">
+          <p>
+            Bạn xác nhận đề nghị chia sẻ <b>{questions.length}</b> câu hỏi lên Ngân hàng câu hỏi của trường. Các câu hỏi bạn chia sẻ có thể:
+          </p>
+          <ul className="list-disc pl-5 space-y-1 text-slate-600">
+            <li>Được sử dụng bởi các giáo viên khác trong trường</li>
+            <li>Được sử dụng để xây dựng các đề thi cấp trường</li>
+          </ul>
+          <div className="rounded-lg border bg-slate-50 p-3 text-sm">
+            Người duyệt: <span className="font-bold text-slate-900">{REVIEWER_NAME}</span>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Hủy</Button>
+          <Button className="bg-indigo-600 hover:bg-indigo-700" onClick={() => onConfirm(questions.map((q) => q.id))}>Xác nhận</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ─────────────────  Create question modal  ───────────────── */
 function CreateQuestionModal({
   type, onClose, onSave,
 }: { type: QType; onClose: () => void; onSave: (q: Question) => void }) {
   const [grade, setGrade] = useState("4");
   const [subject, setSubject] = useState("Toán");
   const [chapter, setChapter] = useState("");
+  const [lesson, setLesson] = useState("");
   const [level, setLevel] = useState<Level>("Nhận biết");
   const [content, setContent] = useState("");
   const [shuffle, setShuffle] = useState(true);
 
-  // multiple-choice answers
+  const lessons = useMemo(
+    () => KNOWLEDGE_TREE.find((c) => c.id === chapter)?.units ?? [],
+    [chapter],
+  );
+
   const [answers, setAnswers] = useState<Answer[]>([
     { text: "", correct: false }, { text: "", correct: false },
     { text: "", correct: false }, { text: "", correct: false },
   ]);
-
-  // true/false
   const [tfTitle, setTfTitle] = useState("");
   const [tfItems, setTfItems] = useState<TFItem[]>([
     { text: "", correct: true },
@@ -439,7 +619,6 @@ function CreateQuestionModal({
   const setAnswer = (idx: number, patch: Partial<Answer>) => {
     setAnswers((prev) => prev.map((a, i) => {
       if (i !== idx) {
-        // radio behavior for single: uncheck others
         if (isSingle && patch.correct === true) return { ...a, correct: false };
         return a;
       }
@@ -456,6 +635,7 @@ function CreateQuestionModal({
 
   const submit = () => {
     if (!grade || !subject) return toast.error("Vui lòng chọn Khối và Môn học");
+    if (!chapter) return toast.error("Vui lòng chọn Chương học");
     if (isTF && !tfTitle.trim()) return toast.error("Nhập tiêu đề nhóm câu hỏi Đúng - Sai");
     if (!isTF && !content.trim()) return toast.error("Nhập nội dung câu hỏi");
     if (isChoice && answers.filter((a) => a.text.trim()).length < 2) {
@@ -472,7 +652,8 @@ function CreateQuestionModal({
       level,
       source: "Phùng Thúy Hằng",
       updatedAt: today(),
-      grade, subject, chapter,
+      grade, subject, chapter, lesson,
+      shareStatus: "none",
       answers: isChoice ? answers.filter((a) => a.text.trim()) : undefined,
       tfTitle: isTF ? tfTitle : undefined,
       tfItems: isTF ? tfItems.filter((t) => t.text.trim()) : undefined,
@@ -495,7 +676,7 @@ function CreateQuestionModal({
               <Select value={grade} onValueChange={setGrade}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {["1","2","3","4","5"].map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}
+                  {GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -504,7 +685,7 @@ function CreateQuestionModal({
               <Select value={subject} onValueChange={setSubject}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {["Toán","Tiếng Việt","Tiếng Anh","Tự nhiên và Xã hội","Đạo đức"].map((s) => (
+                  {SUBJECTS.map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
                 </SelectContent>
@@ -512,13 +693,23 @@ function CreateQuestionModal({
             </div>
             <div>
               <Label className="text-sm">Chương học <span className="text-rose-500">*</span></Label>
-              <Select value={chapter} onValueChange={setChapter}>
+              <Select value={chapter} onValueChange={(v) => { setChapter(v); setLesson(""); }}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn chương" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ch1">Số và Phép tính – Số tự nhiên</SelectItem>
-                  <SelectItem value="ch2">Số và Phép tính – Phân số</SelectItem>
-                  <SelectItem value="ch3">Hình học và Đo lường</SelectItem>
-                  <SelectItem value="ch4">Một số yếu tố Thống kê</SelectItem>
+                  {KNOWLEDGE_TREE.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Bài học</Label>
+              <Select value={lesson} onValueChange={setLesson} disabled={!chapter}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder={chapter ? "Chọn bài học" : "Chọn chương trước"} /></SelectTrigger>
+                <SelectContent>
+                  {lessons.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>{u.title}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -537,7 +728,6 @@ function CreateQuestionModal({
 
           {/* Right column */}
           <div className="col-span-8 space-y-4">
-            {/* Level tabs */}
             <div>
               <div className="flex items-center justify-between">
                 <Label className="text-sm">
@@ -574,7 +764,6 @@ function CreateQuestionModal({
               )}
             </div>
 
-            {/* Answers area */}
             {isChoice && (
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -706,7 +895,16 @@ function ViewQuestionModal({
             <span className="px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border">
               Nguồn: {question.source}
             </span>
+            {question.shareStatus && question.shareStatus !== "none" && (
+              <ShareStatusTag status={question.shareStatus} />
+            )}
           </div>
+          {(question.chapter || question.lesson) && (
+            <div className="text-xs text-slate-600">
+              <span className="font-semibold text-slate-700">{chapterTitle(question.chapter)}</span>
+              {question.lesson && <span> · {lessonTitle(question.chapter, question.lesson)}</span>}
+            </div>
+          )}
           <div className="rounded-lg bg-slate-50 border p-3 text-sm text-slate-800 whitespace-pre-line">
             {question.content}
           </div>
