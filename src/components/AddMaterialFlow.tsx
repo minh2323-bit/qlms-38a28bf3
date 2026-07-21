@@ -221,12 +221,14 @@ function TimeMaskInput({ value, onChange, className }: {
 function CommonMaterialFields({
   ten, setTen, uploadMode, setUploadMode, source, setSource,
   chapterId, setChapterId, lessonId, setLessonId,
+  assignedClasses, setAssignedClasses,
 }: {
   ten: string; setTen: (v: string) => void;
   uploadMode: string; setUploadMode: (v: string) => void;
   source: string; setSource: (v: string) => void;
   chapterId: string; setChapterId: (v: string) => void;
   lessonId: string; setLessonId: (v: string) => void;
+  assignedClasses: Set<string>; setAssignedClasses: (v: Set<string>) => void;
 }) {
   const lessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [],
@@ -239,7 +241,7 @@ function CommonMaterialFields({
           <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
         </Field>
         <Field label="Lớp gán">
-          <TextInput placeholder="VD: Lớp 4A – Toán" />
+          <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
         </Field>
       </div>
       <div className="grid grid-cols-4 gap-3">
