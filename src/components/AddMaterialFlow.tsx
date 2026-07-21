@@ -537,8 +537,14 @@ function GenericForm({
   const [source, setSource] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [lessonId, setLessonId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [completion, setCompletion] = useState<CompletionMode>("manual");
+  const [questions, setQuestions] = useState<SavedQuestion[]>([]);
+  const [addQOpen, setAddQOpen] = useState<null | string>(null);
+  const [scale, setScale] = useState(10);
 
   const needsSource = type !== "text";
+  const supportsCompletion = type === "slide" || type === "doc" || type === "audio";
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
@@ -557,6 +563,7 @@ function GenericForm({
           source={source} setSource={setSource}
           chapterId={chapterId} setChapterId={setChapterId}
           lessonId={lessonId} setLessonId={setLessonId}
+          assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
         />
       ) : (
         <>
@@ -564,7 +571,9 @@ function GenericForm({
             <Field label="Tên học liệu" required>
               <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
             </Field>
-            <Field label="Lớp gán"><TextInput /></Field>
+            <Field label="Lớp gán">
+              <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+            </Field>
           </div>
           <Field label="Nội dung">
             <textarea
@@ -574,10 +583,55 @@ function GenericForm({
           </Field>
         </>
       )}
+
+      {supportsCompletion && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Cách tính hoàn thành">
+              <SelectInput
+                value={completion}
+                onChange={(e) => setCompletion(e.target.value as CompletionMode)}
+              >
+                {COMPLETION_MODES.filter((c) => c.key !== "time").map((c) => (
+                  <option key={c.key} value={c.key}>{c.label}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            {completion === "question" && (
+              <Field label="Thang điểm">
+                <SelectInput value={String(scale)} onChange={(e) => setScale(Number(e.target.value))}>
+                  {[5, 10, 20, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                </SelectInput>
+              </Field>
+            )}
+          </div>
+          {completion === "question" && (
+            <QuestionTableSection
+              questions={questions}
+              setQuestions={setQuestions}
+              onOpenAdd={(qType) => setAddQOpen(qType)}
+              scale={scale}
+            />
+          )}
+        </>
+      )}
+
       <div className="flex justify-end gap-2 pt-2 border-t">
         <Button variant="outline" size="sm" onClick={onClose}>Hủy</Button>
         <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700" onClick={submit}>Lưu học liệu</Button>
       </div>
+
+      {addQOpen && (
+        <AddQuestionModal
+          type={addQOpen}
+          onClose={() => setAddQOpen(null)}
+          onSaved={(q) => {
+            setQuestions((s) => [...s, q]);
+            setAddQOpen(null);
+            toast.success("Đã thêm câu hỏi");
+          }}
+        />
+      )}
     </div>
   );
 }
