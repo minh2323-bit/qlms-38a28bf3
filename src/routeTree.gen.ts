@@ -38,6 +38,7 @@ import { Route as HocLieuBaiGiangIndexRouteImport } from './routes/hoc-lieu.bai-
 import { Route as LopHocSoClassIdHocSinhRouteImport } from './routes/lop-hoc-so.$classId_.hoc-sinh'
 import { Route as HocSinhLopLopRouteImport } from './routes/hoc-sinh.lop.$lop'
 import { Route as HocSinhBaiGiangLessonSlugRouteImport } from './routes/hoc-sinh.bai-giang.$lessonSlug'
+import { Route as HocLieuThemHocLieuTypeRouteImport } from './routes/hoc-lieu.them-hoc-lieu.$type'
 import { Route as HocLieuBaiGiangTaoMoiRouteImport } from './routes/hoc-lieu.bai-giang.tao-moi'
 import { Route as HocLieuBaiGiangLessonSlugRouteImport } from './routes/hoc-lieu.bai-giang.$lessonSlug'
 import { Route as GiaoBaiTapTaoMoiDeLuyenTapRouteImport } from './routes/giao-bai-tap.tao-moi.de-luyen-tap'
@@ -190,6 +191,11 @@ const HocSinhBaiGiangLessonSlugRoute =
     path: '/bai-giang/$lessonSlug',
     getParentRoute: () => HocSinhRoute,
   } as any)
+const HocLieuThemHocLieuTypeRoute = HocLieuThemHocLieuTypeRouteImport.update({
+  id: '/hoc-lieu/them-hoc-lieu/$type',
+  path: '/hoc-lieu/them-hoc-lieu/$type',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HocLieuBaiGiangTaoMoiRoute = HocLieuBaiGiangTaoMoiRouteImport.update({
   id: '/hoc-lieu/bai-giang/tao-moi',
   path: '/hoc-lieu/bai-giang/tao-moi',
@@ -250,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/giao-bai-tap/tao-moi/de-luyen-tap': typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
   '/hoc-lieu/bai-giang/$lessonSlug': typeof HocLieuBaiGiangLessonSlugRoute
   '/hoc-lieu/bai-giang/tao-moi': typeof HocLieuBaiGiangTaoMoiRoute
+  '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
   '/lop-hoc-so/$classId/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/giao-bai-tap/tao-moi/de-luyen-tap': typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
   '/hoc-lieu/bai-giang/$lessonSlug': typeof HocLieuBaiGiangLessonSlugRoute
   '/hoc-lieu/bai-giang/tao-moi': typeof HocLieuBaiGiangTaoMoiRoute
+  '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
   '/lop-hoc-so/$classId/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/giao-bai-tap/tao-moi/de-luyen-tap': typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
   '/hoc-lieu/bai-giang/$lessonSlug': typeof HocLieuBaiGiangLessonSlugRoute
   '/hoc-lieu/bai-giang/tao-moi': typeof HocLieuBaiGiangTaoMoiRoute
+  '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
   '/lop-hoc-so/$classId_/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
@@ -357,6 +366,7 @@ export interface FileRouteTypes {
     | '/giao-bai-tap/tao-moi/de-luyen-tap'
     | '/hoc-lieu/bai-giang/$lessonSlug'
     | '/hoc-lieu/bai-giang/tao-moi'
+    | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
     | '/lop-hoc-so/$classId/hoc-sinh'
@@ -389,6 +399,7 @@ export interface FileRouteTypes {
     | '/giao-bai-tap/tao-moi/de-luyen-tap'
     | '/hoc-lieu/bai-giang/$lessonSlug'
     | '/hoc-lieu/bai-giang/tao-moi'
+    | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
     | '/lop-hoc-so/$classId/hoc-sinh'
@@ -425,6 +436,7 @@ export interface FileRouteTypes {
     | '/giao-bai-tap/tao-moi/de-luyen-tap'
     | '/hoc-lieu/bai-giang/$lessonSlug'
     | '/hoc-lieu/bai-giang/tao-moi'
+    | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
     | '/lop-hoc-so/$classId_/hoc-sinh'
@@ -444,6 +456,7 @@ export interface RootRouteChildren {
   HocLieuNganHangCauHoiRoute: typeof HocLieuNganHangCauHoiRoute
   HocLieuBaiGiangLessonSlugRoute: typeof HocLieuBaiGiangLessonSlugRoute
   HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
+  HocLieuThemHocLieuTypeRoute: typeof HocLieuThemHocLieuTypeRoute
   HocLieuBaiGiangIndexRoute: typeof HocLieuBaiGiangIndexRoute
 }
 
@@ -652,6 +665,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocSinhBaiGiangLessonSlugRouteImport
       parentRoute: typeof HocSinhRoute
     }
+    '/hoc-lieu/them-hoc-lieu/$type': {
+      id: '/hoc-lieu/them-hoc-lieu/$type'
+      path: '/hoc-lieu/them-hoc-lieu/$type'
+      fullPath: '/hoc-lieu/them-hoc-lieu/$type'
+      preLoaderRoute: typeof HocLieuThemHocLieuTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hoc-lieu/bai-giang/tao-moi': {
       id: '/hoc-lieu/bai-giang/tao-moi'
       path: '/hoc-lieu/bai-giang/tao-moi'
@@ -795,6 +815,7 @@ const rootRouteChildren: RootRouteChildren = {
   HocLieuNganHangCauHoiRoute: HocLieuNganHangCauHoiRoute,
   HocLieuBaiGiangLessonSlugRoute: HocLieuBaiGiangLessonSlugRoute,
   HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
+  HocLieuThemHocLieuTypeRoute: HocLieuThemHocLieuTypeRoute,
   HocLieuBaiGiangIndexRoute: HocLieuBaiGiangIndexRoute,
 }
 export const routeTree = rootRouteImport

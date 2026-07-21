@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Search, ChevronDown, Plus, Building2, Globe2,
   FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type, Presentation,
-  MoreVertical, Download, Pencil, Trash2, FileSpreadsheet, X,
+  MoreVertical, Pencil, Trash2, FileSpreadsheet, X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
