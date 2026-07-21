@@ -1399,6 +1399,23 @@ function LessonPanel({
   const [reminderOpen, setReminderOpen] = useState(false);
   const [reminderText, setReminderText] = useState("");
 
+  const lessonDateLabel = useMemo(() => {
+    const wk = grid[weekIdx] ?? [];
+    for (let d = 0; d < wk.length; d++) {
+      const day = wk[d] ?? {};
+      for (const p of Object.values(day)) {
+        if (p && p.id === lesson.id) {
+          const wkInfo = WEEKS.find((w) => w.idx === weekIdx);
+          if (!wkInfo) return null;
+          const dt = new Date(wkInfo.start);
+          dt.setDate(dt.getDate() + d);
+          return `${dt.getDate()}/${dt.getMonth() + 1}/${dt.getFullYear()}`;
+        }
+      }
+    }
+    return null;
+  }, [grid, weekIdx, lesson.id]);
+
   // ClassInfo synth cho các popup dùng chung với Lớp học số
   const classInfoForModal: ClassInfo = useMemo(() => ({
     id: `lbg-${lesson.class}`,
@@ -1807,6 +1824,7 @@ function LessonPanel({
             </DialogTitle>
             <p className="text-sm text-slate-500 mt-1">
               Lời nhắc nhở cho tiết <b>{lesson.subject}</b> lớp <b>{lesson.class}</b>
+              {lessonDateLabel && <> (<b>{lessonDateLabel}</b>)</>}
             </p>
           </DialogHeader>
           <div className="space-y-1.5">
