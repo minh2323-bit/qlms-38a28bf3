@@ -1000,10 +1000,9 @@ function AddQuestionModal({
   const label = meta?.label ?? "câu hỏi";
   const [question, setQuestion] = useState("");
   const [timeDigits, setTimeDigits] = useState("000000");
-  const [pauseVideo, setPauseVideo] = useState(true);
-  const [requireCorrect, setRequireCorrect] = useState(true);
   const [allowRetry, setAllowRetry] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+
   const [answers, setAnswers] = useState<QAnswer[]>([
     { text: "", correct: false }, { text: "", correct: false }, { text: "", correct: false }, { text: "", correct: false },
   ]);
