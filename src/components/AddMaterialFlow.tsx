@@ -1,13 +1,16 @@
 import { useMemo, useState } from "react";
 import {
   Video, PlayCircle, Presentation, FileText, Type, Music, FileBox, Code2,
-  X, Upload, Plus, Trash2, Eye,
+  X, Upload, Plus, Trash2, Eye, ChevronDown, Pencil, ArrowUpDown,
   ListChecks, MoveHorizontal, GripVertical, PenLine, ArrowLeftRight, Type as TypeIcon,
-  CheckSquare, ToggleLeft, MessageSquare,
+  CheckSquare, ToggleLeft, MessageSquare, Library,
 } from "lucide-react";
 import {
-  DropdownMenuItem,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover, PopoverTrigger, PopoverContent,
+} from "@/components/ui/popover";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -15,6 +18,54 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 import { toast } from "sonner";
+
+const ASSIGN_CLASS_OPTIONS = [
+  "Lớp Toán 4A - Cô Hoa",
+  "Lớp Toán 4B - Cô Hoa",
+  "Lớp Tiếng Việt 4A - Cô Lan",
+  "Lớp bổ túc Toán 4",
+  "Lớp ôn thi HSG Tiếng Anh",
+];
+
+function LopGanSelect({
+  value, onChange,
+}: { value: Set<string>; onChange: (v: Set<string>) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white hover:border-slate-300"
+        >
+          <span className={value.size ? "text-slate-700 truncate" : "text-slate-400"}>
+            {value.size ? Array.from(value).join(", ") : "Chọn lớp học để gán học liệu"}
+          </span>
+          <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+        <ul className="max-h-64 overflow-auto">
+          {ASSIGN_CLASS_OPTIONS.map((c) => (
+            <li key={c}>
+              <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                <Checkbox
+                  checked={value.has(c)}
+                  onCheckedChange={() => {
+                    const nxt = new Set(value);
+                    if (nxt.has(c)) nxt.delete(c); else nxt.add(c);
+                    onChange(nxt);
+                  }}
+                />
+                <span className="text-sm text-slate-700">{c}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 /* ============= Ordered list of material types (SHARED) ============= */
 
@@ -170,12 +221,14 @@ function TimeMaskInput({ value, onChange, className }: {
 function CommonMaterialFields({
   ten, setTen, uploadMode, setUploadMode, source, setSource,
   chapterId, setChapterId, lessonId, setLessonId,
+  assignedClasses, setAssignedClasses,
 }: {
   ten: string; setTen: (v: string) => void;
   uploadMode: string; setUploadMode: (v: string) => void;
   source: string; setSource: (v: string) => void;
   chapterId: string; setChapterId: (v: string) => void;
   lessonId: string; setLessonId: (v: string) => void;
+  assignedClasses: Set<string>; setAssignedClasses: (v: Set<string>) => void;
 }) {
   const lessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [],
@@ -188,7 +241,7 @@ function CommonMaterialFields({
           <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
         </Field>
         <Field label="Lớp gán">
-          <TextInput placeholder="VD: Lớp 4A – Toán" />
+          <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
         </Field>
       </div>
       <div className="grid grid-cols-4 gap-3">
@@ -270,6 +323,7 @@ type SavedQuestion = {
   text: string;
   answers?: QAnswer[];     // for mcq/mcq-multi/tf
   freeText?: string;       // for fill/short/essay/reorder/match
+  diem?: number;
 };
 
 /* ============= Video form ============= */
@@ -293,9 +347,11 @@ function VideoForm({
   const [source, setSource] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [lessonId, setLessonId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [completion, setCompletion] = useState<CompletionMode>("time");
   const [questions, setQuestions] = useState<SavedQuestion[]>([]);
   const [addQOpen, setAddQOpen] = useState<null | string>(null);
+  const [scale, setScale] = useState(10);
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
@@ -313,6 +369,7 @@ function VideoForm({
         source={source} setSource={setSource}
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
+        assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -336,7 +393,7 @@ function VideoForm({
         )}
         {completion === "question" && (
           <Field label="Thang điểm">
-            <SelectInput defaultValue="10">
+            <SelectInput value={String(scale)} onChange={(e) => setScale(Number(e.target.value))}>
               {[5, 10, 20, 100].map((n) => <option key={n} value={n}>{n}</option>)}
             </SelectInput>
           </Field>
@@ -344,10 +401,11 @@ function VideoForm({
       </div>
 
       {completion === "question" && (
-        <QuestionListSection
+        <QuestionTableSection
           questions={questions}
           setQuestions={setQuestions}
           onOpenAdd={(qType) => setAddQOpen(qType)}
+          scale={scale}
         />
       )}
 
@@ -385,6 +443,7 @@ function InteractiveVideoForm({
   const [source, setSource] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [lessonId, setLessonId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [questions, setQuestions] = useState<SavedQuestion[]>([]);
   const [addQOpen, setAddQOpen] = useState<null | string>(null);
 
@@ -406,6 +465,7 @@ function InteractiveVideoForm({
         source={source} setSource={setSource}
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
+        assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
       />
 
       <div className="grid grid-cols-2 gap-6 border-t pt-5">
@@ -478,8 +538,14 @@ function GenericForm({
   const [source, setSource] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [lessonId, setLessonId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [completion, setCompletion] = useState<CompletionMode>("manual");
+  const [questions, setQuestions] = useState<SavedQuestion[]>([]);
+  const [addQOpen, setAddQOpen] = useState<null | string>(null);
+  const [scale, setScale] = useState(10);
 
   const needsSource = type !== "text";
+  const supportsCompletion = type === "slide" || type === "doc" || type === "audio";
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
@@ -498,6 +564,7 @@ function GenericForm({
           source={source} setSource={setSource}
           chapterId={chapterId} setChapterId={setChapterId}
           lessonId={lessonId} setLessonId={setLessonId}
+          assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
         />
       ) : (
         <>
@@ -505,7 +572,9 @@ function GenericForm({
             <Field label="Tên học liệu" required>
               <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
             </Field>
-            <Field label="Lớp gán"><TextInput /></Field>
+            <Field label="Lớp gán">
+              <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+            </Field>
           </div>
           <Field label="Nội dung">
             <textarea
@@ -515,10 +584,55 @@ function GenericForm({
           </Field>
         </>
       )}
+
+      {supportsCompletion && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Cách tính hoàn thành">
+              <SelectInput
+                value={completion}
+                onChange={(e) => setCompletion(e.target.value as CompletionMode)}
+              >
+                {COMPLETION_MODES.filter((c) => c.key !== "time").map((c) => (
+                  <option key={c.key} value={c.key}>{c.label}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            {completion === "question" && (
+              <Field label="Thang điểm">
+                <SelectInput value={String(scale)} onChange={(e) => setScale(Number(e.target.value))}>
+                  {[5, 10, 20, 100].map((n) => <option key={n} value={n}>{n}</option>)}
+                </SelectInput>
+              </Field>
+            )}
+          </div>
+          {completion === "question" && (
+            <QuestionTableSection
+              questions={questions}
+              setQuestions={setQuestions}
+              onOpenAdd={(qType) => setAddQOpen(qType)}
+              scale={scale}
+            />
+          )}
+        </>
+      )}
+
       <div className="flex justify-end gap-2 pt-2 border-t">
         <Button variant="outline" size="sm" onClick={onClose}>Hủy</Button>
         <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700" onClick={submit}>Lưu học liệu</Button>
       </div>
+
+      {addQOpen && (
+        <AddQuestionModal
+          type={addQOpen}
+          onClose={() => setAddQOpen(null)}
+          onSaved={(q) => {
+            setQuestions((s) => [...s, q]);
+            setAddQOpen(null);
+            toast.success("Đã thêm câu hỏi");
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -660,6 +774,170 @@ function QuestionListSection({
         questions={questions}
         onRemove={(id) => setQuestions((s) => s.filter((x) => x.id !== id))}
       />
+    </div>
+  );
+}
+
+/* ============= Question TABLE section (image-2 style) ============= */
+
+function QuestionTableSection({
+  questions, setQuestions, onOpenAdd, scale,
+}: {
+  questions: SavedQuestion[];
+  setQuestions: React.Dispatch<React.SetStateAction<SavedQuestion[]>>;
+  onOpenAdd: (k: string) => void;
+  scale: number;
+}) {
+  const autoSplit = () => {
+    if (questions.length === 0) return;
+    const per = +(scale / questions.length).toFixed(2);
+    setQuestions((s) => s.map((q) => ({ ...q, diem: per })));
+    toast.success("Đã chia điểm tự động");
+  };
+  const move = (idx: number, dir: -1 | 1) => {
+    setQuestions((s) => {
+      const nxt = [...s];
+      const j = idx + dir;
+      if (j < 0 || j >= nxt.length) return s;
+      [nxt[idx], nxt[j]] = [nxt[j], nxt[idx]];
+      return nxt;
+    });
+  };
+  return (
+    <div className="border-t pt-4 space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => toast.info("Mở ngân hàng câu hỏi")}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-lg"
+        >
+          <Library className="h-3.5 w-3.5" /> Thêm từ ngân hàng
+        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 px-3 py-2 rounded-lg"
+            >
+              <Plus className="h-3.5 w-3.5" /> Thêm mới <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {QUESTION_TYPES.map((q) => {
+              const Icon = q.Icon;
+              return (
+                <DropdownMenuItem
+                  key={q.key}
+                  className="cursor-pointer gap-2"
+                  onSelect={(e) => { e.preventDefault(); onOpenAdd(q.key); }}
+                >
+                  <Icon className="h-4 w-4 text-indigo-600" />
+                  <span>{q.label}</span>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <button
+          type="button"
+          onClick={autoSplit}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 px-3 py-2 rounded-lg"
+        >
+          Chia điểm tự động
+        </button>
+        <span className="text-xs text-slate-500 ml-auto">Tổng thang điểm: <b>{scale}</b></span>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-slate-200">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-slate-600 text-xs">
+            <tr>
+              <th className="px-3 py-2 text-center w-12">STT</th>
+              <th className="px-3 py-2 text-center w-14">Sửa</th>
+              <th className="px-3 py-2 text-left">Tên câu hỏi</th>
+              <th className="px-3 py-2 text-left w-[38%]">Đáp án</th>
+              <th className="px-3 py-2 text-left w-40">Loại câu hỏi</th>
+              <th className="px-3 py-2 text-center w-24">Điểm</th>
+              <th className="px-3 py-2 text-center w-20">Sắp xếp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {questions.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-3 py-6 text-center text-xs italic text-slate-400">
+                  Chưa có câu hỏi nào. Nhấn "Thêm mới" để chọn dạng câu hỏi.
+                </td>
+              </tr>
+            )}
+            {questions.map((q, idx) => (
+              <tr key={q.id} className="border-t border-slate-100 align-top">
+                <td className="px-3 py-3 text-center font-semibold text-slate-700">{idx + 1}</td>
+                <td className="px-3 py-3 text-center">
+                  <button className="h-7 w-7 text-slate-400 hover:text-indigo-600 inline-flex items-center justify-center" title="Sửa">
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                </td>
+                <td className="px-3 py-3 text-slate-800">{q.text}</td>
+                <td className="px-3 py-3">
+                  {q.answers && q.answers.length > 0 ? (
+                    <div className="space-y-1">
+                      {q.answers.map((a, i) => (
+                        <div
+                          key={i}
+                          className={`flex items-center justify-between gap-2 px-2 py-1 rounded text-xs border ${
+                            a.correct ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white"
+                          }`}
+                        >
+                          <span className="truncate">
+                            <span className="font-semibold text-slate-500 mr-1">{String.fromCharCode(65 + i)}.</span>
+                            {a.text || <span className="italic text-slate-400">(trống)</span>}
+                          </span>
+                          {a.correct && <span className="text-[10px] font-semibold text-emerald-700 shrink-0">Đáp án đúng</span>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : q.freeText ? (
+                    <span className="text-xs text-slate-600 whitespace-pre-line">{q.freeText}</span>
+                  ) : (
+                    <span className="text-xs italic text-slate-400">—</span>
+                  )}
+                </td>
+                <td className="px-3 py-3">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    {q.typeLabel}
+                  </span>
+                </td>
+                <td className="px-3 py-3 text-center">
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.25}
+                    value={q.diem ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value === "" ? undefined : Number(e.target.value);
+                      setQuestions((s) => s.map((x) => x.id === q.id ? { ...x, diem: v } : x));
+                    }}
+                    className="w-16 text-center px-2 py-1 text-sm rounded border border-slate-200"
+                  />
+                </td>
+                <td className="px-3 py-3 text-center">
+                  <div className="inline-flex flex-col items-center">
+                    <button onClick={() => move(idx, -1)} className="text-slate-400 hover:text-indigo-600" title="Lên">
+                      <ArrowUpDown className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setQuestions((s) => s.filter((x) => x.id !== q.id))}
+                      className="text-slate-400 hover:text-rose-600 mt-1" title="Xóa"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
