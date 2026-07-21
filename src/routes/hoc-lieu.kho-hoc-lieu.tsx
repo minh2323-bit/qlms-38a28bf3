@@ -269,7 +269,7 @@ function KhoHocLieuPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-slate-500 text-sm">
+                    <td colSpan={10} className="px-4 py-10 text-center text-slate-500 text-sm">
                       Không tìm thấy học liệu phù hợp với bộ lọc.
                     </td>
                   </tr>
