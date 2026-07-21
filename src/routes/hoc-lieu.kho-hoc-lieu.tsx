@@ -405,6 +405,41 @@ function KhoHocLieuPage() {
         {viewMaterial && (
           <MaterialViewerModal material={viewMaterial} onClose={() => setViewMaterial(null)} />
         )}
+
+        {shareOne && (
+          <ShareLessonModal
+            title={shareOne.ten}
+            entityLabel="học liệu"
+            initial={shares[shareOne.id] ?? emptyShareState}
+            onClose={() => setShareOne(null)}
+            onSubmit={(next) => { doShare([shareOne.id], next); setShareOne(null); }}
+          />
+        )}
+        {shareStatus && (
+          <ShareStatusModal
+            title={shareStatus.ten}
+            entityLabel="học liệu"
+            state={shares[shareStatus.id] ?? emptyShareState}
+            onShareOne={(k) => {
+              const cur = shares[shareStatus.id] ?? emptyShareState;
+              doShare([shareStatus.id], {
+                community: k === "community" ? true : cur.community,
+                internal: k === "internal" ? true : cur.internal,
+                hanoi: k === "hanoi" ? "pending" : (cur.hanoi === "rejected" ? "none" : cur.hanoi === "pending" || cur.hanoi === "approved" ? cur.hanoi : "none"),
+              });
+            }}
+            onClose={() => setShareStatus(null)}
+          />
+        )}
+        {bulkShareOpen && (
+          <ShareLessonModal
+            title={`${selected.size} học liệu đã chọn`}
+            entityLabel="học liệu"
+            initial={emptyShareState}
+            onClose={() => setBulkShareOpen(false)}
+            onSubmit={(next) => { doShare(Array.from(selected), next); setBulkShareOpen(false); exitSelect(); }}
+          />
+        )}
       </>
     </AppShell>
   );
