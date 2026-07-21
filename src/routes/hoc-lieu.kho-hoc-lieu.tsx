@@ -370,9 +370,6 @@ function MaterialViewerModal({ material, onClose }: { material: Material; onClos
           >
             Đóng
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">
-            <Download className="h-4 w-4" /> Tải xuống
-          </button>
         </div>
       </div>
     </div>
