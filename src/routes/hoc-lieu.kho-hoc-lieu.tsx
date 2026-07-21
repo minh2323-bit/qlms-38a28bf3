@@ -1,16 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Search, ChevronDown, Plus, Building2, Globe2,
   FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type, Presentation,
-  MoreVertical, Download, Pencil, Trash2, FileSpreadsheet, X,
+  MoreVertical, Pencil, Trash2, FileSpreadsheet, X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  AddMaterialMenuItems, MaterialFormModal, MATERIAL_TYPE_LIST, type MaterialTypeKey,
+  AddMaterialMenuItems, MATERIAL_TYPE_LIST, type MaterialTypeKey,
 } from "@/components/AddMaterialFlow";
 
 export const Route = createFileRoute("/hoc-lieu/kho-hoc-lieu")({
@@ -82,13 +82,12 @@ const MATERIALS: Material[] = [
 ];
 
 function KhoHocLieuPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [loai, setLoai] = useState<string>("");
   const [khoi, setKhoi] = useState("");
   const [mon, setMon] = useState("");
   const [chuDe, setChuDe] = useState("");
-  const [addType, setAddType] = useState<MaterialTypeKey | null>(null);
-  const [editMaterial, setEditMaterial] = useState<Material | null>(null);
   const [viewMaterial, setViewMaterial] = useState<Material | null>(null);
 
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
@@ -103,9 +102,12 @@ function KhoHocLieuPage() {
     return true;
   });
 
-  const editKey: MaterialTypeKey | null = editMaterial
-    ? (MATERIAL_TYPE_LIST.find((t) => t.label === editMaterial.loai)?.key ?? null)
-    : null;
+  const goAdd = (k: MaterialTypeKey) =>
+    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: k } });
+  const goEdit = (m: Material) => {
+    const key = MATERIAL_TYPE_LIST.find((t) => t.label === m.loai)?.key ?? "doc";
+    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: key } });
+  };
 
   return (
     <AppShell>
@@ -170,7 +172,7 @@ function KhoHocLieuPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <AddMaterialMenuItems onSelect={(k) => setAddType(k)} />
+                <AddMaterialMenuItems onSelect={goAdd} />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -184,17 +186,16 @@ function KhoHocLieuPage() {
               <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
                 <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất excel
               </button>
-              <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
-                <Download className="h-3.5 w-3.5" /> Tải xuống
-              </button>
             </div>
             <div className="overflow-x-auto">
             <table className="w-full text-sm">
+
               <thead>
                 <tr className="bg-indigo-700 text-white text-left">
                   <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Tên học liệu</th>
-                  <th className="px-4 py-3 font-semibold whitespace-nowrap">Lớp - Môn</th>
+                  <th className="px-4 py-3 font-semibold whitespace-nowrap">Khối</th>
+                  <th className="px-4 py-3 font-semibold whitespace-nowrap">Môn</th>
                   <th className="px-4 py-3 font-semibold min-w-[200px]">Chủ đề - Bài học</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Thể loại</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Thuộc bài giảng/Khóa học</th>
@@ -218,7 +219,8 @@ function KhoHocLieuPage() {
                           {m.ten}
                         </button>
                       </td>
-                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.khoi} - {m.mon}</td>
+                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap font-medium">{m.khoi}</td>
+                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.mon}</td>
                       <td className="px-4 py-3">
                         <div className="text-slate-800 font-medium">{m.chuDe}</div>
                         <div className="text-xs text-slate-500 mt-0.5">Bài: {m.baiHoc}</div>
@@ -252,16 +254,14 @@ function KhoHocLieuPage() {
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="cursor-pointer">
-                              <Download className="h-4 w-4 mr-2 text-sky-600" /> Tải xuống
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" onClick={() => setEditMaterial(m)}>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => goEdit(m)}>
                               <Pencil className="h-4 w-4 mr-2 text-indigo-600" /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer text-rose-600">
                               <Trash2 className="h-4 w-4 mr-2" /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
+
                         </DropdownMenu>
                       </td>
                     </tr>
@@ -269,7 +269,7 @@ function KhoHocLieuPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-slate-500 text-sm">
+                    <td colSpan={10} className="px-4 py-10 text-center text-slate-500 text-sm">
                       Không tìm thấy học liệu phù hợp với bộ lọc.
                     </td>
                   </tr>
@@ -280,15 +280,6 @@ function KhoHocLieuPage() {
           </div>
         </section>
 
-        {addType && (
-          <MaterialFormModal type={addType} onClose={() => setAddType(null)} />
-        )}
-        {editMaterial && editKey && (
-          <MaterialFormModal
-            type={editKey}
-            onClose={() => setEditMaterial(null)}
-          />
-        )}
         {viewMaterial && (
           <MaterialViewerModal material={viewMaterial} onClose={() => setViewMaterial(null)} />
         )}
@@ -380,9 +371,6 @@ function MaterialViewerModal({ material, onClose }: { material: Material; onClos
             className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 hover:bg-slate-50"
           >
             Đóng
-          </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">
-            <Download className="h-4 w-4" /> Tải xuống
           </button>
         </div>
       </div>
