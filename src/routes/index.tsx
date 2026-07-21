@@ -1396,6 +1396,8 @@ function LessonPanel({
   const [libraryPickerOpen, setLibraryPickerOpen] = useState(false);
   const [materialSourceOpen, setMaterialSourceOpen] = useState(false);
   const [materialLibraryOpen, setMaterialLibraryOpen] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
+  const [reminderText, setReminderText] = useState("");
 
   // ClassInfo synth cho các popup dùng chung với Lớp học số
   const classInfoForModal: ClassInfo = useMemo(() => ({
@@ -1513,7 +1515,7 @@ function LessonPanel({
               <DropdownMenuItem onClick={() => setMaterialSourceOpen(true)}><BookOpenCheck className="h-4 w-4 mr-2" />Học liệu</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTestPickerOpen(true)}><ListChecks className="h-4 w-4 mr-2" />Bài kiểm tra</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTaskPickerOpen(true)}><FileText className="h-4 w-4 mr-2" />Bài tập</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => quickAdd("doc", "Lời nhắc")}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { setReminderText(""); setReminderOpen(true); }}><BellRing className="h-4 w-4 mr-2" />Lời nhắc</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -1792,6 +1794,51 @@ function LessonPanel({
               }}
             >
               Gỡ bỏ
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={reminderOpen} onOpenChange={(o) => !o && setReminderOpen(false)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <BellRing className="h-5 w-5 text-amber-500" /> Thêm lời nhắc
+            </DialogTitle>
+            <p className="text-sm text-slate-500 mt-1">
+              Lời nhắc nhở cho tiết <b>{lesson.subject}</b> lớp <b>{lesson.class}</b>
+            </p>
+          </DialogHeader>
+          <div className="space-y-1.5">
+            <textarea
+              value={reminderText}
+              onChange={(e) => setReminderText(e.target.value.slice(0, 300))}
+              rows={4}
+              placeholder="Nhập nội dung nhắc"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 resize-none"
+            />
+            <div className="text-[11px] text-slate-400 text-right">{reminderText.length}/300</div>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" size="sm" onClick={() => setReminderOpen(false)}>Hủy bỏ</Button>
+            <Button
+              size="sm"
+              disabled={!reminderText.trim()}
+              onClick={() => {
+                addMaterial({
+                  classRealId: lesson.class,
+                  subject: lesson.subject,
+                  unitId: lesson.unitId,
+                  kind: "doc",
+                  title: reminderText.trim(),
+                  meta: "Lời nhắc",
+                  origin: "schedule",
+                });
+                setReminderOpen(false);
+                toast.success("Đã thêm lời nhắc");
+              }}
+            >
+              Xác nhận
             </Button>
           </div>
         </DialogContent>

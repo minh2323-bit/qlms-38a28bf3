@@ -396,16 +396,25 @@ type ShareState = {
   community: boolean;
   internal: boolean;
   hanoi: "none" | "pending" | "approved" | "rejected";
+  sharedAt: { community?: number; internal?: number; hanoi?: number };
 };
 
+function fmtShared(ts: number) {
+  const d = new Date(ts);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getHours())}:${p(d.getMinutes())} ${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
+
 function initialShareFor(l: LessonCard, idx: number): ShareState {
-  if (!l.approved) return { community: false, internal: false, hanoi: "none" };
+  const base = Date.now() - (idx + 1) * 86400000;
+  const t = (offset: number) => base - offset * 3600000;
+  if (!l.approved) return { community: false, internal: false, hanoi: "none", sharedAt: {} };
   const mod = idx % 5;
-  if (mod === 0) return { community: false, internal: false, hanoi: "none" };
-  if (mod === 1) return { community: false, internal: true, hanoi: "none" };
-  if (mod === 2) return { community: true, internal: true, hanoi: "pending" };
-  if (mod === 3) return { community: true, internal: false, hanoi: "rejected" };
-  return { community: true, internal: true, hanoi: "approved" };
+  if (mod === 0) return { community: false, internal: false, hanoi: "none", sharedAt: {} };
+  if (mod === 1) return { community: false, internal: true, hanoi: "none", sharedAt: { internal: t(2) } };
+  if (mod === 2) return { community: true, internal: true, hanoi: "pending", sharedAt: { community: t(1), internal: t(3), hanoi: t(0) } };
+  if (mod === 3) return { community: true, internal: false, hanoi: "rejected", sharedAt: { community: t(2) } };
+  return { community: true, internal: true, hanoi: "approved", sharedAt: { community: t(4), internal: t(6), hanoi: t(2) } };
 }
 
 const HANOI_LOGIN_URL = "https://id.hanoi.edu.vn/dang-nhap?returnUrl=%2Fconnect%2Fauthorize%3Fresponse_type%3Dcode%26client_id%3Dbaselms_web%26redirect_uri%3Dhttps%253A%252F%252Fstudy.hanoi.edu.vn%252Fauth%252Fsignin%26scope%3Dopenid%2Bprofile%2Bemail%2Bphone%2Bcitizen_id%2Boffline_access%2Blms_base_api%26state%3DX-Yf-EEi_g6tfZ1w-ThReuyRNQ3iZQ6Az3YetJ3LrOw%26nonce%3DkSEw6BawJe5n8jkhF-DGPPH2NVzdCDPivh_4cwJjvU4%26code_challenge%3D67mhSg7btdaEjH6g0VpXGwS88ekOks2VhhMnwmNqYrc%26code_challenge_method%3DS256";
@@ -529,18 +538,23 @@ function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterS
           initial={share}
           onClose={() => setShareOpen(false)}
           onSubmit={(next) => {
-            const withPending: ShareState = {
-              ...next,
-              hanoi: next.hanoi !== "none" ? next.hanoi : (share.hanoi === "none" ? "none" : share.hanoi),
-            };
-            // If user just enabled hanoi, mark as pending
-            const finalState: ShareState = {
+            const now = Date.now();
+            const newSharedAt = { ...share.sharedAt };
+            if (next.community && !share.community) newSharedAt.community = now;
+            if (!next.community) delete newSharedAt.community;
+            if (next.internal && !share.internal) newSharedAt.internal = now;
+            if (!next.internal) delete newSharedAt.internal;
+            const finalHanoi: ShareState["hanoi"] =
+              next.hanoi === "none" ? "none" : (share.hanoi === "approved" ? "approved" : "pending");
+            if (finalHanoi === "approved" && !newSharedAt.hanoi) newSharedAt.hanoi = now;
+            if (finalHanoi === "pending" && share.hanoi === "none") newSharedAt.hanoi = now;
+            if (finalHanoi === "none") delete newSharedAt.hanoi;
+            setShare({
               community: next.community,
               internal: next.internal,
-              hanoi: next.hanoi === "none" ? "none" : (share.hanoi === "approved" ? "approved" : "pending"),
-            };
-            void withPending;
-            setShare(finalState);
+              hanoi: finalHanoi,
+              sharedAt: newSharedAt,
+            });
             setShareOpen(false);
           }}
         />
@@ -552,9 +566,10 @@ function LessonCardView({ l, idx, selectMode, selected, onToggleSelect, onEnterS
           state={share}
           onShareOne={(key) => {
             setShare((prev) => {
-              if (key === "community") return { ...prev, community: true };
-              if (key === "internal") return { ...prev, internal: true };
-              return { ...prev, hanoi: "pending" };
+              const now = Date.now();
+              if (key === "community") return { ...prev, community: true, sharedAt: { ...prev.sharedAt, community: now } };
+              if (key === "internal") return { ...prev, internal: true, sharedAt: { ...prev.sharedAt, internal: now } };
+              return { ...prev, hanoi: "pending", sharedAt: { ...prev.sharedAt, hanoi: now } };
             });
           }}
           onClose={() => setStatusOpen(false)}
@@ -708,7 +723,14 @@ function ShareStatusModal({ title, state, onShareOne, onClose }: {
                   <span className="text-sm font-semibold text-slate-800">{r.label}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+                  <div className="flex flex-col items-end">
+                    <span className={`text-sm font-semibold ${r.tone}`}>{r.status}</span>
+                    {r.status === "Đã chia sẻ thành công" && state.sharedAt[r.key] && (
+                      <span className="text-[11px] italic text-slate-400 mt-0.5">
+                        Chia sẻ lúc {fmtShared(state.sharedAt[r.key]!)}
+                      </span>
+                    )}
+                  </div>
                   {r.action && (
                     <button
                       onClick={() => onShareOne(r.key)}
