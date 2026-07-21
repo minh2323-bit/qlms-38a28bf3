@@ -278,15 +278,6 @@ function KhoHocLieuPage() {
           </div>
         </section>
 
-        {addType && (
-          <MaterialFormModal type={addType} onClose={() => setAddType(null)} />
-        )}
-        {editMaterial && editKey && (
-          <MaterialFormModal
-            type={editKey}
-            onClose={() => setEditMaterial(null)}
-          />
-        )}
         {viewMaterial && (
           <MaterialViewerModal material={viewMaterial} onClose={() => setViewMaterial(null)} />
         )}
