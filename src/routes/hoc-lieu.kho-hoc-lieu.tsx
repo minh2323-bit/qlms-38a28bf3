@@ -172,7 +172,7 @@ function KhoHocLieuPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <AddMaterialMenuItems onSelect={(k) => setAddType(k)} />
+                <AddMaterialMenuItems onSelect={goAdd} />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
