@@ -255,6 +255,10 @@ function KhoHocLieuPage() {
             </table>
           </div>
         </section>
+
+        {addType && (
+          <MaterialFormModal type={addType} onClose={() => setAddType(null)} />
+        )}
       </>
     </AppShell>
   );
