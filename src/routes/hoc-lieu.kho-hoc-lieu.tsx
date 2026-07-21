@@ -309,6 +309,11 @@ function KhoHocLieuPage() {
                   const Icon = meta.icon;
                   return (
                     <tr key={m.id} className={`border-t border-slate-200 align-top ${i % 2 === 1 ? "bg-indigo-50/40" : "bg-white"}`}>
+                      {selectMode && (
+                        <td className="px-3 py-3 text-center">
+                          <input type="checkbox" checked={selected.has(m.id)} onChange={() => toggleOne(m.id)} className="h-4 w-4 accent-indigo-600" />
+                        </td>
+                      )}
                       <td className="px-3 py-3 text-center text-slate-700 font-semibold">{i + 1}</td>
                       <td className="px-4 py-3">
                         <button
@@ -317,6 +322,15 @@ function KhoHocLieuPage() {
                         >
                           {m.ten}
                         </button>
+                        {isShared(shares[m.id] ?? emptyShareState) && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {shares[m.id]?.community && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">Cộng đồng</span>}
+                            {shares[m.id]?.internal && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">Nội bộ</span>}
+                            {shares[m.id]?.hanoi === "approved" && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">Hanoi Study</span>}
+                            {shares[m.id]?.hanoi === "pending" && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Chờ Sở duyệt</span>}
+                            {shares[m.id]?.hanoi === "rejected" && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">Sở từ chối</span>}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-slate-700 whitespace-nowrap font-medium">{m.khoi}</td>
                       <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{m.mon}</td>
@@ -356,11 +370,20 @@ function KhoHocLieuPage() {
                             <DropdownMenuItem className="cursor-pointer" onClick={() => goEdit(m)}>
                               <Pencil className="h-4 w-4 mr-2 text-indigo-600" /> Chỉnh sửa
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer text-rose-600">
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() => isShared(shares[m.id] ?? emptyShareState) ? setShareStatus(m) : setShareOne(m)}
+                            >
+                              <Share2 className="h-4 w-4 mr-2 text-sky-600" />
+                              {isShared(shares[m.id] ?? emptyShareState) ? "Theo dõi trạng thái chia sẻ" : "Chia sẻ"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => enterSelect(m.id)}>
+                              <CheckSquare className="h-4 w-4 mr-2 text-indigo-600" /> Chọn nhiều
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer text-rose-600" onClick={() => removeOne(m.id)}>
                               <Trash2 className="h-4 w-4 mr-2" /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
-
                         </DropdownMenu>
                       </td>
                     </tr>
@@ -368,7 +391,7 @@ function KhoHocLieuPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="px-4 py-10 text-center text-slate-500 text-sm">
+                    <td colSpan={selectMode ? 11 : 10} className="px-4 py-10 text-center text-slate-500 text-sm">
                       Không tìm thấy học liệu phù hợp với bộ lọc.
                     </td>
                   </tr>
