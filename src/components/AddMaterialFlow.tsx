@@ -545,7 +545,8 @@ function GenericForm({
   const [scale, setScale] = useState(10);
 
   const needsSource = type !== "text";
-  const supportsCompletion = type === "slide" || type === "doc" || type === "audio";
+  const supportsCompletion = type === "slide" || type === "doc" || type === "audio" || type === "text";
+  const textLessons = KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [];
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
