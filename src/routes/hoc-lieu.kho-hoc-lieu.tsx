@@ -252,16 +252,14 @@ function KhoHocLieuPage() {
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="cursor-pointer">
-                              <Download className="h-4 w-4 mr-2 text-sky-600" /> Tải xuống
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" onClick={() => setEditMaterial(m)}>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => goEdit(m)}>
                               <Pencil className="h-4 w-4 mr-2 text-indigo-600" /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer text-rose-600">
                               <Trash2 className="h-4 w-4 mr-2" /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
+
                         </DropdownMenu>
                       </td>
                     </tr>
