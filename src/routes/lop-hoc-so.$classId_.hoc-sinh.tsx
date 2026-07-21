@@ -312,6 +312,39 @@ function StudentsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Unregister student confirm */}
+      <Dialog open={!!unregisterTarget} onOpenChange={(o) => !o && setUnregisterTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-800">Hủy đăng ký học sinh</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-700">
+            Bạn xác nhận sẽ hủy học sinh {unregisterTarget && (<span className="font-semibold">{unregisterTarget.hoTen}</span>)} khỏi lớp. Học sinh đó sẽ không thể thấy và tương tác với lớp học.
+          </p>
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <button
+              onClick={() => setUnregisterTarget(null)}
+              className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              Hủy
+            </button>
+            <button
+              onClick={() => {
+                if (unregisterTarget) {
+                  setRemovedIds((prev) => new Set(prev).add(unregisterTarget.stt));
+                  toast.success(`Đã hủy đăng ký ${unregisterTarget.hoTen}`);
+                }
+                setUnregisterTarget(null);
+              }}
+              className="px-4 py-2 text-sm font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700"
+            >
+              Xác nhận
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
+
   );
 }
