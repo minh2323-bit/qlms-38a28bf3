@@ -186,12 +186,10 @@ function KhoHocLieuPage() {
               <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
                 <FileSpreadsheet className="h-3.5 w-3.5" /> Xuất excel
               </button>
-              <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
-                <Download className="h-3.5 w-3.5" /> Tải xuống
-              </button>
             </div>
             <div className="overflow-x-auto">
             <table className="w-full text-sm">
+
               <thead>
                 <tr className="bg-indigo-700 text-white text-left">
                   <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
