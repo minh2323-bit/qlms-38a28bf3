@@ -355,6 +355,8 @@ function CreateClassModal({
   const [tenLop, setTenLop] = useState(initial?.name ?? "");
   const [ganLop, setGanLop] = useState(initial?.lop ?? "");
   const [moTa, setMoTa] = useState("");
+  const [khoi, setKhoi] = useState("");
+  const [mon, setMon] = useState("");
   const [coverUrl, setCoverUrl] = useState<string | null>(initial?.thumb ?? null);
 
 
