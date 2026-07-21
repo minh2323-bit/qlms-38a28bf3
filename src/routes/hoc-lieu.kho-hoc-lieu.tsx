@@ -174,12 +174,7 @@ function KhoHocLieuPage() {
     exitSelect();
   };
 
-  const goAdd = (k: MaterialTypeKey) =>
-    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: k } });
-  const goEdit = (m: Material) => {
-    const key = MATERIAL_TYPE_LIST.find((t) => t.label === m.loai)?.key ?? "doc";
-    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: key } });
-  };
+
 
   return (
     <AppShell>
