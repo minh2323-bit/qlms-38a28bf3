@@ -346,9 +346,11 @@ function VideoForm({
   const [source, setSource] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [lessonId, setLessonId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [completion, setCompletion] = useState<CompletionMode>("time");
   const [questions, setQuestions] = useState<SavedQuestion[]>([]);
   const [addQOpen, setAddQOpen] = useState<null | string>(null);
+  const [scale, setScale] = useState(10);
 
   const submit = () => {
     if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
@@ -366,6 +368,7 @@ function VideoForm({
         source={source} setSource={setSource}
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
+        assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -389,7 +392,7 @@ function VideoForm({
         )}
         {completion === "question" && (
           <Field label="Thang điểm">
-            <SelectInput defaultValue="10">
+            <SelectInput value={String(scale)} onChange={(e) => setScale(Number(e.target.value))}>
               {[5, 10, 20, 100].map((n) => <option key={n} value={n}>{n}</option>)}
             </SelectInput>
           </Field>
@@ -397,10 +400,11 @@ function VideoForm({
       </div>
 
       {completion === "question" && (
-        <QuestionListSection
+        <QuestionTableSection
           questions={questions}
           setQuestions={setQuestions}
           onOpenAdd={(qType) => setAddQOpen(qType)}
+          scale={scale}
         />
       )}
 
