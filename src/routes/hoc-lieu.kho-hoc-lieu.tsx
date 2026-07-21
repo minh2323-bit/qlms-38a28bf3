@@ -286,6 +286,11 @@ function KhoHocLieuPage() {
 
               <thead>
                 <tr className="bg-indigo-700 text-white text-left">
+                  {selectMode && (
+                    <th className="px-3 py-3 w-10 text-center">
+                      <input type="checkbox" checked={allSelected} onChange={toggleAll} className="h-4 w-4 accent-white" />
+                    </th>
+                  )}
                   <th className="px-3 py-3 font-semibold w-14 text-center">STT</th>
                   <th className="px-4 py-3 font-semibold min-w-[220px]">Tên học liệu</th>
                   <th className="px-4 py-3 font-semibold whitespace-nowrap">Khối</th>
