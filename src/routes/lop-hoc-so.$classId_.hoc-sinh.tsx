@@ -148,7 +148,14 @@ function StudentsPage() {
           >
             <FileDown className="h-4 w-4" /> Xuất excel
           </button>
+          <button
+            onClick={() => toast.success("Mở form thêm học sinh")}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+          >
+            <UserPlus className="h-4 w-4" /> Thêm học sinh
+          </button>
         </div>
+
 
         {/* Search only */}
         <div className="mt-4">
