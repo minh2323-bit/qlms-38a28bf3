@@ -1052,10 +1052,6 @@ function AddQuestionModal({
 
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <label className="inline-flex items-center gap-2">
-              <Checkbox checked={pauseVideo} onCheckedChange={(v) => setPauseVideo(!!v)} />
-              <span>Tạm dừng video</span>
-            </label>
-            <label className="inline-flex items-center gap-2">
               <Checkbox checked={allowRetry} onCheckedChange={(v) => setAllowRetry(!!v)} />
               <span>Cho phép làm lại</span>
             </label>
@@ -1064,6 +1060,7 @@ function AddQuestionModal({
               <span>Xem đáp án</span>
             </label>
           </div>
+
 
           <Field label="Câu hỏi" required>
             <textarea
