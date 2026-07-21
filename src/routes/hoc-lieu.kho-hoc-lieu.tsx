@@ -86,6 +86,7 @@ function KhoHocLieuPage() {
   const [khoi, setKhoi] = useState("");
   const [mon, setMon] = useState("");
   const [chuDe, setChuDe] = useState("");
+  const [addType, setAddType] = useState<MaterialTypeKey | null>(null);
 
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
   const chuongOptions = khoi && mon ? CHUONG_BY_MON[`${khoi}-${mon}`] ?? [] : [];
