@@ -36,7 +36,7 @@ function buildItems(title: string): Item[] {
   const topics: Array<{ name: string; items: Array<{ t: string; k: Kind }> }> = [
     { name: "Tìm hiểu", items: [
       { t: `Tìm hiểu về ${title.toLowerCase()}`, k: "video" },
-      { t: `Slide dẫn nhập – ${title}`, k: "slide" },
+      { t: `Bài giảng dẫn nhập – ${title}`, k: "slide" },
     ]},
     { name: "Hình thành kiến thức", items: [
       { t: `Bài giảng chính – ${title}`, k: "slide" },
