@@ -134,7 +134,7 @@ function KhoHocLieuPage() {
   const monOptions = khoi ? MON_BY_KHOI[khoi] ?? [] : [];
   const chuongOptions = khoi && mon ? CHUONG_BY_MON[`${khoi}-${mon}`] ?? [] : [];
 
-  const filtered = MATERIALS.filter((m) => {
+  const filtered = materials.filter((m) => {
     if (search && !m.ten.toLowerCase().includes(search.toLowerCase())) return false;
     if (loai && m.loai !== loai) return false;
     if (khoi && m.khoi !== khoi) return false;
@@ -142,6 +142,37 @@ function KhoHocLieuPage() {
     if (chuDe && m.chuDe !== chuDe) return false;
     return true;
   });
+
+  const allSelected = filtered.length > 0 && filtered.every((m) => selected.has(m.id));
+
+  const goAdd = (k: MaterialTypeKey) =>
+    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: k } });
+  const goEdit = (m: Material) => {
+    const key = MATERIAL_TYPE_LIST.find((t) => t.label === m.loai)?.key ?? "doc";
+    navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: key } });
+  };
+
+  const enterSelect = (id?: string) => {
+    setSelectMode(true);
+    if (id) setSelected(new Set([id]));
+  };
+  const exitSelect = () => { setSelectMode(false); setSelected(new Set()); };
+  const toggleOne = (id: string) => {
+    setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  };
+  const toggleAll = () => {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(filtered.map((m) => m.id)));
+  };
+  const removeOne = (id: string) => {
+    setMaterials((s) => s.filter((m) => m.id !== id));
+    toast.success("Đã xóa học liệu");
+  };
+  const bulkDelete = () => {
+    setMaterials((s) => s.filter((m) => !selected.has(m.id)));
+    toast.success(`Đã xóa ${selected.size} học liệu`);
+    exitSelect();
+  };
 
   const goAdd = (k: MaterialTypeKey) =>
     navigate({ to: "/hoc-lieu/them-hoc-lieu/$type", params: { type: k } });
