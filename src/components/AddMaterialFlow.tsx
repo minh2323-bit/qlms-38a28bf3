@@ -442,6 +442,7 @@ function InteractiveVideoForm({
   const [source, setSource] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [lessonId, setLessonId] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [questions, setQuestions] = useState<SavedQuestion[]>([]);
   const [addQOpen, setAddQOpen] = useState<null | string>(null);
 
@@ -463,6 +464,7 @@ function InteractiveVideoForm({
         source={source} setSource={setSource}
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
+        assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
       />
 
       <div className="grid grid-cols-2 gap-6 border-t pt-5">
