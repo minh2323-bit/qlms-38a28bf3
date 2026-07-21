@@ -2,13 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Search, ChevronDown, Plus, Building2, Globe2,
-  FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type,
+  FileText, Video, Music, FileBox, Code2, ClipboardList, PlayCircle, Type, Presentation,
   MoreVertical, Eye, Pencil, Trash2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AddMaterialMenuItems, MaterialFormModal, MATERIAL_TYPE_LIST, type MaterialTypeKey,
+} from "@/components/AddMaterialFlow";
 
 export const Route = createFileRoute("/hoc-lieu/kho-hoc-lieu")({
   head: () => ({
@@ -20,27 +23,20 @@ export const Route = createFileRoute("/hoc-lieu/kho-hoc-lieu")({
   component: KhoHocLieuPage,
 });
 
-const MATERIAL_TYPES = [
-  "Nội dung thuần",
-  "Video",
-  "Âm thanh",
-  "Tài liệu",
-  "Scorm",
-  "IFrame",
-  "Bài kiểm tra",
-  "Video tương tác",
-] as const;
+const MATERIAL_TYPES = MATERIAL_TYPE_LIST.map((t) => t.label);
 type MaterialType = (typeof MATERIAL_TYPES)[number];
 
-const TYPE_META: Record<MaterialType, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string }> = {
+const TYPE_META: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string }> = {
   "Nội dung thuần": { icon: Type, color: "text-slate-600", bg: "bg-slate-100" },
   "Video": { icon: Video, color: "text-rose-600", bg: "bg-rose-100" },
+  "Video tương tác": { icon: PlayCircle, color: "text-indigo-600", bg: "bg-indigo-100" },
   "Âm thanh": { icon: Music, color: "text-amber-600", bg: "bg-amber-100" },
+  "Tài liệu văn bản": { icon: FileText, color: "text-sky-600", bg: "bg-sky-100" },
   "Tài liệu": { icon: FileText, color: "text-sky-600", bg: "bg-sky-100" },
+  "Slide/Bản trình chiếu": { icon: Presentation, color: "text-orange-600", bg: "bg-orange-100" },
   "Scorm": { icon: FileBox, color: "text-violet-600", bg: "bg-violet-100" },
   "IFrame": { icon: Code2, color: "text-emerald-600", bg: "bg-emerald-100" },
   "Bài kiểm tra": { icon: ClipboardList, color: "text-orange-600", bg: "bg-orange-100" },
-  "Video tương tác": { icon: PlayCircle, color: "text-indigo-600", bg: "bg-indigo-100" },
 };
 
 const KHOI_LIST = ["Lớp 3", "Lớp 4", "Lớp 5"];
