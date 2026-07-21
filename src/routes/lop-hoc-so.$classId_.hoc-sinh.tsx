@@ -65,9 +65,10 @@ function StudentsPage() {
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return STUDENTS;
-    return STUDENTS.filter((x) => x.hoTen.toLowerCase().includes(s));
-  }, [q]);
+    const base = STUDENTS.filter((x) => !removedIds.has(x.stt));
+    if (!s) return base;
+    return base.filter((x) => x.hoTen.toLowerCase().includes(s));
+  }, [q, removedIds]);
 
   const allChecked = filtered.length > 0 && filtered.every((s) => selected.has(s.stt));
   const toggleAll = () => {
