@@ -551,12 +551,13 @@ function InteractiveVideoForm({
 /* ============= Generic form (Slide / Doc / Text / Audio / Scorm / IFrame) ============= */
 
 function GenericForm({
-  type, onClose, onSaved, inModal,
+  type, onClose, onSaved, inModal, hideBasicFields,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (p: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
   const meta = MATERIAL_TYPE_LIST.find((m) => m.key === type)!;
   const [ten, setTen] = useState("");
@@ -575,8 +576,9 @@ function GenericForm({
   const textLessons = KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [];
 
   const submit = () => {
-    if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
-    onSaved?.({ title: ten.trim(), type });
+    const finalTitle = hideBasicFields ? (ten.trim() || `Học liệu ${meta.label.toLowerCase()}`) : ten.trim();
+    if (!hideBasicFields && !ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
+    onSaved?.({ title: finalTitle, type });
     toast.success(`Đã thêm học liệu ${meta.label.toLowerCase()}`);
     onClose();
   };
@@ -592,48 +594,53 @@ function GenericForm({
           chapterId={chapterId} setChapterId={setChapterId}
           lessonId={lessonId} setLessonId={setLessonId}
           assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+          hideBasic={hideBasicFields}
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Tên học liệu" required>
-              <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
-            </Field>
-            <Field label="Lớp gán">
-              <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-4 gap-3">
-            <Field label="Khối" required>
-              <SelectInput defaultValue="Lớp 4">
-                <option>Lớp 3</option>
-                <option>Lớp 4</option>
-                <option>Lớp 5</option>
-              </SelectInput>
-            </Field>
-            <Field label="Môn" required>
-              <SelectInput defaultValue="Toán">
-                <option>Toán</option>
-                <option>Tiếng Việt</option>
-              </SelectInput>
-            </Field>
-            <Field label="Chương/Chủ đề">
-              <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
-                <option value="">— Chọn chương/chủ đề —</option>
-                {KNOWLEDGE_TREE.map((c) => (
-                  <option key={c.id} value={c.id}>{c.title}</option>
-                ))}
-              </SelectInput>
-            </Field>
-            <Field label="Bài học">
-              <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
-                <option value="">— Chọn bài học —</option>
-                {textLessons.map((u) => (
-                  <option key={u.id} value={u.id}>{u.title}</option>
-                ))}
-              </SelectInput>
-            </Field>
-          </div>
+          {!hideBasicFields && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Tên học liệu" required>
+                  <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
+                </Field>
+                <Field label="Lớp gán">
+                  <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+                </Field>
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                <Field label="Khối" required>
+                  <SelectInput defaultValue="Lớp 4">
+                    <option>Lớp 3</option>
+                    <option>Lớp 4</option>
+                    <option>Lớp 5</option>
+                  </SelectInput>
+                </Field>
+                <Field label="Môn" required>
+                  <SelectInput defaultValue="Toán">
+                    <option>Toán</option>
+                    <option>Tiếng Việt</option>
+                  </SelectInput>
+                </Field>
+                <Field label="Chương/Chủ đề">
+                  <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
+                    <option value="">— Chọn chương/chủ đề —</option>
+                    {KNOWLEDGE_TREE.map((c) => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
+                    ))}
+                  </SelectInput>
+                </Field>
+                <Field label="Bài học">
+                  <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
+                    <option value="">— Chọn bài học —</option>
+                    {textLessons.map((u) => (
+                      <option key={u.id} value={u.id}>{u.title}</option>
+                    ))}
+                  </SelectInput>
+                </Field>
+              </div>
+            </>
+          )}
           <Field label="Nội dung">
             <textarea
               rows={8}
