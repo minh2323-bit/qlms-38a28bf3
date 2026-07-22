@@ -765,7 +765,7 @@ function Step2(props: {
             onClick={() => setAddTopicOpen(true)}
             className="px-3 py-2 text-sm font-semibold rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 inline-flex items-center gap-1.5"
           >
-            <Plus className="h-4 w-4" /> Thêm chủ đề
+            <Plus className="h-4 w-4" /> Thêm học phần
           </button>
 
           <DropdownMenu>
@@ -774,18 +774,16 @@ function Step2(props: {
                 <Plus className="h-4 w-4" /> Thêm học liệu <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60">
-              <AddMaterialMenuItems onSelect={(k) => setAddingMaterialAt(`__type__:${k}`)} />
-              <div className="my-1 h-px bg-slate-100" />
-              <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuItem className="cursor-pointer" onSelect={() => toast.info("Chọn từ Kho học liệu của tôi")}>
                 <FolderOpen className="h-4 w-4 mr-2 text-amber-600" /> Thêm từ Kho học liệu của tôi
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Share2 className="h-4 w-4 mr-2 text-sky-600" /> Thêm từ Kho chia sẻ trường
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer" onSelect={() => toast.info("Chọn từ Hanoi Study")}>
                 <Globe2 className="h-4 w-4 mr-2 text-violet-600" /> Thêm từ Hanoi Study
               </DropdownMenuItem>
+              <div className="my-1 h-px bg-slate-100" />
+              <div className="px-2 py-1 text-[11px] font-semibold uppercase text-slate-400">Thêm mới</div>
+              <AddMaterialMenuItems onSelect={(k) => setAddingMaterialAt(`__type__:${k}`)} />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
