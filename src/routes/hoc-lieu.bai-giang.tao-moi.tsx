@@ -868,9 +868,9 @@ function Step2(props: {
       {addingMaterialAt && addingMaterialAt.startsWith("__type__:") && (
         <MaterialFormModal
           type={addingMaterialAt.slice("__type__:".length) as MaterialTypeKey}
+          hideBasicFields
           onClose={() => setAddingMaterialAt(null)}
           onSaved={(p) => {
-            const meta = MATERIAL_TYPE_LIST.find((t) => t.key === p.type);
             const legacyType: Material["type"] =
               p.type === "video" ? "Video"
                 : p.type === "slide" ? "Slide / Bài giảng"
