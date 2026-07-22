@@ -115,16 +115,17 @@ export function AddMaterialMenuItems({
 /* ============= Main modal dispatcher (kept for legacy popup usage) ============= */
 
 export function MaterialFormModal({
-  type, onClose, onSaved,
+  type, onClose, onSaved, hideBasicFields,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
+  hideBasicFields?: boolean;
 }) {
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
-        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal />
+        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal hideBasicFields={hideBasicFields} />
       </DialogContent>
     </Dialog>
   );
@@ -133,16 +134,17 @@ export function MaterialFormModal({
 /* ============= Unwrapped form (used by full-page route) ============= */
 
 export function MaterialForm({
-  type, onClose, onSaved, inModal,
+  type, onClose, onSaved, inModal, hideBasicFields,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
-  if (type === "video") return <VideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} />;
-  if (type === "interactive") return <InteractiveVideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} />;
-  return <GenericForm type={type} onClose={onClose} onSaved={onSaved} inModal={inModal} />;
+  if (type === "video") return <VideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
+  if (type === "interactive") return <InteractiveVideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
+  return <GenericForm type={type} onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
 }
 
 /* ============= Shared form building blocks ============= */
@@ -221,7 +223,7 @@ function TimeMaskInput({ value, onChange, className }: {
 function CommonMaterialFields({
   ten, setTen, uploadMode, setUploadMode, source, setSource,
   chapterId, setChapterId, lessonId, setLessonId,
-  assignedClasses, setAssignedClasses,
+  assignedClasses, setAssignedClasses, hideBasic,
 }: {
   ten: string; setTen: (v: string) => void;
   uploadMode: string; setUploadMode: (v: string) => void;
@@ -229,6 +231,7 @@ function CommonMaterialFields({
   chapterId: string; setChapterId: (v: string) => void;
   lessonId: string; setLessonId: (v: string) => void;
   assignedClasses: Set<string>; setAssignedClasses: (v: Set<string>) => void;
+  hideBasic?: boolean;
 }) {
   const lessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [],
@@ -236,45 +239,49 @@ function CommonMaterialFields({
   );
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tên học liệu" required>
-          <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
-        </Field>
-        <Field label="Lớp gán">
-          <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
-        </Field>
-      </div>
-      <div className="grid grid-cols-4 gap-3">
-        <Field label="Khối" required>
-          <SelectInput defaultValue="Lớp 4">
-            <option>Lớp 3</option>
-            <option>Lớp 4</option>
-            <option>Lớp 5</option>
-          </SelectInput>
-        </Field>
-        <Field label="Môn" required>
-          <SelectInput defaultValue="Toán">
-            <option>Toán</option>
-            <option>Tiếng Việt</option>
-          </SelectInput>
-        </Field>
-        <Field label="Chương/Chủ đề">
-          <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
-            <option value="">— Chọn chương/chủ đề —</option>
-            {KNOWLEDGE_TREE.map((c) => (
-              <option key={c.id} value={c.id}>{c.title}</option>
-            ))}
-          </SelectInput>
-        </Field>
-        <Field label="Bài học">
-          <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
-            <option value="">— Chọn bài học —</option>
-            {lessons.map((u) => (
-              <option key={u.id} value={u.id}>{u.title}</option>
-            ))}
-          </SelectInput>
-        </Field>
-      </div>
+      {!hideBasic && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Tên học liệu" required>
+              <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
+            </Field>
+            <Field label="Lớp gán">
+              <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            <Field label="Khối" required>
+              <SelectInput defaultValue="Lớp 4">
+                <option>Lớp 3</option>
+                <option>Lớp 4</option>
+                <option>Lớp 5</option>
+              </SelectInput>
+            </Field>
+            <Field label="Môn" required>
+              <SelectInput defaultValue="Toán">
+                <option>Toán</option>
+                <option>Tiếng Việt</option>
+              </SelectInput>
+            </Field>
+            <Field label="Chương/Chủ đề">
+              <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
+                <option value="">— Chọn chương/chủ đề —</option>
+                {KNOWLEDGE_TREE.map((c) => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Bài học">
+              <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
+                <option value="">— Chọn bài học —</option>
+                {lessons.map((u) => (
+                  <option key={u.id} value={u.id}>{u.title}</option>
+                ))}
+              </SelectInput>
+            </Field>
+          </div>
+        </>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <Field label="Hình thức tải nội dung" required>
           <SelectInput value={uploadMode} onChange={(e) => setUploadMode(e.target.value)}>
@@ -336,11 +343,12 @@ const COMPLETION_MODES = [
 type CompletionMode = (typeof COMPLETION_MODES)[number]["key"];
 
 function VideoForm({
-  onClose, onSaved, inModal,
+  onClose, onSaved, inModal, hideBasicFields,
 }: {
   onClose: () => void;
   onSaved?: (p: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
   const [ten, setTen] = useState("");
   const [uploadMode, setUploadMode] = useState("file");
@@ -354,8 +362,9 @@ function VideoForm({
   const [scale, setScale] = useState(10);
 
   const submit = () => {
-    if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
-    onSaved?.({ title: ten.trim(), type: "video" });
+    const finalTitle = hideBasicFields ? (ten.trim() || "Học liệu video") : ten.trim();
+    if (!hideBasicFields && !ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
+    onSaved?.({ title: finalTitle, type: "video" });
     toast.success("Đã thêm học liệu video");
     onClose();
   };
@@ -370,6 +379,7 @@ function VideoForm({
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
         assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+        hideBasic={hideBasicFields}
       />
 
       <div className="grid grid-cols-2 gap-4">
@@ -432,11 +442,12 @@ function VideoForm({
 /* ============= Interactive video form ============= */
 
 function InteractiveVideoForm({
-  onClose, onSaved, inModal,
+  onClose, onSaved, inModal, hideBasicFields,
 }: {
   onClose: () => void;
   onSaved?: (p: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
   const [ten, setTen] = useState("");
   const [uploadMode, setUploadMode] = useState("file");
@@ -449,8 +460,9 @@ function InteractiveVideoForm({
   const [requireCorrect, setRequireCorrect] = useState(true);
 
   const submit = () => {
-    if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
-    onSaved?.({ title: ten.trim(), type: "interactive" });
+    const finalTitle = hideBasicFields ? (ten.trim() || "Học liệu video tương tác") : ten.trim();
+    if (!hideBasicFields && !ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
+    onSaved?.({ title: finalTitle, type: "interactive" });
     toast.success("Đã thêm học liệu video tương tác");
     onClose();
   };
@@ -467,6 +479,7 @@ function InteractiveVideoForm({
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
         assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+        hideBasic={hideBasicFields}
       />
 
       <div className="grid grid-cols-2 gap-6 border-t pt-5">
@@ -538,12 +551,13 @@ function InteractiveVideoForm({
 /* ============= Generic form (Slide / Doc / Text / Audio / Scorm / IFrame) ============= */
 
 function GenericForm({
-  type, onClose, onSaved, inModal,
+  type, onClose, onSaved, inModal, hideBasicFields,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (p: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
   const meta = MATERIAL_TYPE_LIST.find((m) => m.key === type)!;
   const [ten, setTen] = useState("");
@@ -562,8 +576,9 @@ function GenericForm({
   const textLessons = KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [];
 
   const submit = () => {
-    if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
-    onSaved?.({ title: ten.trim(), type });
+    const finalTitle = hideBasicFields ? (ten.trim() || `Học liệu ${meta.label.toLowerCase()}`) : ten.trim();
+    if (!hideBasicFields && !ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
+    onSaved?.({ title: finalTitle, type });
     toast.success(`Đã thêm học liệu ${meta.label.toLowerCase()}`);
     onClose();
   };
@@ -579,48 +594,53 @@ function GenericForm({
           chapterId={chapterId} setChapterId={setChapterId}
           lessonId={lessonId} setLessonId={setLessonId}
           assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+          hideBasic={hideBasicFields}
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Tên học liệu" required>
-              <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
-            </Field>
-            <Field label="Lớp gán">
-              <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-4 gap-3">
-            <Field label="Khối" required>
-              <SelectInput defaultValue="Lớp 4">
-                <option>Lớp 3</option>
-                <option>Lớp 4</option>
-                <option>Lớp 5</option>
-              </SelectInput>
-            </Field>
-            <Field label="Môn" required>
-              <SelectInput defaultValue="Toán">
-                <option>Toán</option>
-                <option>Tiếng Việt</option>
-              </SelectInput>
-            </Field>
-            <Field label="Chương/Chủ đề">
-              <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
-                <option value="">— Chọn chương/chủ đề —</option>
-                {KNOWLEDGE_TREE.map((c) => (
-                  <option key={c.id} value={c.id}>{c.title}</option>
-                ))}
-              </SelectInput>
-            </Field>
-            <Field label="Bài học">
-              <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
-                <option value="">— Chọn bài học —</option>
-                {textLessons.map((u) => (
-                  <option key={u.id} value={u.id}>{u.title}</option>
-                ))}
-              </SelectInput>
-            </Field>
-          </div>
+          {!hideBasicFields && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Tên học liệu" required>
+                  <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
+                </Field>
+                <Field label="Lớp gán">
+                  <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+                </Field>
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                <Field label="Khối" required>
+                  <SelectInput defaultValue="Lớp 4">
+                    <option>Lớp 3</option>
+                    <option>Lớp 4</option>
+                    <option>Lớp 5</option>
+                  </SelectInput>
+                </Field>
+                <Field label="Môn" required>
+                  <SelectInput defaultValue="Toán">
+                    <option>Toán</option>
+                    <option>Tiếng Việt</option>
+                  </SelectInput>
+                </Field>
+                <Field label="Chương/Chủ đề">
+                  <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
+                    <option value="">— Chọn chương/chủ đề —</option>
+                    {KNOWLEDGE_TREE.map((c) => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
+                    ))}
+                  </SelectInput>
+                </Field>
+                <Field label="Bài học">
+                  <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
+                    <option value="">— Chọn bài học —</option>
+                    {textLessons.map((u) => (
+                      <option key={u.id} value={u.id}>{u.title}</option>
+                    ))}
+                  </SelectInput>
+                </Field>
+              </div>
+            </>
+          )}
           <Field label="Nội dung">
             <textarea
               rows={8}
