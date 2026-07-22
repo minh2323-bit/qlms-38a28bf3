@@ -115,16 +115,17 @@ export function AddMaterialMenuItems({
 /* ============= Main modal dispatcher (kept for legacy popup usage) ============= */
 
 export function MaterialFormModal({
-  type, onClose, onSaved,
+  type, onClose, onSaved, hideBasicFields,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
+  hideBasicFields?: boolean;
 }) {
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
-        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal />
+        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal hideBasicFields={hideBasicFields} />
       </DialogContent>
     </Dialog>
   );
@@ -133,16 +134,17 @@ export function MaterialFormModal({
 /* ============= Unwrapped form (used by full-page route) ============= */
 
 export function MaterialForm({
-  type, onClose, onSaved, inModal,
+  type, onClose, onSaved, inModal, hideBasicFields,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
-  if (type === "video") return <VideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} />;
-  if (type === "interactive") return <InteractiveVideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} />;
-  return <GenericForm type={type} onClose={onClose} onSaved={onSaved} inModal={inModal} />;
+  if (type === "video") return <VideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
+  if (type === "interactive") return <InteractiveVideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
+  return <GenericForm type={type} onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
 }
 
 /* ============= Shared form building blocks ============= */
