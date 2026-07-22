@@ -442,11 +442,12 @@ function VideoForm({
 /* ============= Interactive video form ============= */
 
 function InteractiveVideoForm({
-  onClose, onSaved, inModal,
+  onClose, onSaved, inModal, hideBasicFields,
 }: {
   onClose: () => void;
   onSaved?: (p: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
   const [ten, setTen] = useState("");
   const [uploadMode, setUploadMode] = useState("file");
@@ -459,8 +460,9 @@ function InteractiveVideoForm({
   const [requireCorrect, setRequireCorrect] = useState(true);
 
   const submit = () => {
-    if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
-    onSaved?.({ title: ten.trim(), type: "interactive" });
+    const finalTitle = hideBasicFields ? (ten.trim() || "Học liệu video tương tác") : ten.trim();
+    if (!hideBasicFields && !ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
+    onSaved?.({ title: finalTitle, type: "interactive" });
     toast.success("Đã thêm học liệu video tương tác");
     onClose();
   };
@@ -477,6 +479,7 @@ function InteractiveVideoForm({
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
         assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+        hideBasic={hideBasicFields}
       />
 
       <div className="grid grid-cols-2 gap-6 border-t pt-5">
