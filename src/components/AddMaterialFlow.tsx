@@ -223,7 +223,7 @@ function TimeMaskInput({ value, onChange, className }: {
 function CommonMaterialFields({
   ten, setTen, uploadMode, setUploadMode, source, setSource,
   chapterId, setChapterId, lessonId, setLessonId,
-  assignedClasses, setAssignedClasses,
+  assignedClasses, setAssignedClasses, hideBasic,
 }: {
   ten: string; setTen: (v: string) => void;
   uploadMode: string; setUploadMode: (v: string) => void;
@@ -231,6 +231,7 @@ function CommonMaterialFields({
   chapterId: string; setChapterId: (v: string) => void;
   lessonId: string; setLessonId: (v: string) => void;
   assignedClasses: Set<string>; setAssignedClasses: (v: Set<string>) => void;
+  hideBasic?: boolean;
 }) {
   const lessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === chapterId)?.units ?? [],
@@ -238,45 +239,49 @@ function CommonMaterialFields({
   );
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
-        <Field label="Tên học liệu" required>
-          <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
-        </Field>
-        <Field label="Lớp gán">
-          <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
-        </Field>
-      </div>
-      <div className="grid grid-cols-4 gap-3">
-        <Field label="Khối" required>
-          <SelectInput defaultValue="Lớp 4">
-            <option>Lớp 3</option>
-            <option>Lớp 4</option>
-            <option>Lớp 5</option>
-          </SelectInput>
-        </Field>
-        <Field label="Môn" required>
-          <SelectInput defaultValue="Toán">
-            <option>Toán</option>
-            <option>Tiếng Việt</option>
-          </SelectInput>
-        </Field>
-        <Field label="Chương/Chủ đề">
-          <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
-            <option value="">— Chọn chương/chủ đề —</option>
-            {KNOWLEDGE_TREE.map((c) => (
-              <option key={c.id} value={c.id}>{c.title}</option>
-            ))}
-          </SelectInput>
-        </Field>
-        <Field label="Bài học">
-          <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
-            <option value="">— Chọn bài học —</option>
-            {lessons.map((u) => (
-              <option key={u.id} value={u.id}>{u.title}</option>
-            ))}
-          </SelectInput>
-        </Field>
-      </div>
+      {!hideBasic && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Tên học liệu" required>
+              <TextInput value={ten} onChange={(e) => setTen(e.target.value)} />
+            </Field>
+            <Field label="Lớp gán">
+              <LopGanSelect value={assignedClasses} onChange={setAssignedClasses} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            <Field label="Khối" required>
+              <SelectInput defaultValue="Lớp 4">
+                <option>Lớp 3</option>
+                <option>Lớp 4</option>
+                <option>Lớp 5</option>
+              </SelectInput>
+            </Field>
+            <Field label="Môn" required>
+              <SelectInput defaultValue="Toán">
+                <option>Toán</option>
+                <option>Tiếng Việt</option>
+              </SelectInput>
+            </Field>
+            <Field label="Chương/Chủ đề">
+              <SelectInput value={chapterId} onChange={(e) => { setChapterId(e.target.value); setLessonId(""); }}>
+                <option value="">— Chọn chương/chủ đề —</option>
+                {KNOWLEDGE_TREE.map((c) => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Bài học">
+              <SelectInput value={lessonId} onChange={(e) => setLessonId(e.target.value)} disabled={!chapterId}>
+                <option value="">— Chọn bài học —</option>
+                {lessons.map((u) => (
+                  <option key={u.id} value={u.id}>{u.title}</option>
+                ))}
+              </SelectInput>
+            </Field>
+          </div>
+        </>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <Field label="Hình thức tải nội dung" required>
           <SelectInput value={uploadMode} onChange={(e) => setUploadMode(e.target.value)}>
