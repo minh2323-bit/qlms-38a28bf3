@@ -4,7 +4,7 @@ import {
   Info, ListChecks, Users, Check, ChevronRight, ArrowLeft, X,
   Plus, Trash2, Eye, SquarePen, Upload, Link as LinkIcon,
   FileText, Video, Presentation as PresentationIcon, ClipboardList, Gamepad2,
-  ChevronDown, Share2, Globe2, Save, FolderOpen,
+  ChevronDown, Globe2, Save, FolderOpen,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
