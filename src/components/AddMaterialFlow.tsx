@@ -343,11 +343,12 @@ const COMPLETION_MODES = [
 type CompletionMode = (typeof COMPLETION_MODES)[number]["key"];
 
 function VideoForm({
-  onClose, onSaved, inModal,
+  onClose, onSaved, inModal, hideBasicFields,
 }: {
   onClose: () => void;
   onSaved?: (p: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
+  hideBasicFields?: boolean;
 }) {
   const [ten, setTen] = useState("");
   const [uploadMode, setUploadMode] = useState("file");
