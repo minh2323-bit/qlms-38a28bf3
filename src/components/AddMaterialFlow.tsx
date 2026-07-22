@@ -362,8 +362,9 @@ function VideoForm({
   const [scale, setScale] = useState(10);
 
   const submit = () => {
-    if (!ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
-    onSaved?.({ title: ten.trim(), type: "video" });
+    const finalTitle = hideBasicFields ? (ten.trim() || "Học liệu video") : ten.trim();
+    if (!hideBasicFields && !ten.trim()) return toast.error("Vui lòng nhập tên học liệu");
+    onSaved?.({ title: finalTitle, type: "video" });
     toast.success("Đã thêm học liệu video");
     onClose();
   };
@@ -378,6 +379,7 @@ function VideoForm({
         chapterId={chapterId} setChapterId={setChapterId}
         lessonId={lessonId} setLessonId={setLessonId}
         assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+        hideBasic={hideBasicFields}
       />
 
       <div className="grid grid-cols-2 gap-4">
