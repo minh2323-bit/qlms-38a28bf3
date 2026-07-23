@@ -359,7 +359,7 @@ function NganHangCauHoiPage() {
                 <TableHead className="w-48">Loại câu hỏi</TableHead>
                 <TableHead className="w-36">Mức độ</TableHead>
                 <TableHead className="w-44">Nguồn</TableHead>
-                <TableHead className="w-32">Cập nhật</TableHead>
+                
                 <TableHead className="w-16 text-center"></TableHead>
               </TableRow>
             </TableHeader>
@@ -404,7 +404,7 @@ function NganHangCauHoiPage() {
                     </span>
                   </TableCell>
                   <TableCell className="text-sm text-slate-600">{q.source}</TableCell>
-                  <TableCell className="text-sm text-slate-600">{q.updatedAt}</TableCell>
+                  
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

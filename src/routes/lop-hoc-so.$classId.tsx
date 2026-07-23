@@ -345,7 +345,7 @@ function ClassDetailPage() {
               onClick={() => toast.message("Thêm chủ đề / Mục lục (demo)")}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             >
-              <Plus className="h-4 w-4" /> Thêm chủ đề/Mục lục
+              <Plus className="h-4 w-4" /> Thêm học phần/Mục lục
             </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
