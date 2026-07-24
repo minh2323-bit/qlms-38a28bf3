@@ -304,28 +304,6 @@ function ClassDetailPage() {
         </div>
       </section>
 
-      {/* Subject selector */}
-      <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-5">
-        <h2 className="text-sm font-bold text-slate-700 mb-3">Môn học phụ trách</h2>
-        <div className="flex flex-wrap gap-2">
-          {info.subjectsTaught.map((s) => {
-            const active = selectedSubject === s;
-            return (
-              <button
-                key={s}
-                onClick={() => setSelectedSubject(s)}
-                className={`px-3.5 py-2 rounded-lg text-sm font-semibold border transition ${
-                  active
-                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                    : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:text-indigo-700"
-                }`}
-              >
-                {s}
-              </button>
-            );
-          })}
-        </div>
-      </section>
 
 
 
