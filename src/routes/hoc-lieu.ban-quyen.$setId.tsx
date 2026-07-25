@@ -1,15 +1,20 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft, ChevronDown, ChevronRight, Plus, ListChecks, FileCheck2, Users,
-  Video, FileText, Music, BookOpen, HelpCircle, X, Check,
+  ArrowLeft, ChevronDown, Plus, ListChecks, FileCheck2, Users,
+  Video, FileText, Music, BookOpen, HelpCircle, X, Check, ExternalLink,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { BAN_QUYEN_SETS, getSetContent, KIND_META, type BanQuyenMaterial } from "@/lib/ban-quyen-data";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/hoc-lieu/ban-quyen/$setId")({
   head: () => ({
