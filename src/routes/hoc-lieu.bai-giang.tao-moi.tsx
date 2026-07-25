@@ -352,35 +352,85 @@ function CreateLessonPage() {
           </Link>
         </section>
 
-        <Stepper current={step} />
+        <Stepper current={step} steps={stepsArr} />
 
         {/* Body */}
         {step === 1 && (
-          <Step1
-            title={title} setTitle={setTitle}
-            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
-            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
-            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
-            unitIds={unitIds} setUnitIds={setUnitIds}
-            assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
-            rule={rule} setRule={setRule}
-            tree={tree}
-            coverMode={coverMode} setCoverMode={setCoverMode}
-            coverLink={coverLink} setCoverLink={setCoverLink}
-            coverFileName={coverFileName}
-            coverDataUrl={coverDataUrl}
-            fileRef={fileRef}
-            onPickFile={(f) => {
-              setCoverFileName(f.name);
-              const r = new FileReader();
-              r.onload = () => setCoverDataUrl(String(r.result));
-              r.readAsDataURL(f);
-            }}
-            canCreate={!!canCreate}
-            onCreate={onCreateShell}
-            lockGradeSubject={isPrefilled}
-            fromHint={search.from}
-          />
+          banquyenMode ? (
+            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
+              <div className="xl:col-span-3">
+                <Step1
+                  title={title} setTitle={setTitle}
+                  khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
+                  mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
+                  chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
+                  unitIds={unitIds} setUnitIds={setUnitIds}
+                  assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+                  rule={rule} setRule={setRule}
+                  tree={tree}
+                  coverMode={coverMode} setCoverMode={setCoverMode}
+                  coverLink={coverLink} setCoverLink={setCoverLink}
+                  coverFileName={coverFileName}
+                  coverDataUrl={coverDataUrl}
+                  fileRef={fileRef}
+                  onPickFile={(f) => {
+                    setCoverFileName(f.name);
+                    const r = new FileReader();
+                    r.onload = () => setCoverDataUrl(String(r.result));
+                    r.readAsDataURL(f);
+                  }}
+                  canCreate={!!canCreate}
+                  onCreate={onCreateShell}
+                  lockGradeSubject={isPrefilled}
+                  fromHint={search.from}
+                  hideHeaderActions
+                />
+              </div>
+              <div className="xl:col-span-2">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-bold text-slate-800">Danh sách học sinh được ghi danh</h3>
+                    <div className="text-sm text-slate-600">
+                      Đã chọn: <b className="text-indigo-700">{selectedStudents.size}</b> học sinh
+                    </div>
+                  </div>
+                  <Step3
+                    regMode={regMode} setRegMode={setRegMode}
+                    filterGrade={filterGrade} setFilterGrade={setFilterGrade}
+                    filterClass={filterClass} setFilterClass={setFilterClass}
+                    selected={selectedStudents} setSelected={setSelectedStudents}
+                    compact
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Step1
+              title={title} setTitle={setTitle}
+              khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
+              mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
+              chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
+              unitIds={unitIds} setUnitIds={setUnitIds}
+              assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+              rule={rule} setRule={setRule}
+              tree={tree}
+              coverMode={coverMode} setCoverMode={setCoverMode}
+              coverLink={coverLink} setCoverLink={setCoverLink}
+              coverFileName={coverFileName}
+              coverDataUrl={coverDataUrl}
+              fileRef={fileRef}
+              onPickFile={(f) => {
+                setCoverFileName(f.name);
+                const r = new FileReader();
+                r.onload = () => setCoverDataUrl(String(r.result));
+                r.readAsDataURL(f);
+              }}
+              canCreate={!!canCreate}
+              onCreate={onCreateShell}
+              lockGradeSubject={isPrefilled}
+              fromHint={search.from}
+            />
+          )
         )}
 
         {step === 2 && (
@@ -394,7 +444,7 @@ function CreateLessonPage() {
           />
         )}
 
-        {step === 3 && (
+        {step === 3 && !banquyenMode && (
           <Step3
             regMode={regMode} setRegMode={setRegMode}
             filterGrade={filterGrade} setFilterGrade={setFilterGrade}
@@ -403,18 +453,20 @@ function CreateLessonPage() {
           />
         )}
 
-        {/* Footer nav (only step 2, 3) */}
-        {step > 1 && (
+        {/* Footer nav */}
+        {(banquyenMode || step > 1) && (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-4 flex items-center justify-between">
-            <button
-              onClick={() => setStep((s) => (s === 3 ? 2 : 1) as 1 | 2 | 3)}
-              className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
-            >
-              <ArrowLeft className="h-4 w-4" /> Quay lại
-            </button>
-            {step === 2 ? (
+            {step > 1 ? (
               <button
-                onClick={() => setStep(3)}
+                onClick={() => setStep((s) => (s === 3 ? 2 : 1) as 1 | 2 | 3)}
+                className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+              >
+                <ArrowLeft className="h-4 w-4" /> Trở lại
+              </button>
+            ) : <span />}
+            {step < lastStep ? (
+              <button
+                onClick={() => setStep((s) => (s + 1) as 1 | 2 | 3)}
                 className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center gap-1.5"
               >
                 Tiếp tục <ChevronRight className="h-4 w-4" />
@@ -435,7 +487,7 @@ function CreateLessonPage() {
                 </button>
                 <button
                   onClick={onFinish}
-                  disabled={regMode === "admin" && selectedStudents.size === 0}
+                  disabled={!banquyenMode && regMode === "admin" && selectedStudents.size === 0}
                   className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                 >
                   <Check className="h-4 w-4" /> Hoàn tất tạo bài giảng
@@ -443,6 +495,7 @@ function CreateLessonPage() {
               </div>
             )}
           </div>
+
         )}
 
         {/* Preview modal */}
