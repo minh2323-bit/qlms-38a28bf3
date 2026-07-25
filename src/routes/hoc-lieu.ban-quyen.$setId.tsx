@@ -263,6 +263,39 @@ function SetDetailPage() {
           </section>
         </div>
       </div>
+
+      {/* Preview material */}
+      <Dialog open={!!previewMat} onOpenChange={(o) => !o && setPreviewMat(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Xem nội dung học liệu</DialogTitle>
+          </DialogHeader>
+          {previewMat && (() => {
+            const Icon = iconOfKind(previewMat.kind);
+            const meta = KIND_META[previewMat.kind];
+            return (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
+                  <span className={`h-11 w-11 rounded-full grid place-items-center ${meta.bg} ${meta.color}`}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <div className="text-base font-bold text-slate-800">{previewMat.title}</div>
+                    <div className="text-xs text-slate-500">{meta.label} · {set?.title}</div>
+                  </div>
+                </div>
+                <div className="aspect-video rounded-xl border bg-slate-50 grid place-items-center text-slate-400 text-sm">
+                  Xem trước học liệu ({meta.label})
+                </div>
+              </div>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewMat(null)}>Đóng</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+
