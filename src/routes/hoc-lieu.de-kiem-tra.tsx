@@ -737,7 +737,7 @@ function ExamWizard({
     return s;
   });
 
-  const canNext1 = name && grade && subject && duration && scoreType;
+  const canNext1 = name && grade && subject && duration && scoreType && startAt;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && close()}>
