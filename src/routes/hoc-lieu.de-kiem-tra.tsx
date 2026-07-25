@@ -685,7 +685,8 @@ function ExamWizard({
 }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
-  const [assignedClass, setAssignedClass] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [classDropOpen, setClassDropOpen] = useState(false);
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
   const [chapter, setChapter] = useState("");
