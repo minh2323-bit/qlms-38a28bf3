@@ -147,11 +147,16 @@ const STEPS = [
   { id: 3, name: "Đăng ký & Học sinh",  icon: Users },
 ] as const;
 
-function Stepper({ current }: { current: 1 | 2 | 3 }) {
+const STEPS_BQ = [
+  { id: 1, name: "Thông tin bài giảng & Danh sách học sinh", icon: Info },
+  { id: 2, name: "Nội dung bài giảng", icon: ListChecks },
+] as const;
+
+function Stepper({ current, steps }: { current: number; steps: ReadonlyArray<{ id: number; name: string; icon: React.ComponentType<{ className?: string }> }> }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
-        {STEPS.map((s, idx) => {
+        {steps.map((s, idx) => {
           const Icon = s.icon;
           const done = current > s.id;
           const active = current === s.id;
@@ -178,7 +183,7 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
                   </div>
                 </div>
               </div>
-              {idx < STEPS.length - 1 && (
+              {idx < steps.length - 1 && (
                 <div className="flex-1 mt-7 mx-2">
                   <div className={`h-1 rounded-full ${done ? "bg-emerald-400" : "bg-slate-200"}`} />
                 </div>
@@ -190,6 +195,7 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
     </div>
   );
 }
+
 
 /* ============================ Page ============================ */
 
