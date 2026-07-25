@@ -844,7 +844,7 @@ function ExamWizard({
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">Thời gian bắt đầu</label>
+                <label className="text-sm font-medium text-slate-700">Thời gian bắt đầu <span className="text-rose-500">*</span></label>
                 <Input type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} className="mt-1" />
               </div>
               <div>
