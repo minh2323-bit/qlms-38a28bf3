@@ -712,7 +712,7 @@ function ExamWizard({
   );
 
   const reset = () => {
-    setStep(1); setName(""); setAssignedClass(""); setGrade(""); setSubject("");
+    setStep(1); setName(""); setAssignedClasses(new Set()); setGrade(""); setSubject("");
     setChapter(""); setLesson(""); setStartAt(""); setDuration(""); setScoreType("");
     setShowAnswers(false); setShowScore(true); setShuffle(true);
     setGradeStep2("4"); setClassStep2("4A"); setSelectedStudents(new Set());
