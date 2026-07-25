@@ -383,7 +383,7 @@ function CreateLessonPage() {
                   onCreate={onCreateShell}
                   lockGradeSubject={isPrefilled}
                   fromHint={search.from}
-                  hideHeaderActions
+    
                 />
               </div>
               <div className="xl:col-span-2">
@@ -399,7 +399,7 @@ function CreateLessonPage() {
                     filterGrade={filterGrade} setFilterGrade={setFilterGrade}
                     filterClass={filterClass} setFilterClass={setFilterClass}
                     selected={selectedStudents} setSelected={setSelectedStudents}
-                    compact
+
                   />
                 </div>
               </div>
