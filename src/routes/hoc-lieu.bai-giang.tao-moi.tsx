@@ -206,6 +206,7 @@ function CreateLessonPage() {
   const prefilledMon = search.mon ?? "";
   const isPrefilled = !!(prefilledKhoi && prefilledMon);
   const isEditing = !!search.edit;
+  const banquyenMode = search.from === "banquyen";
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -251,6 +252,66 @@ function CreateLessonPage() {
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
   const [previewOpen, setPreviewOpen] = useState(false);
 
+  // Banquyen: hydrate topics/materials from sessionStorage on mount
+  const hydratedRef = useRef(false);
+  React.useEffect(() => {
+    if (!banquyenMode || hydratedRef.current) return;
+    try {
+      const raw = sessionStorage.getItem("banquyen.preselected");
+      if (!raw) return;
+      const data = JSON.parse(raw) as {
+        mode: string; grade?: string; subject?: string;
+        items: { id: string; title: string; kind: string; chapterId: string; chapterTitle: string }[];
+      };
+      if (data.mode !== "lesson" || !data.items?.length) return;
+      // group by chapterTitle → topic
+      const topicByChap = new Map<string, Topic>();
+      const nextTopics: Topic[] = [];
+      const nextMats: Material[] = [];
+      data.items.forEach((it, i) => {
+        let tp = topicByChap.get(it.chapterTitle);
+        if (!tp) {
+          tp = { id: "t-bq-" + i + "-" + Date.now(), name: it.chapterTitle };
+          topicByChap.set(it.chapterTitle, tp);
+          nextTopics.push(tp);
+        }
+        const legacyType: Material["type"] =
+          it.kind === "video" ? "Video"
+            : it.kind === "questions" ? "Bài kiểm tra"
+            : it.kind === "book" ? "Slide / Bài giảng"
+            : it.kind === "audio" ? "Tài liệu"
+            : "Tài liệu";
+        nextMats.push({
+          id: "m-bq-" + it.id,
+          name: it.title,
+          type: legacyType,
+          completion: COMPLETION_OPTIONS[0],
+          topicId: tp.id,
+        });
+      });
+      setTopics(nextTopics);
+      setMaterials(nextMats);
+      hydratedRef.current = true;
+    } catch {
+      // ignore
+    }
+  }, [banquyenMode]);
+
+  // Banquyen: auto-select students when assignedClasses changes
+  React.useEffect(() => {
+    if (!banquyenMode) return;
+    const ids = new Set<string>();
+    assignedClasses.forEach((c) => {
+      const m = c.match(/\b([3-5][A-Z])\b/);
+      const key = m?.[1];
+      if (key && STUDENT_DB[key]) STUDENT_DB[key].forEach((s) => ids.add(s.id));
+    });
+    setSelectedStudents(ids);
+  }, [assignedClasses, banquyenMode]);
+
+  const stepsArr = banquyenMode ? STEPS_BQ : STEPS;
+  const lastStep = banquyenMode ? 2 : 3;
+
   const onCreateShell = () => {
     if (!canCreate) return;
     setLessonCreated(true);
@@ -261,6 +322,7 @@ function CreateLessonPage() {
     // mock save
     navigate({ to: "/hoc-lieu/bai-giang" });
   };
+
 
   return (
     <AppShell>
