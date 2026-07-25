@@ -43,6 +43,7 @@ function SetDetailPage() {
   const [activeLesson, setActiveLesson] = useState(chapters[0]?.lessons[0]?.id);
   const [mode, setMode] = useState<Mode>("assign");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [previewMat, setPreviewMat] = useState<BanQuyenMaterial | null>(null);
 
   const chapter = chapters.find(c => c.id === activeChapter) ?? chapters[0];
   const lesson = chapter?.lessons.find(l => l.id === activeLesson) ?? chapter?.lessons[0];
@@ -72,15 +73,32 @@ function SetDetailPage() {
       toast.error("Vui lòng chọn ít nhất 1 học liệu.");
       return;
     }
-    sessionStorage.setItem("banquyen.preselected", JSON.stringify({ mode, ids: Array.from(selected), setId }));
+    // Build a rich payload so the lesson-create page can auto-fill topics & materials.
+    const items: { id: string; title: string; kind: BanQuyenMaterial["kind"]; chapterId: string; chapterTitle: string }[] = [];
+    for (const ch of chapters) {
+      for (const l of ch.lessons) {
+        for (const sec of l.sections) {
+          for (const m of sec.materials) {
+            if (selected.has(m.id)) {
+              items.push({ id: m.id, title: m.title, kind: m.kind, chapterId: ch.id, chapterTitle: ch.title });
+            }
+          }
+        }
+      }
+    }
+    const gradeNum = set?.grade.replace(/[^0-9]/g, "") ?? "";
+    sessionStorage.setItem("banquyen.preselected", JSON.stringify({
+      mode, setId, setTitle: set?.title, grade: gradeNum, subject: set?.subject, items,
+    }));
     if (mode === "lesson") {
       toast.success(`Đã chọn ${selected.size} học liệu — chuyển sang tạo bài giảng.`);
-      navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen" } });
+      navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen", khoi: `Lớp ${gradeNum}`, mon: set?.subject } });
     } else {
       toast.success(`Đã chọn ${selected.size} bộ câu hỏi — chuyển sang tạo đề kiểm tra.`);
       navigate({ to: "/hoc-lieu/de-kiem-tra" });
     }
   };
+
 
   if (!set) {
     return (
