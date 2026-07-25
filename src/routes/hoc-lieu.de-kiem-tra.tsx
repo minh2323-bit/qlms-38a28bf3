@@ -896,9 +896,18 @@ function ExamWizard({
                 <div className="text-sm text-slate-500">Thang điểm</div>
                 <Input className="w-24" placeholder="10" />
                 <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200">0/10</span>
-                <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
-                  <Plus className="h-4 w-4" /> Thêm câu hỏi
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
+                      <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    {["Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai", "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết", "Nối các đáp án tương ứng"].map((t) => (
+                      <DropdownMenuItem key={t} onSelect={() => toast.success(`Thêm câu hỏi: ${t}`)}>{t}</DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
