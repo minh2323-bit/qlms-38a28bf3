@@ -685,7 +685,8 @@ function ExamWizard({
 }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
-  const [assignedClass, setAssignedClass] = useState("");
+  const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
+  const [classDropOpen, setClassDropOpen] = useState(false);
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
   const [chapter, setChapter] = useState("");
@@ -711,7 +712,7 @@ function ExamWizard({
   );
 
   const reset = () => {
-    setStep(1); setName(""); setAssignedClass(""); setGrade(""); setSubject("");
+    setStep(1); setName(""); setAssignedClasses(new Set()); setGrade(""); setSubject("");
     setChapter(""); setLesson(""); setStartAt(""); setDuration(""); setScoreType("");
     setShowAnswers(false); setShowScore(true); setShuffle(true);
     setGradeStep2("4"); setClassStep2("4A"); setSelectedStudents(new Set());
@@ -736,7 +737,7 @@ function ExamWizard({
     return s;
   });
 
-  const canNext1 = name && grade && subject && duration && scoreType;
+  const canNext1 = name && grade && subject && duration && scoreType && startAt;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && close()}>
@@ -780,15 +781,28 @@ function ExamWizard({
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">Lớp gán</label>
-                <Select value={assignedClass} onValueChange={setAssignedClass}>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn lớp" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="4A">4A năm học 2025 - 2026</SelectItem>
-                    <SelectItem value="4B">4B năm học 2025 - 2026</SelectItem>
-                    <SelectItem value="4C">4C năm học 2025 - 2026</SelectItem>
-                  </SelectContent>
-                </Select>
+                <DropdownMenu open={classDropOpen} onOpenChange={setClassDropOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <button type="button" className="mt-1 w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-left">
+                      <span className={assignedClasses.size ? "text-slate-800" : "text-slate-400"}>
+                        {assignedClasses.size ? Array.from(assignedClasses).join(", ") : "Chọn lớp (nhiều)"}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-60" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    {["4A năm học 2025 - 2026", "4B năm học 2025 - 2026", "4C năm học 2025 - 2026"].map((c) => {
+                      const checked = assignedClasses.has(c);
+                      return (
+                        <DropdownMenuItem key={c} onSelect={(e) => { e.preventDefault(); setAssignedClasses(prev => { const n = new Set(prev); n.has(c) ? n.delete(c) : n.add(c); return n; }); }}>
+                          <Checkbox checked={checked} className="mr-2" /> {c}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
+
             </div>
             <div className="grid grid-cols-4 gap-4">
               <div>
@@ -830,7 +844,7 @@ function ExamWizard({
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">Thời gian bắt đầu</label>
+                <label className="text-sm font-medium text-slate-700">Thời gian bắt đầu <span className="text-rose-500">*</span></label>
                 <Input type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} className="mt-1" />
               </div>
               <div>
@@ -882,9 +896,18 @@ function ExamWizard({
                 <div className="text-sm text-slate-500">Thang điểm</div>
                 <Input className="w-24" placeholder="10" />
                 <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200">0/10</span>
-                <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
-                  <Plus className="h-4 w-4" /> Thêm câu hỏi
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
+                      <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    {["Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai", "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết", "Nối các đáp án tương ứng"].map((t) => (
+                      <DropdownMenuItem key={t} onSelect={() => toast.success(`Thêm câu hỏi: ${t}`)}>{t}</DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 

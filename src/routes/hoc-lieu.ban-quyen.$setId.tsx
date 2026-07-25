@@ -1,15 +1,20 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft, ChevronDown, ChevronRight, Plus, ListChecks, FileCheck2, Users,
-  Video, FileText, Music, BookOpen, HelpCircle, X, Check,
+  ArrowLeft, ChevronDown, Plus, ListChecks, FileCheck2, Users,
+  Video, FileText, Music, BookOpen, HelpCircle, X, Check, ExternalLink,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { BAN_QUYEN_SETS, getSetContent, KIND_META, type BanQuyenMaterial } from "@/lib/ban-quyen-data";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/hoc-lieu/ban-quyen/$setId")({
   head: () => ({
@@ -38,6 +43,7 @@ function SetDetailPage() {
   const [activeLesson, setActiveLesson] = useState(chapters[0]?.lessons[0]?.id);
   const [mode, setMode] = useState<Mode>("assign");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [previewMat, setPreviewMat] = useState<BanQuyenMaterial | null>(null);
 
   const chapter = chapters.find(c => c.id === activeChapter) ?? chapters[0];
   const lesson = chapter?.lessons.find(l => l.id === activeLesson) ?? chapter?.lessons[0];
@@ -67,15 +73,32 @@ function SetDetailPage() {
       toast.error("Vui lòng chọn ít nhất 1 học liệu.");
       return;
     }
-    sessionStorage.setItem("banquyen.preselected", JSON.stringify({ mode, ids: Array.from(selected), setId }));
+    // Build a rich payload so the lesson-create page can auto-fill topics & materials.
+    const items: { id: string; title: string; kind: BanQuyenMaterial["kind"]; chapterId: string; chapterTitle: string }[] = [];
+    for (const ch of chapters) {
+      for (const l of ch.lessons) {
+        for (const sec of l.sections) {
+          for (const m of sec.materials) {
+            if (selected.has(m.id)) {
+              items.push({ id: m.id, title: m.title, kind: m.kind, chapterId: ch.id, chapterTitle: ch.title });
+            }
+          }
+        }
+      }
+    }
+    const gradeNum = set?.grade.replace(/[^0-9]/g, "") ?? "";
+    sessionStorage.setItem("banquyen.preselected", JSON.stringify({
+      mode, setId, setTitle: set?.title, grade: gradeNum, subject: set?.subject, items,
+    }));
     if (mode === "lesson") {
       toast.success(`Đã chọn ${selected.size} học liệu — chuyển sang tạo bài giảng.`);
-      navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen" } });
+      navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen", khoi: `Lớp ${gradeNum}`, mon: set?.subject } });
     } else {
       toast.success(`Đã chọn ${selected.size} bộ câu hỏi — chuyển sang tạo đề kiểm tra.`);
       navigate({ to: "/hoc-lieu/de-kiem-tra" });
     }
   };
+
 
   if (!set) {
     return (
@@ -192,36 +215,40 @@ function SetDetailPage() {
                     const selectable = isSelectable(m);
                     const checked = selected.has(m.id);
                     const disabled = mode !== "assign" && !selectable;
+                    const rowClick = () => {
+                      if (mode === "assign") setPreviewMat(m);
+                      else toggle(m.id, disabled);
+                    };
                     return (
-                      <li key={m.id} className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${disabled ? "opacity-50" : ""}`}>
-                        {mode !== "assign" && (
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={disabled}
-                            onChange={() => toggle(m.id, disabled)}
-                            className="h-4 w-4 accent-indigo-600 shrink-0"
-                          />
-                        )}
+                      <li
+                        key={m.id}
+                        onClick={rowClick}
+                        className={`group flex items-center gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer transition ${
+                          disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-indigo-50/60"
+                        } ${checked ? "bg-indigo-50" : ""}`}
+                      >
                         <span className={`h-9 w-9 rounded-full grid place-items-center ${meta.bg} ${meta.color} shrink-0`}>
                           <Icon className="h-4 w-4" />
                         </span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-slate-800 truncate">{m.title}</div>
+                          <div className="text-sm font-semibold text-indigo-700 group-hover:underline truncate inline-flex items-center gap-1">
+                            {m.title}
+                            <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 shrink-0" />
+                          </div>
                           <div className="text-[11px] text-slate-500">{meta.label}</div>
                         </div>
                         {mode === "assign" ? (
                           <button
-                            onClick={() => toast.success(`Chọn giao bài: ${m.title}`)}
+                            onClick={(e) => { e.stopPropagation(); toast.success(`Chọn giao bài: ${m.title}`); }}
                             className="px-3 py-1.5 text-xs font-semibold rounded-md bg-sky-100 text-sky-700 hover:bg-sky-200 inline-flex items-center gap-1"
                           >
                             <Users className="h-3.5 w-3.5" /> Chọn giao bài
                           </button>
                         ) : (
                           <button
-                            onClick={() => toggle(m.id, disabled)}
+                            onClick={(e) => { e.stopPropagation(); toggle(m.id, disabled); }}
                             disabled={disabled}
-                            className={`h-6 w-6 rounded-md grid place-items-center border ${checked ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-300 text-transparent"} ${disabled ? "cursor-not-allowed" : ""}`}
+                            className={`h-6 w-6 rounded-md grid place-items-center border shrink-0 ${checked ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-300 text-transparent"} ${disabled ? "cursor-not-allowed" : ""}`}
                           >
                             <Check className="h-4 w-4" strokeWidth={3} />
                           </button>
@@ -230,11 +257,45 @@ function SetDetailPage() {
                     );
                   })}
                 </ul>
+
               </div>
             ))}
           </section>
         </div>
       </div>
+
+      {/* Preview material */}
+      <Dialog open={!!previewMat} onOpenChange={(o) => !o && setPreviewMat(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700">Xem nội dung học liệu</DialogTitle>
+          </DialogHeader>
+          {previewMat && (() => {
+            const Icon = iconOfKind(previewMat.kind);
+            const meta = KIND_META[previewMat.kind];
+            return (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
+                  <span className={`h-11 w-11 rounded-full grid place-items-center ${meta.bg} ${meta.color}`}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <div className="text-base font-bold text-slate-800">{previewMat.title}</div>
+                    <div className="text-xs text-slate-500">{meta.label} · {set?.title}</div>
+                  </div>
+                </div>
+                <div className="aspect-video rounded-xl border bg-slate-50 grid place-items-center text-slate-400 text-sm">
+                  Xem trước học liệu ({meta.label})
+                </div>
+              </div>
+            );
+          })()}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewMat(null)}>Đóng</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+

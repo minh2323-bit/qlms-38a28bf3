@@ -63,8 +63,44 @@ export const BAN_QUYEN_SETS: BanQuyenSet[] = (() => {
       if ((n % 3) === 0) { out.push(make(`set-${n}`, s.key, g, n)); n++; }
     }
   }
+
+  // Extra emphasized sets for Toán / Tiếng Việt lớp 3-4 (3 publishers × 2 sets)
+  const PUBS = ["Kết nối tri thức", "Cánh diều", "Chân trời sáng tạo"];
+  const VARIANTS = [
+    "Chương trình nâng cao",
+    "Ôn luyện chuyên đề",
+    "Rèn kỹ năng cơ bản",
+    "Chuyên đề trọng tâm",
+    "Bồi dưỡng học sinh giỏi",
+    "Luyện tập theo tuần",
+  ];
+  let k = 1000;
+  for (const g of ["Khối 3", "Khối 4"]) {
+    for (const subj of ["Toán", "Tiếng Việt"]) {
+      for (const p of PUBS) {
+        for (let i = 0; i < 2; i++) {
+          const gradeNum = g.replace(/[^0-9]/g, "");
+          const variant = VARIANTS[(k + i) % VARIANTS.length];
+          out.push({
+            id: `set-${k}`,
+            title: `${subj} ${gradeNum} - ${variant}`,
+            subtitle: `Bộ ${subj} lớp ${gradeNum} theo bộ ${p}`,
+            grade: g,
+            subject: subj,
+            publisher: p,
+            learners: 600 + (k * 17) % 900,
+            totalUnits: 90 + (k * 11) % 130,
+            progress: (k * 7) % 25,
+            color: COLORS[k % COLORS.length],
+          });
+          k++;
+        }
+      }
+    }
+  }
   return out;
 })();
+
 
 /* ==================== Nội dung / mục lục của 1 bộ ==================== */
 

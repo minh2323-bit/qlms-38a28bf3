@@ -147,11 +147,16 @@ const STEPS = [
   { id: 3, name: "Đăng ký & Học sinh",  icon: Users },
 ] as const;
 
-function Stepper({ current }: { current: 1 | 2 | 3 }) {
+const STEPS_BQ = [
+  { id: 1, name: "Thông tin bài giảng & Danh sách học sinh", icon: Info },
+  { id: 2, name: "Nội dung bài giảng", icon: ListChecks },
+] as const;
+
+function Stepper({ current, steps }: { current: number; steps: ReadonlyArray<{ id: number; name: string; icon: React.ComponentType<{ className?: string }> }> }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
-        {STEPS.map((s, idx) => {
+        {steps.map((s, idx) => {
           const Icon = s.icon;
           const done = current > s.id;
           const active = current === s.id;
@@ -178,7 +183,7 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
                   </div>
                 </div>
               </div>
-              {idx < STEPS.length - 1 && (
+              {idx < steps.length - 1 && (
                 <div className="flex-1 mt-7 mx-2">
                   <div className={`h-1 rounded-full ${done ? "bg-emerald-400" : "bg-slate-200"}`} />
                 </div>
@@ -191,6 +196,7 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
   );
 }
 
+
 /* ============================ Page ============================ */
 
 function CreateLessonPage() {
@@ -200,6 +206,7 @@ function CreateLessonPage() {
   const prefilledMon = search.mon ?? "";
   const isPrefilled = !!(prefilledKhoi && prefilledMon);
   const isEditing = !!search.edit;
+  const banquyenMode = search.from === "banquyen";
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -245,6 +252,66 @@ function CreateLessonPage() {
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
   const [previewOpen, setPreviewOpen] = useState(false);
 
+  // Banquyen: hydrate topics/materials from sessionStorage on mount
+  const hydratedRef = useRef(false);
+  React.useEffect(() => {
+    if (!banquyenMode || hydratedRef.current) return;
+    try {
+      const raw = sessionStorage.getItem("banquyen.preselected");
+      if (!raw) return;
+      const data = JSON.parse(raw) as {
+        mode: string; grade?: string; subject?: string;
+        items: { id: string; title: string; kind: string; chapterId: string; chapterTitle: string }[];
+      };
+      if (data.mode !== "lesson" || !data.items?.length) return;
+      // group by chapterTitle → topic
+      const topicByChap = new Map<string, Topic>();
+      const nextTopics: Topic[] = [];
+      const nextMats: Material[] = [];
+      data.items.forEach((it, i) => {
+        let tp = topicByChap.get(it.chapterTitle);
+        if (!tp) {
+          tp = { id: "t-bq-" + i + "-" + Date.now(), name: it.chapterTitle };
+          topicByChap.set(it.chapterTitle, tp);
+          nextTopics.push(tp);
+        }
+        const legacyType: Material["type"] =
+          it.kind === "video" ? "Video"
+            : it.kind === "questions" ? "Bài kiểm tra"
+            : it.kind === "book" ? "Slide / Bài giảng"
+            : it.kind === "audio" ? "Tài liệu"
+            : "Tài liệu";
+        nextMats.push({
+          id: "m-bq-" + it.id,
+          name: it.title,
+          type: legacyType,
+          completion: COMPLETION_OPTIONS[0],
+          topicId: tp.id,
+        });
+      });
+      setTopics(nextTopics);
+      setMaterials(nextMats);
+      hydratedRef.current = true;
+    } catch {
+      // ignore
+    }
+  }, [banquyenMode]);
+
+  // Banquyen: auto-select students when assignedClasses changes
+  React.useEffect(() => {
+    if (!banquyenMode) return;
+    const ids = new Set<string>();
+    assignedClasses.forEach((c) => {
+      const m = c.match(/\b([3-5][A-Z])\b/);
+      const key = m?.[1];
+      if (key && STUDENT_DB[key]) STUDENT_DB[key].forEach((s) => ids.add(s.id));
+    });
+    setSelectedStudents(ids);
+  }, [assignedClasses, banquyenMode]);
+
+  const stepsArr = banquyenMode ? STEPS_BQ : STEPS;
+  const lastStep = banquyenMode ? 2 : 3;
+
   const onCreateShell = () => {
     if (!canCreate) return;
     setLessonCreated(true);
@@ -255,6 +322,7 @@ function CreateLessonPage() {
     // mock save
     navigate({ to: "/hoc-lieu/bai-giang" });
   };
+
 
   return (
     <AppShell>
@@ -284,35 +352,85 @@ function CreateLessonPage() {
           </Link>
         </section>
 
-        <Stepper current={step} />
+        <Stepper current={step} steps={stepsArr} />
 
         {/* Body */}
         {step === 1 && (
-          <Step1
-            title={title} setTitle={setTitle}
-            khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
-            mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
-            chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
-            unitIds={unitIds} setUnitIds={setUnitIds}
-            assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
-            rule={rule} setRule={setRule}
-            tree={tree}
-            coverMode={coverMode} setCoverMode={setCoverMode}
-            coverLink={coverLink} setCoverLink={setCoverLink}
-            coverFileName={coverFileName}
-            coverDataUrl={coverDataUrl}
-            fileRef={fileRef}
-            onPickFile={(f) => {
-              setCoverFileName(f.name);
-              const r = new FileReader();
-              r.onload = () => setCoverDataUrl(String(r.result));
-              r.readAsDataURL(f);
-            }}
-            canCreate={!!canCreate}
-            onCreate={onCreateShell}
-            lockGradeSubject={isPrefilled}
-            fromHint={search.from}
-          />
+          banquyenMode ? (
+            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
+              <div className="xl:col-span-3">
+                <Step1
+                  title={title} setTitle={setTitle}
+                  khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
+                  mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
+                  chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
+                  unitIds={unitIds} setUnitIds={setUnitIds}
+                  assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+                  rule={rule} setRule={setRule}
+                  tree={tree}
+                  coverMode={coverMode} setCoverMode={setCoverMode}
+                  coverLink={coverLink} setCoverLink={setCoverLink}
+                  coverFileName={coverFileName}
+                  coverDataUrl={coverDataUrl}
+                  fileRef={fileRef}
+                  onPickFile={(f) => {
+                    setCoverFileName(f.name);
+                    const r = new FileReader();
+                    r.onload = () => setCoverDataUrl(String(r.result));
+                    r.readAsDataURL(f);
+                  }}
+                  canCreate={!!canCreate}
+                  onCreate={onCreateShell}
+                  lockGradeSubject={isPrefilled}
+                  fromHint={search.from}
+    
+                />
+              </div>
+              <div className="xl:col-span-2">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-bold text-slate-800">Danh sách học sinh được ghi danh</h3>
+                    <div className="text-sm text-slate-600">
+                      Đã chọn: <b className="text-indigo-700">{selectedStudents.size}</b> học sinh
+                    </div>
+                  </div>
+                  <Step3
+                    regMode={regMode} setRegMode={setRegMode}
+                    filterGrade={filterGrade} setFilterGrade={setFilterGrade}
+                    filterClass={filterClass} setFilterClass={setFilterClass}
+                    selected={selectedStudents} setSelected={setSelectedStudents}
+
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Step1
+              title={title} setTitle={setTitle}
+              khoi={khoi} setKhoi={(v) => { setKhoi(v); setChapterId(""); setUnitIds([]); }}
+              mon={mon}   setMon={(v) => { setMon(v); setChapterId(""); setUnitIds([]); }}
+              chapterId={chapterId} setChapterId={(v) => { setChapterId(v); setUnitIds([]); }}
+              unitIds={unitIds} setUnitIds={setUnitIds}
+              assignedClasses={assignedClasses} setAssignedClasses={setAssignedClasses}
+              rule={rule} setRule={setRule}
+              tree={tree}
+              coverMode={coverMode} setCoverMode={setCoverMode}
+              coverLink={coverLink} setCoverLink={setCoverLink}
+              coverFileName={coverFileName}
+              coverDataUrl={coverDataUrl}
+              fileRef={fileRef}
+              onPickFile={(f) => {
+                setCoverFileName(f.name);
+                const r = new FileReader();
+                r.onload = () => setCoverDataUrl(String(r.result));
+                r.readAsDataURL(f);
+              }}
+              canCreate={!!canCreate}
+              onCreate={onCreateShell}
+              lockGradeSubject={isPrefilled}
+              fromHint={search.from}
+            />
+          )
         )}
 
         {step === 2 && (
@@ -326,7 +444,7 @@ function CreateLessonPage() {
           />
         )}
 
-        {step === 3 && (
+        {step === 3 && !banquyenMode && (
           <Step3
             regMode={regMode} setRegMode={setRegMode}
             filterGrade={filterGrade} setFilterGrade={setFilterGrade}
@@ -335,18 +453,20 @@ function CreateLessonPage() {
           />
         )}
 
-        {/* Footer nav (only step 2, 3) */}
-        {step > 1 && (
+        {/* Footer nav */}
+        {(banquyenMode || step > 1) && (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-4 flex items-center justify-between">
-            <button
-              onClick={() => setStep((s) => (s === 3 ? 2 : 1) as 1 | 2 | 3)}
-              className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
-            >
-              <ArrowLeft className="h-4 w-4" /> Quay lại
-            </button>
-            {step === 2 ? (
+            {step > 1 ? (
               <button
-                onClick={() => setStep(3)}
+                onClick={() => setStep((s) => (s === 3 ? 2 : 1) as 1 | 2 | 3)}
+                className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 inline-flex items-center gap-1.5"
+              >
+                <ArrowLeft className="h-4 w-4" /> Trở lại
+              </button>
+            ) : <span />}
+            {step < lastStep ? (
+              <button
+                onClick={() => setStep((s) => (s + 1) as 1 | 2 | 3)}
                 className="px-5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center gap-1.5"
               >
                 Tiếp tục <ChevronRight className="h-4 w-4" />
@@ -367,7 +487,7 @@ function CreateLessonPage() {
                 </button>
                 <button
                   onClick={onFinish}
-                  disabled={regMode === "admin" && selectedStudents.size === 0}
+                  disabled={!banquyenMode && regMode === "admin" && selectedStudents.size === 0}
                   className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                 >
                   <Check className="h-4 w-4" /> Hoàn tất tạo bài giảng
@@ -375,6 +495,7 @@ function CreateLessonPage() {
               </div>
             )}
           </div>
+
         )}
 
         {/* Preview modal */}
