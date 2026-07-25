@@ -148,8 +148,9 @@ function BanQuyenListPage() {
                 </div>
                 <div className="mt-2 flex items-center justify-between text-xs">
                   <span className="inline-flex items-center gap-1 text-slate-600"><ListChecks className="h-3.5 w-3.5" /> {s.totalUnits} Bài</span>
-                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full border-2 border-sky-400 text-sky-600 text-[10px] font-bold">{s.progress}%</span>
+                  <span className="inline-flex items-center gap-1 text-slate-500"><Users className="h-3.5 w-3.5" /> {s.learners}</span>
                 </div>
+
               </div>
             </Link>
           ))}
