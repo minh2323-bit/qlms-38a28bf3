@@ -130,7 +130,7 @@ function BanQuyenListPage() {
               className="group rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition overflow-hidden"
             >
               <div className={`relative aspect-[4/3] bg-gradient-to-br ${s.color} flex items-center justify-center overflow-hidden`}>
-                <div className="absolute top-2 right-0 rotate-45 translate-x-4 -translate-y-0 bg-blue-600 text-white text-[10px] font-bold px-6 py-0.5 shadow">HEID</div>
+                <div className={`absolute top-2 right-0 rotate-45 translate-x-4 -translate-y-0 text-white text-[10px] font-bold px-6 py-0.5 shadow ${s.source === "OLM" ? "bg-emerald-600" : "bg-blue-600"}`}>{s.source}</div>
                 <div className="text-center px-3">
                   <div className="text-white font-black text-2xl leading-tight uppercase drop-shadow" style={{ WebkitTextStroke: "1px rgba(0,0,0,0.15)" }}>
                     {s.subject}
