@@ -10,6 +10,7 @@ export type BanQuyenSet = {
   totalUnits: number;
   progress: number; // 0-100
   color: string;    // gradient tailwind classes for cover
+  source: "HEID" | "OLM";
 };
 
 export const BAN_QUYEN_SUBJECTS = [
