@@ -90,11 +90,10 @@ function BanQuyenTaoMoiPage() {
       }
     }
     sessionStorage.setItem("banquyen.preselected", JSON.stringify({
-      mode: mode === "bai-giang" ? "lesson" : mode === "kiem-tra" ? "test" : "assign",
+      mode: mode === "bai-giang" ? "lesson" : "assign",
       setId: bookId, setTitle: set?.title, grade: gradeNum, subject: set?.subject, items,
     }));
     if (mode === "bai-giang") navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen", khoi: gradeNum ? `Lớp ${gradeNum}` : undefined, mon: set?.subject } });
-    else if (mode === "kiem-tra") navigate({ to: "/hoc-lieu/de-kiem-tra" });
     else navigate({ to: "/giao-bai-tap" });
     toast.success(`Đã chọn ${selected.size} học liệu.`);
   };
