@@ -74,8 +74,26 @@ function BanQuyenTaoMoiPage() {
 
   const confirm = () => {
     if (selected.size === 0) return toast.error("Vui lòng chọn ít nhất 1 học liệu.");
-    sessionStorage.setItem("banquyen.preselected", JSON.stringify({ mode, ids: Array.from(selected), setId: bookId }));
-    if (mode === "bai-giang") navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen" } });
+    const set = books.find(b => b.id === bookId);
+    const gradeNum = set?.grade.replace(/[^0-9]/g, "") ?? "";
+    // Build items payload matching bai-giang hydration shape
+    const items: { id: string; title: string; kind: BanQuyenMaterial["kind"]; chapterId: string; chapterTitle: string }[] = [];
+    for (const ch of chapters) {
+      for (const l of ch.lessons) {
+        for (const sec of l.sections) {
+          for (const m of sec.materials) {
+            if (selected.has(m.id)) {
+              items.push({ id: m.id, title: m.title, kind: m.kind, chapterId: ch.id, chapterTitle: ch.title });
+            }
+          }
+        }
+      }
+    }
+    sessionStorage.setItem("banquyen.preselected", JSON.stringify({
+      mode: mode === "bai-giang" ? "lesson" : mode === "kiem-tra" ? "test" : "assign",
+      setId: bookId, setTitle: set?.title, grade: gradeNum, subject: set?.subject, items,
+    }));
+    if (mode === "bai-giang") navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen", khoi: gradeNum ? `Lớp ${gradeNum}` : undefined, mon: set?.subject } });
     else if (mode === "kiem-tra") navigate({ to: "/hoc-lieu/de-kiem-tra" });
     else navigate({ to: "/giao-bai-tap" });
     toast.success(`Đã chọn ${selected.size} học liệu.`);
@@ -198,13 +216,6 @@ function BanQuyenTaoMoiPage() {
                       const checked = selected.has(m.id);
                       return (
                         <li key={m.id} className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${disabled ? "opacity-50" : ""}`}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={disabled}
-                            onChange={() => toggle(m.id, disabled)}
-                            className="h-4 w-4 accent-indigo-600 shrink-0"
-                          />
                           <span className={`h-9 w-9 rounded-full grid place-items-center ${kmeta.bg} ${kmeta.color} shrink-0`}>
                             <IconM className="h-4 w-4" />
                           </span>
@@ -212,6 +223,13 @@ function BanQuyenTaoMoiPage() {
                             <div className="text-sm font-semibold text-slate-800 truncate">{m.title}</div>
                             <div className="text-[11px] text-slate-500">{kmeta.label}</div>
                           </div>
+                          <button
+                            onClick={() => toggle(m.id, disabled)}
+                            disabled={disabled}
+                            className={`h-6 w-6 rounded-md grid place-items-center border shrink-0 ${checked ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-300 text-transparent"} ${disabled ? "cursor-not-allowed" : ""}`}
+                          >
+                            <Check className="h-4 w-4" strokeWidth={3} />
+                          </button>
                         </li>
                       );
                     })}

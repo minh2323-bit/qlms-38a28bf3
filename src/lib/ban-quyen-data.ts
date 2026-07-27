@@ -10,6 +10,7 @@ export type BanQuyenSet = {
   totalUnits: number;
   progress: number; // 0-100
   color: string;    // gradient tailwind classes for cover
+  source: "HEID" | "OLM";
 };
 
 export const BAN_QUYEN_SUBJECTS = [
@@ -50,6 +51,7 @@ function make(id: string, subject: string, grade: string, i: number): BanQuyenSe
     totalUnits: 120 + (i * 11) % 90,
     progress: (i * 7) % 20,
     color: COLORS[(i + subject.length) % COLORS.length],
+    source: i % 4 === 0 ? "OLM" : "HEID",
   };
 }
 
@@ -92,6 +94,7 @@ export const BAN_QUYEN_SETS: BanQuyenSet[] = (() => {
             totalUnits: 90 + (k * 11) % 130,
             progress: (k * 7) % 25,
             color: COLORS[k % COLORS.length],
+            source: (k % 3 === 0 ? "OLM" : "HEID"),
           });
           k++;
         }
