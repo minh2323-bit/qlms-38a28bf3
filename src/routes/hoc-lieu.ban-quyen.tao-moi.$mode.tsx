@@ -39,6 +39,9 @@ function BanQuyenTaoMoiPage() {
   const meta = MODE_META[mode];
   const Icon = meta.icon;
 
+  if (mode === "kiem-tra") return <TestCompilerPage />;
+
+
   // Left: book (set) list
   const books = BAN_QUYEN_SETS.slice(0, 6);
   const [bookId, setBookId] = useState<string | null>(null);
