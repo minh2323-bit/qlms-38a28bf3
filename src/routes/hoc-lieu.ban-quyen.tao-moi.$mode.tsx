@@ -216,13 +216,6 @@ function BanQuyenTaoMoiPage() {
                       const checked = selected.has(m.id);
                       return (
                         <li key={m.id} className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 ${disabled ? "opacity-50" : ""}`}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={disabled}
-                            onChange={() => toggle(m.id, disabled)}
-                            className="h-4 w-4 accent-indigo-600 shrink-0"
-                          />
                           <span className={`h-9 w-9 rounded-full grid place-items-center ${kmeta.bg} ${kmeta.color} shrink-0`}>
                             <IconM className="h-4 w-4" />
                           </span>
@@ -230,6 +223,13 @@ function BanQuyenTaoMoiPage() {
                             <div className="text-sm font-semibold text-slate-800 truncate">{m.title}</div>
                             <div className="text-[11px] text-slate-500">{kmeta.label}</div>
                           </div>
+                          <button
+                            onClick={() => toggle(m.id, disabled)}
+                            disabled={disabled}
+                            className={`h-6 w-6 rounded-md grid place-items-center border shrink-0 ${checked ? "bg-indigo-600 border-indigo-600 text-white" : "bg-white border-slate-300 text-transparent"} ${disabled ? "cursor-not-allowed" : ""}`}
+                          >
+                            <Check className="h-4 w-4" strokeWidth={3} />
+                          </button>
                         </li>
                       );
                     })}
