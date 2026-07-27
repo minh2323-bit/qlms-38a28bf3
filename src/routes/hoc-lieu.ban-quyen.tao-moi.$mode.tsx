@@ -117,7 +117,7 @@ function BanQuyenTaoMoiPage() {
         {/* Toolbar */}
         <div className="flex items-center justify-end gap-2">
           <div className="text-sm text-slate-600 mr-2">
-            Đang chọn <b className="text-indigo-700">{selected.size}</b> học liệu {mode === "kiem-tra" ? "(chỉ Bộ câu hỏi)" : ""}
+            Đang chọn <b className="text-indigo-700">{selected.size}</b> học liệu
           </div>
           <button onClick={() => setSelected(new Set())} className="px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1.5">
             <X className="h-4 w-4" /> Bỏ chọn
