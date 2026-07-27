@@ -51,6 +51,7 @@ function make(id: string, subject: string, grade: string, i: number): BanQuyenSe
     totalUnits: 120 + (i * 11) % 90,
     progress: (i * 7) % 20,
     color: COLORS[(i + subject.length) % COLORS.length],
+    source: i % 4 === 0 ? "OLM" : "HEID",
   };
 }
 
