@@ -61,11 +61,8 @@ function BanQuyenTaoMoiPage() {
     setSelected(new Set());
   };
 
-  const isSelectable = (m: BanQuyenMaterial) => {
-    if (mode === "giao-bai") return true;
-    if (mode === "kiem-tra") return m.kind === "questions";
-    return true;
-  };
+  const isSelectable = (_m: BanQuyenMaterial) => true;
+
   const toggle = (id: string, disabled: boolean) => {
     if (disabled) return;
     setSelected(prev => {
