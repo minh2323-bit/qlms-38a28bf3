@@ -94,6 +94,7 @@ export const BAN_QUYEN_SETS: BanQuyenSet[] = (() => {
             totalUnits: 90 + (k * 11) % 130,
             progress: (k * 7) % 25,
             color: COLORS[k % COLORS.length],
+            source: (k % 3 === 0 ? "OLM" : "HEID"),
           });
           k++;
         }
