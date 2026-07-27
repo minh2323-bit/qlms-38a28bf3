@@ -74,8 +74,26 @@ function BanQuyenTaoMoiPage() {
 
   const confirm = () => {
     if (selected.size === 0) return toast.error("Vui lòng chọn ít nhất 1 học liệu.");
-    sessionStorage.setItem("banquyen.preselected", JSON.stringify({ mode, ids: Array.from(selected), setId: bookId }));
-    if (mode === "bai-giang") navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen" } });
+    const set = books.find(b => b.id === bookId);
+    const gradeNum = set?.grade.replace(/[^0-9]/g, "") ?? "";
+    // Build items payload matching bai-giang hydration shape
+    const items: { id: string; title: string; kind: BanQuyenMaterial["kind"]; chapterId: string; chapterTitle: string }[] = [];
+    for (const ch of chapters) {
+      for (const l of ch.lessons) {
+        for (const sec of l.sections) {
+          for (const m of sec.materials) {
+            if (selected.has(m.id)) {
+              items.push({ id: m.id, title: m.title, kind: m.kind, chapterId: ch.id, chapterTitle: ch.title });
+            }
+          }
+        }
+      }
+    }
+    sessionStorage.setItem("banquyen.preselected", JSON.stringify({
+      mode: mode === "bai-giang" ? "lesson" : mode === "kiem-tra" ? "test" : "assign",
+      setId: bookId, setTitle: set?.title, grade: gradeNum, subject: set?.subject, items,
+    }));
+    if (mode === "bai-giang") navigate({ to: "/hoc-lieu/bai-giang/tao-moi", search: { from: "banquyen", khoi: gradeNum ? `Lớp ${gradeNum}` : undefined, mon: set?.subject } });
     else if (mode === "kiem-tra") navigate({ to: "/hoc-lieu/de-kiem-tra" });
     else navigate({ to: "/giao-bai-tap" });
     toast.success(`Đã chọn ${selected.size} học liệu.`);
