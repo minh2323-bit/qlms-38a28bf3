@@ -908,6 +908,14 @@ function Step2(props: {
               <div className="my-1 h-px bg-slate-100" />
               <div className="px-2 py-1 text-[11px] font-semibold uppercase text-slate-400">Thêm mới</div>
               <AddMaterialMenuItems onSelect={(k) => setAddingMaterialAt(`__type__:${k}`)} />
+              <DropdownMenuItem
+                className="cursor-pointer gap-2"
+                onSelect={(e) => { e.preventDefault(); setAddingMaterialAt("__lessontest__"); }}
+              >
+                <span className="text-slate-400 text-xs w-4">9.</span>
+                <ClipboardList className="h-4 w-4 text-amber-600" />
+                <span>Bài kiểm tra</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
