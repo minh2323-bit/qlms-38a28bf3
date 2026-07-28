@@ -856,10 +856,8 @@ function ExamWizard({
                 <Select value={scoreType} onValueChange={setScoreType}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mieng">Điểm miệng</SelectItem>
-                    <SelectItem value="15p">Điểm 15 phút</SelectItem>
-                    <SelectItem value="giuaky">Điểm giữa kỳ</SelectItem>
-                    <SelectItem value="cuoiky">Điểm cuối kỳ</SelectItem>
+                    <SelectItem value="none">Không lấy điểm</SelectItem>
+                    <SelectItem value="dgtx">Lấy điểm ĐGTX</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -874,7 +872,7 @@ function ExamWizard({
                   <Switch checked={showAnswers} onCheckedChange={setShowAnswers} /> Cho phép xem đáp án sau khi nộp
                 </label>
                 <label className="flex items-center gap-3 text-sm text-slate-700">
-                  <Switch checked={shuffle} onCheckedChange={setShuffle} /> Xáo trộn đề và câu hỏi ngẫu nhiên
+                  <Switch checked={shuffle} onCheckedChange={setShuffle} /> Xáo trộn thứ tự câu hỏi
                 </label>
               </div>
             </div>
@@ -896,6 +894,9 @@ function ExamWizard({
                 <div className="text-sm text-slate-500">Thang điểm</div>
                 <Input className="w-24" placeholder="10" />
                 <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200">0/10</span>
+                <Button variant="outline" className="gap-1" onClick={() => toast.success("Đã chia đều điểm cho các câu")}>
+                  Chia đều điểm cho các câu
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
@@ -921,7 +922,12 @@ function ExamWizard({
                     <TableHead className="w-20">Điểm</TableHead>
                     <TableHead className="w-24">Mức độ</TableHead>
                     <TableHead className="w-40">Loại câu hỏi</TableHead>
-                    <TableHead className="w-28 text-center">Hoán vị đáp án</TableHead>
+                    <TableHead className="w-28 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Checkbox defaultChecked />
+                        <span>Hoán vị đáp án</span>
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
