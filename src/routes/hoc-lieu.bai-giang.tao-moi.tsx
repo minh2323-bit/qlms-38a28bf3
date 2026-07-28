@@ -442,6 +442,11 @@ function CreateLessonPage() {
             editMatId={editMatId} setEditMatId={setEditMatId}
             addTopicOpen={addTopicOpen} setAddTopicOpen={setAddTopicOpen}
             newTopic={newTopic} setNewTopic={setNewTopic}
+            lectureContext={{
+              khoi, mon,
+              chapterTitle: tree.find((c) => c.id === chapterId)?.title ?? "",
+              lessonTitles: unitIds.map((id) => getUnitTitle(id)).filter(Boolean).join(", "),
+            }}
           />
         )}
 
