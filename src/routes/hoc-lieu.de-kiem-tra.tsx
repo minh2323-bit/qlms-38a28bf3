@@ -856,10 +856,8 @@ function ExamWizard({
                 <Select value={scoreType} onValueChange={setScoreType}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mieng">Điểm miệng</SelectItem>
-                    <SelectItem value="15p">Điểm 15 phút</SelectItem>
-                    <SelectItem value="giuaky">Điểm giữa kỳ</SelectItem>
-                    <SelectItem value="cuoiky">Điểm cuối kỳ</SelectItem>
+                    <SelectItem value="none">Không lấy điểm</SelectItem>
+                    <SelectItem value="dgtx">Lấy điểm ĐGTX</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -874,7 +872,7 @@ function ExamWizard({
                   <Switch checked={showAnswers} onCheckedChange={setShowAnswers} /> Cho phép xem đáp án sau khi nộp
                 </label>
                 <label className="flex items-center gap-3 text-sm text-slate-700">
-                  <Switch checked={shuffle} onCheckedChange={setShuffle} /> Xáo trộn đề và câu hỏi ngẫu nhiên
+                  <Switch checked={shuffle} onCheckedChange={setShuffle} /> Xáo trộn thứ tự câu hỏi
                 </label>
               </div>
             </div>
