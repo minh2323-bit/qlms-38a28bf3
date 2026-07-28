@@ -1026,7 +1026,23 @@ function Step2(props: {
           }}
         />
       )}
-      {addingMaterialAt && !addingMaterialAt.startsWith("__type__:") && (
+      {addingMaterialAt === "__lessontest__" && (
+        <LessonTestModal
+          lectureContext={lectureContext}
+          onClose={() => setAddingMaterialAt(null)}
+          onSaved={(name) => {
+            setMaterials((s) => [...s, {
+              id: "m-" + Date.now(),
+              name,
+              type: "Bài kiểm tra",
+              completion: COMPLETION_OPTIONS[1],
+              topicId: topics[0]?.id ?? "t-uncat",
+            }]);
+            setAddingMaterialAt(null);
+          }}
+        />
+      )}
+      {addingMaterialAt && !addingMaterialAt.startsWith("__type__:") && addingMaterialAt !== "__lessontest__" && (
         <AddMaterialMiniModal
           topics={topics}
           defaultTopicId={addingMaterialAt}
