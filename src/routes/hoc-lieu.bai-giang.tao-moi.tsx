@@ -1485,3 +1485,206 @@ function UnitCheckboxDropdown({
   );
 }
 
+
+/* ============================ LessonTestModal ============================ */
+/**
+ * Bài kiểm tra được gắn trong bài giảng (không phải bài kiểm tra online cho học sinh).
+ * Các field Khối/Môn/Chương/Bài học được tự động điền từ thông tin bài giảng và GV không được sửa.
+ */
+function LessonTestModal({
+  lectureContext, onClose, onSaved,
+}: {
+  lectureContext?: { khoi: string; mon: string; chapterTitle: string; lessonTitles: string };
+  onClose: () => void;
+  onSaved: (name: string) => void;
+}) {
+  const [step, setStep] = useState<1 | 2>(1);
+  const [name, setName] = useState("");
+  const [duration, setDuration] = useState("15");
+  const [scoreType, setScoreType] = useState("none");
+  const [showScore, setShowScore] = useState(true);
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [shuffle, setShuffle] = useState(true);
+  const [maxScore, setMaxScore] = useState("10");
+  const [permuteAll, setPermuteAll] = useState(true);
+
+  const readonly = "w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed";
+
+  const canNext = name.trim().length > 0 && duration.trim().length > 0;
+
+  return (
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{step === 1 ? "Thông tin bài kiểm tra" : "Nội dung bài kiểm tra"}</DialogTitle>
+        </DialogHeader>
+
+        {/* Mini stepper */}
+        <div className="flex items-center gap-3 pb-3 border-b">
+          {[
+            { n: 1, label: "Thông tin" },
+            { n: 2, label: "Nội dung" },
+          ].map((s, i) => (
+            <div key={s.n} className="flex items-center gap-2">
+              <div className={`h-8 w-8 rounded-full grid place-items-center text-xs font-bold ${
+                step >= s.n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+              }`}>
+                {step > s.n ? <Check className="h-4 w-4" /> : s.n}
+              </div>
+              <span className={`text-sm font-semibold ${step === s.n ? "text-indigo-700" : "text-slate-500"}`}>{s.label}</span>
+              {i === 0 && <span className="mx-2 text-slate-300">—</span>}
+            </div>
+          ))}
+        </div>
+
+        {step === 1 && (
+          <div className="space-y-4 pt-3">
+            <div className="rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2 text-xs text-indigo-800 inline-flex items-start gap-2">
+              <Info className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>Các thông tin Khối, Môn, Chương/Chủ đề, Bài học được điền tự động theo bài giảng và không thể chỉnh sửa.</span>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="VD: Kiểm tra 15 phút — Phân số"
+                className="mt-1 w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              <div>
+                <label className="text-xs font-medium text-slate-500">Khối</label>
+                <input readOnly value={lectureContext?.khoi ?? ""} className={"mt-1 " + readonly} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-500">Môn</label>
+                <input readOnly value={lectureContext?.mon ?? ""} className={"mt-1 " + readonly} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-500">Chương/Chủ đề</label>
+                <input readOnly value={lectureContext?.chapterTitle ?? ""} className={"mt-1 " + readonly} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-500">Bài học</label>
+                <input readOnly value={lectureContext?.lessonTitles ?? ""} className={"mt-1 " + readonly} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium text-slate-700">Thời gian làm bài (phút) <span className="text-rose-500">*</span></label>
+                <input type="number" value={duration} onChange={(e) => setDuration(e.target.value)}
+                  className="mt-1 w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Loại điểm <span className="text-rose-500">*</span></label>
+                <select value={scoreType} onChange={(e) => setScoreType(e.target.value)}
+                  className="mt-1 w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200">
+                  <option value="none">Không lấy điểm</option>
+                  <option value="dgtx">Lấy điểm ĐGTX</option>
+                </select>
+              </div>
+            </div>
+            <div className="pt-3 border-t">
+              <div className="font-semibold text-slate-800 mb-2 text-sm">Cấu hình bài kiểm tra</div>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex items-center gap-3 text-sm text-slate-700">
+                  <input type="checkbox" checked={showScore} onChange={(e) => setShowScore(e.target.checked)} className="h-4 w-4 accent-indigo-600" />
+                  Cho phép xem điểm sau khi nộp
+                </label>
+                <label className="flex items-center gap-3 text-sm text-slate-700">
+                  <input type="checkbox" checked={showAnswers} onChange={(e) => setShowAnswers(e.target.checked)} className="h-4 w-4 accent-indigo-600" />
+                  Cho phép xem đáp án sau khi nộp
+                </label>
+                <label className="flex items-center gap-3 text-sm text-slate-700">
+                  <input type="checkbox" checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} className="h-4 w-4 accent-indigo-600" />
+                  Xáo trộn thứ tự câu hỏi
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-3 border-t">
+              <button onClick={onClose} className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">Hủy</button>
+              <button onClick={() => setStep(2)} disabled={!canNext}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50">
+                Tiếp theo
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-3 pt-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="font-semibold text-slate-800">Danh sách câu hỏi</div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-slate-500">Thang điểm</span>
+                <input value={maxScore} onChange={(e) => setMaxScore(e.target.value)} className="w-20 px-2 py-1.5 text-sm rounded-md border border-slate-200" />
+                <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200">0/{maxScore || 10}</span>
+                <button onClick={() => toast.success("Đã chia đều điểm cho các câu")}
+                  className="px-3 py-1.5 text-sm font-semibold rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">
+                  Chia đều điểm cho các câu
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="px-3 py-1.5 text-sm font-semibold rounded-md bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center gap-1">
+                      <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    {["Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai", "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết", "Nối các đáp án tương ứng"].map((t) => (
+                      <DropdownMenuItem key={t} onSelect={() => toast.success(`Thêm câu hỏi: ${t}`)}>{t}</DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-2 text-center w-12">STT</th>
+                    <th className="px-3 py-2 text-left">Câu hỏi</th>
+                    <th className="px-3 py-2 text-left w-[220px]">Đáp án</th>
+                    <th className="px-3 py-2 text-left w-20">Điểm</th>
+                    <th className="px-3 py-2 text-left w-24">Mức độ</th>
+                    <th className="px-3 py-2 text-left w-40">Loại câu hỏi</th>
+                    <th className="px-3 py-2 text-center w-32">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <input type="checkbox" checked={permuteAll} onChange={(e) => setPermuteAll(e.target.checked)} className="h-4 w-4 accent-indigo-600" />
+                        <span>Hoán vị đáp án</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t">
+                    <td className="px-3 py-3 text-center text-slate-500">1</td>
+                    <td className="px-3 py-3 text-slate-800">3000 + 210 = ?</td>
+                    <td className="px-3 py-3">
+                      <div className="text-xs space-y-0.5">
+                        <div className="px-2 py-1 rounded bg-emerald-50 text-emerald-700">A. 3.210 (đáp án đúng)</div>
+                        <div className="px-2 py-1 text-slate-600">B. 3.120</div>
+                        <div className="px-2 py-1 text-slate-600">C. 3.201</div>
+                        <div className="px-2 py-1 text-slate-600">D. 3.021</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3"><input className="w-16 px-2 py-1 rounded border border-slate-200" defaultValue="1" /></td>
+                    <td className="px-3 py-3"><span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700 border border-amber-200">Nhận biết</span></td>
+                    <td className="px-3 py-3 text-xs text-slate-700">Trắc nghiệm nhiều đáp án</td>
+                    <td className="px-3 py-3 text-center"><input type="checkbox" defaultChecked className="h-4 w-4 accent-indigo-600" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="flex justify-between pt-3 border-t">
+              <button onClick={() => setStep(1)} className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">Quay lại</button>
+              <div className="flex gap-2">
+                <button onClick={onClose} className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">Hủy</button>
+                <button onClick={() => { onSaved(name.trim()); toast.success("Đã thêm bài kiểm tra vào bài giảng"); }}
+                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
+                  Lưu bài kiểm tra
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
