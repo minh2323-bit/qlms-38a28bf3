@@ -353,7 +353,7 @@ function CreateLessonPage() {
           </Link>
         </section>
 
-        <Stepper current={step} steps={stepsArr} />
+        <Stepper current={step} steps={stepsArr} filledSteps={materials.length > 0 ? [2] : []} />
 
         {/* Body */}
         {step === 1 && (
