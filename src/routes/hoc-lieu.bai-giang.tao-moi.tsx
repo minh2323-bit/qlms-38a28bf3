@@ -53,8 +53,8 @@ export const Route = createFileRoute("/hoc-lieu/bai-giang/tao-moi")({
 
 /* ------------------------------ Constants ------------------------------ */
 
-const GRADES = ["Lớp 3", "Lớp 4"];
-const SUBJECTS = ["Toán"];
+const GRADES = ["Lớp 1", "Lớp 2", "Lớp 3", "Lớp 4", "Lớp 5"];
+const SUBJECTS = ["Toán", "Tiếng Việt", "Tiếng Anh", "Đạo đức", "Tự nhiên và xã hội", "Khoa học", "Mĩ thuật", "Âm nhạc", "Tin học", "Công nghệ"];
 
 const REG_OPTIONS = [
   {
