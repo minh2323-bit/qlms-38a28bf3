@@ -152,13 +152,14 @@ const STEPS_BQ = [
   { id: 2, name: "Nội dung bài giảng", icon: ListChecks },
 ] as const;
 
-function Stepper({ current, steps }: { current: number; steps: ReadonlyArray<{ id: number; name: string; icon: React.ComponentType<{ className?: string }> }> }) {
+function Stepper({ current, steps, filledSteps }: { current: number; steps: ReadonlyArray<{ id: number; name: string; icon: React.ComponentType<{ className?: string }> }>; filledSteps?: ReadonlyArray<number> }) {
+  const filled = new Set(filledSteps ?? []);
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
         {steps.map((s, idx) => {
           const Icon = s.icon;
-          const done = current > s.id;
+          const done = current > s.id || filled.has(s.id);
           const active = current === s.id;
           return (
             <div key={s.id} className="flex-1 flex items-start">
