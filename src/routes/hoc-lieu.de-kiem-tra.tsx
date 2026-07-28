@@ -894,6 +894,9 @@ function ExamWizard({
                 <div className="text-sm text-slate-500">Thang điểm</div>
                 <Input className="w-24" placeholder="10" />
                 <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200">0/10</span>
+                <Button variant="outline" className="gap-1" onClick={() => toast.success("Đã chia đều điểm cho các câu")}>
+                  Chia đều điểm cho các câu
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
@@ -919,7 +922,12 @@ function ExamWizard({
                     <TableHead className="w-20">Điểm</TableHead>
                     <TableHead className="w-24">Mức độ</TableHead>
                     <TableHead className="w-40">Loại câu hỏi</TableHead>
-                    <TableHead className="w-28 text-center">Hoán vị đáp án</TableHead>
+                    <TableHead className="w-28 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Checkbox defaultChecked />
+                        <span>Hoán vị đáp án</span>
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
