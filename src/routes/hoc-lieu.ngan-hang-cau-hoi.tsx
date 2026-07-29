@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Plus, Trash2, Share2, Search, Pencil, X, ChevronDown, MoreHorizontal, Copy,
   CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2, ToggleLeft,
-  Clock3, CheckCircle2,
+  ArrowUpDown, Clock3, CheckCircle2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
   component: NganHangCauHoiPage,
 });
 
-type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match";
+type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match" | "order";
 type Level = "Nhận biết" | "Thông hiểu" | "Vận dụng" | "Vận dụng cao";
 type ShareStatus = "none" | "pending" | "approved";
 
@@ -67,6 +67,7 @@ const TYPE_LABEL: Record<QType, string> = {
   drag: "Kéo thả",
   fill: "Điền khuyết",
   match: "Nối",
+  order: "Sắp xếp",
 };
 
 const LEVELS: Level[] = ["Nhận biết", "Thông hiểu", "Vận dụng", "Vận dụng cao"];
@@ -136,6 +137,7 @@ function TypeIcon({ type }: { type: QType }) {
     drag: <Move className="h-4 w-4 text-sky-600" />,
     fill: <TextCursorInput className="h-4 w-4 text-teal-600" />,
     match: <Link2 className="h-4 w-4 text-rose-600" />,
+    order: <ArrowUpDown className="h-4 w-4 text-fuchsia-600" />,
   } as const;
   return map[type];
 }
@@ -492,6 +494,7 @@ function PickTypeModal({
     { key: "drag", title: "Kéo thả", desc: "Sắp xếp các mục theo thứ tự", Icon: Move, bg: "bg-sky-50", color: "text-sky-600" },
     { key: "fill", title: "Điền khuyết", desc: "Điền từ vào chỗ trống", Icon: TextCursorInput, bg: "bg-teal-50", color: "text-teal-600" },
     { key: "match", title: "Nối", desc: "Nối các đáp án tương ứng", Icon: Link2, bg: "bg-rose-50", color: "text-rose-600" },
+    { key: "order", title: "Sắp xếp", desc: "Sắp xếp các mục theo thứ tự đúng", Icon: ArrowUpDown, bg: "bg-fuchsia-50", color: "text-fuchsia-600" },
   ];
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>

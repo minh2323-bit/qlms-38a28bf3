@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2, Search,
   Database, Upload, PenLine, ChevronDown, X, Eye, Save,
-  CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2,
+  CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2, ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
@@ -71,7 +71,7 @@ const STUDENT_DB: Record<string, Student[]> = {
 };
 
 /* ---------- Types ---------- */
-type QKind = "single" | "multi" | "essay" | "drag" | "fill" | "match";
+type QKind = "single" | "multi" | "essay" | "drag" | "fill" | "match" | "order";
 const Q_LABEL: Record<QKind, string> = {
   single: "Trắc nghiệm 1 đáp án",
   multi: "Trắc nghiệm nhiều đáp án",
@@ -79,6 +79,7 @@ const Q_LABEL: Record<QKind, string> = {
   drag: "Kéo thả",
   fill: "Điền khuyết",
   match: "Nối",
+  order: "Sắp xếp",
 };
 const Q_BADGE: Record<QKind, string> = {
   single: "bg-indigo-100 text-indigo-700",
@@ -87,6 +88,7 @@ const Q_BADGE: Record<QKind, string> = {
   drag: "bg-sky-100 text-sky-700",
   fill: "bg-emerald-100 text-emerald-700",
   match: "bg-rose-100 text-rose-700",
+  order: "bg-fuchsia-100 text-fuchsia-700",
 };
 
 type Option = { text: string; correct: boolean };
@@ -192,6 +194,7 @@ function ManualQuestionModal({
     : kind === "essay" ? "tự luận"
     : kind === "drag" ? "kéo thả"
     : kind === "fill" ? "điền từ vào chỗ trống"
+    : kind === "order" ? "sắp xếp"
     : "nối"
   }`;
 
@@ -205,7 +208,7 @@ function ManualQuestionModal({
       if (!q.options.some((o) => o.correct)) { toast.error("Chọn ít nhất một đáp án đúng"); return; }
     } else if (kind === "essay") {
       q.fileName = fileName; q.hint = hint;
-    } else if (kind === "drag" || kind === "fill") {
+    } else if (kind === "drag" || kind === "fill" || kind === "order") {
       q.items = items.filter((x) => x.trim());
     } else if (kind === "match") {
       q.pairs = pairs.filter((p) => p.left.trim() && p.right.trim());
@@ -285,10 +288,12 @@ function ManualQuestionModal({
               </>
             )}
 
-            {(kind === "drag" || kind === "fill") && (
+            {(kind === "drag" || kind === "fill" || kind === "order") && (
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">
-                  {kind === "drag" ? "Các mục kéo thả (theo thứ tự đúng)" : "Các từ cần điền (theo thứ tự chỗ trống)"}
+                  {kind === "drag" ? "Các mục kéo thả (theo thứ tự đúng)"
+                    : kind === "order" ? "Các mục cần sắp xếp (theo thứ tự đúng)"
+                    : "Các từ cần điền (theo thứ tự chỗ trống)"}
                 </label>
                 <div className="border rounded-lg p-3 space-y-2">
                   {items.map((it, i) => (
@@ -523,7 +528,7 @@ function Page() {
       );
     }
     if (q.kind === "essay") return <span className="text-xs text-slate-500 italic">Học sinh tự trả lời</span>;
-    if (q.kind === "drag" || q.kind === "fill")
+    if (q.kind === "drag" || q.kind === "fill" || q.kind === "order")
       return <div className="text-xs text-slate-600">{q.items?.join(" | ") || "-"}</div>;
     if (q.kind === "match")
       return (
@@ -899,9 +904,10 @@ function Page() {
               { k: "single", Icon: CircleDot, color: "text-indigo-600 bg-indigo-50", desc: "Chọn 1 phương án đúng" },
               { k: "multi", Icon: CheckSquare, color: "text-violet-600 bg-violet-50", desc: "Chọn nhiều phương án đúng" },
               { k: "essay", Icon: FileText, color: "text-amber-600 bg-amber-50", desc: "Học sinh trả lời tự luận" },
-              { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Sắp xếp các mục theo thứ tự" },
+              { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Kéo các mục vào vị trí đúng" },
               { k: "fill", Icon: TextCursorInput, color: "text-emerald-600 bg-emerald-50", desc: "Điền khuyết" },
               { k: "match", Icon: Link2, color: "text-rose-600 bg-rose-50", desc: "Nối các đáp án tương ứng" },
+              { k: "order", Icon: ArrowUpDown, color: "text-fuchsia-600 bg-fuchsia-50", desc: "Sắp xếp các mục theo thứ tự đúng" },
             ] as { k: QKind; Icon: typeof CircleDot; color: string; desc: string }[]).map(({ k, Icon, color, desc }) => (
               <button key={k}
                 onClick={() => { setPickerOpen(false); setManualKind(k); }}
