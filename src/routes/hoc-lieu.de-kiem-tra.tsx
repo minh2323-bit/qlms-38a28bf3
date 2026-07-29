@@ -305,7 +305,7 @@ function Page() {
               <TableBody>
                 {filteredExams.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-slate-500 py-8">
+                    <TableCell colSpan={8} className="text-center text-slate-500 py-8">
                       Chưa có bài kiểm tra nào được giao.
                     </TableCell>
                   </TableRow>
@@ -324,7 +324,6 @@ function Page() {
                     <TableCell className="text-slate-700">Khối {e.grade}</TableCell>
                     <TableCell className="text-slate-700">{e.subject}</TableCell>
                     <TableCell className="text-slate-700 text-sm">{e.classAssigned}</TableCell>
-                    <TableCell className="text-slate-700 text-sm">{e.lectureAssigned ?? "—"}</TableCell>
                     <TableCell className="text-slate-700 text-sm whitespace-pre-line">
                       {e.startAt.split(" ").join("\n")}
                     </TableCell>
