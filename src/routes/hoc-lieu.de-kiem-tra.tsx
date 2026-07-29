@@ -902,7 +902,7 @@ function ExamWizard({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52">
-                    {["Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai", "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết", "Nối các đáp án tương ứng"].map((t) => (
+                    {["Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai", "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết", "Nối các đáp án tương ứng", "Sắp xếp"].map((t) => (
                       <DropdownMenuItem key={t} onSelect={() => toast.success(`Thêm câu hỏi: ${t}`)}>{t}</DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
