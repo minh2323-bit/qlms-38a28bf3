@@ -36,7 +36,7 @@ export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
   component: NganHangCauHoiPage,
 });
 
-type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match";
+type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match" | "order";
 type Level = "Nhận biết" | "Thông hiểu" | "Vận dụng" | "Vận dụng cao";
 type ShareStatus = "none" | "pending" | "approved";
 
@@ -67,6 +67,7 @@ const TYPE_LABEL: Record<QType, string> = {
   drag: "Kéo thả",
   fill: "Điền khuyết",
   match: "Nối",
+  order: "Sắp xếp",
 };
 
 const LEVELS: Level[] = ["Nhận biết", "Thông hiểu", "Vận dụng", "Vận dụng cao"];
