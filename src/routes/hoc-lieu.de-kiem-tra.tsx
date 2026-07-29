@@ -297,7 +297,6 @@ function Page() {
                   <TableHead className="w-[90px]">Khối</TableHead>
                   <TableHead className="w-[110px]">Môn</TableHead>
                   <TableHead className="w-[180px]">Lớp gán</TableHead>
-                  <TableHead className="w-[180px]">Bài giảng gán</TableHead>
                   <TableHead className="w-[160px]">Thời gian bắt đầu</TableHead>
                   <TableHead className="w-[100px] text-center">Thống kê</TableHead>
                   <TableHead className="w-[60px] text-center">Thao tác</TableHead>
