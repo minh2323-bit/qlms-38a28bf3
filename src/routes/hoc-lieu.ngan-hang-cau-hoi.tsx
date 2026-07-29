@@ -137,6 +137,7 @@ function TypeIcon({ type }: { type: QType }) {
     drag: <Move className="h-4 w-4 text-sky-600" />,
     fill: <TextCursorInput className="h-4 w-4 text-teal-600" />,
     match: <Link2 className="h-4 w-4 text-rose-600" />,
+    order: <ArrowUpDown className="h-4 w-4 text-fuchsia-600" />,
   } as const;
   return map[type];
 }
