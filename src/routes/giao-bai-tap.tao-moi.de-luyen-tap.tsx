@@ -288,10 +288,12 @@ function ManualQuestionModal({
               </>
             )}
 
-            {(kind === "drag" || kind === "fill") && (
+            {(kind === "drag" || kind === "fill" || kind === "order") && (
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">
-                  {kind === "drag" ? "Các mục kéo thả (theo thứ tự đúng)" : "Các từ cần điền (theo thứ tự chỗ trống)"}
+                  {kind === "drag" ? "Các mục kéo thả (theo thứ tự đúng)"
+                    : kind === "order" ? "Các mục cần sắp xếp (theo thứ tự đúng)"
+                    : "Các từ cần điền (theo thứ tự chỗ trống)"}
                 </label>
                 <div className="border rounded-lg p-3 space-y-2">
                   {items.map((it, i) => (
