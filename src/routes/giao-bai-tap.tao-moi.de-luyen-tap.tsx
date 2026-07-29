@@ -194,6 +194,7 @@ function ManualQuestionModal({
     : kind === "essay" ? "tự luận"
     : kind === "drag" ? "kéo thả"
     : kind === "fill" ? "điền từ vào chỗ trống"
+    : kind === "order" ? "sắp xếp"
     : "nối"
   }`;
 
