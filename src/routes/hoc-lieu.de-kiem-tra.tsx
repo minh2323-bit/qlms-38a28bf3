@@ -669,6 +669,17 @@ function Page() {
           toast.success("Đã tạo bài kiểm tra");
         }}
       />
+
+      {/* Create Đề wizard (2 steps) */}
+      <CreateExamWizard
+        open={createExamOpen}
+        onClose={() => setCreateExamOpen(false)}
+        onCreate={(t) => {
+          setTests((prev) => [t, ...prev]);
+          setCreateExamOpen(false);
+          toast.success("Đã tạo đề kiểm tra");
+        }}
+      />
     </AppShell>
   );
 }
