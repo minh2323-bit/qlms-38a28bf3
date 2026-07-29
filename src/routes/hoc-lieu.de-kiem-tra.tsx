@@ -1070,3 +1070,351 @@ function ExamWizard({
     </Dialog>
   );
 }
+
+/* ---------- Create Exam Wizard (2 steps) ---------- */
+
+type BankQuestion = {
+  id: string;
+  content: string;
+  type: string;
+  level: string;
+  chapter: string;
+  lesson: string;
+};
+
+const BANK_QUESTIONS: BankQuestion[] = [
+  { id: "bq1", content: "Số nào lớn nhất trong các số sau: 3 210, 3 120, 3 201, 3 102?", type: "Trắc nghiệm 1 đáp án", level: "Nhận biết", chapter: "Số tự nhiên", lesson: "So sánh số tự nhiên" },
+  { id: "bq2", content: "Chọn các phân số bằng 1/2:", type: "Trắc nghiệm nhiều đáp án", level: "Thông hiểu", chapter: "Phân số", lesson: "Phân số bằng nhau" },
+  { id: "bq3", content: "Tính: 3.245 + 1.876 = ?", type: "Trắc nghiệm 1 đáp án", level: "Nhận biết", chapter: "Phép cộng, trừ", lesson: "Cộng có nhớ" },
+  { id: "bq4", content: "Trình bày cách tìm hai số khi biết tổng và hiệu.", type: "Tự luận", level: "Vận dụng", chapter: "Bài toán tổng - hiệu", lesson: "Giải toán" },
+  { id: "bq5", content: "Sắp xếp các số sau theo thứ tự tăng dần: 1234, 987, 2001, 1500.", type: "Sắp xếp", level: "Thông hiểu", chapter: "Số tự nhiên", lesson: "So sánh số tự nhiên" },
+  { id: "bq6", content: "Nối phép tính với kết quả tương ứng.", type: "Nối", level: "Thông hiểu", chapter: "Phép cộng, trừ", lesson: "Ôn tập" },
+];
+
+const QUESTION_TYPES = [
+  "Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai",
+  "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết",
+  "Nối các đáp án tương ứng", "Sắp xếp",
+];
+
+function CreateExamWizard({
+  open, onClose, onCreate,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (t: Test) => void;
+}) {
+  const [step, setStep] = useState(1);
+  const [name, setName] = useState("");
+  const [grade, setGrade] = useState("");
+  const [subject, setSubject] = useState("");
+  const [chapter, setChapter] = useState("");
+  const [lesson, setLesson] = useState("");
+  const [maxScore, setMaxScore] = useState("10");
+  const [duration, setDuration] = useState("45");
+  const [questions, setQuestions] = useState<BankQuestion[]>([]);
+  const [bankOpen, setBankOpen] = useState(false);
+
+  const subjects = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
+  const tree = useMemo(
+    () => (grade && subject ? getKnowledgeTree(grade, subject) : []),
+    [grade, subject],
+  );
+  const lessons = useMemo(
+    () => tree.find((c) => c.id === chapter)?.units ?? [],
+    [tree, chapter],
+  );
+
+  const reset = () => {
+    setStep(1); setName(""); setGrade(""); setSubject(""); setChapter(""); setLesson("");
+    setMaxScore("10"); setDuration("45"); setQuestions([]);
+  };
+  const close = () => { reset(); onClose(); };
+  const canNext1 = name.trim() && grade && subject && chapter && maxScore && duration;
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={(o) => !o && close()}>
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800">Tạo đề thi từ ngân hàng câu hỏi</DialogTitle>
+          </DialogHeader>
+
+          {/* Stepper */}
+          <div className="flex items-center justify-between px-2 pt-2 pb-4 border-b">
+            {[
+              { n: 1, label: "Thông tin đề" },
+              { n: 2, label: "Nội dung đề" },
+            ].map((s, i) => (
+              <div key={s.n} className="flex-1 flex items-center">
+                <div className="flex flex-col items-center flex-1">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    step >= s.n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                  }`}>
+                    {step > s.n ? <ListChecks className="h-5 w-5" /> : <Info className="h-5 w-5" />}
+                  </div>
+                  <div className="mt-2 text-xs text-slate-500">BƯỚC {s.n}</div>
+                  <div className={`text-sm font-semibold mt-0.5 ${step === s.n ? "text-slate-800" : "text-slate-500"}`}>
+                    {s.label}
+                  </div>
+                </div>
+                {i < 1 && <div className={`h-0.5 flex-1 -mt-10 ${step > s.n ? "bg-indigo-600" : "bg-slate-200"}`} />}
+              </div>
+            ))}
+          </div>
+
+          {step === 1 && (
+            <div className="space-y-4 pt-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">Tên đề thi <span className="text-rose-500">*</span></label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1" placeholder="VD: Kiểm tra 15 phút – Phân số" />
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Khối <span className="text-rose-500">*</span></label>
+                  <Select value={grade} onValueChange={(v) => { setGrade(v); setSubject(""); setChapter(""); setLesson(""); }}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectContent>
+                      {Object.keys(SUBJECTS_BY_GRADE).map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Môn <span className="text-rose-500">*</span></label>
+                  <Select value={subject} onValueChange={(v) => { setSubject(v); setChapter(""); setLesson(""); }} disabled={!grade}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Chương/Chủ đề <span className="text-rose-500">*</span></label>
+                  <Select value={chapter} onValueChange={(v) => { setChapter(v); setLesson(""); }} disabled={!subject || tree.length === 0}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectContent>
+                      {tree.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Bài học</label>
+                  <Select value={lesson} onValueChange={setLesson} disabled={!chapter}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn" /></SelectTrigger>
+                    <SelectContent>
+                      {lessons.map((u) => <SelectItem key={u.id} value={u.id}>{u.title}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Thang điểm <span className="text-rose-500">*</span></label>
+                  <Input type="number" value={maxScore} onChange={(e) => setMaxScore(e.target.value)} className="mt-1" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Số phút <span className="text-rose-500">*</span></label>
+                  <Input type="number" value={duration} onChange={(e) => setDuration(e.target.value)} className="mt-1" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button variant="outline" onClick={close}>Đóng</Button>
+                <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!canNext1} onClick={() => setStep(2)}>
+                  Tiếp tục
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-slate-800">Danh sách câu hỏi của đề</h3>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" className="gap-1" onClick={() => setBankOpen(true)}>
+                    <ClipboardList className="h-4 w-4" /> Thêm từ ngân hàng câu hỏi
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="bg-indigo-700 hover:bg-indigo-800 gap-1">
+                        <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      {QUESTION_TYPES.map((t) => (
+                        <DropdownMenuItem key={t} onSelect={() => {
+                          setQuestions((prev) => [...prev, { id: `nq-${Date.now()}-${prev.length}`, content: `(Câu hỏi mới - ${t})`, type: t, level: "Nhận biết", chapter: "", lesson: "" }]);
+                          toast.success(`Đã thêm câu hỏi: ${t}`);
+                        }}>{t}</DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+
+              <div className="border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50">
+                      <TableHead className="w-12">STT</TableHead>
+                      <TableHead>Câu hỏi</TableHead>
+                      <TableHead className="w-40">Loại</TableHead>
+                      <TableHead className="w-32">Mức độ</TableHead>
+                      <TableHead className="w-20 text-center">Điểm</TableHead>
+                      <TableHead className="w-16 text-center"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {questions.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-slate-500 py-8">
+                          Chưa có câu hỏi nào. Chọn "Thêm mới" hoặc "Thêm từ ngân hàng câu hỏi".
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {questions.map((q, i) => (
+                      <TableRow key={q.id}>
+                        <TableCell className="text-slate-500">{i + 1}</TableCell>
+                        <TableCell className="text-slate-800">{q.content}</TableCell>
+                        <TableCell className="text-xs text-slate-700">{q.type}</TableCell>
+                        <TableCell>
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700 border border-amber-200">{q.level}</span>
+                        </TableCell>
+                        <TableCell className="text-center"><Input className="w-16 mx-auto" defaultValue="1" /></TableCell>
+                        <TableCell className="text-center">
+                          <button className="text-slate-400 hover:text-rose-600" onClick={() => setQuestions((p) => p.filter((x) => x.id !== q.id))}>
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="flex justify-between pt-4 border-t">
+                <Button variant="outline" onClick={() => setStep(1)}>Quay lại</Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={close}>Đóng</Button>
+                  <Button
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    disabled={questions.length === 0}
+                    onClick={() => {
+                      onCreate({
+                        id: `e-${Date.now()}`,
+                        name: name.trim() || "Đề tạo mới",
+                        grade, subject,
+                        chapterId: chapter, lessonId: lesson,
+                        kind: "manual",
+                        duration: Number(duration) || 45,
+                        questions: questions.length,
+                        maxScore: Number(maxScore) || 10,
+                        share: "",
+                      });
+                      reset();
+                    }}
+                  >
+                    Tạo đề
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Bank picker */}
+      <QuestionBankPicker
+        open={bankOpen}
+        onClose={() => setBankOpen(false)}
+        onPick={(picked) => {
+          setQuestions((prev) => [...prev, ...picked]);
+          setBankOpen(false);
+          toast.success(`Đã thêm ${picked.length} câu hỏi từ ngân hàng`);
+        }}
+      />
+    </>
+  );
+}
+
+function QuestionBankPicker({
+  open, onClose, onPick,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onPick: (qs: BankQuestion[]) => void;
+}) {
+  const [q, setQ] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const filtered = useMemo(
+    () => BANK_QUESTIONS.filter((x) => !q || x.content.toLowerCase().includes(q.toLowerCase())),
+    [q],
+  );
+
+  const toggle = (id: string) => setSelected((prev) => {
+    const s = new Set(prev);
+    if (s.has(id)) s.delete(id); else s.add(id);
+    return s;
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && (setSelected(new Set()), onClose())}>
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-indigo-700 flex items-center gap-2">
+            <ClipboardList className="h-5 w-5" /> Ngân hàng câu hỏi
+          </DialogTitle>
+        </DialogHeader>
+        <div className="flex items-center gap-2 pb-2">
+          <div className="relative flex-1">
+            <Search className="h-4 w-4 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2" />
+            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm câu hỏi..." className="pl-8" />
+          </div>
+          <div className="text-sm text-slate-500">Đã chọn <b className="text-slate-800">{selected.size}</b></div>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-50">
+              <TableHead className="w-10"></TableHead>
+              <TableHead>Câu hỏi</TableHead>
+              <TableHead className="w-40">Loại</TableHead>
+              <TableHead className="w-32">Mức độ</TableHead>
+              <TableHead className="w-48">Chương / Bài</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((x) => (
+              <TableRow key={x.id} className="hover:bg-indigo-50/30 cursor-pointer" onClick={() => toggle(x.id)}>
+                <TableCell><Checkbox checked={selected.has(x.id)} onCheckedChange={() => toggle(x.id)} /></TableCell>
+                <TableCell className="text-slate-800">{x.content}</TableCell>
+                <TableCell className="text-xs text-slate-700">{x.type}</TableCell>
+                <TableCell>
+                  <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700 border border-amber-200">{x.level}</span>
+                </TableCell>
+                <TableCell className="text-xs text-slate-600">
+                  <div className="font-medium text-slate-800">{x.chapter}</div>
+                  <div>{x.lesson}</div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <div className="flex justify-end gap-2 pt-4 border-t">
+          <Button variant="outline" onClick={() => { setSelected(new Set()); onClose(); }}>Hủy</Button>
+          <Button
+            className="bg-indigo-700 hover:bg-indigo-800"
+            disabled={selected.size === 0}
+            onClick={() => {
+              const picked = BANK_QUESTIONS.filter((x) => selected.has(x.id));
+              setSelected(new Set());
+              onPick(picked);
+            }}
+          >
+            Thêm {selected.size > 0 ? `(${selected.size})` : ""}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
