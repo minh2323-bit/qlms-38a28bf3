@@ -904,9 +904,10 @@ function Page() {
               { k: "single", Icon: CircleDot, color: "text-indigo-600 bg-indigo-50", desc: "Chọn 1 phương án đúng" },
               { k: "multi", Icon: CheckSquare, color: "text-violet-600 bg-violet-50", desc: "Chọn nhiều phương án đúng" },
               { k: "essay", Icon: FileText, color: "text-amber-600 bg-amber-50", desc: "Học sinh trả lời tự luận" },
-              { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Sắp xếp các mục theo thứ tự" },
+              { k: "drag", Icon: Move, color: "text-sky-600 bg-sky-50", desc: "Kéo các mục vào vị trí đúng" },
               { k: "fill", Icon: TextCursorInput, color: "text-emerald-600 bg-emerald-50", desc: "Điền khuyết" },
               { k: "match", Icon: Link2, color: "text-rose-600 bg-rose-50", desc: "Nối các đáp án tương ứng" },
+              { k: "order", Icon: ArrowUpDown, color: "text-fuchsia-600 bg-fuchsia-50", desc: "Sắp xếp các mục theo thứ tự đúng" },
             ] as { k: QKind; Icon: typeof CircleDot; color: string; desc: string }[]).map(({ k, Icon, color, desc }) => (
               <button key={k}
                 onClick={() => { setPickerOpen(false); setManualKind(k); }}
