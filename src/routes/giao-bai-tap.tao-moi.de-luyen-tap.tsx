@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Info, ListChecks, Users, Check, ArrowLeft, Plus, Trash2, Search,
   Database, Upload, PenLine, ChevronDown, X, Eye, Save,
-  CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2,
+  CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2, ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
