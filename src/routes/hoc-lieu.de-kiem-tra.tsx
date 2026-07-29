@@ -103,6 +103,7 @@ function Page() {
   const [confirmDeleteExam, setConfirmDeleteExam] = useState<Exam | null>(null);
   const [assignFrom, setAssignFrom] = useState<Test | null>(null);
   const [examWizard, setExamWizard] = useState(false);
+  const [createExamOpen, setCreateExamOpen] = useState(false);
 
   const subjectOptions = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
   const tree = useMemo(
