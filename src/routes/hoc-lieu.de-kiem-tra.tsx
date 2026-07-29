@@ -201,7 +201,7 @@ function Page() {
                     <DropdownMenuItem onClick={() => setCreateOpen("matrix")}>
                       <Grid3x3 className="h-4 w-4 mr-2 text-indigo-600" /> Tạo từ khung ma trận
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setCreateOpen("manual")}>
+                    <DropdownMenuItem onClick={() => setCreateExamOpen(true)}>
                       <FileCheck2 className="h-4 w-4 mr-2 text-emerald-600" /> Tạo mới
                     </DropdownMenuItem>
                   </DropdownMenuContent>
