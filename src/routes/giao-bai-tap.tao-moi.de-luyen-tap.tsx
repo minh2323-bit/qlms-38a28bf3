@@ -528,7 +528,7 @@ function Page() {
       );
     }
     if (q.kind === "essay") return <span className="text-xs text-slate-500 italic">Học sinh tự trả lời</span>;
-    if (q.kind === "drag" || q.kind === "fill")
+    if (q.kind === "drag" || q.kind === "fill" || q.kind === "order")
       return <div className="text-xs text-slate-600">{q.items?.join(" | ") || "-"}</div>;
     if (q.kind === "match")
       return (
