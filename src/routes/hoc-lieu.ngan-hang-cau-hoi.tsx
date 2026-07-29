@@ -494,6 +494,7 @@ function PickTypeModal({
     { key: "drag", title: "Kéo thả", desc: "Sắp xếp các mục theo thứ tự", Icon: Move, bg: "bg-sky-50", color: "text-sky-600" },
     { key: "fill", title: "Điền khuyết", desc: "Điền từ vào chỗ trống", Icon: TextCursorInput, bg: "bg-teal-50", color: "text-teal-600" },
     { key: "match", title: "Nối", desc: "Nối các đáp án tương ứng", Icon: Link2, bg: "bg-rose-50", color: "text-rose-600" },
+    { key: "order", title: "Sắp xếp", desc: "Sắp xếp các mục theo thứ tự đúng", Icon: ArrowUpDown, bg: "bg-fuchsia-50", color: "text-fuchsia-600" },
   ];
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
