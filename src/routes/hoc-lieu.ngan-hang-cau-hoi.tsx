@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Plus, Trash2, Share2, Search, Pencil, X, ChevronDown, MoreHorizontal, Copy,
   CircleDot, CheckSquare, FileText, Move, TextCursorInput, Link2, ToggleLeft,
-  Clock3, CheckCircle2,
+  ArrowUpDown, Clock3, CheckCircle2,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
