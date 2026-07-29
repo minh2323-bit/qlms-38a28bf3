@@ -208,7 +208,7 @@ function ManualQuestionModal({
       if (!q.options.some((o) => o.correct)) { toast.error("Chọn ít nhất một đáp án đúng"); return; }
     } else if (kind === "essay") {
       q.fileName = fileName; q.hint = hint;
-    } else if (kind === "drag" || kind === "fill") {
+    } else if (kind === "drag" || kind === "fill" || kind === "order") {
       q.items = items.filter((x) => x.trim());
     } else if (kind === "match") {
       q.pairs = pairs.filter((p) => p.left.trim() && p.right.trim());
