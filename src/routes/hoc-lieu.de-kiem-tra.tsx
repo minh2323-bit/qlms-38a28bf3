@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
+import { listMatrices } from "@/lib/matrix-store";
 
 export const Route = createFileRoute("/hoc-lieu/de-kiem-tra")({
   head: () => ({ meta: [{ title: "Đề & Bài kiểm tra – Học liệu" }] }),
@@ -96,7 +97,9 @@ function Page() {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
+  const navigate = useNavigate();
   const [matrixOpen, setMatrixOpen] = useState(false);
+  const [matrixQ, setMatrixQ] = useState("");
   const [createOpen, setCreateOpen] = useState<null | CreateKind>(null);
   const [shareOne, setShareOne] = useState<Test | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Test | null>(null);
@@ -198,7 +201,7 @@ function Page() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem onClick={() => setCreateOpen("matrix")}>
+                    <DropdownMenuItem onClick={() => setMatrixOpen(true)}>
                       <Grid3x3 className="h-4 w-4 mr-2 text-indigo-600" /> Tạo từ khung ma trận
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setCreateExamOpen(true)}>
