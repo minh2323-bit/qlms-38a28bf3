@@ -481,31 +481,45 @@ function Page() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ListChecks className="h-5 w-5 text-indigo-600" /> Danh sách ma trận đề
+              <ListChecks className="h-5 w-5 text-indigo-600" /> Chọn ma trận để sinh đề
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-            {[
-              { name: "Ma trận cuối kỳ Toán 4", levels: 4, count: 20, grade: "4", subject: "Toán", minutes: 45 },
-              { name: "Ma trận giữa kỳ Toán 3", levels: 3, count: 15, grade: "3", subject: "Toán", minutes: 40 },
-              { name: "Ma trận Tiếng Việt 4 - Đọc hiểu", levels: 4, count: 12, grade: "4", subject: "Tiếng Việt", minutes: 35 },
-              { name: "Ma trận Khoa học 4", levels: 3, count: 18, grade: "4", subject: "Khoa học", minutes: 45 },
-            ].map((m) => (
-              <div key={m.name} className="p-3 rounded-lg border hover:border-indigo-300 hover:bg-indigo-50/30 flex items-center justify-between">
-                <div>
-                  <div className="font-medium text-slate-800">{m.name}</div>
-                  <div className="text-xs text-slate-500">
-                    {m.levels} mức độ · {m.count} câu · Khối {m.grade} · {m.subject} · {m.minutes} phút
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="h-4 w-4 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2" />
+              <Input value={matrixQ} onChange={(e) => setMatrixQ(e.target.value)} placeholder="Tìm ma trận theo tên..." className="pl-8" />
+            </div>
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 gap-1"
+              onClick={() => { setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/tao-moi" }); }}
+            >
+              <Plus className="h-4 w-4" /> Thêm ma trận mới
+            </Button>
+          </div>
+          <div className="space-y-2 max-h-[55vh] overflow-y-auto">
+            {listMatrices()
+              .filter((m) => m.name.toLowerCase().includes(matrixQ.trim().toLowerCase()))
+              .map((m) => (
+                <div key={m.id} className="p-3 rounded-lg border hover:border-indigo-300 hover:bg-indigo-50/30 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-medium text-slate-800">{m.name}</div>
+                    <div className="text-xs text-slate-500">
+                      {m.minutes} phút · {m.count} câu · {m.maxScore} điểm · Khối {m.grade} · {m.subject}
+                    </div>
                   </div>
+                  <Button
+                    size="sm"
+                    className="bg-indigo-700 hover:bg-indigo-800"
+                    onClick={() => { setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } }); }}
+                  >
+                    Sinh đề →
+                  </Button>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => { setMatrixOpen(false); setCreateOpen("matrix"); }}>
-                  Dùng
-                </Button>
-              </div>
-            ))}
+              ))}
           </div>
         </DialogContent>
       </Dialog>
+
 
       {/* Share confirm dialog */}
       <Dialog open={!!shareOne} onOpenChange={(o) => !o && setShareOne(null)}>
