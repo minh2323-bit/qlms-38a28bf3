@@ -164,6 +164,16 @@ function Page() {
     toast.success("Đã đổi sang câu hỏi khác từ ngân hàng câu hỏi");
   };
 
+  const move = (idx: number, dir: -1 | 1) => {
+    setQuestions((prev) => {
+      const next = [...prev];
+      const t = idx + dir;
+      if (t < 0 || t >= next.length) return prev;
+      [next[idx], next[t]] = [next[t], next[idx]];
+      return next;
+    });
+  };
+
   return (
     <AppShell role="teacher">
       <section className="bg-white rounded-xl border shadow-sm">
