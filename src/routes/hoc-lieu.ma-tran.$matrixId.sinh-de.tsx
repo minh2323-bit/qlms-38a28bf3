@@ -4,11 +4,32 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2 } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown,
+  CheckSquare, FileText, ToggleLeft, Move, TextCursorInput, Link2, ArrowUpDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   MATRIX_GROUPS, MATRIX_LEVELS, getMatrix, matrixTotal, type MatrixGroup,
 } from "@/lib/matrix-store";
+
+const QUESTION_TYPES = [
+  { key: "single", label: "Trắc nghiệm 1 đáp án", Icon: CircleDot },
+  { key: "multiple", label: "Trắc nghiệm nhiều đáp án", Icon: CheckSquare },
+  { key: "essay", label: "Tự luận", Icon: FileText },
+  { key: "truefalse", label: "Đúng - Sai", Icon: ToggleLeft },
+  { key: "drag", label: "Kéo thả", Icon: Move },
+  { key: "fill", label: "Điền khuyết", Icon: TextCursorInput },
+  { key: "match", label: "Nối", Icon: Link2 },
+  { key: "order", label: "Sắp xếp", Icon: ArrowUpDown },
+];
+
 
 export const Route = createFileRoute("/hoc-lieu/ma-tran/$matrixId/sinh-de")({
   head: () => ({
