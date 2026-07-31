@@ -75,6 +75,18 @@ function Page() {
   const colTotal = (g: MatrixGroup, li: number) =>
     rows.reduce((s, r) => s + (r.counts[g][li] || 0), 0);
   const perQuestionScore = total > 0 ? Number(maxScore) / total : 0;
+  const scoreTotal = MATRIX_GROUPS.reduce(
+    (s, g) =>
+      s +
+      MATRIX_LEVELS.reduce((s2, _l, li) => {
+        const k = `${g.key}-${li}`;
+        const c = colTotal(g.key, li);
+        const v = scoreOverrides[k] ?? (c ? String(c * perQuestionScore) : "");
+        return s2 + (parseFloat(v) || 0);
+      }, 0),
+    0,
+  );
+
 
   const save = (thenGenerate: boolean) => {
     if (!name.trim()) { toast.error("Vui lòng nhập tên ma trận"); return; }
