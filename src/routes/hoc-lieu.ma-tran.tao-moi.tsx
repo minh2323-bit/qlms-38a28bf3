@@ -298,7 +298,7 @@ function Page() {
                           </td>
                         )),
                       )}
-                      <td className="border border-slate-300 text-center">{total}/{maxScore || 0}</td>
+                      <td className="border border-slate-300 text-center">{total}/{count || 0}</td>
                       <td className="border border-slate-300 text-center">100%</td>
                     </tr>
                     <tr className="bg-slate-50">
@@ -309,16 +309,28 @@ function Page() {
                       {MATRIX_GROUPS.flatMap((g) =>
                         MATRIX_LEVELS.map((_l, li) => {
                           const c = colTotal(g.key, li);
+                          const k = `${g.key}-${li}`;
+                          const auto = c ? (c * perQuestionScore).toFixed(1).replace(/\.0$/, "") : "";
                           return (
-                            <td key={`s-${g.key}-${li}`} className="border border-slate-300 text-center">
-                              {c ? (c * perQuestionScore).toFixed(1).replace(/\.0$/, "") : ""}
+                            <td key={`s-${k}`} className="border border-slate-300 p-0">
+                              <input
+                                value={scoreOverrides[k] ?? auto}
+                                onChange={(e) =>
+                                  setScoreOverrides((p) => ({ ...p, [k]: e.target.value.replace(/[^\d.]/g, "") }))
+                                }
+                                inputMode="decimal"
+                                className="w-full h-9 text-center bg-transparent outline-none focus:bg-indigo-50"
+                              />
                             </td>
                           );
                         }),
                       )}
-                      <td className="border border-slate-300 text-center">{maxScore || 0}/<b>{maxScore || 0}</b></td>
+                      <td className="border border-slate-300 text-center">
+                        {scoreTotal.toFixed(1).replace(/\.0$/, "")}/<b>{maxScore || 0}</b>
+                      </td>
                       <td className="border border-slate-300" />
                     </tr>
+
                   </>
                 )}
               </tbody>
