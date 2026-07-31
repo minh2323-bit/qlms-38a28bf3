@@ -40,6 +40,9 @@ function Page() {
   const [count, setCount] = useState("10");
   const [minutes, setMinutes] = useState("35");
   const [maxScore, setMaxScore] = useState("10");
+  const [scoreMode, setScoreMode] = useState("10");
+  const [scoreOverrides, setScoreOverrides] = useState<Record<string, string>>({});
+
   const [mtype, setMtype] = useState("");
   const [rows, setRows] = useState<MatrixRow[]>([]);
   const [openCh, setOpenCh] = useState<Record<string, boolean>>({});
