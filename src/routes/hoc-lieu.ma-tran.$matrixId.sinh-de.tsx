@@ -214,6 +214,14 @@ function Page() {
                     <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{q.manualType}</Badge>
                   )}
                   <div className="ml-auto flex items-center gap-2">
+                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === 0}
+                      title="Di chuyển lên" onClick={() => move(idx, -1)}>
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === questions.length - 1}
+                      title="Di chuyển xuống" onClick={() => move(idx, 1)}>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => swap(q.id)}>
                       <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
                     </Button>
