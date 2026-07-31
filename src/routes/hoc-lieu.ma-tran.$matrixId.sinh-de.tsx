@@ -255,7 +255,37 @@ function Page() {
           </div>
         </div>
       </section>
+
+      <Dialog open={!!pickFor} onOpenChange={(v) => !v && setPickFor(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700 flex items-center gap-2">
+              <Library className="h-5 w-5" /> Chọn câu hỏi từ ngân hàng câu hỏi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {BANK.map((b, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setQuestions((prev) => prev.map((x) =>
+                    x.id === pickFor ? { ...x, bankIndex: i, manual: false, manualType: undefined } : x));
+                  setPickFor(null);
+                  toast.success("Đã thay thế bằng câu hỏi từ ngân hàng câu hỏi");
+                }}
+                className="w-full text-left rounded-lg border p-3 hover:border-indigo-400 hover:bg-indigo-50/50 transition"
+              >
+                <div className="text-[13px] font-semibold text-slate-800">{b.stem}</div>
+                <div className="text-[12px] text-slate-500 mt-1">
+                  Đáp án đúng: {"ABCD"[b.correct]}. {b.opts[b.correct]}
+                </div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
+
   );
 }
 
