@@ -11,7 +11,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown,
+  ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown, ChevronUp,
   CheckSquare, FileText, ToggleLeft, Move, TextCursorInput, Link2, ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
