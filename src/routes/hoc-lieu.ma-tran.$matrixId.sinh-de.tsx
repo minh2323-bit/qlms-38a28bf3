@@ -88,6 +88,8 @@ type GenQ = {
   group: MatrixGroup;
   lessonTitle: string;
   manual?: boolean;
+  manualType?: string;
+
 };
 
 function Page() {
