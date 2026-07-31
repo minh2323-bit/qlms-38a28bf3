@@ -123,6 +123,8 @@ function Page() {
 
   const [name, setName] = useState(matrix?.name ?? "");
   const [questions, setQuestions] = useState<GenQ[]>(initial);
+  const [pickFor, setPickFor] = useState<string | null>(null);
+
 
   if (!matrix) {
     return (
