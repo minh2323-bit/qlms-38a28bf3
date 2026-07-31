@@ -118,6 +118,20 @@ function Page() {
         });
       });
     });
+    if (out.length === 0) {
+      // Ma trận chưa phân bổ chi tiết -> tự lấy câu hỏi từ ngân hàng theo Số câu
+      const total = matrix.count || 10;
+      const levels = ["Nhận biết", "Thông hiểu", "Vận dụng"];
+      for (let i = 0; i < total; i++) {
+        out.push({
+          id: `q-${i}`,
+          bankIndex: i % BANK.length,
+          level: levels[i < total * 0.4 ? 0 : i < total * 0.8 ? 1 : 2],
+          group: "tn",
+          lessonTitle: FALLBACK_LESSONS[i % FALLBACK_LESSONS.length],
+        });
+      }
+    }
     return out;
   }, [matrix]);
 
