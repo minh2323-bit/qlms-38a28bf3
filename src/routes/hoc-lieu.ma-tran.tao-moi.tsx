@@ -40,6 +40,9 @@ function Page() {
   const [count, setCount] = useState("10");
   const [minutes, setMinutes] = useState("35");
   const [maxScore, setMaxScore] = useState("10");
+  const [scoreMode, setScoreMode] = useState("10");
+  const [scoreOverrides, setScoreOverrides] = useState<Record<string, string>>({});
+
   const [mtype, setMtype] = useState("");
   const [rows, setRows] = useState<MatrixRow[]>([]);
   const [openCh, setOpenCh] = useState<Record<string, boolean>>({});
@@ -72,6 +75,18 @@ function Page() {
   const colTotal = (g: MatrixGroup, li: number) =>
     rows.reduce((s, r) => s + (r.counts[g][li] || 0), 0);
   const perQuestionScore = total > 0 ? Number(maxScore) / total : 0;
+  const scoreTotal = MATRIX_GROUPS.reduce(
+    (s, g) =>
+      s +
+      MATRIX_LEVELS.reduce((s2, _l, li) => {
+        const k = `${g.key}-${li}`;
+        const c = colTotal(g.key, li);
+        const v = scoreOverrides[k] ?? (c ? String(c * perQuestionScore) : "");
+        return s2 + (parseFloat(v) || 0);
+      }, 0),
+    0,
+  );
+
 
   const save = (thenGenerate: boolean) => {
     if (!name.trim()) { toast.error("Vui lòng nhập tên ma trận"); return; }
@@ -128,7 +143,7 @@ function Page() {
           </div>
           <div>
             <Label>Số câu</Label>
-            <Input value={total > 0 ? String(total) : count} onChange={(e) => setCount(e.target.value)} readOnly={total > 0} />
+            <Input value={count} onChange={(e) => setCount(e.target.value)} inputMode="numeric" />
           </div>
           <div>
             <Label>Thời gian (phút)</Label>
@@ -136,20 +151,43 @@ function Page() {
           </div>
           <div>
             <Label>Thang điểm</Label>
-            <Input value={maxScore} onChange={(e) => setMaxScore(e.target.value)} />
+            <div className="flex items-center gap-2">
+              <Select
+                value={scoreMode}
+                onValueChange={(v) => {
+                  setScoreMode(v);
+                  if (v !== "custom") setMaxScore(v);
+                }}
+              >
+                <SelectTrigger className={scoreMode === "custom" ? "w-[140px]" : ""}><SelectValue placeholder="Chọn thang điểm" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="custom">Tùy chỉnh</SelectItem>
+                </SelectContent>
+              </Select>
+              {scoreMode === "custom" && (
+                <Input
+                  value={maxScore}
+                  onChange={(e) => setMaxScore(e.target.value.replace(/[^\d.]/g, ""))}
+                  inputMode="numeric"
+                  placeholder="Nhập số"
+                  className="flex-1"
+                />
+              )}
+            </div>
           </div>
           <div>
             <Label>Loại khung ma trận</Label>
             <Select value={mtype} onValueChange={setMtype}>
               <SelectTrigger><SelectValue placeholder="Chọn loại" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="15p">Kiểm tra 15 phút</SelectItem>
-                <SelectItem value="1tiet">Kiểm tra 1 tiết</SelectItem>
-                <SelectItem value="gk">Giữa kỳ</SelectItem>
-                <SelectItem value="ck">Cuối kỳ</SelectItem>
+                <SelectItem value="chuong-bai">Khung ma trận theo Chương - Bài học</SelectItem>
+                <SelectItem value="mach-kien-thuc">Khung ma trận theo mạch kiến thức (CT GDPT 2018)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
         </div>
 
         {/* Body: tree + matrix */}
@@ -272,7 +310,7 @@ function Page() {
                           </td>
                         )),
                       )}
-                      <td className="border border-slate-300 text-center">{total}/{maxScore || 0}</td>
+                      <td className="border border-slate-300 text-center">{total}/{count || 0}</td>
                       <td className="border border-slate-300 text-center">100%</td>
                     </tr>
                     <tr className="bg-slate-50">
@@ -283,16 +321,28 @@ function Page() {
                       {MATRIX_GROUPS.flatMap((g) =>
                         MATRIX_LEVELS.map((_l, li) => {
                           const c = colTotal(g.key, li);
+                          const k = `${g.key}-${li}`;
+                          const auto = c ? (c * perQuestionScore).toFixed(1).replace(/\.0$/, "") : "";
                           return (
-                            <td key={`s-${g.key}-${li}`} className="border border-slate-300 text-center">
-                              {c ? (c * perQuestionScore).toFixed(1).replace(/\.0$/, "") : ""}
+                            <td key={`s-${k}`} className="border border-slate-300 p-0">
+                              <input
+                                value={scoreOverrides[k] ?? auto}
+                                onChange={(e) =>
+                                  setScoreOverrides((p) => ({ ...p, [k]: e.target.value.replace(/[^\d.]/g, "") }))
+                                }
+                                inputMode="decimal"
+                                className="w-full h-9 text-center bg-transparent outline-none focus:bg-indigo-50"
+                              />
                             </td>
                           );
                         }),
                       )}
-                      <td className="border border-slate-300 text-center">{maxScore || 0}/<b>{maxScore || 0}</b></td>
+                      <td className="border border-slate-300 text-center">
+                        {scoreTotal.toFixed(1).replace(/\.0$/, "")}/<b>{maxScore || 0}</b>
+                      </td>
                       <td className="border border-slate-300" />
                     </tr>
+
                   </>
                 )}
               </tbody>

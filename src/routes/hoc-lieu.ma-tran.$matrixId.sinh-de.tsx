@@ -4,11 +4,32 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2 } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown,
+  CheckSquare, FileText, ToggleLeft, Move, TextCursorInput, Link2, ArrowUpDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   MATRIX_GROUPS, MATRIX_LEVELS, getMatrix, matrixTotal, type MatrixGroup,
 } from "@/lib/matrix-store";
+
+const QUESTION_TYPES = [
+  { key: "single", label: "Trắc nghiệm 1 đáp án", Icon: CircleDot },
+  { key: "multiple", label: "Trắc nghiệm nhiều đáp án", Icon: CheckSquare },
+  { key: "essay", label: "Tự luận", Icon: FileText },
+  { key: "truefalse", label: "Đúng - Sai", Icon: ToggleLeft },
+  { key: "drag", label: "Kéo thả", Icon: Move },
+  { key: "fill", label: "Điền khuyết", Icon: TextCursorInput },
+  { key: "match", label: "Nối", Icon: Link2 },
+  { key: "order", label: "Sắp xếp", Icon: ArrowUpDown },
+];
+
 
 export const Route = createFileRoute("/hoc-lieu/ma-tran/$matrixId/sinh-de")({
   head: () => ({
@@ -67,6 +88,8 @@ type GenQ = {
   group: MatrixGroup;
   lessonTitle: string;
   manual?: boolean;
+  manualType?: string;
+
 };
 
 function Page() {
@@ -100,6 +123,8 @@ function Page() {
 
   const [name, setName] = useState(matrix?.name ?? "");
   const [questions, setQuestions] = useState<GenQ[]>(initial);
+  const [pickFor, setPickFor] = useState<string | null>(null);
+
 
   if (!matrix) {
     return (
@@ -161,21 +186,41 @@ function Page() {
                   </span>
                   <span className="text-[13px] text-slate-500">{q.lessonTitle}</span>
                   {q.manual && <Badge className="bg-slate-200 text-slate-700 hover:bg-slate-200">Nhập thủ công</Badge>}
+                  {q.manualType && (
+                    <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{q.manualType}</Badge>
+                  )}
                   <div className="ml-auto flex items-center gap-2">
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => swap(q.id)}>
                       <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
                     </Button>
-                    <Button
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 gap-1"
-                      onClick={() => {
-                        setQuestions((prev) => prev.map((x) => x.id === q.id ? { ...x, manual: true } : x));
-                        toast.info("Bạn có thể chỉnh sửa trực tiếp nội dung câu hỏi bên dưới");
-                      }}
-                    >
-                      <PenLine className="h-3.5 w-3.5" /> Thay câu hỏi thủ công
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => setPickFor(q.id)}>
+                      <Library className="h-3.5 w-3.5" /> Chọn từ ngân hàng câu hỏi
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 gap-1">
+                          <PenLine className="h-3.5 w-3.5" /> Thay câu hỏi thủ công
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64">
+                        {QUESTION_TYPES.map((t) => (
+                          <DropdownMenuItem
+                            key={t.key}
+                            className="gap-2"
+                            onClick={() => {
+                              setQuestions((prev) => prev.map((x) =>
+                                x.id === q.id ? { ...x, manual: true, manualType: t.label } : x));
+                              toast.info(`Nhập thủ công câu hỏi dạng: ${t.label}`);
+                            }}
+                          >
+                            <t.Icon className="h-4 w-4 text-indigo-600" /> {t.label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
+
                 </div>
 
                 <Input defaultValue={b.stem} key={`${q.id}-${q.bankIndex}`} readOnly={!q.manual}
@@ -210,7 +255,37 @@ function Page() {
           </div>
         </div>
       </section>
+
+      <Dialog open={!!pickFor} onOpenChange={(v) => !v && setPickFor(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-indigo-700 flex items-center gap-2">
+              <Library className="h-5 w-5" /> Chọn câu hỏi từ ngân hàng câu hỏi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {BANK.map((b, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setQuestions((prev) => prev.map((x) =>
+                    x.id === pickFor ? { ...x, bankIndex: i, manual: false, manualType: undefined } : x));
+                  setPickFor(null);
+                  toast.success("Đã thay thế bằng câu hỏi từ ngân hàng câu hỏi");
+                }}
+                className="w-full text-left rounded-lg border p-3 hover:border-indigo-400 hover:bg-indigo-50/50 transition"
+              >
+                <div className="text-[13px] font-semibold text-slate-800">{b.stem}</div>
+                <div className="text-[12px] text-slate-500 mt-1">
+                  Đáp án đúng: {"ABCD"[b.correct]}. {b.opts[b.correct]}
+                </div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
+
   );
 }
 
