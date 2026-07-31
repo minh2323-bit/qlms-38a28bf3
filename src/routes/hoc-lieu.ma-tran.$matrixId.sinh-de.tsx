@@ -173,7 +173,10 @@ function Page() {
           </Button>
           <div className="flex items-center gap-2">
             <FileCheck2 className="h-5 w-5 text-indigo-700" />
-            <h1 className="text-lg font-bold text-slate-800">Sinh đề từ khung ma trận</h1>
+            <div>
+              <h1 className="text-lg font-bold text-slate-800">Sinh đề từ khung ma trận</h1>
+              <p className="text-[13px] italic text-slate-500">{matrix.name}</p>
+            </div>
           </div>
         </div>
 
