@@ -81,6 +81,13 @@ const BANK = [
   },
 ];
 
+const FALLBACK_LESSONS = [
+  "Bài 1: Ôn tập các số đến 100 000",
+  "Bài 2: Ôn tập các phép tính",
+  "Bài 3: Số chẵn, số lẻ",
+  "Bài 4: Biểu thức số",
+];
+
 type GenQ = {
   id: string;
   bankIndex: number;
