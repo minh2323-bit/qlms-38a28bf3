@@ -182,21 +182,41 @@ function Page() {
                   </span>
                   <span className="text-[13px] text-slate-500">{q.lessonTitle}</span>
                   {q.manual && <Badge className="bg-slate-200 text-slate-700 hover:bg-slate-200">Nhập thủ công</Badge>}
+                  {q.manualType && (
+                    <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{q.manualType}</Badge>
+                  )}
                   <div className="ml-auto flex items-center gap-2">
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => swap(q.id)}>
                       <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
                     </Button>
-                    <Button
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 gap-1"
-                      onClick={() => {
-                        setQuestions((prev) => prev.map((x) => x.id === q.id ? { ...x, manual: true } : x));
-                        toast.info("Bạn có thể chỉnh sửa trực tiếp nội dung câu hỏi bên dưới");
-                      }}
-                    >
-                      <PenLine className="h-3.5 w-3.5" /> Thay câu hỏi thủ công
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => setPickFor(q.id)}>
+                      <Library className="h-3.5 w-3.5" /> Chọn từ ngân hàng câu hỏi
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 gap-1">
+                          <PenLine className="h-3.5 w-3.5" /> Thay câu hỏi thủ công
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64">
+                        {QUESTION_TYPES.map((t) => (
+                          <DropdownMenuItem
+                            key={t.key}
+                            className="gap-2"
+                            onClick={() => {
+                              setQuestions((prev) => prev.map((x) =>
+                                x.id === q.id ? { ...x, manual: true, manualType: t.label } : x));
+                              toast.info(`Nhập thủ công câu hỏi dạng: ${t.label}`);
+                            }}
+                          >
+                            <t.Icon className="h-4 w-4 text-indigo-600" /> {t.label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
+
                 </div>
 
                 <Input defaultValue={b.stem} key={`${q.id}-${q.bankIndex}`} readOnly={!q.manual}
