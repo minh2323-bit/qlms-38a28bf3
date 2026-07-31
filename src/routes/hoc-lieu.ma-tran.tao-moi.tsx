@@ -128,7 +128,7 @@ function Page() {
           </div>
           <div>
             <Label>Số câu</Label>
-            <Input value={total > 0 ? String(total) : count} onChange={(e) => setCount(e.target.value)} readOnly={total > 0} />
+            <Input value={count} onChange={(e) => setCount(e.target.value)} inputMode="numeric" />
           </div>
           <div>
             <Label>Thời gian (phút)</Label>
@@ -136,20 +136,43 @@ function Page() {
           </div>
           <div>
             <Label>Thang điểm</Label>
-            <Input value={maxScore} onChange={(e) => setMaxScore(e.target.value)} />
+            <div className="flex items-center gap-2">
+              <Select
+                value={scoreMode}
+                onValueChange={(v) => {
+                  setScoreMode(v);
+                  if (v !== "custom") setMaxScore(v);
+                }}
+              >
+                <SelectTrigger className={scoreMode === "custom" ? "w-[140px]" : ""}><SelectValue placeholder="Chọn thang điểm" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="custom">Tùy chỉnh</SelectItem>
+                </SelectContent>
+              </Select>
+              {scoreMode === "custom" && (
+                <Input
+                  value={maxScore}
+                  onChange={(e) => setMaxScore(e.target.value.replace(/[^\d.]/g, ""))}
+                  inputMode="numeric"
+                  placeholder="Nhập số"
+                  className="flex-1"
+                />
+              )}
+            </div>
           </div>
           <div>
             <Label>Loại khung ma trận</Label>
             <Select value={mtype} onValueChange={setMtype}>
               <SelectTrigger><SelectValue placeholder="Chọn loại" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="15p">Kiểm tra 15 phút</SelectItem>
-                <SelectItem value="1tiet">Kiểm tra 1 tiết</SelectItem>
-                <SelectItem value="gk">Giữa kỳ</SelectItem>
-                <SelectItem value="ck">Cuối kỳ</SelectItem>
+                <SelectItem value="chuong-bai">Khung ma trận theo Chương - Bài học</SelectItem>
+                <SelectItem value="mach-kien-thuc">Khung ma trận theo mạch kiến thức (CT GDPT 2018)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
         </div>
 
         {/* Body: tree + matrix */}
