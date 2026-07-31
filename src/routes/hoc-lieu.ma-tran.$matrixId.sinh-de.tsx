@@ -11,7 +11,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown,
+  ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown, ChevronUp,
   CheckSquare, FileText, ToggleLeft, Move, TextCursorInput, Link2, ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -81,6 +81,13 @@ const BANK = [
   },
 ];
 
+const FALLBACK_LESSONS = [
+  "Bài 1: Ôn tập các số đến 100 000",
+  "Bài 2: Ôn tập các phép tính",
+  "Bài 3: Số chẵn, số lẻ",
+  "Bài 4: Biểu thức số",
+];
+
 type GenQ = {
   id: string;
   bankIndex: number;
@@ -118,6 +125,20 @@ function Page() {
         });
       });
     });
+    if (out.length === 0) {
+      // Ma trận chưa phân bổ chi tiết -> tự lấy câu hỏi từ ngân hàng theo Số câu
+      const total = matrix.count || 10;
+      const levels = ["Nhận biết", "Thông hiểu", "Vận dụng"];
+      for (let i = 0; i < total; i++) {
+        out.push({
+          id: `q-${i}`,
+          bankIndex: i % BANK.length,
+          level: levels[i < total * 0.4 ? 0 : i < total * 0.8 ? 1 : 2],
+          group: "tn",
+          lessonTitle: FALLBACK_LESSONS[i % FALLBACK_LESSONS.length],
+        });
+      }
+    }
     return out;
   }, [matrix]);
 
@@ -143,6 +164,16 @@ function Page() {
     toast.success("Đã đổi sang câu hỏi khác từ ngân hàng câu hỏi");
   };
 
+  const move = (idx: number, dir: -1 | 1) => {
+    setQuestions((prev) => {
+      const next = [...prev];
+      const t = idx + dir;
+      if (t < 0 || t >= next.length) return prev;
+      [next[idx], next[t]] = [next[t], next[idx]];
+      return next;
+    });
+  };
+
   return (
     <AppShell role="teacher">
       <section className="bg-white rounded-xl border shadow-sm">
@@ -152,7 +183,10 @@ function Page() {
           </Button>
           <div className="flex items-center gap-2">
             <FileCheck2 className="h-5 w-5 text-indigo-700" />
-            <h1 className="text-lg font-bold text-slate-800">Sinh đề từ khung ma trận</h1>
+            <div>
+              <h1 className="text-lg font-bold text-slate-800">Sinh đề từ khung ma trận</h1>
+              <p className="text-[13px] italic text-slate-500">{matrix.name}</p>
+            </div>
           </div>
         </div>
 
@@ -190,6 +224,14 @@ function Page() {
                     <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{q.manualType}</Badge>
                   )}
                   <div className="ml-auto flex items-center gap-2">
+                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === 0}
+                      title="Di chuyển lên" onClick={() => move(idx, -1)}>
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === questions.length - 1}
+                      title="Di chuyển xuống" onClick={() => move(idx, 1)}>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => swap(q.id)}>
                       <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
                     </Button>
