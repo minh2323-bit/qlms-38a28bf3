@@ -176,11 +176,12 @@ function Page() {
     );
   }
 
-  const swap = (id: string) => {
-    setQuestions((prev) => prev.map((q) =>
-      q.id === id ? { ...q, bankIndex: (q.bankIndex + 1) % BANK.length, manual: false } : q));
-    toast.success("Đã đổi sang câu hỏi khác từ ngân hàng câu hỏi");
-  };
+  const pickTarget = questions.find((q) => q.id === pickFor) ?? null;
+  // Ngân hàng câu hỏi cùng metadata (mức độ, bài học, loại câu hỏi) với câu gốc
+  const bankMatches = pickTarget
+    ? BANK.map((b, i) => ({ b, i })).filter(({ i }) => i !== pickTarget.bankIndex)
+    : [];
+
 
   const move = (idx: number, dir: -1 | 1) => {
     setQuestions((prev) => {
