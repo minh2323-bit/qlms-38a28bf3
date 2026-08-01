@@ -69,12 +69,57 @@ export function matrixTotal(rows: MatrixRow[]) {
 }
 
 
+function seedRows(chapter: string, lessons: string[], base: number): MatrixRow[] {
+  return lessons.map((title, i) => ({
+    id: `seed-${base}-${i}`,
+    chapterId: `seed-ch-${base}`,
+    chapterTitle: chapter,
+    lessonId: `seed-l-${base}-${i}`,
+    lessonTitle: title,
+    counts: {
+      tn: [2 + (i % 2), 1, i % 2] as [number, number, number],
+      tnn: [1, i % 2, 0] as [number, number, number],
+      tl: [0, 1, 1] as [number, number, number],
+    },
+  }));
+}
+
 const SEED: ExamMatrix[] = [
-  { id: "m1", name: "Ma trận cuối kỳ Toán 4", grade: "4", subject: "Toán", count: 20, minutes: 45, maxScore: 10, rows: [] },
-  { id: "m2", name: "Ma trận giữa kỳ Toán 3", grade: "3", subject: "Toán", count: 15, minutes: 40, maxScore: 10, rows: [] },
-  { id: "m3", name: "Ma trận Tiếng Việt 4 - Đọc hiểu", grade: "4", subject: "Tiếng Việt", count: 12, minutes: 35, maxScore: 10, rows: [] },
-  { id: "m4", name: "Ma trận Khoa học 4", grade: "4", subject: "Khoa học", count: 18, minutes: 45, maxScore: 10, rows: [] },
+  {
+    id: "m1", name: "Ma trận cuối kỳ Toán 4", grade: "4", subject: "Toán",
+    count: 20, minutes: 45, maxScore: 10, type: "chuong-bai",
+    rows: seedRows("Chủ đề 1: Ôn tập và bổ sung", [
+      "Bài 1: Ôn tập các số đến 100 000",
+      "Bài 2: Ôn tập các phép tính trong phạm vi 100 000",
+      "Bài 3: Số chẵn, số lẻ",
+    ], 1),
+  },
+  {
+    id: "m2", name: "Ma trận giữa kỳ Toán 3", grade: "3", subject: "Toán",
+    count: 15, minutes: 40, maxScore: 10, type: "chuong-bai",
+    rows: seedRows("Chủ đề 1: Ôn tập và bổ sung", [
+      "Bài 1: Ôn tập các số đến 1 000",
+      "Bài 2: Ôn tập phép cộng, phép trừ",
+    ], 2),
+  },
+  {
+    id: "m3", name: "Ma trận Tiếng Việt 4 - Đọc hiểu", grade: "4", subject: "Tiếng Việt",
+    count: 12, minutes: 35, maxScore: 10, type: "chuong-bai",
+    rows: seedRows("Chủ đề 1: Mỗi người một vẻ", [
+      "Bài 1: Điều kì diệu",
+      "Bài 2: Thi nhạc",
+    ], 3),
+  },
+  {
+    id: "m4", name: "Ma trận Khoa học 4", grade: "4", subject: "Khoa học",
+    count: 18, minutes: 45, maxScore: 10, type: "chuong-bai",
+    rows: seedRows("Chủ đề 1: Chất", [
+      "Bài 1: Tính chất của nước",
+      "Bài 2: Sự chuyển thể của nước",
+    ], 4),
+  },
 ];
+
 
 let MATRICES: ExamMatrix[] = [...SEED];
 
