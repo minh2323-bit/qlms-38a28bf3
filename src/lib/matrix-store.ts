@@ -1,21 +1,40 @@
 // Mock store cho Khung ma trận đề.
+export type MatrixGroup = string;
+
 export type MatrixRow = {
   id: string;
   chapterId: string;
   chapterTitle: string;
   lessonId: string;
   lessonTitle: string;
-  // counts[group][level] : group = tn | tnn | tl ; level = 0 Biết, 1 Hiểu, 2 VD
+  // counts[group][level] : level = 0 Biết, 1 Hiểu, 2 VD
   counts: Record<MatrixGroup, [number, number, number]>;
 };
 
-export type MatrixGroup = "tn" | "tnn" | "tl";
+export type MatrixGroupDef = { key: MatrixGroup; label: string };
 
-export const MATRIX_GROUPS: { key: MatrixGroup; label: string }[] = [
+export const MATRIX_GROUPS: MatrixGroupDef[] = [
   { key: "tn", label: "Trắc nghiệm" },
   { key: "tnn", label: "Trắc nghiệm nhiều đáp án" },
   { key: "tl", label: "Tự luận" },
 ];
+
+// Các dạng câu hỏi khác có thể bổ sung thành cột trong ma trận
+// (đồng bộ với ngân hàng câu hỏi)
+export const MATRIX_EXTRA_GROUPS: MatrixGroupDef[] = [
+  { key: "dungsai", label: "Đúng - Sai" },
+  { key: "dienkhuyet", label: "Điền khuyết" },
+  { key: "noi", label: "Nối" },
+  { key: "keotha", label: "Kéo thả" },
+  { key: "sapxep", label: "Sắp xếp" },
+  { key: "trloingan", label: "Trả lời ngắn" },
+];
+
+export const ALL_MATRIX_GROUPS: MatrixGroupDef[] = [...MATRIX_GROUPS, ...MATRIX_EXTRA_GROUPS];
+
+export function groupLabel(key: MatrixGroup) {
+  return ALL_MATRIX_GROUPS.find((g) => g.key === key)?.label ?? key;
+}
 
 export const MATRIX_LEVELS = ["Biết", "Hiểu", "VD"] as const;
 
@@ -28,16 +47,19 @@ export type ExamMatrix = {
   minutes: number;
   maxScore: number;
   type?: string;
+  groups?: MatrixGroup[];
   rows: MatrixRow[];
 };
 
-export function emptyCounts(): Record<MatrixGroup, [number, number, number]> {
-  return { tn: [0, 0, 0], tnn: [0, 0, 0], tl: [0, 0, 0] };
+export function emptyCounts(groups: MatrixGroup[] = MATRIX_GROUPS.map((g) => g.key)) {
+  const out: Record<MatrixGroup, [number, number, number]> = {};
+  groups.forEach((g) => { out[g] = [0, 0, 0]; });
+  return out;
 }
 
 export function rowTotal(r: MatrixRow) {
-  return MATRIX_GROUPS.reduce(
-    (s, g) => s + r.counts[g.key].reduce((a, b) => a + (b || 0), 0),
+  return Object.values(r.counts).reduce(
+    (s, arr) => s + arr.reduce((a, b) => a + (b || 0), 0),
     0,
   );
 }
@@ -45,6 +67,7 @@ export function rowTotal(r: MatrixRow) {
 export function matrixTotal(rows: MatrixRow[]) {
   return rows.reduce((s, r) => s + rowTotal(r), 0);
 }
+
 
 const SEED: ExamMatrix[] = [
   { id: "m1", name: "Ma trận cuối kỳ Toán 4", grade: "4", subject: "Toán", count: 20, minutes: 45, maxScore: 10, rows: [] },
