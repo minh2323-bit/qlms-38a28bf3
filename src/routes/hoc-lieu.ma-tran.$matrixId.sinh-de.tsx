@@ -230,7 +230,8 @@ function Page() {
           {questions.map((q, idx) => {
             const b = BANK[q.bankIndex];
             return (
-              <div key={q.id} className="rounded-lg border p-4">
+              <div key={q.id} className="flex items-start gap-2">
+                <div className="flex-1 rounded-lg border p-4">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <Badge variant="outline" className="font-semibold">Câu {idx + 1}.</Badge>
                   <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">{q.level}</Badge>
@@ -243,19 +244,8 @@ function Page() {
                     <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{q.manualType}</Badge>
                   )}
                   <div className="ml-auto flex items-center gap-2">
-                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === 0}
-                      title="Di chuyển lên" onClick={() => move(idx, -1)}>
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === questions.length - 1}
-                      title="Di chuyển xuống" onClick={() => move(idx, 1)}>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" className="gap-1" onClick={() => swap(q.id)}>
-                      <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
-                    </Button>
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => setPickFor(q.id)}>
-                      <Library className="h-3.5 w-3.5" /> Chọn từ ngân hàng câu hỏi
+                      <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -299,9 +289,23 @@ function Page() {
                 </div>
                 <div className="mt-2 text-[11px] uppercase tracking-wide text-amber-600 text-right">Hướng dẫn giải</div>
                 <p className="text-[13px] text-slate-500">{b.hint}</p>
+                </div>
+
+                {/* Sắp xếp câu hỏi - đặt bên ngoài, phía phải */}
+                <div className="flex flex-col gap-2 pt-4 shrink-0">
+                  <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" disabled={idx === 0}
+                    title="Di chuyển lên" onClick={() => move(idx, -1)}>
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" disabled={idx === questions.length - 1}
+                    title="Di chuyển xuống" onClick={() => move(idx, 1)}>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             );
           })}
+
 
           <div className="flex justify-end">
             <Button
