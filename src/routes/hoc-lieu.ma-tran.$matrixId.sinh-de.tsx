@@ -328,8 +328,19 @@ function Page() {
               <Library className="h-5 w-5" /> Chọn câu hỏi từ ngân hàng câu hỏi
             </DialogTitle>
           </DialogHeader>
+          {pickTarget && (
+            <div className="flex flex-wrap items-center gap-2 -mt-1">
+              <span className="text-[12px] text-slate-500">Cùng dữ liệu với câu hỏi gốc:</span>
+              <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">{pickTarget.level}</Badge>
+              <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{GROUP_LABEL[pickTarget.group]}</Badge>
+              <Badge variant="outline">{pickTarget.lessonTitle}</Badge>
+            </div>
+          )}
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-            {BANK.map((b, i) => (
+            {bankMatches.length === 0 && (
+              <p className="text-sm text-slate-500">Không có câu hỏi nào khác cùng dữ liệu trong ngân hàng.</p>
+            )}
+            {bankMatches.map(({ b, i }) => (
               <button
                 key={i}
                 onClick={() => {
@@ -347,6 +358,7 @@ function Page() {
               </button>
             ))}
           </div>
+
         </DialogContent>
       </Dialog>
     </AppShell>
