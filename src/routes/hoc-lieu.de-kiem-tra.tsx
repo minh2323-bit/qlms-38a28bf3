@@ -503,7 +503,13 @@ function Page() {
             {listMatrices()
               .filter((m) => m.name.toLowerCase().includes(matrixQ.trim().toLowerCase()))
               .map((m) => (
-                <div key={m.id} className="p-3 rounded-lg border hover:border-indigo-300 hover:bg-indigo-50/30 flex items-center justify-between gap-3">
+                <div
+                  key={m.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => { setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/$matrixId/chi-tiet", params: { matrixId: m.id } }); }}
+                  className="p-3 rounded-lg border hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer flex items-center justify-between gap-3"
+                >
                   <div>
                     <div className="font-medium text-slate-800">{m.name}</div>
                     <div className="text-xs text-slate-500">
@@ -513,12 +519,13 @@ function Page() {
                   <Button
                     size="sm"
                     className="bg-indigo-700 hover:bg-indigo-800"
-                    onClick={() => { setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } }); }}
+                    onClick={(e) => { e.stopPropagation(); setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } }); }}
                   >
                     Sinh đề →
                   </Button>
                 </div>
               ))}
+
           </div>
         </DialogContent>
       </Dialog>
