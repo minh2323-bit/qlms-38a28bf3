@@ -79,7 +79,25 @@ const BANK = [
     correct: 2,
     hint: "Số chẵn có chữ số tận cùng là 0, 2, 4, 6, 8.",
   },
+  {
+    stem: "Số 25 018 đọc là",
+    opts: [
+      "Hai mươi lăm nghìn không trăm mười tám",
+      "Hai mươi lăm nghìn mười tám",
+      "Hai lăm nghìn không trăm tám mươi",
+      "Hai mươi lăm nghìn một trăm tám",
+    ],
+    correct: 0,
+    hint: "Đọc theo từng lớp: lớp nghìn rồi lớp đơn vị.",
+  },
+  {
+    stem: "Giá trị của biểu thức 120 : 4 + 15 là",
+    opts: ["45", "30", "50", "35"],
+    correct: 0,
+    hint: "Thực hiện phép chia trước, phép cộng sau.",
+  },
 ];
+
 
 const FALLBACK_LESSONS = [
   "Bài 1: Ôn tập các số đến 100 000",
