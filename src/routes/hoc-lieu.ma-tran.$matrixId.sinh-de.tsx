@@ -79,7 +79,25 @@ const BANK = [
     correct: 2,
     hint: "Số chẵn có chữ số tận cùng là 0, 2, 4, 6, 8.",
   },
+  {
+    stem: "Số 25 018 đọc là",
+    opts: [
+      "Hai mươi lăm nghìn không trăm mười tám",
+      "Hai mươi lăm nghìn mười tám",
+      "Hai lăm nghìn không trăm tám mươi",
+      "Hai mươi lăm nghìn một trăm tám",
+    ],
+    correct: 0,
+    hint: "Đọc theo từng lớp: lớp nghìn rồi lớp đơn vị.",
+  },
+  {
+    stem: "Giá trị của biểu thức 120 : 4 + 15 là",
+    opts: ["45", "30", "50", "35"],
+    correct: 0,
+    hint: "Thực hiện phép chia trước, phép cộng sau.",
+  },
 ];
+
 
 const FALLBACK_LESSONS = [
   "Bài 1: Ôn tập các số đến 100 000",
@@ -158,11 +176,12 @@ function Page() {
     );
   }
 
-  const swap = (id: string) => {
-    setQuestions((prev) => prev.map((q) =>
-      q.id === id ? { ...q, bankIndex: (q.bankIndex + 1) % BANK.length, manual: false } : q));
-    toast.success("Đã đổi sang câu hỏi khác từ ngân hàng câu hỏi");
-  };
+  const pickTarget = questions.find((q) => q.id === pickFor) ?? null;
+  // Ngân hàng câu hỏi cùng metadata (mức độ, bài học, loại câu hỏi) với câu gốc
+  const bankMatches = pickTarget
+    ? BANK.map((b, i) => ({ b, i })).filter(({ i }) => i !== pickTarget.bankIndex)
+    : [];
+
 
   const move = (idx: number, dir: -1 | 1) => {
     setQuestions((prev) => {
@@ -211,7 +230,8 @@ function Page() {
           {questions.map((q, idx) => {
             const b = BANK[q.bankIndex];
             return (
-              <div key={q.id} className="rounded-lg border p-4">
+              <div key={q.id} className="flex items-start gap-2">
+                <div className="flex-1 rounded-lg border p-4">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <Badge variant="outline" className="font-semibold">Câu {idx + 1}.</Badge>
                   <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">{q.level}</Badge>
@@ -224,19 +244,8 @@ function Page() {
                     <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{q.manualType}</Badge>
                   )}
                   <div className="ml-auto flex items-center gap-2">
-                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === 0}
-                      title="Di chuyển lên" onClick={() => move(idx, -1)}>
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                    <Button size="icon" variant="outline" className="h-8 w-8" disabled={idx === questions.length - 1}
-                      title="Di chuyển xuống" onClick={() => move(idx, 1)}>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" className="gap-1" onClick={() => swap(q.id)}>
-                      <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
-                    </Button>
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => setPickFor(q.id)}>
-                      <Library className="h-3.5 w-3.5" /> Chọn từ ngân hàng câu hỏi
+                      <RefreshCw className="h-3.5 w-3.5" /> Đổi câu khác
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -280,9 +289,23 @@ function Page() {
                 </div>
                 <div className="mt-2 text-[11px] uppercase tracking-wide text-amber-600 text-right">Hướng dẫn giải</div>
                 <p className="text-[13px] text-slate-500">{b.hint}</p>
+                </div>
+
+                {/* Sắp xếp câu hỏi - đặt bên ngoài, phía phải */}
+                <div className="flex flex-col gap-2 pt-4 shrink-0">
+                  <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" disabled={idx === 0}
+                    title="Di chuyển lên" onClick={() => move(idx, -1)}>
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" disabled={idx === questions.length - 1}
+                    title="Di chuyển xuống" onClick={() => move(idx, 1)}>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             );
           })}
+
 
           <div className="flex justify-end">
             <Button
@@ -305,8 +328,19 @@ function Page() {
               <Library className="h-5 w-5" /> Chọn câu hỏi từ ngân hàng câu hỏi
             </DialogTitle>
           </DialogHeader>
+          {pickTarget && (
+            <div className="flex flex-wrap items-center gap-2 -mt-1">
+              <span className="text-[12px] text-slate-500">Cùng dữ liệu với câu hỏi gốc:</span>
+              <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">{pickTarget.level}</Badge>
+              <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100">{GROUP_LABEL[pickTarget.group]}</Badge>
+              <Badge variant="outline">{pickTarget.lessonTitle}</Badge>
+            </div>
+          )}
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-            {BANK.map((b, i) => (
+            {bankMatches.length === 0 && (
+              <p className="text-sm text-slate-500">Không có câu hỏi nào khác cùng dữ liệu trong ngân hàng.</p>
+            )}
+            {bankMatches.map(({ b, i }) => (
               <button
                 key={i}
                 onClick={() => {
@@ -324,6 +358,7 @@ function Page() {
               </button>
             ))}
           </div>
+
         </DialogContent>
       </Dialog>
     </AppShell>

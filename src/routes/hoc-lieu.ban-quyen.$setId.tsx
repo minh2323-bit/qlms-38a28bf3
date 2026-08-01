@@ -238,13 +238,33 @@ function SetDetailPage() {
                           <div className="text-[11px] text-slate-500">{meta.label}</div>
                         </div>
                         {mode === "assign" ? (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); toast.success(`Chọn giao bài: ${m.title}`); }}
-                            className="px-3 py-1.5 text-xs font-semibold rounded-md bg-sky-100 text-sky-700 hover:bg-sky-200 inline-flex items-center gap-1"
-                          >
-                            <Users className="h-3.5 w-3.5" /> Chọn giao bài
-                          </button>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toast.success(`Chọn giao bài: ${m.title}`); }}
+                              className="px-3 py-1.5 text-xs font-semibold rounded-md bg-sky-100 text-sky-700 hover:bg-sky-200 inline-flex items-center gap-1"
+                            >
+                              <Users className="h-3.5 w-3.5" /> Chọn giao bài
+                            </button>
+                            {m.kind === "questions" && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const gradeNum = set?.grade.replace(/[^0-9]/g, "") ?? "";
+                                  sessionStorage.setItem("banquyen.preselected", JSON.stringify({
+                                    mode: "test", setId, setTitle: set?.title, grade: gradeNum, subject: set?.subject,
+                                    items: [{ id: m.id, title: m.title, kind: m.kind, chapterId: chapter?.id, chapterTitle: chapter?.title }],
+                                  }));
+                                  toast.success(`Tạo đề từ: ${m.title}`);
+                                  navigate({ to: "/hoc-lieu/de-kiem-tra" });
+                                }}
+                                className="px-3 py-1.5 text-xs font-semibold rounded-md bg-indigo-100 text-indigo-700 hover:bg-indigo-200 inline-flex items-center gap-1"
+                              >
+                                <FileCheck2 className="h-3.5 w-3.5" /> Tạo đề
+                              </button>
+                            )}
+                          </div>
                         ) : (
+
                           <button
                             onClick={(e) => { e.stopPropagation(); toggle(m.id, disabled); }}
                             disabled={disabled}

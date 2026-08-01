@@ -48,6 +48,7 @@ import { Route as GiaoBaiTapTaoMoiDeLuyenTapRouteImport } from './routes/giao-ba
 import { Route as GiaoBaiTapTaoMoiBaiTapDocRouteImport } from './routes/giao-bai-tap.tao-moi.bai-tap-doc'
 import { Route as LopHocSoClassIdHocLieuMaterialIdRouteImport } from './routes/lop-hoc-so.$classId.hoc-lieu.$materialId'
 import { Route as HocLieuMaTranMatrixIdSinhDeRouteImport } from './routes/hoc-lieu.ma-tran.$matrixId.sinh-de'
+import { Route as HocLieuMaTranMatrixIdChiTietRouteImport } from './routes/hoc-lieu.ma-tran.$matrixId.chi-tiet'
 import { Route as HocLieuBanQuyenTaoMoiModeRouteImport } from './routes/hoc-lieu.ban-quyen.tao-moi.$mode'
 
 const LopTrucTuyenRoute = LopTrucTuyenRouteImport.update({
@@ -251,6 +252,12 @@ const HocLieuMaTranMatrixIdSinhDeRoute =
     path: '/hoc-lieu/ma-tran/$matrixId/sinh-de',
     getParentRoute: () => rootRouteImport,
   } as any)
+const HocLieuMaTranMatrixIdChiTietRoute =
+  HocLieuMaTranMatrixIdChiTietRouteImport.update({
+    id: '/hoc-lieu/ma-tran/$matrixId/chi-tiet',
+    path: '/hoc-lieu/ma-tran/$matrixId/chi-tiet',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HocLieuBanQuyenTaoMoiModeRoute =
   HocLieuBanQuyenTaoMoiModeRouteImport.update({
     id: '/hoc-lieu/ban-quyen/tao-moi/$mode',
@@ -297,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen/': typeof HocLieuBanQuyenIndexRoute
   '/hoc-lieu/ban-quyen/tao-moi/$mode': typeof HocLieuBanQuyenTaoMoiModeRoute
+  '/hoc-lieu/ma-tran/$matrixId/chi-tiet': typeof HocLieuMaTranMatrixIdChiTietRoute
   '/hoc-lieu/ma-tran/$matrixId/sinh-de': typeof HocLieuMaTranMatrixIdSinhDeRoute
   '/lop-hoc-so/$classId/hoc-lieu/$materialId': typeof LopHocSoClassIdHocLieuMaterialIdRoute
 }
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen': typeof HocLieuBanQuyenIndexRoute
   '/hoc-lieu/ban-quyen/tao-moi/$mode': typeof HocLieuBanQuyenTaoMoiModeRoute
+  '/hoc-lieu/ma-tran/$matrixId/chi-tiet': typeof HocLieuMaTranMatrixIdChiTietRoute
   '/hoc-lieu/ma-tran/$matrixId/sinh-de': typeof HocLieuMaTranMatrixIdSinhDeRoute
   '/lop-hoc-so/$classId/hoc-lieu/$materialId': typeof LopHocSoClassIdHocLieuMaterialIdRoute
 }
@@ -378,6 +387,7 @@ export interface FileRoutesById {
   '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen/': typeof HocLieuBanQuyenIndexRoute
   '/hoc-lieu/ban-quyen/tao-moi/$mode': typeof HocLieuBanQuyenTaoMoiModeRoute
+  '/hoc-lieu/ma-tran/$matrixId/chi-tiet': typeof HocLieuMaTranMatrixIdChiTietRoute
   '/hoc-lieu/ma-tran/$matrixId/sinh-de': typeof HocLieuMaTranMatrixIdSinhDeRoute
   '/lop-hoc-so/$classId/hoc-lieu/$materialId': typeof LopHocSoClassIdHocLieuMaterialIdRoute
 }
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/hoc-lieu/bai-giang/'
     | '/hoc-lieu/ban-quyen/'
     | '/hoc-lieu/ban-quyen/tao-moi/$mode'
+    | '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
     | '/hoc-lieu/ma-tran/$matrixId/sinh-de'
     | '/lop-hoc-so/$classId/hoc-lieu/$materialId'
   fileRoutesByTo: FileRoutesByTo
@@ -460,6 +471,7 @@ export interface FileRouteTypes {
     | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/ban-quyen'
     | '/hoc-lieu/ban-quyen/tao-moi/$mode'
+    | '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
     | '/hoc-lieu/ma-tran/$matrixId/sinh-de'
     | '/lop-hoc-so/$classId/hoc-lieu/$materialId'
   id:
@@ -502,6 +514,7 @@ export interface FileRouteTypes {
     | '/hoc-lieu/bai-giang/'
     | '/hoc-lieu/ban-quyen/'
     | '/hoc-lieu/ban-quyen/tao-moi/$mode'
+    | '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
     | '/hoc-lieu/ma-tran/$matrixId/sinh-de'
     | '/lop-hoc-so/$classId/hoc-lieu/$materialId'
   fileRoutesById: FileRoutesById
@@ -524,6 +537,7 @@ export interface RootRouteChildren {
   HocLieuBaiGiangIndexRoute: typeof HocLieuBaiGiangIndexRoute
   HocLieuBanQuyenIndexRoute: typeof HocLieuBanQuyenIndexRoute
   HocLieuBanQuyenTaoMoiModeRoute: typeof HocLieuBanQuyenTaoMoiModeRoute
+  HocLieuMaTranMatrixIdChiTietRoute: typeof HocLieuMaTranMatrixIdChiTietRoute
   HocLieuMaTranMatrixIdSinhDeRoute: typeof HocLieuMaTranMatrixIdSinhDeRoute
 }
 
@@ -802,6 +816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocLieuMaTranMatrixIdSinhDeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hoc-lieu/ma-tran/$matrixId/chi-tiet': {
+      id: '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
+      path: '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
+      fullPath: '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
+      preLoaderRoute: typeof HocLieuMaTranMatrixIdChiTietRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hoc-lieu/ban-quyen/tao-moi/$mode': {
       id: '/hoc-lieu/ban-quyen/tao-moi/$mode'
       path: '/hoc-lieu/ban-quyen/tao-moi/$mode'
@@ -923,6 +944,7 @@ const rootRouteChildren: RootRouteChildren = {
   HocLieuBaiGiangIndexRoute: HocLieuBaiGiangIndexRoute,
   HocLieuBanQuyenIndexRoute: HocLieuBanQuyenIndexRoute,
   HocLieuBanQuyenTaoMoiModeRoute: HocLieuBanQuyenTaoMoiModeRoute,
+  HocLieuMaTranMatrixIdChiTietRoute: HocLieuMaTranMatrixIdChiTietRoute,
   HocLieuMaTranMatrixIdSinhDeRoute: HocLieuMaTranMatrixIdSinhDeRoute,
 }
 export const routeTree = rootRouteImport
