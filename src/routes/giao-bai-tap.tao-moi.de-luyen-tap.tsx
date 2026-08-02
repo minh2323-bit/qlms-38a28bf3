@@ -461,15 +461,15 @@ function BankModal({
 /* ============================ Page ============================ */
 function Page() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Step 1
-  const [title, setTitle] = useState("");
-  const [grade, setGrade] = useState("");
-  const [subject, setSubject] = useState("");
-  const [klass, setKlass] = useState("");
-  const [chapterId, setChapterId] = useState("");
-  const [unitId, setUnitId] = useState("");
+  const [title, setTitle] = useState(search.fromExam ? `Đề ôn tập – ${search.fromExam}` : "");
+  const [grade, setGrade] = useState(search.grade ?? "");
+  const [subject, setSubject] = useState(search.subject ?? "");
+  const [chapterId, setChapterId] = useState(search.chapterId ?? "");
+  const [unitId, setUnitId] = useState(search.lessonId ?? "");
   const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [assignPickerOpen, setAssignPickerOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -482,10 +482,12 @@ function Page() {
     lateSubmit: false, showScore: true, showAnswers: false, exportGrade: false,
   });
   const tree = useMemo(() => getKnowledgeTree(grade, subject), [grade, subject]);
-  const step1Valid = title.trim() && grade && subject && klass && chapterId && unitId && assignedAt && dueAt && scale;
+  const step1Valid = title.trim() && grade && subject && chapterId && unitId && assignedAt && dueAt && scale;
 
   // Step 2
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>(() =>
+    search.fromExam ? buildExamQuestions(search.count ?? 10) : [],
+  );
   const [manualKind, setManualKind] = useState<QKind | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
