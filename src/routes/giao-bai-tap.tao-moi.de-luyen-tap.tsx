@@ -122,6 +122,34 @@ type Question = {
   pairs?: MatchPair[];      // match
 };
 
+/* ---------- Prefill từ đề kiểm tra ---------- */
+const EXAM_QUESTION_SAMPLES: { text: string; kind: QKind }[] = [
+  { text: "Số nào lớn nhất trong các số sau: 3 210, 3 120, 3 201, 3 102?", kind: "single" },
+  { text: "Chọn các phân số bằng 1/2:", kind: "multi" },
+  { text: "Tính: 3.245 + 1.876 = ?", kind: "single" },
+  { text: "Sắp xếp các số sau theo thứ tự tăng dần: 1234, 987, 2001, 1500.", kind: "order" },
+  { text: "Điền số thích hợp vào chỗ trống: 45 + ... = 100", kind: "fill" },
+  { text: "Nối phép tính với kết quả tương ứng.", kind: "match" },
+  { text: "Trình bày cách tìm hai số khi biết tổng và hiệu.", kind: "essay" },
+  { text: "Kéo thả các hình vào đúng nhóm hình học.", kind: "drag" },
+];
+
+function buildExamQuestions(count: number): Question[] {
+  return Array.from({ length: Math.max(1, count) }, (_, i) => {
+    const s = EXAM_QUESTION_SAMPLES[i % EXAM_QUESTION_SAMPLES.length];
+    const base: Question = { id: `pq-${i + 1}`, kind: s.kind, text: `Câu ${i + 1}. ${s.text}`, score: 1 };
+    if (s.kind === "single" || s.kind === "multi") {
+      base.options = [
+        { text: "Đáp án A", correct: true },
+        { text: "Đáp án B", correct: false },
+        { text: "Đáp án C", correct: false },
+        { text: "Đáp án D", correct: false },
+      ];
+    }
+    return base;
+  });
+}
+
 /* ---------- Stepper ---------- */
 const STEPS = [
   { id: 1, name: "Thông tin bài tập", icon: Info },
@@ -943,7 +971,7 @@ function Page() {
             <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
               <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên đề)"}</div>
               <div className="text-xs text-slate-500 mt-1">
-                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+                Khối {grade || "—"} · {subject || "—"}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
