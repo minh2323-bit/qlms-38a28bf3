@@ -106,7 +106,15 @@ function Page() {
   const [confirmDeleteExam, setConfirmDeleteExam] = useState<Exam | null>(null);
   const [assignFrom, setAssignFrom] = useState<Test | null>(null);
   const [examWizard, setExamWizard] = useState(false);
+  const [examPrefill, setExamPrefill] = useState<ExamPrefill | null>(null);
   const [createExamOpen, setCreateExamOpen] = useState(false);
+
+  const resolveMeta = (t: Test) => {
+    const tr = getKnowledgeTree(t.grade, t.subject);
+    const ch = tr.find((c) => c.id === t.chapterId) ?? tr[0];
+    const ls = ch?.units.find((u) => u.id === t.lessonId) ?? ch?.units[0];
+    return { chapterId: ch?.id, lessonId: ls?.id };
+  };
 
   const subjectOptions = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
   const tree = useMemo(
@@ -210,7 +218,7 @@ function Page() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1" onClick={() => setExamWizard(true)}>
+                <Button className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1" onClick={() => { setExamPrefill(null); setExamWizard(true); }}>
                   <Plus className="h-4 w-4" /> Thêm bài kiểm tra mới
                 </Button>
               )}
@@ -634,8 +642,20 @@ function Page() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => {
-                toast.success(`Đã tạo Đề ôn tập từ: ${assignFrom?.name}`);
+                if (!assignFrom) return;
+                const meta = resolveMeta(assignFrom);
                 setAssignFrom(null);
+                navigate({
+                  to: "/giao-bai-tap/tao-moi/de-luyen-tap",
+                  search: {
+                    fromExam: assignFrom.name,
+                    grade: assignFrom.grade,
+                    subject: assignFrom.subject,
+                    chapterId: meta.chapterId,
+                    lessonId: meta.lessonId,
+                    count: assignFrom.questions,
+                  },
+                });
               }}
               className="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition"
             >
@@ -653,6 +673,16 @@ function Page() {
             </button>
             <button
               onClick={() => {
+                if (!assignFrom) return;
+                const meta = resolveMeta(assignFrom);
+                setExamPrefill({
+                  name: `Bài kiểm tra – ${assignFrom.name}`,
+                  grade: assignFrom.grade,
+                  subject: assignFrom.subject,
+                  chapterId: meta.chapterId,
+                  lessonId: meta.lessonId,
+                  count: assignFrom.questions,
+                });
                 setAssignFrom(null);
                 setExamWizard(true);
               }}
@@ -677,7 +707,8 @@ function Page() {
       {/* Exam 3-step wizard */}
       <ExamWizard
         open={examWizard}
-        onClose={() => setExamWizard(false)}
+        prefill={examPrefill}
+        onClose={() => { setExamWizard(false); setExamPrefill(null); }}
         onCreate={(name, gradeV, subjectV) => {
           setExams((prev) => [{
             id: `b-${Date.now()}`,
@@ -689,6 +720,7 @@ function Page() {
             upcoming: true,
           }, ...prev]);
           setExamWizard(false);
+          setExamPrefill(null);
           setTab("bai");
           toast.success("Đã tạo bài kiểm tra");
         }}
