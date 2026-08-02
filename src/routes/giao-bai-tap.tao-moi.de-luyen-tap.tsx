@@ -129,13 +129,13 @@ const STEPS = [
   { id: 3, name: "Danh sách học sinh", icon: Users },
 ] as const;
 
-function Stepper({ current }: { current: 1 | 2 | 3 }) {
+function Stepper({ current, extraDone = [] }: { current: 1 | 2 | 3; extraDone?: number[] }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
         {STEPS.map((s, idx) => {
           const Icon = s.icon;
-          const done = current > s.id;
+          const done = current > s.id || extraDone.includes(s.id);
           const active = current === s.id;
           return (
             <div key={s.id} className="flex-1 flex items-start">
@@ -572,7 +572,7 @@ function Page() {
           </div>
         </div>
 
-        <Stepper current={step} />
+        <Stepper current={step} extraDone={questions.length > 0 ? [2] : []} />
 
         {/* ============ STEP 1 ============ */}
         {step === 1 && (
