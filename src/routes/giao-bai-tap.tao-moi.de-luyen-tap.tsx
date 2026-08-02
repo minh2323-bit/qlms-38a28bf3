@@ -589,10 +589,10 @@ function Page() {
                 placeholder="VD: Luyện tập phép tính với phân số" />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Khối <span className="text-rose-500">*</span></label>
-                <Select value={grade} onValueChange={(v) => { setGrade(v); setKlass(""); setChapterId(""); setUnitId(""); }}>
+                <Select value={grade} onValueChange={(v) => { setGrade(v); setChapterId(""); setUnitId(""); }}>
                   <SelectTrigger><SelectValue placeholder="Chọn khối" /></SelectTrigger>
                   <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}</SelectContent>
                 </Select>
@@ -604,16 +604,8 @@ function Page() {
                   <SelectContent>{SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp <span className="text-rose-500">*</span></label>
-                <Select value={klass} onValueChange={setKlass} disabled={!grade}>
-                  <SelectTrigger><SelectValue placeholder="Chọn lớp" /></SelectTrigger>
-                  <SelectContent>
-                    {(CLASSES_BY_GRADE[grade] ?? []).map((c) => <SelectItem key={c} value={c}>Lớp {c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
+
 
             <div className="grid grid-cols-2 gap-4">
               <div>
