@@ -46,13 +46,6 @@ export const Route = createFileRoute("/giao-bai-tap/tao-moi/de-luyen-tap")({
 /* ---------- Data ---------- */
 const GRADES = ["1", "2", "3", "4", "5"];
 const SUBJECTS = ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"];
-const CLASSES_BY_GRADE: Record<string, string[]> = {
-  "1": ["1A", "1B", "1C"],
-  "2": ["2A", "2B"],
-  "3": ["3A", "3B", "3C", "3D"],
-  "4": ["4A", "4B", "4C", "4D"],
-  "5": ["5A", "5B"],
-};
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
   "Lớp Toán 4B - Cô Hoa",
