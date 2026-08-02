@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import {
 import {
   FileCheck2, Plus, Search, Filter, Upload, ChevronDown,
   Grid3x3, Send, ListChecks, MoreVertical, Copy, Share2, Trash2, CheckSquare,
-  Eye, ClipboardList, BookOpen, Info,
+  Eye, ClipboardList, BookOpen, Info, Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
@@ -106,7 +106,15 @@ function Page() {
   const [confirmDeleteExam, setConfirmDeleteExam] = useState<Exam | null>(null);
   const [assignFrom, setAssignFrom] = useState<Test | null>(null);
   const [examWizard, setExamWizard] = useState(false);
+  const [examPrefill, setExamPrefill] = useState<ExamPrefill | null>(null);
   const [createExamOpen, setCreateExamOpen] = useState(false);
+
+  const resolveMeta = (t: Test) => {
+    const tr = getKnowledgeTree(t.grade, t.subject);
+    const ch = tr.find((c) => c.id === t.chapterId) ?? tr[0];
+    const ls = ch?.units.find((u) => u.id === t.lessonId) ?? ch?.units[0];
+    return { chapterId: ch?.id, lessonId: ls?.id };
+  };
 
   const subjectOptions = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
   const tree = useMemo(
@@ -210,7 +218,7 @@ function Page() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1" onClick={() => setExamWizard(true)}>
+                <Button className="bg-indigo-700 hover:bg-indigo-800 text-white gap-1" onClick={() => { setExamPrefill(null); setExamWizard(true); }}>
                   <Plus className="h-4 w-4" /> Thêm bài kiểm tra mới
                 </Button>
               )}
@@ -634,8 +642,20 @@ function Page() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => {
-                toast.success(`Đã tạo Đề ôn tập từ: ${assignFrom?.name}`);
+                if (!assignFrom) return;
+                const meta = resolveMeta(assignFrom);
                 setAssignFrom(null);
+                navigate({
+                  to: "/giao-bai-tap/tao-moi/de-luyen-tap",
+                  search: {
+                    fromExam: assignFrom.name,
+                    grade: assignFrom.grade,
+                    subject: assignFrom.subject,
+                    chapterId: meta.chapterId,
+                    lessonId: meta.lessonId,
+                    count: assignFrom.questions,
+                  },
+                });
               }}
               className="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition"
             >
@@ -653,6 +673,16 @@ function Page() {
             </button>
             <button
               onClick={() => {
+                if (!assignFrom) return;
+                const meta = resolveMeta(assignFrom);
+                setExamPrefill({
+                  name: `Bài kiểm tra – ${assignFrom.name}`,
+                  grade: assignFrom.grade,
+                  subject: assignFrom.subject,
+                  chapterId: meta.chapterId,
+                  lessonId: meta.lessonId,
+                  count: assignFrom.questions,
+                });
                 setAssignFrom(null);
                 setExamWizard(true);
               }}
@@ -677,7 +707,8 @@ function Page() {
       {/* Exam 3-step wizard */}
       <ExamWizard
         open={examWizard}
-        onClose={() => setExamWizard(false)}
+        prefill={examPrefill}
+        onClose={() => { setExamWizard(false); setExamPrefill(null); }}
         onCreate={(name, gradeV, subjectV) => {
           setExams((prev) => [{
             id: `b-${Date.now()}`,
@@ -689,6 +720,7 @@ function Page() {
             upcoming: true,
           }, ...prev]);
           setExamWizard(false);
+          setExamPrefill(null);
           setTab("bai");
           toast.success("Đã tạo bài kiểm tra");
         }}
@@ -710,12 +742,39 @@ function Page() {
 
 /* ---------- Exam Wizard ---------- */
 
+export type ExamPrefill = {
+  name: string;
+  grade: string;
+  subject: string;
+  chapterId?: string;
+  lessonId?: string;
+  count: number;
+};
+
+type WizardQuestion = { id: string; content: string; type: string; level: string; score: string };
+
+function buildWizardQuestions(count: number): WizardQuestion[] {
+  const samples = [
+    { content: "3000 + 210 = ?", type: "Trắc nghiệm 1 đáp án", level: "Nhận biết" },
+    { content: "Chọn các phân số bằng 1/2", type: "Trắc nghiệm nhiều đáp án", level: "Thông hiểu" },
+    { content: "Điền số thích hợp: 45 + ... = 100", type: "Điền khuyết", level: "Thông hiểu" },
+    { content: "Sắp xếp các số theo thứ tự tăng dần", type: "Sắp xếp", level: "Vận dụng" },
+    { content: "Nối phép tính với kết quả tương ứng", type: "Nối các đáp án tương ứng", level: "Thông hiểu" },
+    { content: "Trình bày cách tìm hai số khi biết tổng và hiệu", type: "Tự luận", level: "Vận dụng" },
+  ];
+  return Array.from({ length: Math.max(1, count) }, (_, i) => {
+    const q = samples[i % samples.length];
+    return { id: `wq-${i + 1}`, ...q, score: "1" };
+  });
+}
+
 function ExamWizard({
-  open, onClose, onCreate,
+  open, onClose, onCreate, prefill,
 }: {
   open: boolean;
   onClose: () => void;
   onCreate: (name: string, grade: string, subject: string) => void;
+  prefill?: ExamPrefill | null;
 }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
@@ -734,6 +793,19 @@ function ExamWizard({
   const [gradeStep2, setGradeStep2] = useState("4");
   const [classStep2, setClassStep2] = useState("4A");
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
+  const [questions, setQuestions] = useState<WizardQuestion[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (prefill) {
+      setName(prefill.name);
+      setGrade(prefill.grade);
+      setSubject(prefill.subject);
+      setChapter(prefill.chapterId ?? "");
+      setLesson(prefill.lessonId ?? "");
+      setQuestions(buildWizardQuestions(prefill.count));
+    }
+  }, [open, prefill]);
 
   const subjects = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
   const tree = useMemo(
@@ -750,6 +822,7 @@ function ExamWizard({
     setChapter(""); setLesson(""); setStartAt(""); setDuration(""); setScoreType("");
     setShowAnswers(false); setShowScore(true); setShuffle(true);
     setGradeStep2("4"); setClassStep2("4A"); setSelectedStudents(new Set());
+    setQuestions([]);
   };
 
   const close = () => { reset(); onClose(); };
@@ -790,9 +863,11 @@ function ExamWizard({
             <div key={s.n} className="flex-1 flex items-center">
               <div className="flex flex-col items-center flex-1">
                 <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
-                  step >= s.n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                  s.n === 2 && questions.length > 0 && step !== 2
+                    ? "bg-emerald-500 text-white"
+                    : step >= s.n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
                 }`}>
-                  {s.n}
+                  {s.n === 2 && questions.length > 0 && step !== 2 ? <Check className="h-5 w-5" strokeWidth={3} /> : s.n}
                 </div>
                 <div className="mt-2 text-xs text-slate-500">BƯỚC {s.n}</div>
                 <div className={`text-sm font-semibold mt-0.5 ${step === s.n ? "text-slate-800" : "text-slate-500"}`}>
@@ -939,7 +1014,10 @@ function ExamWizard({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52">
                     {["Trắc nghiệm 1 đáp án", "Trắc nghiệm nhiều đáp án", "Đúng / Sai", "Trả lời ngắn", "Tự luận", "Kéo thả", "Điền khuyết", "Nối các đáp án tương ứng", "Sắp xếp"].map((t) => (
-                      <DropdownMenuItem key={t} onSelect={() => toast.success(`Thêm câu hỏi: ${t}`)}>{t}</DropdownMenuItem>
+                      <DropdownMenuItem key={t} onSelect={() => {
+                        setQuestions((p) => [...p, { id: `wq-${Date.now()}`, content: `Câu hỏi mới (${t})`, type: t, level: "Nhận biết", score: "1" }]);
+                        toast.success(`Thêm câu hỏi: ${t}`);
+                      }}>{t}</DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -965,28 +1043,40 @@ function ExamWizard({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell>1</TableCell>
-                    <TableCell className="text-slate-800">3000 + 210 = ?</TableCell>
-                    <TableCell>
-                      <div className="text-xs space-y-0.5">
-                        <div className="px-2 py-1 rounded bg-emerald-50 text-emerald-700">A. 3.210 (đáp án đúng)</div>
-                        <div className="px-2 py-1 text-slate-600">B. 3.120</div>
-                        <div className="px-2 py-1 text-slate-600">C. 3.201</div>
-                        <div className="px-2 py-1 text-slate-600">D. 3.021</div>
-                      </div>
-                    </TableCell>
-                    <TableCell><Input className="w-16" defaultValue="1" /></TableCell>
-                    <TableCell>
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700 border border-amber-200">
-                        Nhận biết
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-xs text-slate-700">Trắc nghiệm nhiều đáp án</TableCell>
-                    <TableCell className="text-center">
-                      <Checkbox defaultChecked />
-                    </TableCell>
-                  </TableRow>
+                  {questions.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-slate-500 py-8">
+                        Chưa có câu hỏi. Bấm "Thêm mới" để thêm câu hỏi.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {questions.map((qq, i) => (
+                    <TableRow key={qq.id}>
+                      <TableCell>{i + 1}</TableCell>
+                      <TableCell className="text-slate-800">{qq.content}</TableCell>
+                      <TableCell>
+                        <div className="text-xs space-y-0.5">
+                          <div className="px-2 py-1 rounded bg-emerald-50 text-emerald-700">A. Đáp án đúng</div>
+                          <div className="px-2 py-1 text-slate-600">B. Đáp án B</div>
+                          <div className="px-2 py-1 text-slate-600">C. Đáp án C</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          className="w-16"
+                          value={qq.score}
+                          onChange={(e) => setQuestions((p) => p.map((x) => x.id === qq.id ? { ...x, score: e.target.value } : x))}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700 border border-amber-200">
+                          {qq.level}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-xs text-slate-700">{qq.type}</TableCell>
+                      <TableCell className="text-center"><Checkbox defaultChecked /></TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>

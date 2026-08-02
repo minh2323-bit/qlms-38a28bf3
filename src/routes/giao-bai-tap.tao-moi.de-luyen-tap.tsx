@@ -21,7 +21,24 @@ import {
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
+type ExamSearch = {
+  fromExam?: string;
+  grade?: string;
+  subject?: string;
+  chapterId?: string;
+  lessonId?: string;
+  count?: number;
+};
+
 export const Route = createFileRoute("/giao-bai-tap/tao-moi/de-luyen-tap")({
+  validateSearch: (s: Record<string, unknown>): ExamSearch => ({
+    fromExam: typeof s.fromExam === "string" ? s.fromExam : undefined,
+    grade: typeof s.grade === "string" ? s.grade : undefined,
+    subject: typeof s.subject === "string" ? s.subject : undefined,
+    chapterId: typeof s.chapterId === "string" ? s.chapterId : undefined,
+    lessonId: typeof s.lessonId === "string" ? s.lessonId : undefined,
+    count: Number(s.count) > 0 ? Number(s.count) : undefined,
+  }),
   head: () => ({ meta: [{ title: "Tạo đề luyện tập" }] }),
   component: Page,
 });
@@ -29,13 +46,6 @@ export const Route = createFileRoute("/giao-bai-tap/tao-moi/de-luyen-tap")({
 /* ---------- Data ---------- */
 const GRADES = ["1", "2", "3", "4", "5"];
 const SUBJECTS = ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"];
-const CLASSES_BY_GRADE: Record<string, string[]> = {
-  "1": ["1A", "1B", "1C"],
-  "2": ["2A", "2B"],
-  "3": ["3A", "3B", "3C", "3D"],
-  "4": ["4A", "4B", "4C", "4D"],
-  "5": ["5A", "5B"],
-};
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
   "Lớp Toán 4B - Cô Hoa",
@@ -105,6 +115,34 @@ type Question = {
   pairs?: MatchPair[];      // match
 };
 
+/* ---------- Prefill từ đề kiểm tra ---------- */
+const EXAM_QUESTION_SAMPLES: { text: string; kind: QKind }[] = [
+  { text: "Số nào lớn nhất trong các số sau: 3 210, 3 120, 3 201, 3 102?", kind: "single" },
+  { text: "Chọn các phân số bằng 1/2:", kind: "multi" },
+  { text: "Tính: 3.245 + 1.876 = ?", kind: "single" },
+  { text: "Sắp xếp các số sau theo thứ tự tăng dần: 1234, 987, 2001, 1500.", kind: "order" },
+  { text: "Điền số thích hợp vào chỗ trống: 45 + ... = 100", kind: "fill" },
+  { text: "Nối phép tính với kết quả tương ứng.", kind: "match" },
+  { text: "Trình bày cách tìm hai số khi biết tổng và hiệu.", kind: "essay" },
+  { text: "Kéo thả các hình vào đúng nhóm hình học.", kind: "drag" },
+];
+
+function buildExamQuestions(count: number): Question[] {
+  return Array.from({ length: Math.max(1, count) }, (_, i) => {
+    const s = EXAM_QUESTION_SAMPLES[i % EXAM_QUESTION_SAMPLES.length];
+    const base: Question = { id: `pq-${i + 1}`, kind: s.kind, text: `Câu ${i + 1}. ${s.text}`, score: 1 };
+    if (s.kind === "single" || s.kind === "multi") {
+      base.options = [
+        { text: "Đáp án A", correct: true },
+        { text: "Đáp án B", correct: false },
+        { text: "Đáp án C", correct: false },
+        { text: "Đáp án D", correct: false },
+      ];
+    }
+    return base;
+  });
+}
+
 /* ---------- Stepper ---------- */
 const STEPS = [
   { id: 1, name: "Thông tin bài tập", icon: Info },
@@ -112,13 +150,13 @@ const STEPS = [
   { id: 3, name: "Danh sách học sinh", icon: Users },
 ] as const;
 
-function Stepper({ current }: { current: 1 | 2 | 3 }) {
+function Stepper({ current, extraDone = [] }: { current: 1 | 2 | 3; extraDone?: number[] }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
         {STEPS.map((s, idx) => {
           const Icon = s.icon;
-          const done = current > s.id;
+          const done = current > s.id || extraDone.includes(s.id);
           const active = current === s.id;
           return (
             <div key={s.id} className="flex-1 flex items-start">
@@ -444,15 +482,15 @@ function BankModal({
 /* ============================ Page ============================ */
 function Page() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Step 1
-  const [title, setTitle] = useState("");
-  const [grade, setGrade] = useState("");
-  const [subject, setSubject] = useState("");
-  const [klass, setKlass] = useState("");
-  const [chapterId, setChapterId] = useState("");
-  const [unitId, setUnitId] = useState("");
+  const [title, setTitle] = useState(search.fromExam ? `Đề ôn tập – ${search.fromExam}` : "");
+  const [grade, setGrade] = useState(search.grade ?? "");
+  const [subject, setSubject] = useState(search.subject ?? "");
+  const [chapterId, setChapterId] = useState(search.chapterId ?? "");
+  const [unitId, setUnitId] = useState(search.lessonId ?? "");
   const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
   const [assignPickerOpen, setAssignPickerOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -465,10 +503,12 @@ function Page() {
     lateSubmit: false, showScore: true, showAnswers: false, exportGrade: false,
   });
   const tree = useMemo(() => getKnowledgeTree(grade, subject), [grade, subject]);
-  const step1Valid = title.trim() && grade && subject && klass && chapterId && unitId && assignedAt && dueAt && scale;
+  const step1Valid = title.trim() && grade && subject && chapterId && unitId && assignedAt && dueAt && scale;
 
   // Step 2
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>(() =>
+    search.fromExam ? buildExamQuestions(search.count ?? 10) : [],
+  );
   const [manualKind, setManualKind] = useState<QKind | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
@@ -555,7 +595,7 @@ function Page() {
           </div>
         </div>
 
-        <Stepper current={step} />
+        <Stepper current={step} extraDone={questions.length > 0 ? [2] : []} />
 
         {/* ============ STEP 1 ============ */}
         {step === 1 && (
@@ -570,10 +610,10 @@ function Page() {
                 placeholder="VD: Luyện tập phép tính với phân số" />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Khối <span className="text-rose-500">*</span></label>
-                <Select value={grade} onValueChange={(v) => { setGrade(v); setKlass(""); setChapterId(""); setUnitId(""); }}>
+                <Select value={grade} onValueChange={(v) => { setGrade(v); setChapterId(""); setUnitId(""); }}>
                   <SelectTrigger><SelectValue placeholder="Chọn khối" /></SelectTrigger>
                   <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}</SelectContent>
                 </Select>
@@ -585,16 +625,8 @@ function Page() {
                   <SelectContent>{SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp <span className="text-rose-500">*</span></label>
-                <Select value={klass} onValueChange={setKlass} disabled={!grade}>
-                  <SelectTrigger><SelectValue placeholder="Chọn lớp" /></SelectTrigger>
-                  <SelectContent>
-                    {(CLASSES_BY_GRADE[grade] ?? []).map((c) => <SelectItem key={c} value={c}>Lớp {c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
+
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -932,7 +964,7 @@ function Page() {
             <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
               <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên đề)"}</div>
               <div className="text-xs text-slate-500 mt-1">
-                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+                Khối {grade || "—"} · {subject || "—"}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
