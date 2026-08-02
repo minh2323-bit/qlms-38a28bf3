@@ -21,7 +21,24 @@ import {
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
+type ExamSearch = {
+  fromExam?: string;
+  grade?: string;
+  subject?: string;
+  chapterId?: string;
+  lessonId?: string;
+  count?: number;
+};
+
 export const Route = createFileRoute("/giao-bai-tap/tao-moi/de-luyen-tap")({
+  validateSearch: (s: Record<string, unknown>): ExamSearch => ({
+    fromExam: typeof s.fromExam === "string" ? s.fromExam : undefined,
+    grade: typeof s.grade === "string" ? s.grade : undefined,
+    subject: typeof s.subject === "string" ? s.subject : undefined,
+    chapterId: typeof s.chapterId === "string" ? s.chapterId : undefined,
+    lessonId: typeof s.lessonId === "string" ? s.lessonId : undefined,
+    count: Number(s.count) > 0 ? Number(s.count) : undefined,
+  }),
   head: () => ({ meta: [{ title: "Tạo đề luyện tập" }] }),
   component: Page,
 });
