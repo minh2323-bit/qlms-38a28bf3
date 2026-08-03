@@ -1012,7 +1012,14 @@ function Step2(props: {
         <MaterialFormModal
           type={addingMaterialAt.slice("__type__:".length) as MaterialTypeKey}
           hideBasicFields
+          context={{
+            grade: lectureContext?.khoi,
+            subject: lectureContext?.mon,
+            chapterId: lectureContext?.chapterId,
+            lessonId: lectureContext?.lessonId,
+          }}
           onClose={() => setAddingMaterialAt(null)}
+
           onSaved={(p) => {
             const legacyType: Material["type"] =
               p.type === "video" ? "Video"
