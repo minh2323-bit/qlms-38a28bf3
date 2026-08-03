@@ -70,7 +70,7 @@ function LopGanSelect({
 /* ============= Ordered list of material types (SHARED) ============= */
 
 export type MaterialTypeKey =
-  | "video" | "interactive" | "slide" | "doc" | "text" | "audio" | "scorm" | "iframe";
+  | "video" | "interactive" | "slide" | "doc" | "text" | "audio" | "scorm" | "iframe" | "worksheet";
 
 export const MATERIAL_TYPE_LIST: {
   key: MaterialTypeKey; label: string; Icon: typeof Video; color: string; bg: string;
@@ -81,9 +81,11 @@ export const MATERIAL_TYPE_LIST: {
   { key: "doc",         label: "Tài liệu văn bản",         Icon: FileText,     color: "text-sky-600",     bg: "bg-sky-50" },
   { key: "text",        label: "Nội dung thuần",           Icon: Type,         color: "text-slate-600",   bg: "bg-slate-100" },
   { key: "audio",       label: "Âm thanh",                 Icon: Music,        color: "text-amber-600",   bg: "bg-amber-50" },
+  { key: "worksheet",   label: "Phiếu bài tập",            Icon: ClipboardList, color: "text-teal-600",   bg: "bg-teal-50" },
   { key: "scorm",       label: "Scorm",                    Icon: FileBox,      color: "text-violet-600",  bg: "bg-violet-50" },
   { key: "iframe",      label: "IFrame",                   Icon: Code2,        color: "text-emerald-600", bg: "bg-emerald-50" },
 ];
+
 
 /* ============= Menu items (drop into any DropdownMenuContent) ============= */
 
