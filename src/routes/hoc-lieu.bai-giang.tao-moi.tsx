@@ -444,9 +444,12 @@ function CreateLessonPage() {
             newTopic={newTopic} setNewTopic={setNewTopic}
             lectureContext={{
               khoi, mon,
+              chapterId,
+              lessonId: unitIds[0] ?? "",
               chapterTitle: tree.find((c) => c.id === chapterId)?.title ?? "",
               lessonTitles: unitIds.map((id) => getUnitTitle(id)).filter(Boolean).join(", "),
             }}
+
           />
         )}
 
