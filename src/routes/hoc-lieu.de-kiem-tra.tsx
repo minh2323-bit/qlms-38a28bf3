@@ -66,13 +66,8 @@ const SUBJECTS_BY_GRADE: Record<string, string[]> = {
   "5": ["Toán", "Tiếng Việt", "Khoa học"],
 };
 
-const SEED: Test[] = [
-  { id: "e1", name: "Kiểm tra giữa kỳ – Cộng trừ phân số", grade: "4", subject: "Toán", kind: "matrix", duration: 45, questions: 20, maxScore: 10, share: "approved" },
-  { id: "e2", name: "Kiểm tra 15 phút – Số tự nhiên", grade: "4", subject: "Toán", kind: "manual", duration: 15, questions: 10, maxScore: 10, share: "pending" },
-  { id: "e3", name: "Kiểm tra đọc hiểu – Cây bàng", grade: "4", subject: "Tiếng Việt", kind: "manual", duration: 30, questions: 12, maxScore: 10, share: "" },
-  { id: "e4", name: "Kiểm tra cuối kỳ – Toán 3", grade: "3", subject: "Toán", kind: "matrix", duration: 60, questions: 25, maxScore: 10, share: "" },
-  { id: "e5", name: "Đề luyện – Hình học lớp 4", grade: "4", subject: "Toán", kind: "matrix", duration: 45, questions: 18, maxScore: 10, share: "approved" },
-];
+const SEED: Test[] = listTests() as Test[];
+
 
 const EXAM_SEED: Exam[] = [
   { id: "b1", name: "Bài kiểm tra ôn tập", grade: "4", subject: "Toán", classAssigned: "4A năm học 2025 - 2026", startAt: "20:00 15/06/2026", upcoming: true },
