@@ -117,17 +117,21 @@ export function AddMaterialMenuItems({
 /* ============= Main modal dispatcher (kept for legacy popup usage) ============= */
 
 export function MaterialFormModal({
-  type, onClose, onSaved, hideBasicFields,
+  type, onClose, onSaved, hideBasicFields, context,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
   hideBasicFields?: boolean;
+  context?: WorksheetContext;
 }) {
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
-        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal hideBasicFields={hideBasicFields} />
+      <DialogContent className={`${type === "worksheet" ? "max-w-5xl" : "max-w-3xl"} max-h-[92vh] overflow-y-auto`}>
+        <DialogHeader className="sr-only">
+          <DialogTitle>Thêm học liệu</DialogTitle>
+        </DialogHeader>
+        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal hideBasicFields={hideBasicFields} context={context} />
       </DialogContent>
     </Dialog>
   );
@@ -136,18 +140,29 @@ export function MaterialFormModal({
 /* ============= Unwrapped form (used by full-page route) ============= */
 
 export function MaterialForm({
-  type, onClose, onSaved, inModal, hideBasicFields,
+  type, onClose, onSaved, inModal, hideBasicFields, context,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
   hideBasicFields?: boolean;
+  context?: WorksheetContext;
 }) {
+  if (type === "worksheet") {
+    return (
+      <WorksheetWizard
+        onClose={onClose}
+        context={context}
+        onSaved={(p) => onSaved?.({ title: p.title, type: "worksheet" })}
+      />
+    );
+  }
   if (type === "video") return <VideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
   if (type === "interactive") return <InteractiveVideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
   return <GenericForm type={type} onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
 }
+
 
 /* ============= Shared form building blocks ============= */
 
