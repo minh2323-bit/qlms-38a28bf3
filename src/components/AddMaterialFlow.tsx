@@ -3,7 +3,7 @@ import {
   Video, PlayCircle, Presentation, FileText, Type, Music, FileBox, Code2,
   X, Upload, Plus, Trash2, Eye, ChevronDown, Pencil, ArrowUpDown,
   ListChecks, MoveHorizontal, GripVertical, PenLine, ArrowLeftRight, Type as TypeIcon,
-  CheckSquare, ToggleLeft, MessageSquare, Library,
+  CheckSquare, ToggleLeft, MessageSquare, Library, ClipboardList,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -17,7 +17,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
+import { WorksheetWizard, type WorksheetContext } from "@/components/WorksheetWizard";
 import { toast } from "sonner";
+
 
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
@@ -70,7 +72,7 @@ function LopGanSelect({
 /* ============= Ordered list of material types (SHARED) ============= */
 
 export type MaterialTypeKey =
-  | "video" | "interactive" | "slide" | "doc" | "text" | "audio" | "scorm" | "iframe";
+  | "video" | "interactive" | "slide" | "doc" | "text" | "audio" | "scorm" | "iframe" | "worksheet";
 
 export const MATERIAL_TYPE_LIST: {
   key: MaterialTypeKey; label: string; Icon: typeof Video; color: string; bg: string;
@@ -81,9 +83,11 @@ export const MATERIAL_TYPE_LIST: {
   { key: "doc",         label: "Tài liệu văn bản",         Icon: FileText,     color: "text-sky-600",     bg: "bg-sky-50" },
   { key: "text",        label: "Nội dung thuần",           Icon: Type,         color: "text-slate-600",   bg: "bg-slate-100" },
   { key: "audio",       label: "Âm thanh",                 Icon: Music,        color: "text-amber-600",   bg: "bg-amber-50" },
+  { key: "worksheet",   label: "Phiếu bài tập",            Icon: ClipboardList, color: "text-teal-600",   bg: "bg-teal-50" },
   { key: "scorm",       label: "Scorm",                    Icon: FileBox,      color: "text-violet-600",  bg: "bg-violet-50" },
   { key: "iframe",      label: "IFrame",                   Icon: Code2,        color: "text-emerald-600", bg: "bg-emerald-50" },
 ];
+
 
 /* ============= Menu items (drop into any DropdownMenuContent) ============= */
 
@@ -115,17 +119,21 @@ export function AddMaterialMenuItems({
 /* ============= Main modal dispatcher (kept for legacy popup usage) ============= */
 
 export function MaterialFormModal({
-  type, onClose, onSaved, hideBasicFields,
+  type, onClose, onSaved, hideBasicFields, context,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
   hideBasicFields?: boolean;
+  context?: WorksheetContext;
 }) {
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
-        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal hideBasicFields={hideBasicFields} />
+      <DialogContent className={`${type === "worksheet" ? "max-w-5xl" : "max-w-3xl"} max-h-[92vh] overflow-y-auto`}>
+        <DialogHeader className="sr-only">
+          <DialogTitle>Thêm học liệu</DialogTitle>
+        </DialogHeader>
+        <MaterialForm type={type} onClose={onClose} onSaved={onSaved} inModal hideBasicFields={hideBasicFields} context={context} />
       </DialogContent>
     </Dialog>
   );
@@ -134,18 +142,29 @@ export function MaterialFormModal({
 /* ============= Unwrapped form (used by full-page route) ============= */
 
 export function MaterialForm({
-  type, onClose, onSaved, inModal, hideBasicFields,
+  type, onClose, onSaved, inModal, hideBasicFields, context,
 }: {
   type: MaterialTypeKey;
   onClose: () => void;
   onSaved?: (payload: { title: string; type: MaterialTypeKey }) => void;
   inModal?: boolean;
   hideBasicFields?: boolean;
+  context?: WorksheetContext;
 }) {
+  if (type === "worksheet") {
+    return (
+      <WorksheetWizard
+        onClose={onClose}
+        context={context}
+        onSaved={(p) => onSaved?.({ title: p.title, type: "worksheet" })}
+      />
+    );
+  }
   if (type === "video") return <VideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
   if (type === "interactive") return <InteractiveVideoForm onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
   return <GenericForm type={type} onClose={onClose} onSaved={onSaved} inModal={inModal} hideBasicFields={hideBasicFields} />;
 }
+
 
 /* ============= Shared form building blocks ============= */
 

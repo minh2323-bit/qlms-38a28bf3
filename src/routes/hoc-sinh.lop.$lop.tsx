@@ -230,7 +230,11 @@ function Page() {
         </div>
       </section>
 
-      {/* 3. Lớp học trực tuyến */}
+      {/* 3. Bài kiểm tra */}
+      <ExamsSection subject={subject} />
+
+      {/* 4. Lớp học trực tuyến */}
+
       {classLive.length > 0 && (
         <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
           <h2 className="text-lg font-bold text-slate-800 mb-4">Lớp học trực tuyến — {subject}</h2>
@@ -249,6 +253,93 @@ function Page() {
     </AppShell>
   );
 }
+
+/* ---------- Bài kiểm tra của lớp ---------- */
+type StudentExam = {
+  id: string;
+  name: string;
+  subject: string;
+  startAt: string;
+  done: boolean;
+  score?: string;
+};
+
+const CLASS_EXAMS: StudentExam[] = [
+  { id: "x1", name: "Bài kiểm tra 15 phút – Số tự nhiên", subject: "Toán", startAt: "08:00 12/05/2026", done: true, score: "9/10" },
+  { id: "x2", name: "Bài kiểm tra giữa kỳ – Cộng trừ phân số", subject: "Toán", startAt: "20:00 15/06/2026", done: false },
+  { id: "x3", name: "Bài kiểm tra cuối chương – Hình học", subject: "Toán", startAt: "09:30 22/06/2026", done: false },
+  { id: "x4", name: "Bài kiểm tra đọc hiểu – Cây bàng", subject: "Tiếng Việt", startAt: "14:00 10/05/2026", done: true, score: "8/10" },
+  { id: "x5", name: "Bài kiểm tra chính tả tuần 30", subject: "Tiếng Việt", startAt: "15:00 18/06/2026", done: false },
+];
+
+const EXAM_FILTERS = [
+  { key: "all", label: "Tất cả" },
+  { key: "todo", label: "Chưa làm" },
+  { key: "done", label: "Đã hoàn thành" },
+] as const;
+
+function ExamsSection({ subject }: { subject: string }) {
+  const [filter, setFilter] = useState<(typeof EXAM_FILTERS)[number]["key"]>("all");
+
+  const items = CLASS_EXAMS.filter((e) => e.subject === subject).filter((e) =>
+    filter === "all" ? true : filter === "done" ? e.done : !e.done,
+  );
+
+  return (
+    <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">Bài kiểm tra — {subject}</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Các bài kiểm tra giáo viên đã gán cho lớp và ghi danh cho em.
+          </p>
+        </div>
+        <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+          {EXAM_FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition ${
+                filter === f.key ? "bg-white text-indigo-700 shadow-sm" : "text-slate-600 hover:text-slate-800"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <ul className="mt-5 space-y-3">
+        {items.map((e) => (
+          <li key={e.id} className="rounded-xl border border-slate-200 p-4 flex items-center gap-3 hover:bg-slate-50 transition">
+            <span className="h-9 w-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+              <ClipboardList className="h-4.5 w-4.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="font-semibold text-slate-800 truncate">{e.name}</div>
+              <div className="text-sm text-slate-500 mt-0.5">Thời gian tổ chức: {e.startAt}</div>
+            </div>
+            {e.done ? (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Đã hoàn thành{e.score ? ` • ${e.score}` : ""}
+              </span>
+            ) : (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                Chưa làm
+              </span>
+            )}
+          </li>
+        ))}
+        {items.length === 0 && (
+          <li className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
+            Chưa có bài kiểm tra nào cho môn <b>{subject}</b>.
+          </li>
+        )}
+      </ul>
+    </section>
+  );
+}
+
 
 function ItemIcon({ kind }: { kind: MaterialKind }) {
   const map = {

@@ -444,9 +444,12 @@ function CreateLessonPage() {
             newTopic={newTopic} setNewTopic={setNewTopic}
             lectureContext={{
               khoi, mon,
+              chapterId,
+              lessonId: unitIds[0] ?? "",
               chapterTitle: tree.find((c) => c.id === chapterId)?.title ?? "",
               lessonTitles: unitIds.map((id) => getUnitTitle(id)).filter(Boolean).join(", "),
             }}
+
           />
         )}
 
@@ -865,7 +868,8 @@ function Step2(props: {
   editMatId: string | null; setEditMatId: (v: string | null) => void;
   addTopicOpen: boolean; setAddTopicOpen: (v: boolean) => void;
   newTopic: string; setNewTopic: (v: string) => void;
-  lectureContext?: { khoi: string; mon: string; chapterTitle: string; lessonTitles: string };
+  lectureContext?: { khoi: string; mon: string; chapterTitle: string; lessonTitles: string; chapterId?: string; lessonId?: string };
+
 }) {
   const {
     topics, setTopics, materials, setMaterials,
@@ -1008,7 +1012,14 @@ function Step2(props: {
         <MaterialFormModal
           type={addingMaterialAt.slice("__type__:".length) as MaterialTypeKey}
           hideBasicFields
+          context={{
+            grade: lectureContext?.khoi,
+            subject: lectureContext?.mon,
+            chapterId: lectureContext?.chapterId,
+            lessonId: lectureContext?.lessonId,
+          }}
           onClose={() => setAddingMaterialAt(null)}
+
           onSaved={(p) => {
             const legacyType: Material["type"] =
               p.type === "video" ? "Video"
