@@ -3,7 +3,7 @@ import {
   Video, PlayCircle, Presentation, FileText, Type, Music, FileBox, Code2,
   X, Upload, Plus, Trash2, Eye, ChevronDown, Pencil, ArrowUpDown,
   ListChecks, MoveHorizontal, GripVertical, PenLine, ArrowLeftRight, Type as TypeIcon,
-  CheckSquare, ToggleLeft, MessageSquare, Library,
+  CheckSquare, ToggleLeft, MessageSquare, Library, ClipboardList,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
