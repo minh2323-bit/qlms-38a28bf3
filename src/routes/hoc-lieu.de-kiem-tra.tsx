@@ -26,6 +26,8 @@ import {
 import { toast } from "sonner";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 import { listMatrices } from "@/lib/matrix-store";
+import { listTests } from "@/lib/exam-store";
+
 
 export const Route = createFileRoute("/hoc-lieu/de-kiem-tra")({
   head: () => ({ meta: [{ title: "Đề & Bài kiểm tra – Học liệu" }] }),
