@@ -413,7 +413,14 @@ function Page() {
                     </TableCell>
                   )}
                   <TableCell>
-                    <div className="font-medium text-slate-800">{t.name}</div>
+                    <button
+                      type="button"
+                      className="font-medium text-slate-800 hover:text-indigo-700 hover:underline text-left"
+                      onClick={() => navigate({ to: "/hoc-lieu/de-kiem-tra/$testId", params: { testId: t.id } })}
+                    >
+                      {t.name}
+                    </button>
+
                     <div className="mt-1 flex items-center gap-1.5">
                       <Badge variant="outline" className="text-[10px]">
                         {t.kind === "matrix" ? "Ma trận" : "Tạo mới"}
