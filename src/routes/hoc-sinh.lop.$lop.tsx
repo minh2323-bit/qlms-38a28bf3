@@ -230,7 +230,11 @@ function Page() {
         </div>
       </section>
 
-      {/* 3. Lớp học trực tuyến */}
+      {/* 3. Bài kiểm tra */}
+      <ExamsSection subject={subject} />
+
+      {/* 4. Lớp học trực tuyến */}
+
       {classLive.length > 0 && (
         <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
           <h2 className="text-lg font-bold text-slate-800 mb-4">Lớp học trực tuyến — {subject}</h2>
