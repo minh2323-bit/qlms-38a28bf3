@@ -868,7 +868,8 @@ function Step2(props: {
   editMatId: string | null; setEditMatId: (v: string | null) => void;
   addTopicOpen: boolean; setAddTopicOpen: (v: boolean) => void;
   newTopic: string; setNewTopic: (v: string) => void;
-  lectureContext?: { khoi: string; mon: string; chapterTitle: string; lessonTitles: string };
+  lectureContext?: { khoi: string; mon: string; chapterTitle: string; lessonTitles: string; chapterId?: string; lessonId?: string };
+
 }) {
   const {
     topics, setTopics, materials, setMaterials,
