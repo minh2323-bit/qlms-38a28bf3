@@ -54,8 +54,9 @@ const TEACHER_NAV: NavItem[] = [
       { icon: Landmark, label: "Kỳ thi cấp Sở" },
       { icon: Building2, label: "Kỳ thi cấp Xã/Phường" },
       { icon: School, label: "Kỳ thi cấp Trường" },
-      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi dùng chung" },
-      { icon: FileCheck2, label: "Đề thi & Ma trận đề" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi kỳ thi", to: "/ky-thi/ngan-hang-cau-hoi" },
+      { icon: FileCheck2, label: "Đề thi kỳ thi", to: "/ky-thi/de-thi" },
+
 
     ],
   },
