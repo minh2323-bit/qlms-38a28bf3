@@ -91,25 +91,26 @@ function seedOnce() {
   for (const [cls, subj, unit] of SEED_COMBOS) {
     const tpl = SEED_TEMPLATES[unit];
     if (!tpl) continue;
-    for (const m of tpl) {
+    tpl.forEach((m, i) => {
       acc.push({
-        id: uid(),
+        id: `seed-${cls}-${subj}-${unit}-${i}`,
         classRealId: cls, subject: subj, unitId: unit,
         kind: m.kind, title: m.title, meta: m.meta, origin: "seed",
       });
-    }
+    });
   }
   for (const [cls, subj] of MISC_CLASSES) {
-    for (const m of MISC_TEMPLATES) {
+    MISC_TEMPLATES.forEach((m, i) => {
       acc.push({
-        id: uid(),
+        id: `seed-misc-${cls}-${subj}-${i}`,
         classRealId: cls, subject: subj, unitId: "_misc",
         kind: m.kind, title: m.title, meta: m.meta, origin: "seed",
       });
-    }
+    });
   }
   materials = acc;
 }
+
 seedOnce();
 
 
