@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "qlms-mockup",
+      "version": "0.1.0",
+      "title": "QLMS mockup"
+    },
+    "tools": [
+      {
+        "name": "list_curriculum",
+        "title": "List curriculum",
+        "description": "List the curriculum tree (chương/chủ đề và bài học) for a grade and subject in QLMS.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "grade": {
+              "type": "string",
+              "description": "Grade, e.g. \"3\" or \"4\"."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Subject, e.g. \"Toán\" or \"Tiếng Việt\"."
+            }
+          },
+          "required": [
+            "grade",
+            "subject"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_exams",
+        "title": "List exams",
+        "description": "List the demo exams (đề kiểm tra) in QLMS, optionally filtered by grade (khối) or subject (môn).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "grade": {
+              "type": "string",
+              "description": "Grade filter, e.g. \"3\" or \"4\"."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Subject filter, e.g. \"Toán\"."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_exam",
+        "title": "Get exam detail",
+        "description": "Get one demo exam by id, including its questions and the matrix (khung ma trận) it was generated from.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Exam id, e.g. \"e1\"."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_matrices",
+        "title": "List exam matrices",
+        "description": "List the demo exam matrices (khung ma trận đề) with their rows and total question count.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "grade": {
+              "type": "string",
+              "description": "Grade filter, e.g. \"4\"."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Subject filter, e.g. \"Toán\"."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
