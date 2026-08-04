@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LopTrucTuyenRouteImport } from './routes/lop-truc-tuyen'
 import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
 import { Route as HocSinhRouteImport } from './routes/hoc-sinh'
@@ -34,6 +35,8 @@ import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc
 import { Route as HocLieuDeKiemTraRouteImport } from './routes/hoc-lieu.de-kiem-tra'
 import { Route as HeThongDanhMucRouteImport } from './routes/he-thong.danh-muc'
 import { Route as GiaoBaiTapTaskIdRouteImport } from './routes/giao-bai-tap.$taskId'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as HocLieuBanQuyenIndexRouteImport } from './routes/hoc-lieu.ban-quyen.index'
 import { Route as HocLieuBaiGiangIndexRouteImport } from './routes/hoc-lieu.bai-giang.index'
 import { Route as LopHocSoClassIdHocSinhRouteImport } from './routes/lop-hoc-so.$classId_.hoc-sinh'
@@ -47,11 +50,17 @@ import { Route as HocLieuBaiGiangTaoMoiRouteImport } from './routes/hoc-lieu.bai
 import { Route as HocLieuBaiGiangLessonSlugRouteImport } from './routes/hoc-lieu.bai-giang.$lessonSlug'
 import { Route as GiaoBaiTapTaoMoiDeLuyenTapRouteImport } from './routes/giao-bai-tap.tao-moi.de-luyen-tap'
 import { Route as GiaoBaiTapTaoMoiBaiTapDocRouteImport } from './routes/giao-bai-tap.tao-moi.bai-tap-doc'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LopHocSoClassIdHocLieuMaterialIdRouteImport } from './routes/lop-hoc-so.$classId.hoc-lieu.$materialId'
 import { Route as HocLieuMaTranMatrixIdSinhDeRouteImport } from './routes/hoc-lieu.ma-tran.$matrixId.sinh-de'
 import { Route as HocLieuMaTranMatrixIdChiTietRouteImport } from './routes/hoc-lieu.ma-tran.$matrixId.chi-tiet'
 import { Route as HocLieuBanQuyenTaoMoiModeRouteImport } from './routes/hoc-lieu.ban-quyen.tao-moi.$mode'
 
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LopTrucTuyenRoute = LopTrucTuyenRouteImport.update({
   id: '/lop-truc-tuyen',
   path: '/lop-truc-tuyen',
@@ -177,6 +186,18 @@ const GiaoBaiTapTaskIdRoute = GiaoBaiTapTaskIdRouteImport.update({
   path: '/$taskId',
   getParentRoute: () => GiaoBaiTapRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HocLieuBanQuyenIndexRoute = HocLieuBanQuyenIndexRouteImport.update({
   id: '/hoc-lieu/ban-quyen/',
   path: '/hoc-lieu/ban-quyen/',
@@ -246,6 +267,12 @@ const GiaoBaiTapTaoMoiBaiTapDocRoute =
     path: '/tao-moi/bai-tap-doc',
     getParentRoute: () => GiaoBaiTapRoute,
   } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LopHocSoClassIdHocLieuMaterialIdRoute =
   LopHocSoClassIdHocLieuMaterialIdRouteImport.update({
     id: '/hoc-lieu/$materialId',
@@ -277,6 +304,9 @@ export interface FileRoutesByFullPath {
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
@@ -297,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/hoc-sinh/': typeof HocSinhIndexRoute
   '/lop-hoc-so/': typeof LopHocSoIndexRoute
   '/lop-truc-tuyen/': typeof LopTrucTuyenIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/giao-bai-tap/tao-moi/bai-tap-doc': typeof GiaoBaiTapTaoMoiBaiTapDocRoute
   '/giao-bai-tap/tao-moi/de-luyen-tap': typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
   '/hoc-lieu/bai-giang/$lessonSlug': typeof HocLieuBaiGiangLessonSlugRoute
@@ -317,6 +348,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
@@ -337,6 +371,7 @@ export interface FileRoutesByTo {
   '/hoc-sinh': typeof HocSinhIndexRoute
   '/lop-hoc-so': typeof LopHocSoIndexRoute
   '/lop-truc-tuyen': typeof LopTrucTuyenIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/giao-bai-tap/tao-moi/bai-tap-doc': typeof GiaoBaiTapTaoMoiBaiTapDocRoute
   '/giao-bai-tap/tao-moi/de-luyen-tap': typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
   '/hoc-lieu/bai-giang/$lessonSlug': typeof HocLieuBaiGiangLessonSlugRoute
@@ -362,6 +397,9 @@ export interface FileRoutesById {
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
@@ -382,6 +420,7 @@ export interface FileRoutesById {
   '/hoc-sinh/': typeof HocSinhIndexRoute
   '/lop-hoc-so/': typeof LopHocSoIndexRoute
   '/lop-truc-tuyen/': typeof LopTrucTuyenIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/giao-bai-tap/tao-moi/bai-tap-doc': typeof GiaoBaiTapTaoMoiBaiTapDocRoute
   '/giao-bai-tap/tao-moi/de-luyen-tap': typeof GiaoBaiTapTaoMoiDeLuyenTapRoute
   '/hoc-lieu/bai-giang/$lessonSlug': typeof HocLieuBaiGiangLessonSlugRoute
@@ -408,6 +447,9 @@ export interface FileRouteTypes {
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
     | '/hoc-lieu/de-kiem-tra'
@@ -428,6 +470,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/'
     | '/lop-hoc-so/'
     | '/lop-truc-tuyen/'
+    | '/.mcp/invoke-tool/$tool'
     | '/giao-bai-tap/tao-moi/bai-tap-doc'
     | '/giao-bai-tap/tao-moi/de-luyen-tap'
     | '/hoc-lieu/bai-giang/$lessonSlug'
@@ -448,6 +491,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
     | '/hoc-lieu/de-kiem-tra'
@@ -468,6 +514,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
+    | '/.mcp/invoke-tool/$tool'
     | '/giao-bai-tap/tao-moi/bai-tap-doc'
     | '/giao-bai-tap/tao-moi/de-luyen-tap'
     | '/hoc-lieu/bai-giang/$lessonSlug'
@@ -492,6 +539,9 @@ export interface FileRouteTypes {
     | '/hoc-sinh'
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
     | '/hoc-lieu/de-kiem-tra'
@@ -512,6 +562,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/'
     | '/lop-hoc-so/'
     | '/lop-truc-tuyen/'
+    | '/.mcp/invoke-tool/$tool'
     | '/giao-bai-tap/tao-moi/bai-tap-doc'
     | '/giao-bai-tap/tao-moi/de-luyen-tap'
     | '/hoc-lieu/bai-giang/$lessonSlug'
@@ -537,10 +588,14 @@ export interface RootRouteChildren {
   HocSinhRoute: typeof HocSinhRouteWithChildren
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
   LopTrucTuyenRoute: typeof LopTrucTuyenRouteWithChildren
+  McpRoute: typeof McpRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   HeThongDanhMucRoute: typeof HeThongDanhMucRoute
   HocLieuDeKiemTraRoute: typeof HocLieuDeKiemTraRoute
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
   HocLieuNganHangCauHoiRoute: typeof HocLieuNganHangCauHoiRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   HocLieuBaiGiangLessonSlugRoute: typeof HocLieuBaiGiangLessonSlugRoute
   HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
   HocLieuBanQuyenSetIdRoute: typeof HocLieuBanQuyenSetIdRoute
@@ -556,6 +611,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lop-truc-tuyen': {
       id: '/lop-truc-tuyen'
       path: '/lop-truc-tuyen'
@@ -731,6 +793,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GiaoBaiTapTaskIdRouteImport
       parentRoute: typeof GiaoBaiTapRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hoc-lieu/ban-quyen/': {
       id: '/hoc-lieu/ban-quyen/'
       path: '/hoc-lieu/ban-quyen'
@@ -821,6 +897,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/giao-bai-tap/tao-moi/bai-tap-doc'
       preLoaderRoute: typeof GiaoBaiTapTaoMoiBaiTapDocRouteImport
       parentRoute: typeof GiaoBaiTapRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lop-hoc-so/$classId/hoc-lieu/$materialId': {
       id: '/lop-hoc-so/$classId/hoc-lieu/$materialId'
@@ -952,10 +1035,15 @@ const rootRouteChildren: RootRouteChildren = {
   HocSinhRoute: HocSinhRouteWithChildren,
   LopHocSoRoute: LopHocSoRouteWithChildren,
   LopTrucTuyenRoute: LopTrucTuyenRouteWithChildren,
+  McpRoute: McpRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   HeThongDanhMucRoute: HeThongDanhMucRoute,
   HocLieuDeKiemTraRoute: HocLieuDeKiemTraRoute,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
   HocLieuNganHangCauHoiRoute: HocLieuNganHangCauHoiRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   HocLieuBaiGiangLessonSlugRoute: HocLieuBaiGiangLessonSlugRoute,
   HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
   HocLieuBanQuyenSetIdRoute: HocLieuBanQuyenSetIdRoute,
