@@ -772,13 +772,28 @@ function buildWizardQuestions(count: number): WizardQuestion[] {
   });
 }
 
-function ExamWizard({
-  open, onClose, onCreate, prefill,
+const WIZARD_STUDENTS: { id: string; code: string; name: string; dob: string }[] = [
+  { id: "01", code: "0123456783", name: "Nguyễn An", dob: "15/03/2015" },
+  { id: "02", code: "0365427720", name: "Mai Huyền", dob: "02/07/2015" },
+  { id: "03", code: "0123456787", name: "Trần Bảo", dob: "21/11/2015" },
+  { id: "04", code: "0348844088", name: "Thanh Vân", dob: "08/05/2015" },
+  { id: "05", code: "0335773123", name: "Vũ Huy Hoàng", dob: "30/09/2015" },
+  { id: "06", code: "0912125548", name: "Phạm Tất Thắng", dob: "12/12/2015" },
+  { id: "07", code: "0934778812", name: "Lê Minh Châu", dob: "04/02/2015" },
+  { id: "08", code: "0978221190", name: "Hoàng Khánh Linh", dob: "19/06/2015" },
+];
+
+export function ExamWizard({
+  open, onClose, onCreate, prefill, lockedClass, lockedGrade, lockedSubject,
 }: {
   open: boolean;
   onClose: () => void;
   onCreate: (name: string, grade: string, subject: string) => void;
   prefill?: ExamPrefill | null;
+  /** Khi mở từ chi tiết lớp học: lớp gán cố định, không thể sửa */
+  lockedClass?: string;
+  lockedGrade?: string;
+  lockedSubject?: string;
 }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
@@ -809,7 +824,14 @@ function ExamWizard({
       setLesson(prefill.lessonId ?? "");
       setQuestions(buildWizardQuestions(prefill.count));
     }
-  }, [open, prefill]);
+    if (lockedClass) {
+      setAssignedClasses(new Set([lockedClass]));
+      if (lockedGrade) { setGrade(lockedGrade); setGradeStep2(lockedGrade); }
+      if (lockedSubject) setSubject(lockedSubject);
+      setClassStep2(lockedClass);
+      setSelectedStudents(new Set(WIZARD_STUDENTS.map((s) => s.id)));
+    }
+  }, [open, prefill, lockedClass, lockedGrade, lockedSubject]);
 
   const subjects = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
   const tree = useMemo(
@@ -831,16 +853,7 @@ function ExamWizard({
 
   const close = () => { reset(); onClose(); };
 
-  const students = [
-    { id: "01", code: "0123456783", name: "Nguyễn An", dob: "15/03/2015" },
-    { id: "02", code: "0365427720", name: "Mai Huyền", dob: "02/07/2015" },
-    { id: "03", code: "0123456787", name: "Trần Bảo", dob: "21/11/2015" },
-    { id: "04", code: "0348844088", name: "Thanh Vân", dob: "08/05/2015" },
-    { id: "05", code: "0335773123", name: "Vũ Huy Hoàng", dob: "30/09/2015" },
-    { id: "06", code: "0912125548", name: "Phạm Tất Thắng", dob: "12/12/2015" },
-    { id: "07", code: "0934778812", name: "Lê Minh Châu", dob: "04/02/2015" },
-    { id: "08", code: "0978221190", name: "Hoàng Khánh Linh", dob: "19/06/2015" },
-  ];
+  const students = WIZARD_STUDENTS;
 
   const toggleStudent = (id: string) => setSelectedStudents((prev) => {
     const s = new Set(prev);
@@ -894,6 +907,9 @@ function ExamWizard({
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">Lớp gán</label>
+                {lockedClass ? (
+                  <Input value={lockedClass} readOnly disabled className="mt-1 bg-slate-100 text-slate-700" />
+                ) : (
                 <DropdownMenu open={classDropOpen} onOpenChange={setClassDropOpen}>
                   <DropdownMenuTrigger asChild>
                     <button type="button" className="mt-1 w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-left">
@@ -914,7 +930,9 @@ function ExamWizard({
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
+                )}
               </div>
+
 
             </div>
             <div className="grid grid-cols-4 gap-4">
@@ -1100,6 +1118,12 @@ function ExamWizard({
           <div className="space-y-4 pt-4">
             <div className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
+                {lockedClass ? (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Khối {lockedGrade ?? gradeStep2}</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-medium">{lockedClass}</span>
+                  </div>
+                ) : (
                 <div className="flex items-center gap-3">
                   <div>
                     <div className="text-xs text-slate-500">Khối</div>
@@ -1124,6 +1148,8 @@ function ExamWizard({
                     </Select>
                   </div>
                 </div>
+                )}
+
                 <div className="text-sm text-slate-500">Đã chọn: <b className="text-slate-800">{selectedStudents.size}</b> học sinh</div>
               </div>
               <Table>

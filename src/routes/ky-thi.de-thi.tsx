@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Plus, Search, SlidersHorizontal, Check, Ban, MinusCircle, FileCheck2, LayoutGrid,
+  Plus, Search, SlidersHorizontal, FileCheck2, LayoutGrid, ChevronDown, ListChecks, Grid3x3,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,11 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { FilterSelect, ApprovalTag, RejectReasonModal } from "@/components/ExamBankShared";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { FilterSelect, ApprovalTag } from "@/components/ExamBankShared";
+import { listMatrices } from "@/lib/matrix-store";
 import {
   GRADES, SUBJECTS, PROPOSERS, STATUS_LABEL, type ApprovalStatus,
 } from "@/lib/shared-exam-bank";
@@ -37,8 +41,8 @@ export const Route = createFileRoute("/ky-thi/de-thi")({
   component: Page,
 });
 
-/** Giáo viên hiện tại có quyền trực tiếp thêm mới đề thi dùng chung hay không. */
-const CAN_CREATE = true;
+/** Tên người dùng hiện tại — đề do chính họ đề xuất hiển thị "Tôi - ..." */
+const ME = "Phùng Thúy Hằng";
 
 type Exam = {
   id: string;
@@ -54,22 +58,25 @@ type Exam = {
 };
 
 const SEED: Exam[] = [
-  { id: "se1", name: "Đề thi cuối kỳ I – Toán 4", grade: "4", subject: "Toán", questions: 25, minutes: 45, kind: "Ma trận", proposer: "Phùng Thúy Hằng", status: "approved" },
+  { id: "se1", name: "Đề thi cuối kỳ I – Toán 4", grade: "4", subject: "Toán", questions: 25, minutes: 45, kind: "Ma trận", proposer: ME, status: "approved" },
   { id: "se2", name: "Đề thi giữa kỳ – Tiếng Việt 4", grade: "4", subject: "Tiếng Việt", questions: 20, minutes: 40, kind: "Tạo mới", proposer: "Trần Thị Bích", status: "pending" },
   { id: "se3", name: "Đề khảo sát chất lượng đầu năm – Toán 3", grade: "3", subject: "Toán", questions: 18, minutes: 40, kind: "Ma trận", proposer: "Nguyễn Văn A", status: "pending" },
   { id: "se4", name: "Đề thi thử học sinh giỏi – Tiếng Anh 5", grade: "5", subject: "Tiếng Anh", questions: 30, minutes: 60, kind: "Tạo mới", proposer: "Lê Minh Châu", status: "rejected", rejectReason: "Cấu trúc đề chưa bám sát ma trận của tổ chuyên môn." },
+  { id: "se5", name: "Đề thi cuối kỳ II – Toán 4 (đề xuất)", grade: "4", subject: "Toán", questions: 22, minutes: 45, kind: "Ma trận", proposer: ME, status: "pending" },
 ];
 
 type Filters = { keyword: string; grade: string; subject: string; status: string; proposer: string; kind: string };
 const EMPTY: Filters = { keyword: "", grade: "all", subject: "all", status: "all", proposer: "all", kind: "all" };
 
 function Page() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Exam[]>(SEED);
   const [draft, setDraft] = useState<Filters>(EMPTY);
   const [applied, setApplied] = useState<Filters>(EMPTY);
   const [panel, setPanel] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [rejecting, setRejecting] = useState<Exam | null>(null);
+  const [matrixOpen, setMatrixOpen] = useState(false);
+  const [matrixQ, setMatrixQ] = useState("");
 
   const filtered = useMemo(() => items.filter((e) => {
     const f = applied;
@@ -87,20 +94,6 @@ function Page() {
     [applied],
   );
 
-  const approve = (e: Exam) => {
-    setItems((p) => p.map((x) => x.id === e.id ? { ...x, status: "approved", rejectReason: undefined } : x));
-    toast.success("Đã duyệt đề thi vào kho dùng chung");
-  };
-  const doReject = (e: Exam, reason: string) => {
-    setItems((p) => p.map((x) => x.id === e.id ? { ...x, status: "rejected", rejectReason: reason } : x));
-    setRejecting(null);
-    toast.success("Đã từ chối đề thi");
-  };
-  const removeOne = (e: Exam) => {
-    setItems((p) => p.filter((x) => x.id !== e.id));
-    toast.success("Đã gỡ đề thi khỏi kho dùng chung");
-  };
-
   return (
     <AppShell>
       <div className="bg-white rounded-2xl border shadow-sm">
@@ -111,15 +104,21 @@ function Page() {
               Kho đề thi dùng chung cả trường, đáp ứng chuyên môn để tổ chức các đề thi, kỳ thi toàn trường.
             </p>
           </div>
-          {CAN_CREATE ? (
-            <Button className="gap-1.5 bg-indigo-600 hover:bg-indigo-700" onClick={() => setCreating(true)}>
-              <Plus className="h-4 w-4" /> Thêm mới
-            </Button>
-          ) : (
-            <Button disabled className="gap-1.5" title="Chỉ giáo viên được phân quyền mới được thêm mới">
-              <Plus className="h-4 w-4" /> Thêm mới
-            </Button>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="gap-1.5 bg-indigo-600 hover:bg-indigo-700">
+                <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={() => setMatrixOpen(true)}>
+                <Grid3x3 className="h-4 w-4 mr-2 text-indigo-600" /> Tạo đề từ khung ma trận
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setCreating(true)}>
+                <FileCheck2 className="h-4 w-4 mr-2 text-emerald-600" /> Tạo mới
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="px-4 py-3 flex items-center gap-3 border-b bg-slate-50/60">
@@ -135,7 +134,10 @@ function Page() {
             <button onClick={() => { setApplied(EMPTY); setDraft(EMPTY); }}
               className="text-xs text-slate-500 hover:text-rose-600 cursor-pointer">Xóa bộ lọc</button>
           )}
-          <div className="ml-auto text-xs text-slate-500">
+          <Button variant="outline" className="gap-1.5 ml-auto" onClick={() => setMatrixOpen(true)}>
+            <ListChecks className="h-4 w-4" /> Xem danh sách ma trận đề
+          </Button>
+          <div className="text-xs text-slate-500">
             <span className="font-semibold text-slate-700">{filtered.length}</span> đề thi
           </div>
         </div>
@@ -150,8 +152,7 @@ function Page() {
                 <TableHead className="w-28">Môn</TableHead>
                 <TableHead className="w-24 text-center">Số câu</TableHead>
                 <TableHead className="w-28 text-center">Thời gian</TableHead>
-                <TableHead className="w-40">Người đề xuất</TableHead>
-                <TableHead className="w-40 text-center">Hành động</TableHead>
+                <TableHead className="w-52">Người đề xuất</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,35 +175,18 @@ function Page() {
                   <TableCell className="text-sm text-slate-700">{e.subject}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700">{e.questions}</TableCell>
                   <TableCell className="text-center text-sm text-slate-700">{e.minutes} phút</TableCell>
-                  <TableCell className="text-sm text-slate-600">{e.proposer}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-1.5">
-                      {e.status === "approved" ? (
-                        <button onClick={() => removeOne(e)}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
-                          <MinusCircle className="h-4 w-4" /> Gỡ bỏ
-                        </button>
-                      ) : (
-                        <>
-                          <button onClick={() => approve(e)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer">
-                            <Check className="h-4 w-4" /> Duyệt
-                          </button>
-                          {e.status !== "rejected" && (
-                            <button onClick={() => setRejecting(e)}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
-                              <Ban className="h-4 w-4" /> Từ chối
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
+                  <TableCell className="text-sm text-slate-600">
+                    {e.proposer === ME ? (
+                      <span className="text-slate-700">
+                        <b className="text-indigo-700">Tôi</b> - {e.proposer}
+                      </span>
+                    ) : e.proposer}
                   </TableCell>
                 </TableRow>
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-sm text-slate-500 py-10">
+                  <TableCell colSpan={7} className="text-center text-sm text-slate-500 py-10">
                     Không có đề thi phù hợp.
                   </TableCell>
                 </TableRow>
@@ -211,6 +195,64 @@ function Page() {
           </Table>
         </div>
       </div>
+
+      {/* Khung ma trận đề thi */}
+      <section className="mt-6 bg-white rounded-2xl border shadow-sm">
+        <div className="p-4 border-b flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-bold text-slate-800">Khung ma trận đề thi</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Các khung ma trận dùng chung để sinh đề thi cho kỳ thi toàn trường.
+            </p>
+          </div>
+          <Button variant="outline" className="gap-1.5"
+            onClick={() => navigate({ to: "/hoc-lieu/ma-tran/tao-moi" })}>
+            <Plus className="h-4 w-4" /> Thêm ma trận mới
+          </Button>
+        </div>
+        <div className="p-2 overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50">
+                <TableHead className="w-12 text-center">STT</TableHead>
+                <TableHead className="min-w-[260px]">Tên khung ma trận</TableHead>
+                <TableHead className="w-20 text-center">Khối</TableHead>
+                <TableHead className="w-28">Môn</TableHead>
+                <TableHead className="w-24 text-center">Số câu</TableHead>
+                <TableHead className="w-28 text-center">Thời gian</TableHead>
+                <TableHead className="w-28 text-center">Điểm</TableHead>
+                <TableHead className="w-32 text-center">Hành động</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {listMatrices().map((m, i) => (
+                <TableRow key={m.id} className="hover:bg-indigo-50/40">
+                  <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => navigate({ to: "/hoc-lieu/ma-tran/$matrixId/chi-tiet", params: { matrixId: m.id } })}
+                      className="text-slate-800 font-medium hover:text-indigo-700 cursor-pointer text-left"
+                    >
+                      {m.name}
+                    </button>
+                  </TableCell>
+                  <TableCell className="text-center text-sm text-slate-700">Khối {m.grade}</TableCell>
+                  <TableCell className="text-sm text-slate-700">{m.subject}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700">{m.count}</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700">{m.minutes} phút</TableCell>
+                  <TableCell className="text-center text-sm text-slate-700">{m.maxScore}</TableCell>
+                  <TableCell className="text-center">
+                    <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700"
+                      onClick={() => navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } })}>
+                      Sinh đề →
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </section>
 
       <Sheet open={panel} onOpenChange={setPanel}>
         <SheetContent side="left" className="w-[380px] sm:max-w-[380px] flex flex-col p-0">
@@ -231,7 +273,8 @@ function Page() {
               allLabel="Tất cả trạng thái"
               options={(Object.keys(STATUS_LABEL) as ApprovalStatus[]).map((s) => ({ value: s, label: STATUS_LABEL[s] }))} />
             <FilterSelect label="Người đề xuất" value={draft.proposer} onChange={(v) => setDraft({ ...draft, proposer: v })}
-              allLabel="Tất cả giáo viên trong tổ" options={PROPOSERS.map((p) => ({ value: p, label: p }))} />
+              allLabel="Tất cả giáo viên trong tổ"
+              options={PROPOSERS.map((p) => ({ value: p, label: p === ME ? `Tôi - ${p}` : p }))} />
             <FilterSelect label="Khối" value={draft.grade} onChange={(v) => setDraft({ ...draft, grade: v })}
               allLabel="Tất cả khối" options={GRADES.map((g) => ({ value: g, label: `Khối ${g}` }))} />
             <FilterSelect label="Môn" value={draft.subject} onChange={(v) => setDraft({ ...draft, subject: v })}
@@ -250,17 +293,61 @@ function Page() {
         </SheetContent>
       </Sheet>
 
+      {/* Chọn ma trận để sinh đề */}
+      <Dialog open={matrixOpen} onOpenChange={setMatrixOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ListChecks className="h-5 w-5 text-indigo-600" /> Chọn ma trận để sinh đề
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="h-4 w-4 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2" />
+              <Input value={matrixQ} onChange={(e) => setMatrixQ(e.target.value)}
+                placeholder="Tìm ma trận theo tên..." className="pl-8" />
+            </div>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 gap-1"
+              onClick={() => { setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/tao-moi" }); }}>
+              <Plus className="h-4 w-4" /> Thêm ma trận mới
+            </Button>
+          </div>
+          <div className="space-y-2 max-h-[55vh] overflow-y-auto">
+            {listMatrices()
+              .filter((m) => m.name.toLowerCase().includes(matrixQ.trim().toLowerCase()))
+              .map((m) => (
+                <div
+                  key={m.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => { setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/$matrixId/chi-tiet", params: { matrixId: m.id } }); }}
+                  className="p-3 rounded-lg border hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer flex items-center justify-between gap-3"
+                >
+                  <div>
+                    <div className="font-medium text-slate-800">{m.name}</div>
+                    <div className="text-xs text-slate-500">
+                      {m.minutes} phút · {m.count} câu · {m.maxScore} điểm · Khối {m.grade} · {m.subject}
+                    </div>
+                  </div>
+                  <Button size="sm" className="bg-indigo-700 hover:bg-indigo-800"
+                    onClick={(e) => { e.stopPropagation(); setMatrixOpen(false); navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } }); }}>
+                    Sinh đề →
+                  </Button>
+                </div>
+              ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {creating && (
         <CreateExamModal
           onClose={() => setCreating(false)}
-          onSave={(e) => { setItems((p) => [e, ...p]); setCreating(false); toast.success("Đã thêm đề thi vào kho dùng chung"); }}
+          onSave={(e) => {
+            setItems((p) => [e, ...p]);
+            setCreating(false);
+            toast.success("Đã gửi đề thi, chờ Phó hiệu trưởng duyệt");
+          }}
         />
-      )}
-
-      {rejecting && (
-        <RejectReasonModal name={rejecting.name} proposer={rejecting.proposer}
-          onClose={() => setRejecting(null)}
-          onConfirm={(reason) => doReject(rejecting, reason)} />
       )}
     </AppShell>
   );
@@ -279,6 +366,9 @@ function CreateExamModal({ onClose, onSave }: { onClose: () => void; onSave: (e:
       <DialogContent className="max-w-lg">
         <DialogHeader><DialogTitle className="text-indigo-700">Thêm mới đề thi kỳ thi</DialogTitle></DialogHeader>
         <div className="space-y-3">
+          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            Đề thi sau khi tạo sẽ ở trạng thái <b>Chờ duyệt</b> và cần Phó hiệu trưởng phê duyệt trước khi dùng chung.
+          </div>
           <div>
             <Label className="text-sm">Tên đề thi <span className="text-rose-500">*</span></Label>
             <Input className="mt-1" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ví dụ: Đề thi cuối kỳ II – Toán 4" />
@@ -326,7 +416,7 @@ function CreateExamModal({ onClose, onSave }: { onClose: () => void; onSave: (e:
               onSave({
                 id: `se_${Date.now()}`, name: name.trim(), grade, subject,
                 questions: Number(questions) || 0, minutes: Number(minutes) || 0,
-                kind, proposer: "Phùng Thúy Hằng", status: "approved",
+                kind, proposer: ME, status: "pending",
               });
             }}>Ghi</Button>
         </DialogFooter>
