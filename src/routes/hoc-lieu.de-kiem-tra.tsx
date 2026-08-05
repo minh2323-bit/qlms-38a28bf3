@@ -772,13 +772,17 @@ function buildWizardQuestions(count: number): WizardQuestion[] {
   });
 }
 
-function ExamWizard({
-  open, onClose, onCreate, prefill,
+export function ExamWizard({
+  open, onClose, onCreate, prefill, lockedClass, lockedGrade, lockedSubject,
 }: {
   open: boolean;
   onClose: () => void;
   onCreate: (name: string, grade: string, subject: string) => void;
   prefill?: ExamPrefill | null;
+  /** Khi mở từ chi tiết lớp học: lớp gán cố định, không thể sửa */
+  lockedClass?: string;
+  lockedGrade?: string;
+  lockedSubject?: string;
 }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
