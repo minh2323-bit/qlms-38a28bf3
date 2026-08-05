@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  Plus, Search, SlidersHorizontal, Check, Ban, MinusCircle, FileCheck2, LayoutGrid,
+  Plus, Search, SlidersHorizontal, FileCheck2, LayoutGrid, ChevronDown, ListChecks, Grid3x3,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,11 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { FilterSelect, ApprovalTag, RejectReasonModal } from "@/components/ExamBankShared";
+import { FilterSelect, ApprovalTag } from "@/components/ExamBankShared";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { listMatrices } from "@/lib/matrix-store";
 import {
   GRADES, SUBJECTS, PROPOSERS, STATUS_LABEL, type ApprovalStatus,
 } from "@/lib/shared-exam-bank";
@@ -37,8 +41,8 @@ export const Route = createFileRoute("/ky-thi/de-thi")({
   component: Page,
 });
 
-/** Giáo viên hiện tại có quyền trực tiếp thêm mới đề thi dùng chung hay không. */
-const CAN_CREATE = true;
+/** Tên người dùng hiện tại — đề do chính họ đề xuất sẽ hiển thị "Tôi - ..." */
+const ME = "Phùng Thúy Hằng";
 
 type Exam = {
   id: string;
@@ -54,7 +58,7 @@ type Exam = {
 };
 
 const SEED: Exam[] = [
-  { id: "se1", name: "Đề thi cuối kỳ I – Toán 4", grade: "4", subject: "Toán", questions: 25, minutes: 45, kind: "Ma trận", proposer: "Phùng Thúy Hằng", status: "approved" },
+  { id: "se1", name: "Đề thi cuối kỳ I – Toán 4", grade: "4", subject: "Toán", questions: 25, minutes: 45, kind: "Ma trận", proposer: ME, status: "approved" },
   { id: "se2", name: "Đề thi giữa kỳ – Tiếng Việt 4", grade: "4", subject: "Tiếng Việt", questions: 20, minutes: 40, kind: "Tạo mới", proposer: "Trần Thị Bích", status: "pending" },
   { id: "se3", name: "Đề khảo sát chất lượng đầu năm – Toán 3", grade: "3", subject: "Toán", questions: 18, minutes: 40, kind: "Ma trận", proposer: "Nguyễn Văn A", status: "pending" },
   { id: "se4", name: "Đề thi thử học sinh giỏi – Tiếng Anh 5", grade: "5", subject: "Tiếng Anh", questions: 30, minutes: 60, kind: "Tạo mới", proposer: "Lê Minh Châu", status: "rejected", rejectReason: "Cấu trúc đề chưa bám sát ma trận của tổ chuyên môn." },
