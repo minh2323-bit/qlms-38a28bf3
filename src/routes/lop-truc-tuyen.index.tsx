@@ -17,6 +17,10 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { LiveClassModal, CLASS_DB } from "@/routes/lop-hoc-so.$classId";
+import { addLiveClass } from "@/lib/live-class-store";
 
 export const Route = createFileRoute("/lop-truc-tuyen/")({
   head: () => ({ meta: [{ title: "Lớp học trực tuyến" }] }),
@@ -58,6 +62,7 @@ function Page() {
   const [status, setStatus] = useState<Status | "all">("all");
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [createOpen, setCreateOpen] = useState(false);
 
   // Two-stage link modal: view first, then edit.
   const [linkView, setLinkView] = useState<LiveClass | null>(null);
@@ -119,7 +124,7 @@ function Page() {
   return (
     <AppShell role="teacher">
       <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
-        <header className="flex items-center gap-2 mb-4">
+        <header className="flex items-center gap-3 mb-4">
           <span className="h-9 w-9 rounded-lg bg-indigo-600 text-white inline-flex items-center justify-center">
             <Video className="h-4 w-4" />
           </span>
@@ -127,6 +132,13 @@ function Page() {
             <h1 className="text-lg font-bold text-slate-800">Lớp học trực tuyến</h1>
             <p className="text-xs text-slate-500">Quản lý các buổi học trực tuyến đã lên lịch</p>
           </div>
+          <Button
+            size="lg"
+            className="ml-auto gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="h-5 w-5" /> Tạo lớp học trực tuyến
+          </Button>
         </header>
 
         {/* Filters — 2 rows */}
