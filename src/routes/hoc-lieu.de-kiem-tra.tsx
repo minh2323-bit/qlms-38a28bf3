@@ -813,7 +813,14 @@ export function ExamWizard({
       setLesson(prefill.lessonId ?? "");
       setQuestions(buildWizardQuestions(prefill.count));
     }
-  }, [open, prefill]);
+    if (lockedClass) {
+      setAssignedClasses(new Set([lockedClass]));
+      if (lockedGrade) { setGrade(lockedGrade); setGradeStep2(lockedGrade); }
+      if (lockedSubject) setSubject(lockedSubject);
+      setClassStep2(lockedClass);
+      setSelectedStudents(new Set(WIZARD_STUDENTS.map((s) => s.id)));
+    }
+  }, [open, prefill, lockedClass, lockedGrade, lockedSubject]);
 
   const subjects = grade ? (SUBJECTS_BY_GRADE[grade] ?? []) : [];
   const tree = useMemo(
@@ -835,16 +842,7 @@ export function ExamWizard({
 
   const close = () => { reset(); onClose(); };
 
-  const students = [
-    { id: "01", code: "0123456783", name: "Nguyễn An", dob: "15/03/2015" },
-    { id: "02", code: "0365427720", name: "Mai Huyền", dob: "02/07/2015" },
-    { id: "03", code: "0123456787", name: "Trần Bảo", dob: "21/11/2015" },
-    { id: "04", code: "0348844088", name: "Thanh Vân", dob: "08/05/2015" },
-    { id: "05", code: "0335773123", name: "Vũ Huy Hoàng", dob: "30/09/2015" },
-    { id: "06", code: "0912125548", name: "Phạm Tất Thắng", dob: "12/12/2015" },
-    { id: "07", code: "0934778812", name: "Lê Minh Châu", dob: "04/02/2015" },
-    { id: "08", code: "0978221190", name: "Hoàng Khánh Linh", dob: "19/06/2015" },
-  ];
+  const students = WIZARD_STUDENTS;
 
   const toggleStudent = (id: string) => setSelectedStudents((prev) => {
     const s = new Set(prev);
