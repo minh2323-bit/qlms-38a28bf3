@@ -1712,16 +1712,24 @@ function TestsSection({ classInfo }: { classInfo: ClassInfo }) {
         )}
       </div>
 
-      <AddTestModal
+      <ExamWizard
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        classInfo={classInfo}
-        onCreated={(name, startAt, endAt) => {
-          setTests((prev) => [{ id: `t-${Date.now()}`, name, startAt, endAt }, ...prev]);
+        lockedClass={classInfo.name.replace("Lớp ", "").trim()}
+        lockedGrade={classInfo.lop.replace(/[^0-9]/g, "")}
+        lockedSubject={classInfo.subject}
+        onCreate={(name) => {
+          setTests((prev) => [{
+            id: `t-${Date.now()}`,
+            name: name || "Bài kiểm tra mới",
+            startAt: "20:00 15/06/2026",
+            endAt: "20:45 15/06/2026",
+          }, ...prev]);
           setModalOpen(false);
           toast.success("Đã tạo bài kiểm tra");
         }}
       />
+
     </section>
   );
 }
