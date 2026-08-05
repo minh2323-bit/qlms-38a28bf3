@@ -907,6 +907,9 @@ export function ExamWizard({
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">Lớp gán</label>
+                {lockedClass ? (
+                  <Input value={lockedClass} readOnly disabled className="mt-1 bg-slate-100 text-slate-700" />
+                ) : (
                 <DropdownMenu open={classDropOpen} onOpenChange={setClassDropOpen}>
                   <DropdownMenuTrigger asChild>
                     <button type="button" className="mt-1 w-full flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-left">
@@ -927,7 +930,9 @@ export function ExamWizard({
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
+                )}
               </div>
+
 
             </div>
             <div className="grid grid-cols-4 gap-4">
