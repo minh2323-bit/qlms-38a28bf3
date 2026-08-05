@@ -34,6 +34,7 @@ import { LiveClassStatsModal } from "@/components/LiveClassStatsModal";
 import { AnnouncementSection } from "@/components/AnnouncementSection";
 import { BarChart3 } from "lucide-react";
 import { useCompletion } from "@/lib/material-progress-store";
+import { ExamWizard } from "@/routes/hoc-lieu.de-kiem-tra";
 
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
@@ -60,7 +61,7 @@ export type ClassInfo = {
   homeroom?: boolean;
 };
 
-const CLASS_DB: Record<string, ClassInfo> = {
+export const CLASS_DB: Record<string, ClassInfo> = {
   c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"], homeroom: true },
   c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"], homeroom: true },
   c3: { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp học dành riêng cho lớp 3D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3D", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Đạo đức"] },
@@ -1174,7 +1175,7 @@ type LiveCreatePayload = {
   link: string; description?: string; studentCount: number;
 };
 
-function LiveClassModal({
+export function LiveClassModal({
   classInfo, onClose, onCreated,
 }: {
   classInfo: ClassInfo;
