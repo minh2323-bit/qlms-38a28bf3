@@ -350,7 +350,29 @@ function Page() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {createOpen && (
+        <LiveClassModal
+          classInfo={CLASS_DB.c1}
+          onClose={() => setCreateOpen(false)}
+          onCreated={(data) => {
+            addLiveClass({
+              classRealId: CLASS_DB.c1.lop,
+              subject: CLASS_DB.c1.subject,
+              name: data.name,
+              unitId: data.unitId,
+              startAt: data.startAt,
+              endAt: data.endAt,
+              link: data.link,
+              description: data.description,
+              studentCount: data.studentCount,
+            });
+            setCreateOpen(false);
+            toast.success(`Đã tạo lớp học trực tuyến "${data.name}"`);
+          }}
+        />
+      )}
     </AppShell>
+
   );
 }
 
