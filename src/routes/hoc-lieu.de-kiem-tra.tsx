@@ -1118,6 +1118,12 @@ export function ExamWizard({
           <div className="space-y-4 pt-4">
             <div className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
+                {lockedClass ? (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">Khối {lockedGrade ?? gradeStep2}</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-medium">{lockedClass}</span>
+                  </div>
+                ) : (
                 <div className="flex items-center gap-3">
                   <div>
                     <div className="text-xs text-slate-500">Khối</div>
@@ -1142,6 +1148,8 @@ export function ExamWizard({
                     </Select>
                   </div>
                 </div>
+                )}
+
                 <div className="text-sm text-slate-500">Đã chọn: <b className="text-slate-800">{selectedStudents.size}</b> học sinh</div>
               </div>
               <Table>
