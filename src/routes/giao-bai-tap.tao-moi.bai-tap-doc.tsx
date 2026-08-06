@@ -206,23 +206,8 @@ function Page() {
   /* ---------- Handlers Step 2 ---------- */
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const addContent = () => {
-    const nc: ContentItem = { id: `c-${Date.now()}`, name: "", kind: "file", questions: [] };
-    setContents((p) => [...p, nc]);
-    setActiveContentId(nc.id);
-  };
-  const removeContent = (id: string) => {
-    setContents((p) => {
-      const nxt = p.filter((c) => c.id !== id);
-      if (nxt.length === 0) {
-        const fresh: ContentItem = { id: `c-${Date.now()}`, name: "", kind: "file", questions: [] };
-        setActiveContentId(fresh.id);
-        return [fresh];
-      }
-      if (id === activeContentId) setActiveContentId(nxt[0].id);
-      return nxt;
-    });
-  };
+  // Chỉ cho phép 1 nội dung duy nhất — không có thêm/xóa nội dung.
+
   const updateContent = (id: string, patch: Partial<ContentItem>) => {
     setContents((p) => p.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   };
