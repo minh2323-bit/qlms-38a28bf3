@@ -64,8 +64,7 @@ const TEACHER_NAV: NavItem[] = [
     icon: BarChart3,
     label: "Thống kê\n& Báo cáo",
     submenu: [
-      { icon: TrendingUp, label: "Hoạt động giảng dạy" },
-      { icon: Users, label: "Hoạt động cá nhân" },
+      { icon: TrendingUp, label: "Thống kê giảng dạy & học tập", to: "/thong-ke" },
     ],
   },
   {

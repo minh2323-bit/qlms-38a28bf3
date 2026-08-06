@@ -206,23 +206,8 @@ function Page() {
   /* ---------- Handlers Step 2 ---------- */
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const addContent = () => {
-    const nc: ContentItem = { id: `c-${Date.now()}`, name: "", kind: "file", questions: [] };
-    setContents((p) => [...p, nc]);
-    setActiveContentId(nc.id);
-  };
-  const removeContent = (id: string) => {
-    setContents((p) => {
-      const nxt = p.filter((c) => c.id !== id);
-      if (nxt.length === 0) {
-        const fresh: ContentItem = { id: `c-${Date.now()}`, name: "", kind: "file", questions: [] };
-        setActiveContentId(fresh.id);
-        return [fresh];
-      }
-      if (id === activeContentId) setActiveContentId(nxt[0].id);
-      return nxt;
-    });
-  };
+  // Chỉ cho phép 1 nội dung duy nhất — không có thêm/xóa nội dung.
+
   const updateContent = (id: string, patch: Partial<ContentItem>) => {
     setContents((p) => p.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   };
@@ -502,69 +487,50 @@ function Page() {
                   : "Bài tập không tính điểm — học sinh chỉ cần hoàn thành."}
               </div>
 
-              {/* Horizontal list of contents */}
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {contents.map((c, i) => {
-                  const active = c.id === activeContentId;
-                  return (
-                    <div key={c.id}
-                      onClick={() => setActiveContentId(c.id)}
-                      className={`shrink-0 w-64 rounded-lg border p-3 cursor-pointer transition ${
-                        active ? "border-indigo-500 bg-white ring-2 ring-indigo-100"
-                        : "border-slate-200 bg-white hover:border-indigo-300"}`}>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs font-semibold text-indigo-700">NỘI DUNG {i + 1}</div>
-                        <button onClick={(e) => { e.stopPropagation(); removeContent(c.id); }}
-                          className="text-slate-400 hover:text-rose-600">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                      <div className="mt-2 space-y-2">
-                        <Input
-                          value={c.name}
-                          onChange={(e) => updateContent(c.id, { name: e.target.value })}
-                          placeholder="Tên tài liệu"
-                          className="h-8 text-sm"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        <div className="flex items-center gap-2">
-                          {c.kind === "file" ? (
-                            <>
-                              <Button size="sm" variant="outline" className="gap-1 h-8"
-                                onClick={(e) => { e.stopPropagation(); setActiveContentId(c.id); fileInputRef.current?.click(); }}>
-                                <Upload className="h-3.5 w-3.5" /> Tải file
-                              </Button>
-                              <Button size="sm" variant="ghost" className="gap-1 h-8"
-                                onClick={(e) => { e.stopPropagation(); updateContent(c.id, { kind: "link", url: "" }); }}>
-                                <LinkIcon className="h-3.5 w-3.5" /> Dán link
-                              </Button>
-                            </>
-                          ) : (
-                            <Input
-                              value={c.url ?? ""}
-                              onChange={(e) => updateContent(c.id, { url: e.target.value })}
-                              placeholder="Dán link (doc/video)"
-                              className="h-8 text-sm"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          )}
-                        </div>
-                        <div className="text-[11px] text-slate-500">
-                          {c.questions.length} câu hỏi
-                        </div>
-                      </div>
+              {/* Single content block */}
+              {contents.slice(0, 1).map((c) => (
+                <div key={c.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <div className="text-xs font-semibold text-indigo-700 mb-2">NỘI DUNG BÀI ĐỌC</div>
+                  <div className="grid md:grid-cols-2 gap-3 items-start">
+                    <Input
+                      value={c.name}
+                      onChange={(e) => updateContent(c.id, { name: e.target.value })}
+                      placeholder="Tên tài liệu"
+                      className="h-9"
+                    />
+                    <div className="flex items-center gap-2">
+                      {c.kind === "file" ? (
+                        <>
+                          <Button size="sm" variant="outline" className="gap-1 h-9"
+                            onClick={() => { setActiveContentId(c.id); fileInputRef.current?.click(); }}>
+                            <Upload className="h-4 w-4" /> Tải file
+                          </Button>
+                          <Button size="sm" variant="ghost" className="gap-1 h-9"
+                            onClick={() => updateContent(c.id, { kind: "link", url: "" })}>
+                            <LinkIcon className="h-4 w-4" /> Dán link
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Input
+                            value={c.url ?? ""}
+                            onChange={(e) => updateContent(c.id, { url: e.target.value })}
+                            placeholder="Dán link (doc/video)"
+                            className="h-9"
+                          />
+                          <Button size="sm" variant="ghost" className="gap-1 h-9 shrink-0"
+                            onClick={() => updateContent(c.id, { kind: "file", url: "" })}>
+                            <Upload className="h-4 w-4" /> Tải file
+                          </Button>
+                        </>
+                      )}
                     </div>
-                  );
-                })}
-                <button
-                  onClick={addContent}
-                  className="shrink-0 w-40 rounded-lg border-2 border-dashed border-slate-300 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 flex flex-col items-center justify-center gap-1 py-6"
-                >
-                  <Plus className="h-5 w-5" />
-                  <span className="text-sm font-medium">Thêm nội dung</span>
-                </button>
-                <input type="file" ref={fileInputRef} className="hidden" onChange={onPickFile} />
-              </div>
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-2">{c.questions.length} câu hỏi</div>
+                </div>
+              ))}
+              <input type="file" ref={fileInputRef} className="hidden" onChange={onPickFile} />
+
 
               {/* Questions for active content (below) */}
               <div className="border rounded-xl p-4 space-y-3 bg-slate-50/40">

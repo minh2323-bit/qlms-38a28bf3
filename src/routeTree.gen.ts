@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThongKeRouteImport } from './routes/thong-ke'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LopTrucTuyenRouteImport } from './routes/lop-truc-tuyen'
 import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
@@ -58,6 +59,11 @@ import { Route as HocLieuMaTranMatrixIdSinhDeRouteImport } from './routes/hoc-li
 import { Route as HocLieuMaTranMatrixIdChiTietRouteImport } from './routes/hoc-lieu.ma-tran.$matrixId.chi-tiet'
 import { Route as HocLieuBanQuyenTaoMoiModeRouteImport } from './routes/hoc-lieu.ban-quyen.tao-moi.$mode'
 
+const ThongKeRoute = ThongKeRouteImport.update({
+  id: '/thong-ke',
+  path: '/thong-ke',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
   '/mcp': typeof McpRoute
+  '/thong-ke': typeof ThongKeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
@@ -363,6 +370,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mcp': typeof McpRoute
+  '/thong-ke': typeof ThongKeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
@@ -414,6 +422,7 @@ export interface FileRoutesById {
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
   '/mcp': typeof McpRoute
+  '/thong-ke': typeof ThongKeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
@@ -466,6 +475,7 @@ export interface FileRouteTypes {
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
     | '/mcp'
+    | '/thong-ke'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
@@ -512,6 +522,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/mcp'
+    | '/thong-ke'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
@@ -562,6 +573,7 @@ export interface FileRouteTypes {
     | '/lop-hoc-so'
     | '/lop-truc-tuyen'
     | '/mcp'
+    | '/thong-ke'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
@@ -613,6 +625,7 @@ export interface RootRouteChildren {
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
   LopTrucTuyenRoute: typeof LopTrucTuyenRouteWithChildren
   McpRoute: typeof McpRoute
+  ThongKeRoute: typeof ThongKeRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   HeThongDanhMucRoute: typeof HeThongDanhMucRoute
@@ -637,6 +650,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/thong-ke': {
+      id: '/thong-ke'
+      path: '/thong-ke'
+      fullPath: '/thong-ke'
+      preLoaderRoute: typeof ThongKeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
@@ -1076,6 +1096,7 @@ const rootRouteChildren: RootRouteChildren = {
   LopHocSoRoute: LopHocSoRouteWithChildren,
   LopTrucTuyenRoute: LopTrucTuyenRouteWithChildren,
   McpRoute: McpRoute,
+  ThongKeRoute: ThongKeRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
