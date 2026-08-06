@@ -22,7 +22,7 @@ import {
 
 export const Route = createFileRoute("/giao-bai-tap/")({
   head: () => ({ meta: [{ title: "Giao bài tập, nhiệm vụ" }] }),
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { highlight?: string } => ({
     highlight: typeof s.highlight === "string" ? (s.highlight as string) : undefined,
   }),
   component: Page,
