@@ -29,13 +29,6 @@ export const Route = createFileRoute("/giao-bai-tap/tao-moi/bai-tap-doc")({
 /* ---------- Data ---------- */
 const GRADES = ["1", "2", "3", "4", "5"];
 const SUBJECTS = ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"];
-const CLASSES_BY_GRADE: Record<string, string[]> = {
-  "1": ["1A", "1B", "1C"],
-  "3": ["3A", "3B", "3C", "3D"],
-  "4": ["4A", "4B", "4C", "4D"],
-  "5": ["5A", "5B"],
-  "2": ["2A", "2B"],
-};
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
   "Lớp Toán 4B - Cô Hoa",
@@ -159,7 +152,6 @@ function Page() {
   const [title, setTitle] = useState("");
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
-  const [klass, setKlass] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [unitId, setUnitId] = useState("");
   const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
@@ -178,7 +170,7 @@ function Page() {
   });
   const tree = useMemo(() => getKnowledgeTree(grade, subject), [grade, subject]);
 
-  const step1Valid = title.trim() && grade && subject && klass && chapterId && unitId &&
+  const step1Valid = title.trim() && grade && subject && chapterId && unitId &&
     assignedAt && dueAt && scale;
 
   // Step 2
@@ -291,7 +283,11 @@ function Page() {
           </div>
         </div>
 
-        <Stepper current={step} />
+        <Stepper
+          current={step}
+          canJump={(s) => (s === 1 ? true : s === 2 ? !!step1Valid : !!step1Valid && !!step2Valid)}
+          onJump={setStep}
+        />
 
         {/* ============ STEP 1 ============ */}
         {step === 1 && (
@@ -795,7 +791,7 @@ function Page() {
             <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
               <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên bài tập)"}</div>
               <div className="text-xs text-slate-500 mt-1">
-                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+                Khối {grade || "—"} · {subject || "—"}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
