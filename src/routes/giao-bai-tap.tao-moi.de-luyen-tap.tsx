@@ -150,7 +150,9 @@ const STEPS = [
   { id: 3, name: "Danh sách học sinh", icon: Users },
 ] as const;
 
-function Stepper({ current, extraDone = [] }: { current: 1 | 2 | 3; extraDone?: number[] }) {
+function Stepper({
+  current, extraDone = [], onJump, canJump,
+}: { current: 1 | 2 | 3; extraDone?: number[]; onJump?: (s: 1 | 2 | 3) => void; canJump?: (s: 1 | 2 | 3) => boolean }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
@@ -158,13 +160,19 @@ function Stepper({ current, extraDone = [] }: { current: 1 | 2 | 3; extraDone?: 
           const Icon = s.icon;
           const done = current > s.id || extraDone.includes(s.id);
           const active = current === s.id;
+          const allowed = !!onJump && (canJump ? canJump(s.id as 1 | 2 | 3) : true);
           return (
             <div key={s.id} className="flex-1 flex items-start">
-              <div className="flex flex-col items-center flex-1 min-w-0">
+              <button
+                type="button"
+                disabled={!allowed}
+                onClick={() => allowed && onJump?.(s.id as 1 | 2 | 3)}
+                className={`flex flex-col items-center flex-1 min-w-0 ${allowed ? "cursor-pointer" : "cursor-default"}`}
+              >
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center border-2 transition ${
                   done ? "bg-emerald-500 border-emerald-500 text-white"
                   : active ? "bg-indigo-600 border-indigo-600 text-white ring-4 ring-indigo-100"
-                  : "bg-white border-slate-200 text-slate-400"}`}>
+                  : "bg-white border-slate-200 text-slate-400"} ${allowed && !active ? "hover:ring-4 hover:ring-indigo-100" : ""}`}>
                   {done ? <Check className="h-5 w-5" strokeWidth={3} /> : <Icon className="h-5 w-5" />}
                 </div>
                 <div className="mt-2 text-center">
@@ -175,7 +183,7 @@ function Stepper({ current, extraDone = [] }: { current: 1 | 2 | 3; extraDone?: 
                     {s.name}
                   </div>
                 </div>
-              </div>
+              </button>
               {idx < STEPS.length - 1 && (
                 <div className="flex-1 mt-6 mx-2">
                   <div className={`h-1 rounded-full ${done ? "bg-emerald-500" : "bg-slate-200"}`} />
