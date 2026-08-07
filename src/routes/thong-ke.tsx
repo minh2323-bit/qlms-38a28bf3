@@ -128,14 +128,14 @@ const CLASS_ORDER = ["4A", "4B", "4C", "3A", "3B", "3C", "3D"];
 function Page() {
   const [cls, setCls] = useState(CLASS_ORDER[0]);
   const [q, setQ] = useState("");
-  const [subject, setSubject] = useState("all");
+  const [subject, setSubject] = useState(SUBJECTS[0]);
 
   const rows = useMemo(() => {
     const list = CLASS_STUDENTS[cls] ?? [];
     return list.filter(
       (r) =>
         r.name.toLowerCase().includes(q.trim().toLowerCase()) &&
-        (subject === "all" || r.subject === subject),
+        r.subject === subject,
     );
   }, [cls, q, subject]);
 
@@ -187,9 +187,9 @@ function Page() {
 
             <div className="lg:col-span-2">
               <h3 className="text-sm font-bold text-slate-700 mb-2">Nội dung đã tạo theo tháng</h3>
-              <div className="h-[420px] rounded-xl border p-3">
+              <div className="h-[300px] rounded-xl border p-3">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={MONTHLY} barGap={6} barCategoryGap="28%">
+                  <BarChart data={MONTHLY} barGap={10} barCategoryGap="14%">
                     <defs>
                       <linearGradient id="gBG" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#818cf8" />
@@ -209,9 +209,9 @@ function Page() {
                     <YAxis fontSize={12} allowDecimals={false} tickLine={false} axisLine={false} />
                     <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0", fontSize: 12 }} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: 13, fontWeight: 600 }} />
-                    <Bar dataKey="baiGiang" name="Bài giảng" fill="url(#gBG)" radius={[6, 6, 0, 0]} maxBarSize={34} />
-                    <Bar dataKey="baiTap" name="Bài tập" fill="url(#gBT)" radius={[6, 6, 0, 0]} maxBarSize={34} />
-                    <Bar dataKey="kiemTra" name="Bài kiểm tra" fill="url(#gKT)" radius={[6, 6, 0, 0]} maxBarSize={34} />
+                    <Bar dataKey="baiGiang" name="Bài giảng" fill="url(#gBG)" radius={[6, 6, 0, 0]} maxBarSize={56} />
+                    <Bar dataKey="baiTap" name="Bài tập" fill="url(#gBT)" radius={[6, 6, 0, 0]} maxBarSize={56} />
+                    <Bar dataKey="kiemTra" name="Bài kiểm tra" fill="url(#gKT)" radius={[6, 6, 0, 0]} maxBarSize={56} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -252,7 +252,6 @@ function Page() {
               <Select value={subject} onValueChange={setSubject}>
                 <SelectTrigger className="h-9 w-[150px]"><SelectValue placeholder="Môn" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả môn</SelectItem>
                   {SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
