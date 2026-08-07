@@ -878,7 +878,12 @@ export function ExamWizard({
             { n: 3, label: "Danh sách tham gia" },
           ].map((s, i) => (
             <div key={s.n} className="flex-1 flex items-center">
-              <div className="flex flex-col items-center flex-1">
+              <button
+                type="button"
+                disabled={!(s.n === 1 || canNext1)}
+                onClick={() => { if (s.n === 1 || canNext1) setStep(s.n); }}
+                className="flex flex-col items-center flex-1 cursor-pointer disabled:cursor-default"
+              >
                 <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                   s.n === 2 && questions.length > 0 && step !== 2
                     ? "bg-emerald-500 text-white"
@@ -890,7 +895,7 @@ export function ExamWizard({
                 <div className={`text-sm font-semibold mt-0.5 ${step === s.n ? "text-slate-800" : "text-slate-500"}`}>
                   {s.label}
                 </div>
-              </div>
+              </button>
               {i < 2 && <div className={`h-0.5 flex-1 -mt-10 ${step > s.n ? "bg-indigo-600" : "bg-slate-200"}`} />}
             </div>
           ))}
@@ -1291,7 +1296,12 @@ function CreateExamWizard({
               { n: 2, label: "Nội dung đề" },
             ].map((s, i) => (
               <div key={s.n} className="flex-1 flex items-center">
-                <div className="flex flex-col items-center flex-1">
+                <button
+                  type="button"
+                  disabled={!(s.n === 1 || canNext1)}
+                  onClick={() => { if (s.n === 1 || canNext1) setStep(s.n); }}
+                  className="flex flex-col items-center flex-1 cursor-pointer disabled:cursor-default"
+                >
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                     step >= s.n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
                   }`}>
@@ -1301,7 +1311,7 @@ function CreateExamWizard({
                   <div className={`text-sm font-semibold mt-0.5 ${step === s.n ? "text-slate-800" : "text-slate-500"}`}>
                     {s.label}
                   </div>
-                </div>
+                </button>
                 {i < 1 && <div className={`h-0.5 flex-1 -mt-10 ${step > s.n ? "bg-indigo-600" : "bg-slate-200"}`} />}
               </div>
             ))}

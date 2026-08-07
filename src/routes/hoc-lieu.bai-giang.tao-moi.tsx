@@ -152,7 +152,7 @@ const STEPS_BQ = [
   { id: 2, name: "Nội dung bài giảng", icon: ListChecks },
 ] as const;
 
-function Stepper({ current, steps, filledSteps }: { current: number; steps: ReadonlyArray<{ id: number; name: string; icon: React.ComponentType<{ className?: string }> }>; filledSteps?: ReadonlyArray<number> }) {
+function Stepper({ current, steps, filledSteps, onJump, canJump }: { current: number; steps: ReadonlyArray<{ id: number; name: string; icon: React.ComponentType<{ className?: string }> }>; filledSteps?: ReadonlyArray<number>; onJump?: (s: number) => void; canJump?: (s: number) => boolean }) {
   const filled = new Set(filledSteps ?? []);
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
@@ -163,7 +163,12 @@ function Stepper({ current, steps, filledSteps }: { current: number; steps: Read
           const active = current === s.id;
           return (
             <div key={s.id} className="flex-1 flex items-start">
-              <div className="flex flex-col items-center flex-1 min-w-0">
+              <button
+                type="button"
+                disabled={!(onJump && (canJump ? canJump(s.id) : true))}
+                onClick={() => { if (onJump && (canJump ? canJump(s.id) : true)) onJump(s.id); }}
+                className="flex flex-col items-center flex-1 min-w-0 disabled:cursor-default cursor-pointer"
+              >
                 <div
                   className={`h-14 w-14 rounded-full flex items-center justify-center border-2 transition shadow-sm ${
                     done
@@ -183,7 +188,7 @@ function Stepper({ current, steps, filledSteps }: { current: number; steps: Read
                     {s.name}
                   </div>
                 </div>
-              </div>
+              </button>
               {idx < steps.length - 1 && (
                 <div className="flex-1 mt-7 mx-2">
                   <div className={`h-1 rounded-full ${done ? "bg-emerald-400" : "bg-slate-200"}`} />
@@ -353,7 +358,13 @@ function CreateLessonPage() {
           </Link>
         </section>
 
-        <Stepper current={step} steps={stepsArr} filledSteps={materials.length > 0 ? [2] : []} />
+        <Stepper
+          current={step}
+          steps={stepsArr}
+          filledSteps={materials.length > 0 ? [2] : []}
+          canJump={(t) => t === 1 || banquyenMode || !!canCreate}
+          onJump={(t) => setStep(t as 1 | 2 | 3)}
+        />
 
         {/* Body */}
         {step === 1 && (

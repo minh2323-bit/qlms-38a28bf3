@@ -95,7 +95,12 @@ export function WorksheetWizard({
           const done = s.n === 2 && questions.length > 0 && step !== 2;
           return (
             <div key={s.n} className="flex-1 flex items-center">
-              <div className="flex flex-col items-center flex-1">
+              <button
+                type="button"
+                disabled={!(s.n === 1 || canNext1)}
+                onClick={() => { if (s.n === 1 || canNext1) setStep(s.n); }}
+                className="flex flex-col items-center flex-1 cursor-pointer disabled:cursor-default"
+              >
                 <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                   done ? "bg-emerald-500 text-white"
                     : step >= s.n ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
@@ -106,7 +111,7 @@ export function WorksheetWizard({
                 <div className={`text-sm font-semibold mt-0.5 ${step === s.n ? "text-slate-800" : "text-slate-500"}`}>
                   {s.label}
                 </div>
-              </div>
+              </button>
               {i < 2 && <div className={`h-0.5 flex-1 -mt-10 ${step > s.n ? "bg-indigo-600" : "bg-slate-200"}`} />}
             </div>
           );

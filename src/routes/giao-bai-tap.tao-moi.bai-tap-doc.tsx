@@ -29,13 +29,6 @@ export const Route = createFileRoute("/giao-bai-tap/tao-moi/bai-tap-doc")({
 /* ---------- Data ---------- */
 const GRADES = ["1", "2", "3", "4", "5"];
 const SUBJECTS = ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"];
-const CLASSES_BY_GRADE: Record<string, string[]> = {
-  "1": ["1A", "1B", "1C"],
-  "3": ["3A", "3B", "3C", "3D"],
-  "4": ["4A", "4B", "4C", "4D"],
-  "5": ["5A", "5B"],
-  "2": ["2A", "2B"],
-};
 const ASSIGN_CLASS_OPTIONS = [
   "Lớp Toán 4A - Cô Hoa",
   "Lớp Toán 4B - Cô Hoa",
@@ -103,7 +96,9 @@ const STEPS = [
   { id: 3, name: "Danh sách học sinh", icon: Users },
 ] as const;
 
-function Stepper({ current }: { current: 1 | 2 | 3 }) {
+function Stepper({
+  current, onJump, canJump,
+}: { current: 1 | 2 | 3; onJump?: (s: 1 | 2 | 3) => void; canJump?: (s: 1 | 2 | 3) => boolean }) {
   return (
     <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm px-6 py-5">
       <div className="flex items-start justify-between gap-4">
@@ -111,13 +106,19 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
           const Icon = s.icon;
           const done = current > s.id;
           const active = current === s.id;
+          const allowed = !!onJump && (canJump ? canJump(s.id as 1 | 2 | 3) : true);
           return (
             <div key={s.id} className="flex-1 flex items-start">
-              <div className="flex flex-col items-center flex-1 min-w-0">
+              <button
+                type="button"
+                disabled={!allowed}
+                onClick={() => allowed && onJump?.(s.id as 1 | 2 | 3)}
+                className={`flex flex-col items-center flex-1 min-w-0 ${allowed ? "cursor-pointer" : "cursor-default"}`}
+              >
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center border-2 transition ${
                   done ? "bg-emerald-500 border-emerald-500 text-white"
                   : active ? "bg-indigo-600 border-indigo-600 text-white ring-4 ring-indigo-100"
-                  : "bg-white border-slate-200 text-slate-400"}`}>
+                  : "bg-white border-slate-200 text-slate-400"} ${allowed && !active ? "hover:ring-4 hover:ring-indigo-100" : ""}`}>
                   {done ? <Check className="h-5 w-5" strokeWidth={3} /> : <Icon className="h-5 w-5" />}
                 </div>
                 <div className="mt-2 text-center">
@@ -128,7 +129,7 @@ function Stepper({ current }: { current: 1 | 2 | 3 }) {
                     {s.name}
                   </div>
                 </div>
-              </div>
+              </button>
               {idx < STEPS.length - 1 && (
                 <div className="flex-1 mt-6 mx-2">
                   <div className={`h-1 rounded-full ${done ? "bg-emerald-500" : "bg-slate-200"}`} />
@@ -151,7 +152,6 @@ function Page() {
   const [title, setTitle] = useState("");
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
-  const [klass, setKlass] = useState("");
   const [chapterId, setChapterId] = useState("");
   const [unitId, setUnitId] = useState("");
   const [assignedClasses, setAssignedClasses] = useState<Set<string>>(new Set());
@@ -170,7 +170,7 @@ function Page() {
   });
   const tree = useMemo(() => getKnowledgeTree(grade, subject), [grade, subject]);
 
-  const step1Valid = title.trim() && grade && subject && klass && chapterId && unitId &&
+  const step1Valid = title.trim() && grade && subject && chapterId && unitId &&
     assignedAt && dueAt && scale;
 
   // Step 2
@@ -283,7 +283,11 @@ function Page() {
           </div>
         </div>
 
-        <Stepper current={step} />
+        <Stepper
+          current={step}
+          canJump={(s) => (s === 1 ? true : s === 2 ? !!step1Valid : !!step1Valid && !!step2Valid)}
+          onJump={setStep}
+        />
 
         {/* ============ STEP 1 ============ */}
         {step === 1 && (
@@ -298,10 +302,10 @@ function Page() {
                 placeholder="VD: Đọc hiểu: Cây bàng mùa hè" />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1 block">Khối <span className="text-rose-500">*</span></label>
-                <Select value={grade} onValueChange={(v) => { setGrade(v); setKlass(""); setChapterId(""); setUnitId(""); }}>
+                <Select value={grade} onValueChange={(v) => { setGrade(v); setChapterId(""); setUnitId(""); }}>
                   <SelectTrigger><SelectValue placeholder="Chọn khối" /></SelectTrigger>
                   <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}</SelectContent>
                 </Select>
@@ -313,16 +317,8 @@ function Page() {
                   <SelectContent>{SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Lớp <span className="text-rose-500">*</span></label>
-                <Select value={klass} onValueChange={setKlass} disabled={!grade}>
-                  <SelectTrigger><SelectValue placeholder="Chọn lớp" /></SelectTrigger>
-                  <SelectContent>
-                    {(CLASSES_BY_GRADE[grade] ?? []).map((c) => <SelectItem key={c} value={c}>Lớp {c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
+
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -795,7 +791,7 @@ function Page() {
             <div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-3">
               <div className="text-lg font-bold text-slate-800">{title || "(Chưa có tên bài tập)"}</div>
               <div className="text-xs text-slate-500 mt-1">
-                Khối {grade || "—"} · {subject || "—"} · Lớp {klass || "—"}
+                Khối {grade || "—"} · {subject || "—"}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
