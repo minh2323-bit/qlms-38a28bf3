@@ -603,7 +603,12 @@ function Page() {
           </div>
         </div>
 
-        <Stepper current={step} extraDone={questions.length > 0 ? [2] : []} />
+        <Stepper
+          current={step}
+          extraDone={questions.length > 0 ? [2] : []}
+          canJump={(s) => (s === 1 ? true : s === 2 ? !!step1Valid : !!step1Valid && !!step2Valid)}
+          onJump={setStep}
+        />
 
         {/* ============ STEP 1 ============ */}
         {step === 1 && (
