@@ -22,10 +22,20 @@ const STUDENTS_IN_CLASS = [
 ];
 
 function fmtTime(ts: number) {
-  const d = new Date(ts);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getHours())}:${pad(d.getMinutes())} ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  // Fixed timezone so SSR and client render identical strings
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour12: false,
+  }).formatToParts(new Date(ts));
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("hour")}:${get("minute")} ${get("day")}/${get("month")}/${get("year")}`;
 }
+
 
 export function AnnouncementSection({ classRealId, subject, teacherName }: Props) {
   const items = useAnnouncements(classRealId, subject);
