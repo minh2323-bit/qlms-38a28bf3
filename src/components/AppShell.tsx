@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
-  ClipboardList, Video, Building2, School, Landmark,
+  ClipboardList, Video, School, Landmark,
   Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
 } from "lucide-react";
