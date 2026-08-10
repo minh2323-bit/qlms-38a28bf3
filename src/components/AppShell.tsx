@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
-  ClipboardList, Video, Building2, School, Landmark,
+  ClipboardList, Video, School, Landmark,
   Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
 } from "lucide-react";
@@ -51,9 +51,9 @@ const TEACHER_NAV: NavItem[] = [
     icon: FolderKanban,
     label: "Kỳ thi",
     submenu: [
-      { icon: Landmark, label: "Kỳ thi cấp Sở" },
-      { icon: Building2, label: "Kỳ thi cấp Xã/Phường" },
-      { icon: School, label: "Kỳ thi cấp Trường" },
+      { icon: Landmark, label: "Kỳ thi chính thức", to: "/ky-thi/chinh-thuc" },
+      { icon: School, label: "Kỳ thi ôn tập", to: "/ky-thi/on-tap" },
+
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi kỳ thi", to: "/ky-thi/ngan-hang-cau-hoi" },
       { icon: FileCheck2, label: "Đề thi kỳ thi", to: "/ky-thi/de-thi" },
 
