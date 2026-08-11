@@ -45,6 +45,8 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as HocLieuBanQuyenIndexRouteImport } from './routes/hoc-lieu.ban-quyen.index'
 import { Route as HocLieuBaiGiangIndexRouteImport } from './routes/hoc-lieu.bai-giang.index'
 import { Route as LopHocSoClassIdHocSinhRouteImport } from './routes/lop-hoc-so.$classId_.hoc-sinh'
+import { Route as KyThiTraCuuExamIdRouteImport } from './routes/ky-thi.tra-cuu.$examId'
+import { Route as KyThiGiamSatExamIdRouteImport } from './routes/ky-thi.giam-sat.$examId'
 import { Route as HocSinhLopLopRouteImport } from './routes/hoc-sinh.lop.$lop'
 import { Route as HocSinhBaiGiangLessonSlugRouteImport } from './routes/hoc-sinh.bai-giang.$lessonSlug'
 import { Route as HocLieuThemHocLieuTypeRouteImport } from './routes/hoc-lieu.them-hoc-lieu.$type'
@@ -243,6 +245,16 @@ const LopHocSoClassIdHocSinhRoute = LopHocSoClassIdHocSinhRouteImport.update({
   path: '/$classId/hoc-sinh',
   getParentRoute: () => LopHocSoRoute,
 } as any)
+const KyThiTraCuuExamIdRoute = KyThiTraCuuExamIdRouteImport.update({
+  id: '/ky-thi/tra-cuu/$examId',
+  path: '/ky-thi/tra-cuu/$examId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KyThiGiamSatExamIdRoute = KyThiGiamSatExamIdRouteImport.update({
+  id: '/ky-thi/giam-sat/$examId',
+  path: '/ky-thi/giam-sat/$examId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HocSinhLopLopRoute = HocSinhLopLopRouteImport.update({
   id: '/lop/$lop',
   path: '/lop/$lop',
@@ -373,6 +385,8 @@ export interface FileRoutesByFullPath {
   '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
+  '/ky-thi/giam-sat/$examId': typeof KyThiGiamSatExamIdRoute
+  '/ky-thi/tra-cuu/$examId': typeof KyThiTraCuuExamIdRoute
   '/lop-hoc-so/$classId/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
   '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen/': typeof HocLieuBanQuyenIndexRoute
@@ -422,6 +436,8 @@ export interface FileRoutesByTo {
   '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
+  '/ky-thi/giam-sat/$examId': typeof KyThiGiamSatExamIdRoute
+  '/ky-thi/tra-cuu/$examId': typeof KyThiTraCuuExamIdRoute
   '/lop-hoc-so/$classId/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
   '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen': typeof HocLieuBanQuyenIndexRoute
@@ -476,6 +492,8 @@ export interface FileRoutesById {
   '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
+  '/ky-thi/giam-sat/$examId': typeof KyThiGiamSatExamIdRoute
+  '/ky-thi/tra-cuu/$examId': typeof KyThiTraCuuExamIdRoute
   '/lop-hoc-so/$classId_/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
   '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen/': typeof HocLieuBanQuyenIndexRoute
@@ -531,6 +549,8 @@ export interface FileRouteTypes {
     | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
+    | '/ky-thi/giam-sat/$examId'
+    | '/ky-thi/tra-cuu/$examId'
     | '/lop-hoc-so/$classId/hoc-sinh'
     | '/hoc-lieu/bai-giang/'
     | '/hoc-lieu/ban-quyen/'
@@ -580,6 +600,8 @@ export interface FileRouteTypes {
     | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
+    | '/ky-thi/giam-sat/$examId'
+    | '/ky-thi/tra-cuu/$examId'
     | '/lop-hoc-so/$classId/hoc-sinh'
     | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/ban-quyen'
@@ -633,6 +655,8 @@ export interface FileRouteTypes {
     | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
+    | '/ky-thi/giam-sat/$examId'
+    | '/ky-thi/tra-cuu/$examId'
     | '/lop-hoc-so/$classId_/hoc-sinh'
     | '/hoc-lieu/bai-giang/'
     | '/hoc-lieu/ban-quyen/'
@@ -667,6 +691,8 @@ export interface RootRouteChildren {
   HocLieuDeKiemTraTestIdRoute: typeof HocLieuDeKiemTraTestIdRoute
   HocLieuMaTranTaoMoiRoute: typeof HocLieuMaTranTaoMoiRoute
   HocLieuThemHocLieuTypeRoute: typeof HocLieuThemHocLieuTypeRoute
+  KyThiGiamSatExamIdRoute: typeof KyThiGiamSatExamIdRoute
+  KyThiTraCuuExamIdRoute: typeof KyThiTraCuuExamIdRoute
   HocLieuBaiGiangIndexRoute: typeof HocLieuBaiGiangIndexRoute
   HocLieuBanQuyenIndexRoute: typeof HocLieuBanQuyenIndexRoute
   HocLieuBanQuyenTaoMoiModeRoute: typeof HocLieuBanQuyenTaoMoiModeRoute
@@ -928,6 +954,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LopHocSoClassIdHocSinhRouteImport
       parentRoute: typeof LopHocSoRoute
     }
+    '/ky-thi/tra-cuu/$examId': {
+      id: '/ky-thi/tra-cuu/$examId'
+      path: '/ky-thi/tra-cuu/$examId'
+      fullPath: '/ky-thi/tra-cuu/$examId'
+      preLoaderRoute: typeof KyThiTraCuuExamIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ky-thi/giam-sat/$examId': {
+      id: '/ky-thi/giam-sat/$examId'
+      path: '/ky-thi/giam-sat/$examId'
+      fullPath: '/ky-thi/giam-sat/$examId'
+      preLoaderRoute: typeof KyThiGiamSatExamIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hoc-sinh/lop/$lop': {
       id: '/hoc-sinh/lop/$lop'
       path: '/lop/$lop'
@@ -1155,6 +1195,8 @@ const rootRouteChildren: RootRouteChildren = {
   HocLieuDeKiemTraTestIdRoute: HocLieuDeKiemTraTestIdRoute,
   HocLieuMaTranTaoMoiRoute: HocLieuMaTranTaoMoiRoute,
   HocLieuThemHocLieuTypeRoute: HocLieuThemHocLieuTypeRoute,
+  KyThiGiamSatExamIdRoute: KyThiGiamSatExamIdRoute,
+  KyThiTraCuuExamIdRoute: KyThiTraCuuExamIdRoute,
   HocLieuBaiGiangIndexRoute: HocLieuBaiGiangIndexRoute,
   HocLieuBanQuyenIndexRoute: HocLieuBanQuyenIndexRoute,
   HocLieuBanQuyenTaoMoiModeRoute: HocLieuBanQuyenTaoMoiModeRoute,
