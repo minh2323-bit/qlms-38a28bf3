@@ -1,36 +1,32 @@
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { format } from "date-fns";
+import type { DateRange } from "react-day-picker";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
 import { FilterSelect } from "@/components/ExamBankShared";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
-import { Search, Eye, Landmark, Building2, School, RotateCcw } from "lucide-react";
-
-export type ExamLevel = "truong" | "xa" | "so";
-export type ExamStatus = "upcoming" | "ongoing" | "done";
-
-export type ExamSession = {
-  id: string;
-  name: string;
-  level: ExamLevel;
-  grade: string;
-  subject: string;
-  date: string;
-  minutes: number;
-  students: number;
-  submitted: number;
-  status: ExamStatus;
-  avgScore: number;
-  /** phân bố điểm: [<5, 5-6.4, 6.5-7.9, 8-10] */
-  dist: [number, number, number, number];
-};
+import {
+  CHAPTERS, EFFECT_META, type ExamSession, type ExamLevel,
+} from "@/lib/exam-sessions";
+import {
+  Search, SlidersHorizontal, Plus, Trash2, CheckCircle2, XCircle, Pencil,
+  CalendarIcon, Landmark, Building2, School, RotateCcw,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const TABS: { key: ExamLevel; label: string; icon: typeof School }[] = [
   { key: "truong", label: "Kỳ thi cấp Trường", icon: School },
@@ -38,14 +34,10 @@ const TABS: { key: ExamLevel; label: string; icon: typeof School }[] = [
   { key: "so", label: "Kỳ thi cấp Sở", icon: Landmark },
 ];
 
-const STATUS_META: Record<ExamStatus, { label: string; cls: string }> = {
-  upcoming: { label: "Sắp diễn ra", cls: "bg-amber-100 text-amber-700 hover:bg-amber-100" },
-  ongoing: { label: "Đang diễn ra", cls: "bg-sky-100 text-sky-700 hover:bg-sky-100" },
-  done: { label: "Đã kết thúc", cls: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" },
-};
-
-const DIST_LABELS = ["Dưới 5", "5 – 6,4", "6,5 – 7,9", "8 – 10"];
-const DIST_COLORS = ["bg-rose-500", "bg-amber-500", "bg-sky-500", "bg-emerald-500"];
+function parseDate(d: string) {
+  const [dd, mm, yyyy] = d.split("/").map(Number);
+  return new Date(yyyy, mm - 1, dd);
+}
 
 export function ExamSessionsPage({
   title, subtitle, icon: Icon, data,
@@ -59,29 +51,108 @@ export function ExamSessionsPage({
   const [q, setQ] = useState("");
   const [grade, setGrade] = useState("all");
   const [subject, setSubject] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [detail, setDetail] = useState<ExamSession | null>(null);
+  const [chapter, setChapter] = useState("all");
+  const [approval, setApproval] = useState("all");
+  const [effect, setEffect] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
+  const [advOpen, setAdvOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [confirm, setConfirm] = useState<null | "delete" | "unapprove" | "approve">(null);
 
   const rows = useMemo(
-    () => data.filter((e) =>
-      e.level === tab
-      && (q.trim() === "" || e.name.toLowerCase().includes(q.trim().toLowerCase()))
-      && (grade === "all" || e.grade === grade)
-      && (subject === "all" || e.subject === subject)
-      && (status === "all" || e.status === status)),
-    [data, tab, q, grade, subject, status],
+    () => data.filter((e) => {
+      const d = parseDate(e.date);
+      return e.level === tab
+        && (q.trim() === "" || e.name.toLowerCase().includes(q.trim().toLowerCase()))
+        && (grade === "all" || e.grade === grade)
+        && (subject === "all" || e.subject === subject)
+        && (chapter === "all" || e.chapter === chapter)
+        && (approval === "all" || e.approval === approval)
+        && (effect === "all" || (e.approval === "approved" && e.effect === effect))
+        && (!range?.from || d >= range.from)
+        && (!range?.to || d <= range.to);
+    }),
+    [data, tab, q, grade, subject, chapter, approval, effect, range],
   );
 
-  const reset = () => { setQ(""); setGrade("all"); setSubject("all"); setStatus("all"); };
+  const reset = () => {
+    setQ(""); setGrade("all"); setSubject("all"); setChapter("all");
+    setApproval("all"); setEffect("all"); setRange(undefined);
+  };
+
+  const allChecked = rows.length > 0 && rows.every((r) => selected.includes(r.id));
+  const toggleAll = () =>
+    setSelected(allChecked ? [] : rows.map((r) => r.id));
+  const toggleOne = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const runAction = () => {
+    const n = selected.length;
+    if (confirm === "delete") toast.success(`Đã xóa ${n} kỳ thi.`);
+    if (confirm === "unapprove") toast.success(`Đã hủy duyệt ${n} kỳ thi.`);
+    if (confirm === "approve") toast.success(`Đã duyệt ${n} kỳ thi.`);
+    setSelected([]);
+    setConfirm(null);
+  };
+
+  const rangeLabel = range?.from
+    ? `${format(range.from, "dd/MM/yyyy")}${range.to ? ` – ${format(range.to, "dd/MM/yyyy")}` : ""}`
+    : "Chọn khoảng ngày";
+
+  const advancedFilters = (
+    <div className="space-y-4">
+      <FilterSelect
+        label="Chương / Bài" value={chapter} onChange={setChapter} allLabel="Tất cả chương / bài"
+        options={CHAPTERS.map((c) => ({ value: c, label: c }))}
+      />
+      <FilterSelect
+        label="Trạng thái" value={approval} onChange={setApproval} allLabel="Tất cả"
+        options={[{ value: "approved", label: "Đã duyệt" }, { value: "pending", label: "Chờ duyệt" }]}
+      />
+      <div>
+        <Label className="text-sm">Thời gian tổ chức</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="mt-1 w-full justify-start font-normal bg-white">
+              <CalendarIcon className="mr-2 h-4 w-4" /> {rangeLabel}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="range" selected={range} onSelect={setRange} numberOfMonths={1} className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <FilterSelect
+        label="Hiệu lực" value={effect} onChange={setEffect} allLabel="Tất cả hiệu lực"
+        options={(Object.keys(EFFECT_META) as (keyof typeof EFFECT_META)[]).map((k) => ({ value: k, label: EFFECT_META[k].label }))}
+      />
+    </div>
+  );
 
   return (
     <AppShell>
       <section className="bg-white rounded-2xl border shadow-sm">
         <div className="px-6 py-4 border-b flex items-start gap-3">
           <Icon className="h-6 w-6 text-indigo-700 mt-0.5" />
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-bold text-slate-800">{title}</h1>
             <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>
+          </div>
+          <div className="flex flex-wrap gap-2 justify-end">
+            <Button variant="outline" className="text-rose-600 border-rose-200 hover:bg-rose-50"
+              disabled={!selected.length} onClick={() => setConfirm("delete")}>
+              <Trash2 className="h-4 w-4" /> Xóa
+            </Button>
+            <Button variant="outline" disabled={!selected.length} onClick={() => setConfirm("unapprove")}>
+              <XCircle className="h-4 w-4" /> Hủy duyệt
+            </Button>
+            <Button variant="outline" className="text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+              disabled={!selected.length} onClick={() => setConfirm("approve")}>
+              <CheckCircle2 className="h-4 w-4" /> Duyệt kỳ thi
+            </Button>
+            <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => toast.info("Mở form thêm kỳ thi mới.")}>
+              <Plus className="h-4 w-4" /> Thêm mới
+            </Button>
           </div>
         </div>
 
@@ -89,7 +160,7 @@ export function ExamSessionsPage({
           {TABS.map((t) => (
             <button
               key={t.key}
-              onClick={() => setTab(t.key)}
+              onClick={() => { setTab(t.key); setSelected([]); }}
               className={`px-4 py-2 text-sm font-semibold border-b-2 transition flex items-center gap-1.5 ${
                 tab === t.key
                   ? "border-indigo-700 text-indigo-700"
@@ -102,9 +173,9 @@ export function ExamSessionsPage({
         </div>
 
         <div className="p-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-slate-700">Tìm kiếm</label>
+              <Label className="text-sm">Tìm kiếm</Label>
               <div className="relative mt-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
@@ -123,63 +194,117 @@ export function ExamSessionsPage({
               label="Môn" value={subject} onChange={setSubject} allLabel="Tất cả môn"
               options={SUBJECTS.map((s) => ({ value: s, label: s }))}
             />
-            <div className="flex gap-2 items-end">
-              <div className="flex-1">
-                <FilterSelect
-                  label="Trạng thái" value={status} onChange={setStatus} allLabel="Tất cả trạng thái"
-                  options={(Object.keys(STATUS_META) as ExamStatus[]).map((s) => ({ value: s, label: STATUS_META[s].label }))}
-                />
-              </div>
+            <FilterSelect
+              label="Chương bài" value={chapter} onChange={setChapter} allLabel="Tất cả chương bài"
+              options={CHAPTERS.map((c) => ({ value: c, label: c }))}
+            />
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setAdvOpen(true)}>
+                <SlidersHorizontal className="h-4 w-4" /> Tìm kiếm nâng cao
+              </Button>
               <Button variant="outline" onClick={reset} title="Đặt lại bộ lọc">
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          <div className="rounded-xl border overflow-hidden">
-            <Table>
+          <div className="rounded-xl border overflow-x-auto">
+            <Table className="min-w-[1280px]">
               <TableHeader>
                 <TableRow className="bg-slate-50">
-                  <TableHead className="w-14 text-center">STT</TableHead>
-                  <TableHead>Tên kỳ thi</TableHead>
-                  <TableHead className="text-center w-20">Khối</TableHead>
-                  <TableHead className="w-36">Môn</TableHead>
-                  <TableHead className="text-center w-32">Thời gian</TableHead>
-                  <TableHead className="text-center w-28">Số học sinh</TableHead>
-                  <TableHead className="text-center w-36">Trạng thái</TableHead>
-                  <TableHead className="text-center w-36">Thống kê kết quả</TableHead>
+                  <TableHead className="w-12 text-center">STT</TableHead>
+                  <TableHead className="w-12 text-center">
+                    <Checkbox checked={allChecked} onCheckedChange={toggleAll} aria-label="Chọn tất cả" />
+                  </TableHead>
+                  <TableHead className="w-16 text-center">Sửa</TableHead>
+                  <TableHead className="w-16 text-center">Khối</TableHead>
+                  <TableHead className="w-28">Môn</TableHead>
+                  <TableHead className="min-w-[240px]">Tên kỳ thi</TableHead>
+                  <TableHead className="text-center w-32">Hiệu lực</TableHead>
+                  <TableHead className="text-center w-40">Thời gian tổ chức</TableHead>
+                  <TableHead className="text-center w-36">Thí sinh ĐK &amp; Dự thi</TableHead>
+                  <TableHead className="w-56">Số lượng &amp; Danh sách đề thi</TableHead>
+                  <TableHead className="text-center w-24">Giám sát</TableHead>
+                  <TableHead className="text-center w-32">Tra cứu kết quả</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((e, i) => (
-                  <TableRow key={e.id} className="hover:bg-slate-50">
+                  <TableRow key={e.id} className="hover:bg-slate-50 align-top">
                     <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
-                    <TableCell className="font-semibold text-slate-800">{e.name}</TableCell>
-                    <TableCell className="text-center">{e.grade}</TableCell>
-                    <TableCell>{e.subject}</TableCell>
-                    <TableCell className="text-center text-sm">
-                      <div className="font-medium text-slate-700">{e.date}</div>
-                      <div className="text-xs text-slate-500">{e.minutes} phút</div>
-                    </TableCell>
-                    <TableCell className="text-center">{e.students}</TableCell>
                     <TableCell className="text-center">
-                      <Badge className={STATUS_META[e.status].cls}>{STATUS_META[e.status].label}</Badge>
+                      <Checkbox
+                        checked={selected.includes(e.id)}
+                        onCheckedChange={() => toggleOne(e.id)}
+                        aria-label={`Chọn ${e.name}`}
+                      />
                     </TableCell>
                     <TableCell className="text-center">
                       <button
-                        onClick={() => setDetail(e)}
-                        title="Xem chi tiết thống kê"
-                        aria-label={`Xem chi tiết thống kê ${e.name}`}
+                        onClick={() => toast.info(`Sửa kỳ thi: ${e.name}`)}
+                        aria-label={`Sửa ${e.name}`}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-lg border text-indigo-700 hover:bg-indigo-50"
                       >
-                        <Eye className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </button>
+                    </TableCell>
+                    <TableCell className="text-center">{e.grade}</TableCell>
+                    <TableCell>{e.subject}</TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
+                        e.approval === "approved"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
+                      }`}>
+                        {e.approval === "approved" ? "Đã duyệt" : "Chờ duyệt"}
+                      </span>
+                      <div className="font-semibold text-slate-800 mt-1">{e.name}</div>
+                      <div className="text-xs text-slate-500">{e.chapter}</div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {e.approval === "approved" ? (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${EFFECT_META[e.effect].cls}`}>
+                          {EFFECT_META[e.effect].label}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center text-sm">
+                      <div className="font-medium text-slate-700">{e.date}</div>
+                      <div className="text-xs text-slate-500">{e.timeRange} · {e.minutes} phút</div>
+                    </TableCell>
+                    <TableCell className="text-center text-sm">
+                      <div>Đăng ký: <span className="font-semibold text-slate-800">{e.registered}</span></div>
+                      <div>Dự thi: <span className="font-semibold text-indigo-700">{e.attended}</span></div>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <div>Đề gốc: <span className="font-semibold">{e.originalCount}</span> · Đề hoán vị: <span className="font-semibold">{e.permutedCodes.length}</span></div>
+                      <div className="text-xs text-slate-500 mt-0.5">{e.permutedCodes.join("; ")}</div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {e.approval === "approved" && e.effect === "ongoing" ? (
+                        <Link to="/ky-thi/giam-sat/$examId" params={{ examId: e.id }} className="text-indigo-700 font-semibold hover:underline">
+                          Giám sát
+                        </Link>
+                      ) : (
+                        <span className="text-slate-400">Giám sát</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {e.approval === "approved" && e.effect === "done" ? (
+                        <Link to="/ky-thi/tra-cuu/$examId" params={{ examId: e.id }} className="text-indigo-700 font-semibold hover:underline">
+                          Tra cứu
+                        </Link>
+                      ) : (
+                        <span className="text-slate-400">Tra cứu</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
                 {rows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-slate-500 py-10">
+                    <TableCell colSpan={12} className="text-center text-slate-500 py-10">
                       Không có kỳ thi nào phù hợp bộ lọc.
                     </TableCell>
                   </TableRow>
@@ -190,58 +315,41 @@ export function ExamSessionsPage({
         </div>
       </section>
 
-      <Dialog open={!!detail} onOpenChange={(v) => !v && setDetail(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Thống kê kết quả</DialogTitle>
-          </DialogHeader>
-          {detail && (
-            <div className="space-y-4">
-              <div className="rounded-lg border bg-slate-50 p-3 text-sm">
-                <div className="font-semibold text-slate-800">{detail.name}</div>
-                <div className="text-slate-500 mt-0.5">
-                  Khối {detail.grade} · {detail.subject} · {detail.date} · {detail.minutes} phút
-                </div>
-              </div>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { label: "Học sinh dự thi", value: detail.students },
-                  { label: "Đã nộp bài", value: detail.submitted },
-                  {
-                    label: "Tỷ lệ nộp",
-                    value: `${detail.students ? Math.round((detail.submitted / detail.students) * 100) : 0}%`,
-                  },
-                  { label: "Điểm trung bình", value: detail.avgScore.toFixed(1) },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border p-3 text-center">
-                    <div className="text-2xl font-bold text-indigo-700">{s.value}</div>
-                    <div className="text-xs text-slate-500 mt-1">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-slate-700 mb-2">Phân bố điểm</div>
-                <div className="space-y-2">
-                  {detail.dist.map((v, i) => {
-                    const total = detail.dist.reduce((a, b) => a + b, 0) || 1;
-                    return (
-                      <div key={DIST_LABELS[i]} className="flex items-center gap-3 text-sm">
-                        <div className="w-20 text-slate-600">{DIST_LABELS[i]}</div>
-                        <div className="flex-1 h-3 rounded-full bg-slate-100 overflow-hidden">
-                          <div className={`h-full ${DIST_COLORS[i]}`} style={{ width: `${(v / total) * 100}%` }} />
-                        </div>
-                        <div className="w-24 text-right text-slate-600">
-                          {v} HS ({Math.round((v / total) * 100)}%)
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <Sheet open={advOpen} onOpenChange={setAdvOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-5 w-5 text-indigo-700" /> Tìm kiếm nâng cao
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto py-4">{advancedFilters}</div>
+          <div className="border-t pt-4 flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={reset}>Đặt lại</Button>
+            <Button className="flex-1 bg-indigo-700 hover:bg-indigo-800" onClick={() => setAdvOpen(false)}>
+              <Search className="h-4 w-4" /> Áp dụng
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirm === "delete" ? "Xóa kỳ thi?" : confirm === "unapprove" ? "Hủy duyệt kỳ thi?" : "Duyệt kỳ thi?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Thao tác áp dụng cho {selected.length} kỳ thi đang chọn.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={runAction}>Xác nhận</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
+
+export type { ExamSession };
