@@ -55,11 +55,52 @@ export const PRACTICE_SESSIONS: ExamSession[] = [
   { id: "o7", name: "Đề ôn cấp Sở – Tiếng Việt", level: "so", grade: "5", subject: "Tiếng Việt", chapter: "Chương 4. Đọc hiểu", date: "20/02/2026", timeRange: "07:30 – 08:30", minutes: 60, approval: "approved", effect: "done", registered: 150, attended: 142, originalCount: 2, permutedCodes: ["OSOV1", "OSOV2", "OSOV3"] },
 ];
 
+/* ----- Bổ sung thêm nhiều kỳ thi cho đủ 3 cấp × 3 hiệu lực ----- */
+const MORE_OFFICIAL: ExamSession[] = [
+  { id: "c8", name: "Kiểm tra định kỳ tháng 9 – Trường Tô Hiệu", level: "truong", grade: "5", subject: "Toán", chapter: "Chương 1. Ôn tập và bổ sung", date: "20/09/2026", timeRange: "07:30 – 08:10", minutes: 40, approval: "pending", effect: "upcoming", registered: 132, attended: 0, originalCount: 2, permutedCodes: ["TH511", "TH512", "TH513"] },
+  { id: "c9", name: "Kiểm tra định kỳ tháng 10 – Trường Tô Hiệu", level: "truong", grade: "3", subject: "Tiếng Việt", chapter: "Chương 4. Đọc hiểu", date: "12/10/2026", timeRange: "08:00 – 08:40", minutes: 40, approval: "approved", effect: "upcoming", registered: 98, attended: 0, originalCount: 1, permutedCodes: ["TV311", "TV312"] },
+  { id: "c10", name: "Khảo sát đầu năm – Trường Tô Hiệu (Tiếng Anh)", level: "truong", grade: "4", subject: "Tiếng Anh", chapter: "Chương 4. Đọc hiểu", date: "11/08/2026", timeRange: "09:00 – 09:45", minutes: 45, approval: "approved", effect: "ongoing", registered: 120, attended: 111, originalCount: 2, permutedCodes: ["TA401", "TA402", "TA403"] },
+  { id: "c11", name: "Kiểm tra chuyên đề Toán – Trường Tô Hiệu", level: "truong", grade: "5", subject: "Toán", chapter: "Chương 3. Hình học", date: "11/08/2026", timeRange: "13:30 – 14:15", minutes: 45, approval: "approved", effect: "ongoing", registered: 132, attended: 126, originalCount: 3, permutedCodes: ["TH521", "TH522", "TH523", "TH524"] },
+  { id: "c12", name: "Kiểm tra giữa kỳ I – Trường Tô Hiệu (Toán 5)", level: "truong", grade: "5", subject: "Toán", chapter: "Chương 2. Số thập phân", date: "28/10/2025", timeRange: "07:30 – 08:15", minutes: 45, approval: "approved", effect: "done", registered: 132, attended: 130, originalCount: 2, permutedCodes: ["TH531", "TH532", "TH533"] },
+  { id: "c13", name: "Kiểm tra cuối kỳ I – Trường Tô Hiệu (Tiếng Anh)", level: "truong", grade: "4", subject: "Tiếng Anh", chapter: "Chương 4. Đọc hiểu", date: "26/12/2025", timeRange: "09:00 – 09:40", minutes: 40, approval: "approved", effect: "done", registered: 120, attended: 117, originalCount: 1, permutedCodes: ["TA411", "TA412"] },
+  { id: "c14", name: "Kỳ thi cấp Xã – Học sinh giỏi Toán", level: "xa", grade: "5", subject: "Toán", chapter: "Chương 3. Hình học", date: "11/08/2026", timeRange: "07:30 – 08:30", minutes: 60, approval: "approved", effect: "ongoing", registered: 72, attended: 68, originalCount: 2, permutedCodes: ["XA511", "XA512", "XA513"] },
+  { id: "c15", name: "Kỳ thi cấp Xã – Tiếng Anh", level: "xa", grade: "4", subject: "Tiếng Anh", chapter: "Chương 4. Đọc hiểu", date: "22/09/2026", timeRange: "08:00 – 08:50", minutes: 50, approval: "pending", effect: "upcoming", registered: 60, attended: 0, originalCount: 1, permutedCodes: ["XA421", "XA422"] },
+  { id: "c16", name: "Kỳ thi cấp Sở – Học sinh giỏi Toán", level: "so", grade: "5", subject: "Toán", chapter: "Chương 3. Hình học", date: "05/10/2026", timeRange: "07:30 – 08:30", minutes: 60, approval: "pending", effect: "upcoming", registered: 150, attended: 0, originalCount: 2, permutedCodes: ["SO521", "SO522", "SO523"] },
+  { id: "c17", name: "Khảo sát chất lượng đầu năm – Sở GD&ĐT", level: "so", grade: "4", subject: "Tiếng Việt", chapter: "Chương 4. Đọc hiểu", date: "11/08/2026", timeRange: "14:00 – 15:00", minutes: 60, approval: "approved", effect: "ongoing", registered: 144, attended: 138, originalCount: 3, permutedCodes: ["SO441", "SO442", "SO443", "SO444"] },
+  { id: "c18", name: "Khảo sát chất lượng cuối kỳ I – Sở GD&ĐT", level: "so", grade: "4", subject: "Toán", chapter: "Chương 2. Số thập phân", date: "20/12/2025", timeRange: "07:30 – 08:30", minutes: 60, approval: "approved", effect: "done", registered: 144, attended: 141, originalCount: 2, permutedCodes: ["SO451", "SO452", "SO453"] },
+];
+
+const MORE_PRACTICE: ExamSession[] = [
+  { id: "o8", name: "Đề ôn đầu năm – Trường Tô Hiệu (Toán 5)", level: "truong", grade: "5", subject: "Toán", chapter: "Chương 1. Ôn tập và bổ sung", date: "15/09/2026", timeRange: "07:30 – 08:10", minutes: 40, approval: "pending", effect: "upcoming", registered: 132, attended: 0, originalCount: 2, permutedCodes: ["OT511", "OT512", "OT513"] },
+  { id: "o9", name: "Đề ôn chuyên đề Hình học – Trường Tô Hiệu", level: "truong", grade: "4", subject: "Toán", chapter: "Chương 3. Hình học", date: "02/10/2026", timeRange: "08:00 – 08:40", minutes: 40, approval: "approved", effect: "upcoming", registered: 120, attended: 0, originalCount: 1, permutedCodes: ["OT431", "OT432"] },
+  { id: "o10", name: "Đề ôn Tiếng Anh – Trường Tô Hiệu", level: "truong", grade: "4", subject: "Tiếng Anh", chapter: "Chương 4. Đọc hiểu", date: "11/08/2026", timeRange: "09:30 – 10:10", minutes: 40, approval: "approved", effect: "ongoing", registered: 120, attended: 98, originalCount: 2, permutedCodes: ["OTA41", "OTA42", "OTA43"] },
+  { id: "o11", name: "Đề ôn giữa kỳ I – Trường Tô Hiệu (Tiếng Việt 5)", level: "truong", grade: "5", subject: "Tiếng Việt", chapter: "Chương 4. Đọc hiểu", date: "30/10/2025", timeRange: "08:00 – 08:40", minutes: 40, approval: "approved", effect: "done", registered: 132, attended: 125, originalCount: 2, permutedCodes: ["OTV51", "OTV52", "OTV53"] },
+  { id: "o12", name: "Đề ôn cuối kỳ I – Trường Tô Hiệu (Toán 3)", level: "truong", grade: "3", subject: "Toán", chapter: "Chương 1. Ôn tập và bổ sung", date: "18/12/2025", timeRange: "09:00 – 09:35", minutes: 35, approval: "approved", effect: "done", registered: 96, attended: 92, originalCount: 1, permutedCodes: ["OT331", "OT332"] },
+  { id: "o13", name: "Đề ôn cấp Xã – Tiếng Việt", level: "xa", grade: "4", subject: "Tiếng Việt", chapter: "Chương 4. Đọc hiểu", date: "11/08/2026", timeRange: "15:00 – 15:40", minutes: 40, approval: "approved", effect: "ongoing", registered: 64, attended: 49, originalCount: 1, permutedCodes: ["OXV41", "OXV42"] },
+  { id: "o14", name: "Đề ôn cấp Xã – Toán 5", level: "xa", grade: "5", subject: "Toán", chapter: "Chương 2. Số thập phân", date: "25/09/2026", timeRange: "07:30 – 08:15", minutes: 45, approval: "pending", effect: "upcoming", registered: 58, attended: 0, originalCount: 2, permutedCodes: ["OXT51", "OXT52", "OXT53"] },
+  { id: "o15", name: "Đề ôn cấp Sở số 2 – Tiếng Việt", level: "so", grade: "4", subject: "Tiếng Việt", chapter: "Chương 4. Đọc hiểu", date: "11/08/2026", timeRange: "07:30 – 08:30", minutes: 60, approval: "approved", effect: "ongoing", registered: 144, attended: 130, originalCount: 2, permutedCodes: ["OSV41", "OSV42", "OSV43"] },
+  { id: "o16", name: "Đề ôn cấp Sở – Toán 4", level: "so", grade: "4", subject: "Toán", chapter: "Chương 3. Hình học", date: "08/12/2025", timeRange: "07:30 – 08:30", minutes: 60, approval: "approved", effect: "done", registered: 144, attended: 139, originalCount: 3, permutedCodes: ["OST41", "OST42", "OST43", "OST44"] },
+];
+
+OFFICIAL_SESSIONS.push(...MORE_OFFICIAL);
+PRACTICE_SESSIONS.push(...MORE_PRACTICE);
+
 export const ALL_SESSIONS = [...OFFICIAL_SESSIONS, ...PRACTICE_SESSIONS];
 
 export function getSession(id: string) {
   return ALL_SESSIONS.find((s) => s.id === id);
 }
+
+/** Danh sách đề gốc của một kỳ thi (sinh ổn định theo id). */
+export function getOriginalPapers(session: ExamSession) {
+  const prefix = session.permutedCodes[0]?.slice(0, 3) ?? "DE";
+  return Array.from({ length: session.originalCount }, (_, i) => ({
+    id: `${session.id}-g${i + 1}`,
+    code: `${prefix}-G${i + 1}`,
+    name: `Đề gốc số ${i + 1} – ${session.subject} khối ${session.grade}`,
+  }));
+}
+
 
 /* ---------------- Thí sinh (sinh dữ liệu ổn định theo id) ---------------- */
 
