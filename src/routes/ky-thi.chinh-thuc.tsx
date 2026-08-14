@@ -23,6 +23,7 @@ function Page() {
       title="Kỳ thi chính thức"
       subtitle="Danh sách các kỳ thi chính thức được tổ chức theo cấp Trường, Xã/Phường và Sở GD&ĐT."
       icon={Landmark}
+      kind="chinh-thuc"
       data={OFFICIAL_SESSIONS}
     />
   );

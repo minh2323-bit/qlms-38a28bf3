@@ -47,12 +47,13 @@ function parseDate(d: string) {
 }
 
 export function ExamSessionsPage({
-  title, subtitle, icon: Icon, data,
+  title, subtitle, icon: Icon, data, kind,
 }: {
   title: string;
   subtitle: string;
   icon: typeof School;
   data: ExamSession[];
+  kind: "chinh-thuc" | "on-tap";
 }) {
   const [tab, setTab] = useState<ExamLevel>("truong");
   const [effectTab, setEffectTab] = useState<ExamEffect>("upcoming");
