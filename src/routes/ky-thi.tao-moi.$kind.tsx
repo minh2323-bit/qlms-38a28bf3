@@ -217,8 +217,10 @@ function Page() {
     { n: 1, label: "Thông tin kỳ thi" },
     { n: 2, label: "Nội dung kỳ thi" },
     { n: 3, label: `Quản lý thí sinh (${candidates.length})` },
-    { n: 4, label: "Quản lý ca thi" },
+    ...(isPractice ? [] : [{ n: 4, label: "Quản lý ca thi" }]),
   ];
+  const lastStep = STEPS[STEPS.length - 1].n;
+
 
   const canGo = (n: number) => n === 1 || canNext1;
 
