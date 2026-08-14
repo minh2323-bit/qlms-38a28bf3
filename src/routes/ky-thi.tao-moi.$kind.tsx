@@ -180,6 +180,14 @@ function Page() {
   const [addOpen, setAddOpen] = useState(false);
   const [addPicked, setAddPicked] = useState<string[]>([]);
   const [selCand, setSelCand] = useState<string[]>([]);
+  const [copyOpen, setCopyOpen] = useState(false);
+  const [copySource, setCopySource] = useState(SOURCE_EXAMS[0]);
+  const [copyShiftMode, setCopyShiftMode] = useState("none");
+  const [addGrade, setAddGrade] = useState("4");
+  const [addClass, setAddClass] = useState("all");
+  const [addName, setAddName] = useState("");
+  const [addCccd, setAddCccd] = useState("");
+
 
   const classes = Array.from(new Set(CANDIDATE_POOL.filter((c) => c.grade === fGrade).map((c) => c.klass)));
   const candRows = CANDIDATE_POOL.filter(
