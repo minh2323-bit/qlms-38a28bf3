@@ -231,12 +231,9 @@ function Page() {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-slate-800">{heading}</h1>
-            <p className="text-sm text-slate-500 mt-0.5">Kỳ thi cấp Trường – hoàn thành 4 bước để phát hành kỳ thi.</p>
+            <p className="text-sm text-slate-500 mt-0.5">Kỳ thi cấp Trường – hoàn thành {STEPS.length} bước để phát hành kỳ thi.</p>
           </div>
-          <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
-          <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => { toast.success("Đã ghi kỳ thi."); navigate({ to: backTo }); }}>
-            <Save className="h-4 w-4" /> Ghi
-          </Button>
+
         </div>
 
         {/* Stepper */}
