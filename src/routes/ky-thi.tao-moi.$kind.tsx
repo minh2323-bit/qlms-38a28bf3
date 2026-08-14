@@ -12,17 +12,20 @@ import {
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Check, ChevronLeft, FileCheck2, Pencil, Upload, Plus, Save, X, Search,
+  Check, ChevronLeft, ChevronDown, FileCheck2, Pencil, Upload, Plus, X, Search, Copy,
   FileSpreadsheet, Trash2, RefreshCw, Wand2, Library, Target, ListChecks,
   ArrowUpDown, ToggleLeft, PenLine, GripVertical, Type as TypeIcon, Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
+
 
 export const Route = createFileRoute("/ky-thi/tao-moi/$kind")({
   head: () => ({
