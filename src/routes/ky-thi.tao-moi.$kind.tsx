@@ -12,17 +12,20 @@ import {
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Check, ChevronLeft, FileCheck2, Pencil, Upload, Plus, Save, X, Search,
+  Check, ChevronLeft, ChevronDown, FileCheck2, Pencil, Upload, Plus, X, Search, Copy,
   FileSpreadsheet, Trash2, RefreshCw, Wand2, Library, Target, ListChecks,
   ArrowUpDown, ToggleLeft, PenLine, GripVertical, Type as TypeIcon, Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
+
 
 export const Route = createFileRoute("/ky-thi/tao-moi/$kind")({
   head: () => ({
@@ -177,6 +180,14 @@ function Page() {
   const [addOpen, setAddOpen] = useState(false);
   const [addPicked, setAddPicked] = useState<string[]>([]);
   const [selCand, setSelCand] = useState<string[]>([]);
+  const [copyOpen, setCopyOpen] = useState(false);
+  const [copySource, setCopySource] = useState(SOURCE_EXAMS[0]);
+  const [copyShiftMode, setCopyShiftMode] = useState("none");
+  const [addGrade, setAddGrade] = useState("4");
+  const [addClass, setAddClass] = useState("all");
+  const [addName, setAddName] = useState("");
+  const [addCccd, setAddCccd] = useState("");
+
 
   const classes = Array.from(new Set(CANDIDATE_POOL.filter((c) => c.grade === fGrade).map((c) => c.klass)));
   const candRows = CANDIDATE_POOL.filter(
@@ -214,8 +225,10 @@ function Page() {
     { n: 1, label: "Thông tin kỳ thi" },
     { n: 2, label: "Nội dung kỳ thi" },
     { n: 3, label: `Quản lý thí sinh (${candidates.length})` },
-    { n: 4, label: "Quản lý ca thi" },
+    ...(isPractice ? [] : [{ n: 4, label: "Quản lý ca thi" }]),
   ];
+  const lastStep = STEPS[STEPS.length - 1].n;
+
 
   const canGo = (n: number) => n === 1 || canNext1;
 
@@ -228,12 +241,9 @@ function Page() {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-slate-800">{heading}</h1>
-            <p className="text-sm text-slate-500 mt-0.5">Kỳ thi cấp Trường – hoàn thành 4 bước để phát hành kỳ thi.</p>
+            <p className="text-sm text-slate-500 mt-0.5">Kỳ thi cấp Trường – hoàn thành {STEPS.length} bước để phát hành kỳ thi.</p>
           </div>
-          <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
-          <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => { toast.success("Đã ghi kỳ thi."); navigate({ to: backTo }); }}>
-            <Save className="h-4 w-4" /> Ghi
-          </Button>
+
         </div>
 
         {/* Stepper */}
