@@ -23,6 +23,7 @@ function Page() {
       title="Kỳ thi ôn tập"
       subtitle="Danh sách các kỳ thi ôn tập theo cấp Trường, Xã/Phường và Sở GD&ĐT kèm thống kê kết quả luyện tập."
       icon={BookOpenCheck}
+      kind="on-tap"
       data={PRACTICE_SESSIONS}
     />
   );

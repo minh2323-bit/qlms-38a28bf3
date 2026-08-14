@@ -47,12 +47,13 @@ function parseDate(d: string) {
 }
 
 export function ExamSessionsPage({
-  title, subtitle, icon: Icon, data,
+  title, subtitle, icon: Icon, data, kind,
 }: {
   title: string;
   subtitle: string;
   icon: typeof School;
   data: ExamSession[];
+  kind: "chinh-thuc" | "on-tap";
 }) {
   const [tab, setTab] = useState<ExamLevel>("truong");
   const [effectTab, setEffectTab] = useState<ExamEffect>("upcoming");
@@ -155,8 +156,10 @@ export function ExamSessionsPage({
                 disabled={!selected.length} onClick={() => setConfirm("approve")}>
                 <CheckCircle2 className="h-4 w-4" /> Duyệt kỳ thi
               </Button>
-              <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => toast.info("Mở form thêm kỳ thi mới.")}>
-                <Plus className="h-4 w-4" /> Thêm mới
+              <Button asChild className="bg-indigo-700 hover:bg-indigo-800">
+                <Link to="/ky-thi/tao-moi/$kind" params={{ kind }}>
+                  <Plus className="h-4 w-4" /> Thêm mới
+                </Link>
               </Button>
             </div>
           )}
