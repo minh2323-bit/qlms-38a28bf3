@@ -83,16 +83,37 @@ const NEW_TYPES = [
 ];
 
 const CANDIDATE_POOL = [
-  { id: "s1", cccd: "0123456783", name: "Nguyễn Hải An", dob: "15/03/2016", grade: "4", klass: "4A" },
-  { id: "s2", cccd: "0365427720", name: "Mai Thị Huyền", dob: "02/07/2016", grade: "4", klass: "4A" },
-  { id: "s3", cccd: "0123456787", name: "Trần Gia Bảo", dob: "21/11/2016", grade: "4", klass: "4B" },
-  { id: "s4", cccd: "0348844088", name: "Đỗ Thanh Vân", dob: "08/05/2016", grade: "4", klass: "4B" },
-  { id: "s5", cccd: "0335773123", name: "Vũ Huy Hoàng", dob: "30/09/2016", grade: "4", klass: "4C" },
-  { id: "s6", cccd: "0912125548", name: "Phạm Tất Thắng", dob: "12/12/2016", grade: "4", klass: "4C" },
-  { id: "s7", cccd: "0771233456", name: "Lê Khánh Linh", dob: "19/01/2017", grade: "3", klass: "3A" },
-  { id: "s8", cccd: "0668121999", name: "Bùi Minh Quân", dob: "27/04/2017", grade: "3", klass: "3B" },
-  { id: "s9", cccd: "0559120034", name: "Ngô Phương Mai", dob: "05/08/2015", grade: "5", klass: "5A" },
-  { id: "s10", cccd: "0442988177", name: "Đặng Nam Phúc", dob: "14/10/2015", grade: "5", klass: "5B" },
+  { id: "s1", cccd: "0123456783", name: "Nguyễn Hải An", sex: "Nam", dob: "15/03/2016", grade: "4", klass: "4A" },
+  { id: "s2", cccd: "0365427720", name: "Mai Thị Huyền", sex: "Nữ", dob: "02/07/2016", grade: "4", klass: "4A" },
+  { id: "s3", cccd: "0123456787", name: "Trần Gia Bảo", sex: "Nam", dob: "21/11/2016", grade: "4", klass: "4B" },
+  { id: "s4", cccd: "0348844088", name: "Đỗ Thanh Vân", sex: "Nữ", dob: "08/05/2016", grade: "4", klass: "4B" },
+  { id: "s5", cccd: "0335773123", name: "Vũ Huy Hoàng", sex: "Nam", dob: "30/09/2016", grade: "4", klass: "4C" },
+  { id: "s6", cccd: "0912125548", name: "Phạm Tất Thắng", sex: "Nam", dob: "12/12/2016", grade: "4", klass: "4C" },
+  { id: "s7", cccd: "0771233456", name: "Lê Khánh Linh", sex: "Nữ", dob: "19/01/2017", grade: "3", klass: "3A" },
+  { id: "s8", cccd: "0668121999", name: "Bùi Minh Quân", sex: "Nam", dob: "27/04/2017", grade: "3", klass: "3B" },
+  { id: "s9", cccd: "0559120034", name: "Ngô Phương Mai", sex: "Nữ", dob: "05/08/2015", grade: "5", klass: "5A" },
+  { id: "s10", cccd: "0442988177", name: "Đặng Nam Phúc", sex: "Nam", dob: "14/10/2015", grade: "5", klass: "5B" },
+];
+
+/** Giáo viên toàn trường – dùng cho field Người chấm */
+const CURRENT_TEACHER = "Nguyễn Thị Hạnh (bạn)";
+const TEACHERS = [
+  CURRENT_TEACHER,
+  "Trần Thu Hương – Toán",
+  "Lê Minh Tuấn – Toán",
+  "Phạm Ngọc Lan – Tiếng Việt",
+  "Đỗ Hải Yến – Tiếng Việt",
+  "Vũ Quang Huy – Tiếng Anh",
+  "Bùi Thanh Mai – Tiếng Anh",
+  "Ngô Văn Kiên – Tin học",
+];
+
+/** Kỳ thi nguồn để sao chép thí sinh */
+const SOURCE_EXAMS = [
+  "[Kỳ thi ôn tập] Trường (đề từ tệp)",
+  "[Kỳ thi chính thức] Kiểm tra giữa kỳ II – Trường Tô Hiệu",
+  "[Kỳ thi chính thức] Kiểm tra cuối kỳ I – Trường Tô Hiệu",
+  "[Kỳ thi ôn tập] Đề ôn cuối kỳ – Toán 4",
 ];
 
 type Shift = { id: string; code: string; name: string; count: number };
@@ -100,8 +121,9 @@ type Shift = { id: string; code: string; name: string; count: number };
 function Page() {
   const { kind } = useParams({ from: "/ky-thi/tao-moi/$kind" });
   const navigate = useNavigate();
-  const backTo = kind === "on-tap" ? "/ky-thi/on-tap" : "/ky-thi/chinh-thuc";
-  const heading = kind === "on-tap" ? "Thêm mới kỳ thi ôn tập" : "Thêm mới kỳ thi chính thức";
+  const isPractice = kind === "on-tap";
+  const backTo = isPractice ? "/ky-thi/on-tap" : "/ky-thi/chinh-thuc";
+  const heading = isPractice ? "Thêm mới kỳ thi ôn tập" : "Thêm mới kỳ thi chính thức";
 
   const [step, setStep] = useState(1);
 
@@ -110,6 +132,7 @@ function Page() {
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
   const [chapter, setChapter] = useState("");
+  const [graders, setGraders] = useState<string[]>([CURRENT_TEACHER]);
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
   const [duration, setDuration] = useState("45");
@@ -118,6 +141,8 @@ function Page() {
   const [showScore, setShowScore] = useState(true);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showWork, setShowWork] = useState(false);
+  const [limitStudents, setLimitStudents] = useState(false);
+
 
   const tree = useMemo(
     () => (grade && subject ? getKnowledgeTree(grade, subject) : []),
@@ -190,6 +215,16 @@ function Page() {
 
 
   const classes = Array.from(new Set(CANDIDATE_POOL.filter((c) => c.grade === fGrade).map((c) => c.klass)));
+  const addClasses = Array.from(new Set(CANDIDATE_POOL.filter((c) => c.grade === addGrade).map((c) => c.klass)));
+  const addRows = CANDIDATE_POOL.filter(
+    (c) =>
+      !candidates.includes(c.id) &&
+      c.grade === addGrade &&
+      (addClass === "all" || c.klass === addClass) &&
+      (addCccd.trim() === "" || c.cccd.includes(addCccd.trim())) &&
+      (addName.trim() === "" || c.name.toLowerCase().includes(addName.trim().toLowerCase())),
+  );
+
   const candRows = CANDIDATE_POOL.filter(
     (c) =>
       candidates.includes(c.id) &&
@@ -227,7 +262,7 @@ function Page() {
     { n: 3, label: `Quản lý thí sinh (${candidates.length})` },
     ...(isPractice ? [] : [{ n: 4, label: "Quản lý ca thi" }]),
   ];
-  const lastStep = STEPS[STEPS.length - 1].n;
+
 
 
   const canGo = (n: number) => n === 1 || canNext1;
@@ -326,6 +361,34 @@ function Page() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div>
+                    <Label className="text-sm">Người chấm</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="mt-1 w-full justify-between font-normal">
+                          <span className="truncate text-left">
+                            {graders.length ? `${graders.length} giáo viên: ${graders.join(", ")}` : "Chọn giáo viên chấm"}
+                          </span>
+                          <ChevronDown className="h-4 w-4 opacity-60" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="start" className="w-80 p-2 max-h-72 overflow-auto">
+                        {TEACHERS.map((t) => (
+                          <label key={t} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50 cursor-pointer text-sm">
+                            <Checkbox
+                              checked={graders.includes(t)}
+                              onCheckedChange={() =>
+                                setGraders((v) => v.includes(t) ? v.filter((x) => x !== t) : [...v, t])
+                              }
+                            />
+                            {t}
+                          </label>
+                        ))}
+                      </PopoverContent>
+                    </Popover>
+                    <p className="text-xs text-slate-500 mt-1">Các giáo viên có quyền chấm nếu kỳ thi có chứa câu hỏi tự luận</p>
+                  </div>
+
                 </div>
               </div>
 
@@ -388,11 +451,23 @@ function Page() {
                       <Switch checked={t.v} onCheckedChange={t.set} />
                     </div>
                   ))}
+                  <div className="flex items-start justify-between gap-4 pt-2 border-t">
+                    <div>
+                      <div className="text-sm text-slate-700">Giới hạn học sinh tham gia</div>
+                      <p className="text-xs text-slate-500 mt-1">
+                        OFF: Học sinh cả trường có thể thấy kỳ thi và tự tham gia<br />
+                        ON: Quản trị viên ghi danh học sinh được tham gia
+                      </p>
+                    </div>
+                    <Switch className="mt-1" checked={limitStudents} onCheckedChange={setLimitStudents} />
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
               <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!canNext1} onClick={() => setStep(2)}>
+
                 Tiếp theo
               </Button>
             </div>
@@ -550,8 +625,12 @@ function Page() {
             )}
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(1)}>Quay lại</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(1)}>Quay lại</Button>
+                <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
+              </div>
               <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setStep(3)}>Tiếp theo</Button>
+
             </div>
           </div>
         )}
@@ -563,6 +642,10 @@ function Page() {
               <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setAddOpen(true)}>
                 <Plus className="h-4 w-4" /> Thêm thí sinh
               </Button>
+              <Button variant="outline" onClick={() => setCopyOpen(true)}>
+                <Copy className="h-4 w-4" /> Sao chép thí sinh
+              </Button>
+
               <Button variant="outline" className="text-rose-600 border-rose-200 hover:bg-rose-50"
                 disabled={!selCand.length}
                 onClick={() => { setCandidates((c) => c.filter((id) => !selCand.includes(id))); setSelCand([]); toast.success("Đã xóa thí sinh."); }}>
@@ -645,14 +728,25 @@ function Page() {
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(2)}>Quay lại</Button>
-              <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setStep(4)}>Tiếp theo</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(2)}>Quay lại</Button>
+                <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
+              </div>
+              {isPractice ? (
+                <Button className="bg-indigo-700 hover:bg-indigo-800"
+                  onClick={() => { toast.success("Đã tạo kỳ thi."); navigate({ to: backTo }); }}>
+                  Hoàn tất
+                </Button>
+              ) : (
+                <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setStep(4)}>Tiếp theo</Button>
+              )}
             </div>
+
           </div>
         )}
 
         {/* ---------------- Bước 4 ---------------- */}
-        {step === 4 && (
+        {step === 4 && !isPractice && (
           <div className="p-6 space-y-4">
             <div className="text-sm font-semibold text-rose-600">
               Đã xếp {Math.min(arranged, candidates.length)}/{candidates.length} thí sinh vào các ca thi.
@@ -740,7 +834,11 @@ function Page() {
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(3)}>Quay lại</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(3)}>Quay lại</Button>
+                <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
+              </div>
+
               <Button className="bg-indigo-700 hover:bg-indigo-800"
                 onClick={() => { toast.success("Đã tạo kỳ thi."); navigate({ to: backTo }); }}>
                 Hoàn tất
@@ -832,24 +930,60 @@ function Page() {
         </DialogContent>
       </Dialog>
 
-      {/* Popup thêm thí sinh */}
+      {/* Popup thêm thí sinh vào kỳ thi */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader><DialogTitle>Thêm thí sinh</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader><DialogTitle>Thêm thí sinh vào kỳ thi</DialogTitle></DialogHeader>
+          <div className="border-b">
+            <span className="inline-block border-b-2 border-indigo-600 text-indigo-700 font-medium pb-2 text-sm">
+              1. Danh sách theo lớp
+            </span>
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-sm">Khối học</Label>
+              <Select value={addGrade} onValueChange={(v) => { setAddGrade(v); setAddClass("all"); }}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Lớp</Label>
+              <Select value={addClass} onValueChange={setAddClass}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">— Tất cả —</SelectItem>
+                  {addClasses.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <Input placeholder="Họ tên" value={addName} onChange={(e) => setAddName(e.target.value)} />
+            <Input placeholder="Số CCCD" value={addCccd} onChange={(e) => setAddCccd(e.target.value)} />
+          </div>
           <div className="max-h-96 overflow-auto rounded-xl border">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50">
-                  <TableHead className="w-12" />
+                  <TableHead className="w-14 text-center">STT</TableHead>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={addRows.length > 0 && addRows.every((c) => addPicked.includes(c.id))}
+                      onCheckedChange={(v) => setAddPicked(v ? addRows.map((c) => c.id) : [])}
+                    />
+                  </TableHead>
                   <TableHead>Số CCCD</TableHead>
                   <TableHead>Họ tên</TableHead>
+                  <TableHead className="text-center">Giới tính</TableHead>
                   <TableHead>Ngày sinh</TableHead>
                   <TableHead>Lớp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {CANDIDATE_POOL.filter((c) => !candidates.includes(c.id)).map((c) => (
+                {addRows.length === 0 ? (
+                  <TableRow><TableCell colSpan={7} className="text-center text-slate-400 py-8">Không có thí sinh phù hợp.</TableCell></TableRow>
+                ) : addRows.map((c, i) => (
                   <TableRow key={c.id}>
+                    <TableCell className="text-center">{i + 1}</TableCell>
                     <TableCell>
                       <Checkbox
                         checked={addPicked.includes(c.id)}
@@ -858,6 +992,7 @@ function Page() {
                     </TableCell>
                     <TableCell>{c.cccd}</TableCell>
                     <TableCell className="font-medium text-slate-800">{c.name}</TableCell>
+                    <TableCell className="text-center">{c.sex}</TableCell>
                     <TableCell>{c.dob}</TableCell>
                     <TableCell>{c.klass}</TableCell>
                   </TableRow>
@@ -866,14 +1001,61 @@ function Page() {
             </Table>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Hủy</Button>
             <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!addPicked.length}
               onClick={() => { setCandidates((c) => [...c, ...addPicked]); setAddPicked([]); setAddOpen(false); toast.success("Đã thêm thí sinh."); }}>
-              Thêm vào kỳ thi
+              Chọn thí sinh
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Popup sao chép thí sinh từ kỳ thi khác */}
+      <Dialog open={copyOpen} onOpenChange={setCopyOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle>Sao chép thí sinh từ kỳ thi khác</DialogTitle></DialogHeader>
+          <div>
+            <Label className="text-sm">Kỳ thi nguồn</Label>
+            <Select value={copySource} onValueChange={setCopySource}>
+              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectContent>{SOURCE_EXAMS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          {!isPractice && (
+            <div>
+              <div className="font-semibold text-slate-800 mb-2">Xử lý ca thi</div>
+              <RadioGroup value={copyShiftMode} onValueChange={setCopyShiftMode} className="space-y-2">
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <RadioGroupItem value="none" /> Không sao chép ca thi
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <RadioGroupItem value="if-empty" /> Sao chép kèm ca thi nếu kỳ thi đích chưa có ca thi
+                </label>
+              </RadioGroup>
+            </div>
+          )}
+          <div className="rounded-xl bg-slate-50 border p-4 text-sm text-slate-600">
+            <div className="font-semibold text-slate-800 mb-2">Ghi chú:</div>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Hệ thống luôn bỏ qua thí sinh đã tồn tại trong kỳ thi đích.</li>
+              <li>Không sao chép điểm, trạng thái thi, thời gian làm bài.</li>
+              {!isPractice && <li>Nếu không sao chép ca thi, thí sinh sau khi sao chép sẽ chưa được gán ca thi.</li>}
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => toast.info("Xem trước danh sách thí sinh sẽ được sao chép.")}>Xem trước</Button>
+            <Button className="bg-indigo-700 hover:bg-indigo-800"
+              onClick={() => {
+                const add = CANDIDATE_POOL.filter((c) => !candidates.includes(c.id)).slice(0, 5).map((c) => c.id);
+                setCandidates((v) => [...v, ...add]);
+                setCopyOpen(false);
+                toast.success(`Đã sao chép ${add.length} thí sinh từ kỳ thi nguồn.`);
+              }}>
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {/* Popup ca thi */}
       <Dialog open={shiftOpen} onOpenChange={setShiftOpen}>
