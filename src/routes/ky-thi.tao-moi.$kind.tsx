@@ -83,16 +83,37 @@ const NEW_TYPES = [
 ];
 
 const CANDIDATE_POOL = [
-  { id: "s1", cccd: "0123456783", name: "Nguyễn Hải An", dob: "15/03/2016", grade: "4", klass: "4A" },
-  { id: "s2", cccd: "0365427720", name: "Mai Thị Huyền", dob: "02/07/2016", grade: "4", klass: "4A" },
-  { id: "s3", cccd: "0123456787", name: "Trần Gia Bảo", dob: "21/11/2016", grade: "4", klass: "4B" },
-  { id: "s4", cccd: "0348844088", name: "Đỗ Thanh Vân", dob: "08/05/2016", grade: "4", klass: "4B" },
-  { id: "s5", cccd: "0335773123", name: "Vũ Huy Hoàng", dob: "30/09/2016", grade: "4", klass: "4C" },
-  { id: "s6", cccd: "0912125548", name: "Phạm Tất Thắng", dob: "12/12/2016", grade: "4", klass: "4C" },
-  { id: "s7", cccd: "0771233456", name: "Lê Khánh Linh", dob: "19/01/2017", grade: "3", klass: "3A" },
-  { id: "s8", cccd: "0668121999", name: "Bùi Minh Quân", dob: "27/04/2017", grade: "3", klass: "3B" },
-  { id: "s9", cccd: "0559120034", name: "Ngô Phương Mai", dob: "05/08/2015", grade: "5", klass: "5A" },
-  { id: "s10", cccd: "0442988177", name: "Đặng Nam Phúc", dob: "14/10/2015", grade: "5", klass: "5B" },
+  { id: "s1", cccd: "0123456783", name: "Nguyễn Hải An", sex: "Nam", dob: "15/03/2016", grade: "4", klass: "4A" },
+  { id: "s2", cccd: "0365427720", name: "Mai Thị Huyền", sex: "Nữ", dob: "02/07/2016", grade: "4", klass: "4A" },
+  { id: "s3", cccd: "0123456787", name: "Trần Gia Bảo", sex: "Nam", dob: "21/11/2016", grade: "4", klass: "4B" },
+  { id: "s4", cccd: "0348844088", name: "Đỗ Thanh Vân", sex: "Nữ", dob: "08/05/2016", grade: "4", klass: "4B" },
+  { id: "s5", cccd: "0335773123", name: "Vũ Huy Hoàng", sex: "Nam", dob: "30/09/2016", grade: "4", klass: "4C" },
+  { id: "s6", cccd: "0912125548", name: "Phạm Tất Thắng", sex: "Nam", dob: "12/12/2016", grade: "4", klass: "4C" },
+  { id: "s7", cccd: "0771233456", name: "Lê Khánh Linh", sex: "Nữ", dob: "19/01/2017", grade: "3", klass: "3A" },
+  { id: "s8", cccd: "0668121999", name: "Bùi Minh Quân", sex: "Nam", dob: "27/04/2017", grade: "3", klass: "3B" },
+  { id: "s9", cccd: "0559120034", name: "Ngô Phương Mai", sex: "Nữ", dob: "05/08/2015", grade: "5", klass: "5A" },
+  { id: "s10", cccd: "0442988177", name: "Đặng Nam Phúc", sex: "Nam", dob: "14/10/2015", grade: "5", klass: "5B" },
+];
+
+/** Giáo viên toàn trường – dùng cho field Người chấm */
+const CURRENT_TEACHER = "Nguyễn Thị Hạnh (bạn)";
+const TEACHERS = [
+  CURRENT_TEACHER,
+  "Trần Thu Hương – Toán",
+  "Lê Minh Tuấn – Toán",
+  "Phạm Ngọc Lan – Tiếng Việt",
+  "Đỗ Hải Yến – Tiếng Việt",
+  "Vũ Quang Huy – Tiếng Anh",
+  "Bùi Thanh Mai – Tiếng Anh",
+  "Ngô Văn Kiên – Tin học",
+];
+
+/** Kỳ thi nguồn để sao chép thí sinh */
+const SOURCE_EXAMS = [
+  "[Kỳ thi ôn tập] Trường (đề từ tệp)",
+  "[Kỳ thi chính thức] Kiểm tra giữa kỳ II – Trường Tô Hiệu",
+  "[Kỳ thi chính thức] Kiểm tra cuối kỳ I – Trường Tô Hiệu",
+  "[Kỳ thi ôn tập] Đề ôn cuối kỳ – Toán 4",
 ];
 
 type Shift = { id: string; code: string; name: string; count: number };
@@ -100,8 +121,9 @@ type Shift = { id: string; code: string; name: string; count: number };
 function Page() {
   const { kind } = useParams({ from: "/ky-thi/tao-moi/$kind" });
   const navigate = useNavigate();
-  const backTo = kind === "on-tap" ? "/ky-thi/on-tap" : "/ky-thi/chinh-thuc";
-  const heading = kind === "on-tap" ? "Thêm mới kỳ thi ôn tập" : "Thêm mới kỳ thi chính thức";
+  const isPractice = kind === "on-tap";
+  const backTo = isPractice ? "/ky-thi/on-tap" : "/ky-thi/chinh-thuc";
+  const heading = isPractice ? "Thêm mới kỳ thi ôn tập" : "Thêm mới kỳ thi chính thức";
 
   const [step, setStep] = useState(1);
 
@@ -110,6 +132,7 @@ function Page() {
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
   const [chapter, setChapter] = useState("");
+  const [graders, setGraders] = useState<string[]>([CURRENT_TEACHER]);
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
   const [duration, setDuration] = useState("45");
@@ -118,6 +141,8 @@ function Page() {
   const [showScore, setShowScore] = useState(true);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showWork, setShowWork] = useState(false);
+  const [limitStudents, setLimitStudents] = useState(false);
+
 
   const tree = useMemo(
     () => (grade && subject ? getKnowledgeTree(grade, subject) : []),
