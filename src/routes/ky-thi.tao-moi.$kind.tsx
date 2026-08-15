@@ -116,7 +116,21 @@ const SOURCE_EXAMS = [
   "[Kỳ thi ôn tập] Đề ôn cuối kỳ – Toán 4",
 ];
 
-type Shift = { id: string; code: string; name: string; count: number };
+type Shift = { id: string; code: string; name: string; count: number; start: string; end: string };
+
+const SEED_SHIFTS: Shift[] = [
+  { id: "ca1", code: "ABA", name: "bábsa 1", count: 0, start: "2026-08-13T00:00", end: "2026-08-16T00:00" },
+  { id: "ca2", code: "FJ", name: "cmcm 1", count: 0, start: "2026-08-13T00:00", end: "2026-08-16T00:00" },
+  { id: "ca3", code: "AB", name: "á 1", count: 0, start: "2026-08-14T00:00", end: "2026-08-16T00:00" },
+  { id: "ca4", code: "UQG", name: "ág 1", count: 0, start: "2026-08-13T00:00", end: "2026-08-16T00:00" },
+];
+
+const fmtDT = (v: string) => {
+  if (!v) return "—";
+  const [d, t] = v.split("T");
+  const [y, m, dd] = d.split("-");
+  return `${dd}/${m}/${y} ${t ?? ""}`.trim();
+};
 
 function Page() {
   const { kind } = useParams({ from: "/ky-thi/tao-moi/$kind" });
