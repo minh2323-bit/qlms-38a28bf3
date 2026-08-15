@@ -632,6 +632,10 @@ function Page() {
               <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setAddOpen(true)}>
                 <Plus className="h-4 w-4" /> Thêm thí sinh
               </Button>
+              <Button variant="outline" onClick={() => setCopyOpen(true)}>
+                <Copy className="h-4 w-4" /> Sao chép thí sinh
+              </Button>
+
               <Button variant="outline" className="text-rose-600 border-rose-200 hover:bg-rose-50"
                 disabled={!selCand.length}
                 onClick={() => { setCandidates((c) => c.filter((id) => !selCand.includes(id))); setSelCand([]); toast.success("Đã xóa thí sinh."); }}>
