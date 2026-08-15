@@ -834,7 +834,11 @@ function Page() {
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(3)}>Quay lại</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(3)}>Quay lại</Button>
+                <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
+              </div>
+
               <Button className="bg-indigo-700 hover:bg-indigo-800"
                 onClick={() => { toast.success("Đã tạo kỳ thi."); navigate({ to: backTo }); }}>
                 Hoàn tất
