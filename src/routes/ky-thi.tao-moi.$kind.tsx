@@ -714,9 +714,20 @@ function Page() {
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(2)}>Quay lại</Button>
-              <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setStep(4)}>Tiếp theo</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(2)}>Quay lại</Button>
+                <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
+              </div>
+              {isPractice ? (
+                <Button className="bg-indigo-700 hover:bg-indigo-800"
+                  onClick={() => { toast.success("Đã tạo kỳ thi."); navigate({ to: backTo }); }}>
+                  Hoàn tất
+                </Button>
+              ) : (
+                <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => setStep(4)}>Tiếp theo</Button>
+              )}
             </div>
+
           </div>
         )}
 
