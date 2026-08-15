@@ -262,7 +262,7 @@ function Page() {
     { n: 3, label: `Quản lý thí sinh (${candidates.length})` },
     ...(isPractice ? [] : [{ n: 4, label: "Quản lý ca thi" }]),
   ];
-  const lastStep = STEPS[STEPS.length - 1].n;
+
 
 
   const canGo = (n: number) => n === 1 || canNext1;
@@ -746,7 +746,7 @@ function Page() {
         )}
 
         {/* ---------------- Bước 4 ---------------- */}
-        {step === 4 && (
+        {step === 4 && !isPractice && (
           <div className="p-6 space-y-4">
             <div className="text-sm font-semibold text-rose-600">
               Đã xếp {Math.min(arranged, candidates.length)}/{candidates.length} thí sinh vào các ca thi.
