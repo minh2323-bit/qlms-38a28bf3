@@ -351,6 +351,34 @@ function Page() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div>
+                    <Label className="text-sm">Người chấm</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="mt-1 w-full justify-between font-normal">
+                          <span className="truncate text-left">
+                            {graders.length ? `${graders.length} giáo viên: ${graders.join(", ")}` : "Chọn giáo viên chấm"}
+                          </span>
+                          <ChevronDown className="h-4 w-4 opacity-60" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent align="start" className="w-80 p-2 max-h-72 overflow-auto">
+                        {TEACHERS.map((t) => (
+                          <label key={t} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50 cursor-pointer text-sm">
+                            <Checkbox
+                              checked={graders.includes(t)}
+                              onCheckedChange={() =>
+                                setGraders((v) => v.includes(t) ? v.filter((x) => x !== t) : [...v, t])
+                              }
+                            />
+                            {t}
+                          </label>
+                        ))}
+                      </PopoverContent>
+                    </Popover>
+                    <p className="text-xs text-slate-500 mt-1">Các giáo viên có quyền chấm nếu kỳ thi có chứa câu hỏi tự luận</p>
+                  </div>
+
                 </div>
               </div>
 
