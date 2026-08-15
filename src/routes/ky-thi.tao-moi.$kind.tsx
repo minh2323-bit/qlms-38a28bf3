@@ -441,11 +441,23 @@ function Page() {
                       <Switch checked={t.v} onCheckedChange={t.set} />
                     </div>
                   ))}
+                  <div className="flex items-start justify-between gap-4 pt-2 border-t">
+                    <div>
+                      <div className="text-sm text-slate-700">Giới hạn học sinh tham gia</div>
+                      <p className="text-xs text-slate-500 mt-1">
+                        OFF: Học sinh cả trường có thể thấy kỳ thi và tự tham gia<br />
+                        ON: Quản trị viên ghi danh học sinh được tham gia
+                      </p>
+                    </div>
+                    <Switch className="mt-1" checked={limitStudents} onCheckedChange={setLimitStudents} />
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => navigate({ to: backTo })}>Đóng</Button>
               <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!canNext1} onClick={() => setStep(2)}>
+
                 Tiếp theo
               </Button>
             </div>
