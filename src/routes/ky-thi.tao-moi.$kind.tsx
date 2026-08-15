@@ -916,24 +916,60 @@ function Page() {
         </DialogContent>
       </Dialog>
 
-      {/* Popup thêm thí sinh */}
+      {/* Popup thêm thí sinh vào kỳ thi */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader><DialogTitle>Thêm thí sinh</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader><DialogTitle>Thêm thí sinh vào kỳ thi</DialogTitle></DialogHeader>
+          <div className="border-b">
+            <span className="inline-block border-b-2 border-indigo-600 text-indigo-700 font-medium pb-2 text-sm">
+              1. Danh sách theo lớp
+            </span>
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-sm">Khối học</Label>
+              <Select value={addGrade} onValueChange={(v) => { setAddGrade(v); setAddClass("all"); }}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Lớp</Label>
+              <Select value={addClass} onValueChange={setAddClass}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">— Tất cả —</SelectItem>
+                  {addClasses.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <Input placeholder="Họ tên" value={addName} onChange={(e) => setAddName(e.target.value)} />
+            <Input placeholder="Số CCCD" value={addCccd} onChange={(e) => setAddCccd(e.target.value)} />
+          </div>
           <div className="max-h-96 overflow-auto rounded-xl border">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50">
-                  <TableHead className="w-12" />
+                  <TableHead className="w-14 text-center">STT</TableHead>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={addRows.length > 0 && addRows.every((c) => addPicked.includes(c.id))}
+                      onCheckedChange={(v) => setAddPicked(v ? addRows.map((c) => c.id) : [])}
+                    />
+                  </TableHead>
                   <TableHead>Số CCCD</TableHead>
                   <TableHead>Họ tên</TableHead>
+                  <TableHead className="text-center">Giới tính</TableHead>
                   <TableHead>Ngày sinh</TableHead>
                   <TableHead>Lớp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {CANDIDATE_POOL.filter((c) => !candidates.includes(c.id)).map((c) => (
+                {addRows.length === 0 ? (
+                  <TableRow><TableCell colSpan={7} className="text-center text-slate-400 py-8">Không có thí sinh phù hợp.</TableCell></TableRow>
+                ) : addRows.map((c, i) => (
                   <TableRow key={c.id}>
+                    <TableCell className="text-center">{i + 1}</TableCell>
                     <TableCell>
                       <Checkbox
                         checked={addPicked.includes(c.id)}
@@ -942,6 +978,7 @@ function Page() {
                     </TableCell>
                     <TableCell>{c.cccd}</TableCell>
                     <TableCell className="font-medium text-slate-800">{c.name}</TableCell>
+                    <TableCell className="text-center">{c.sex}</TableCell>
                     <TableCell>{c.dob}</TableCell>
                     <TableCell>{c.klass}</TableCell>
                   </TableRow>
@@ -950,14 +987,61 @@ function Page() {
             </Table>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Hủy</Button>
             <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!addPicked.length}
               onClick={() => { setCandidates((c) => [...c, ...addPicked]); setAddPicked([]); setAddOpen(false); toast.success("Đã thêm thí sinh."); }}>
-              Thêm vào kỳ thi
+              Chọn thí sinh
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Popup sao chép thí sinh từ kỳ thi khác */}
+      <Dialog open={copyOpen} onOpenChange={setCopyOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle>Sao chép thí sinh từ kỳ thi khác</DialogTitle></DialogHeader>
+          <div>
+            <Label className="text-sm">Kỳ thi nguồn</Label>
+            <Select value={copySource} onValueChange={setCopySource}>
+              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectContent>{SOURCE_EXAMS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          {!isPractice && (
+            <div>
+              <div className="font-semibold text-slate-800 mb-2">Xử lý ca thi</div>
+              <RadioGroup value={copyShiftMode} onValueChange={setCopyShiftMode} className="space-y-2">
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <RadioGroupItem value="none" /> Không sao chép ca thi
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <RadioGroupItem value="if-empty" /> Sao chép kèm ca thi nếu kỳ thi đích chưa có ca thi
+                </label>
+              </RadioGroup>
+            </div>
+          )}
+          <div className="rounded-xl bg-slate-50 border p-4 text-sm text-slate-600">
+            <div className="font-semibold text-slate-800 mb-2">Ghi chú:</div>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Hệ thống luôn bỏ qua thí sinh đã tồn tại trong kỳ thi đích.</li>
+              <li>Không sao chép điểm, trạng thái thi, thời gian làm bài.</li>
+              {!isPractice && <li>Nếu không sao chép ca thi, thí sinh sau khi sao chép sẽ chưa được gán ca thi.</li>}
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => toast.info("Xem trước danh sách thí sinh sẽ được sao chép.")}>Xem trước</Button>
+            <Button className="bg-indigo-700 hover:bg-indigo-800"
+              onClick={() => {
+                const add = CANDIDATE_POOL.filter((c) => !candidates.includes(c.id)).slice(0, 5).map((c) => c.id);
+                setCandidates((v) => [...v, ...add]);
+                setCopyOpen(false);
+                toast.success(`Đã sao chép ${add.length} thí sinh từ kỳ thi nguồn.`);
+              }}>
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {/* Popup ca thi */}
       <Dialog open={shiftOpen} onOpenChange={setShiftOpen}>
