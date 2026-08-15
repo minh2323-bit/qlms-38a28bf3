@@ -215,6 +215,16 @@ function Page() {
 
 
   const classes = Array.from(new Set(CANDIDATE_POOL.filter((c) => c.grade === fGrade).map((c) => c.klass)));
+  const addClasses = Array.from(new Set(CANDIDATE_POOL.filter((c) => c.grade === addGrade).map((c) => c.klass)));
+  const addRows = CANDIDATE_POOL.filter(
+    (c) =>
+      !candidates.includes(c.id) &&
+      c.grade === addGrade &&
+      (addClass === "all" || c.klass === addClass) &&
+      (addCccd.trim() === "" || c.cccd.includes(addCccd.trim())) &&
+      (addName.trim() === "" || c.name.toLowerCase().includes(addName.trim().toLowerCase())),
+  );
+
   const candRows = CANDIDATE_POOL.filter(
     (c) =>
       candidates.includes(c.id) &&
