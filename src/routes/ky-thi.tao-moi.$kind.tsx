@@ -862,7 +862,7 @@ function Page() {
                       </TableCell>
                       <TableCell className="text-center">
                         <button className="text-indigo-700 hover:underline"
-                          onClick={() => { setEditShift(s); setSCode(s.code); setSName(s.name); setSCount(String(s.count)); setShiftOpen(true); }}>
+                          onClick={() => openShift(s)}>
                           Sửa
                         </button>
                       </TableCell>
