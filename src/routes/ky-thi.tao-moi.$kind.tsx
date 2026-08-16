@@ -840,6 +840,8 @@ function Page() {
                     <TableHead className="text-center">Xem thí sinh ca thi</TableHead>
                     <TableHead>Mã ca thi</TableHead>
                     <TableHead>Tên ca thi</TableHead>
+                    <TableHead className="text-center">Ngày giờ bắt đầu</TableHead>
+                    <TableHead className="text-center">Ngày giờ kết thúc</TableHead>
                     <TableHead className="text-right">Số lượng thí sinh</TableHead>
                     <TableHead className="text-center">Chia thí sinh chủ động theo ca thi</TableHead>
                   </TableRow>
