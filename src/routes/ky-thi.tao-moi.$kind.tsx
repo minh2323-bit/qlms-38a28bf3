@@ -873,6 +873,8 @@ function Page() {
                       </TableCell>
                       <TableCell>{s.code}</TableCell>
                       <TableCell>{s.name}</TableCell>
+                      <TableCell className="text-center whitespace-nowrap">{fmtDT(s.start)}</TableCell>
+                      <TableCell className="text-center whitespace-nowrap">{fmtDT(s.end)}</TableCell>
                       <TableCell className="text-right">{s.count}</TableCell>
                       <TableCell className="text-center text-sm">
                         <button className="text-indigo-700 hover:underline" onClick={() => toast.info("Thêm thí sinh vào ca thi.")}>Thêm</button>
