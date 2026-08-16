@@ -849,7 +849,7 @@ function Page() {
                 <TableBody>
                   {shifts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-slate-400 py-8">Chưa có ca thi nào.</TableCell>
+                      <TableCell colSpan={10} className="text-center text-slate-400 py-8">Chưa có ca thi nào.</TableCell>
                     </TableRow>
                   ) : shifts.map((s, i) => (
                     <TableRow key={s.id}>
