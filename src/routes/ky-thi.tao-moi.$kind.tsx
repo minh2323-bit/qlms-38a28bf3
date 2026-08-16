@@ -804,7 +804,7 @@ function Page() {
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
               <Button className="bg-indigo-700 hover:bg-indigo-800"
-                onClick={() => { setEditShift(null); setSCode(""); setSName(""); setSCount("20"); setShiftOpen(true); }}>
+                onClick={() => openShift(null)}>
                 Thêm ca thi
               </Button>
               <Button variant="outline" onClick={() => {
