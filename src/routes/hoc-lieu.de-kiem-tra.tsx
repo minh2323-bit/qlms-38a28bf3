@@ -804,6 +804,7 @@ export function ExamWizard({
   const [chapter, setChapter] = useState("");
   const [lesson, setLesson] = useState("");
   const [startAt, setStartAt] = useState("");
+  const [lockAt, setLockAt] = useState("");
   const [duration, setDuration] = useState("");
   const [scoreType, setScoreType] = useState("");
   const [showAnswers, setShowAnswers] = useState(false);
@@ -978,11 +979,19 @@ export function ExamWizard({
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-slate-700">Thời gian bắt đầu <span className="text-rose-500">*</span></label>
                 <Input type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} className="mt-1" />
+                <p className="text-xs text-slate-500 mt-1">Thời gian mở đề cho học sinh tham gia kiểm tra</p>
               </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Thời gian khóa đề</label>
+                <Input type="datetime-local" value={lockAt} onChange={(e) => setLockAt(e.target.value)} className="mt-1" />
+                <p className="text-xs text-slate-500 mt-1">Hạn chót mở đề để học sinh có thể vào làm</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-slate-700">Thời gian làm bài (phút) <span className="text-rose-500">*</span></label>
                 <Input type="number" value={duration} onChange={(e) => setDuration(e.target.value)} className="mt-1" />
