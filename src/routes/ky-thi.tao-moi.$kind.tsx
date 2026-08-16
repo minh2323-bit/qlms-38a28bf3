@@ -249,22 +249,58 @@ function Page() {
   );
 
   /* ---------- Bước 4 ---------- */
-  const [shifts, setShifts] = useState<Shift[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>(SEED_SHIFTS);
   const [selShifts, setSelShifts] = useState<string[]>([]);
   const [shiftOpen, setShiftOpen] = useState(false);
   const [editShift, setEditShift] = useState<Shift | null>(null);
+  const [sQty, setSQty] = useState("1");
   const [sCode, setSCode] = useState("");
   const [sName, setSName] = useState("");
+  const [sStart, setSStart] = useState("");
+  const [sEnd, setSEnd] = useState("");
+  const [sGen, setSGen] = useState("manual");
   const [sCount, setSCount] = useState("20");
 
   const arranged = shifts.reduce((a, s) => a + s.count, 0);
 
+  const openShift = (s: Shift | null) => {
+    setEditShift(s);
+    setSQty("1");
+    setSCode(s?.code ?? "");
+    setSName(s?.name ?? "");
+    setSStart(s?.start ?? startAt);
+    setSEnd(s?.end ?? endAt);
+    setSCount(s ? String(s.count) : "20");
+    setSGen("manual");
+    setShiftOpen(true);
+  };
+
+  const shiftErr = (() => {
+    if (sStart && startAt && sStart < startAt) return "Ngày giờ bắt đầu ca thi phải sau thời gian bắt đầu kỳ thi.";
+    if (sEnd && endAt && sEnd > endAt) return "Ngày giờ kết thúc ca thi phải trước thời gian đóng đề.";
+    if (sStart && sEnd && sEnd <= sStart) return "Ngày giờ kết thúc phải sau ngày giờ bắt đầu.";
+    return "";
+  })();
+
   const saveShift = () => {
-    if (!sCode || !sName) return;
+    if (!sCode || !sName || shiftErr) return;
     if (editShift) {
-      setShifts((v) => v.map((s) => (s.id === editShift.id ? { ...s, code: sCode, name: sName, count: Number(sCount) || 0 } : s)));
+      setShifts((v) => v.map((s) => (s.id === editShift.id
+        ? { ...s, code: sCode, name: sName, count: Number(sCount) || 0, start: sStart, end: sEnd }
+        : s)));
     } else {
-      setShifts((v) => [...v, { id: `ca${Date.now()}`, code: sCode, name: sName, count: Number(sCount) || 0 }]);
+      const qty = Math.max(1, Number(sQty) || 1);
+      setShifts((v) => [
+        ...v,
+        ...Array.from({ length: qty }, (_, i) => ({
+          id: `ca${Date.now()}-${i}`,
+          code: qty > 1 ? `${sCode}${i + 1}` : sCode,
+          name: qty > 1 ? `${sName} ${i + 1}` : sName,
+          count: Number(sCount) || 0,
+          start: sStart,
+          end: sEnd,
+        })),
+      ]);
     }
     setShiftOpen(false);
     setEditShift(null);
