@@ -249,22 +249,58 @@ function Page() {
   );
 
   /* ---------- Bước 4 ---------- */
-  const [shifts, setShifts] = useState<Shift[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>(SEED_SHIFTS);
   const [selShifts, setSelShifts] = useState<string[]>([]);
   const [shiftOpen, setShiftOpen] = useState(false);
   const [editShift, setEditShift] = useState<Shift | null>(null);
+  const [sQty, setSQty] = useState("1");
   const [sCode, setSCode] = useState("");
   const [sName, setSName] = useState("");
+  const [sStart, setSStart] = useState("");
+  const [sEnd, setSEnd] = useState("");
+  const [sGen, setSGen] = useState("manual");
   const [sCount, setSCount] = useState("20");
 
   const arranged = shifts.reduce((a, s) => a + s.count, 0);
 
+  const openShift = (s: Shift | null) => {
+    setEditShift(s);
+    setSQty("1");
+    setSCode(s?.code ?? "");
+    setSName(s?.name ?? "");
+    setSStart(s?.start ?? startAt);
+    setSEnd(s?.end ?? endAt);
+    setSCount(s ? String(s.count) : "20");
+    setSGen("manual");
+    setShiftOpen(true);
+  };
+
+  const shiftErr = (() => {
+    if (sStart && startAt && sStart < startAt) return "Ngày giờ bắt đầu ca thi phải sau thời gian bắt đầu kỳ thi.";
+    if (sEnd && endAt && sEnd > endAt) return "Ngày giờ kết thúc ca thi phải trước thời gian đóng đề.";
+    if (sStart && sEnd && sEnd <= sStart) return "Ngày giờ kết thúc phải sau ngày giờ bắt đầu.";
+    return "";
+  })();
+
   const saveShift = () => {
-    if (!sCode || !sName) return;
+    if (!sCode || !sName || shiftErr) return;
     if (editShift) {
-      setShifts((v) => v.map((s) => (s.id === editShift.id ? { ...s, code: sCode, name: sName, count: Number(sCount) || 0 } : s)));
+      setShifts((v) => v.map((s) => (s.id === editShift.id
+        ? { ...s, code: sCode, name: sName, count: Number(sCount) || 0, start: sStart, end: sEnd }
+        : s)));
     } else {
-      setShifts((v) => [...v, { id: `ca${Date.now()}`, code: sCode, name: sName, count: Number(sCount) || 0 }]);
+      const qty = Math.max(1, Number(sQty) || 1);
+      setShifts((v) => [
+        ...v,
+        ...Array.from({ length: qty }, (_, i) => ({
+          id: `ca${Date.now()}-${i}`,
+          code: qty > 1 ? `${sCode}${i + 1}` : sCode,
+          name: qty > 1 ? `${sName} ${i + 1}` : sName,
+          count: Number(sCount) || 0,
+          start: sStart,
+          end: sEnd,
+        })),
+      ]);
     }
     setShiftOpen(false);
     setEditShift(null);
@@ -768,7 +804,7 @@ function Page() {
             </div>
             <div className="flex flex-wrap gap-2 justify-end">
               <Button className="bg-indigo-700 hover:bg-indigo-800"
-                onClick={() => { setEditShift(null); setSCode(""); setSName(""); setSCount("20"); setShiftOpen(true); }}>
+                onClick={() => openShift(null)}>
                 Thêm ca thi
               </Button>
               <Button variant="outline" onClick={() => {
@@ -804,6 +840,8 @@ function Page() {
                     <TableHead className="text-center">Xem thí sinh ca thi</TableHead>
                     <TableHead>Mã ca thi</TableHead>
                     <TableHead>Tên ca thi</TableHead>
+                    <TableHead className="text-center">Ngày giờ bắt đầu</TableHead>
+                    <TableHead className="text-center">Ngày giờ kết thúc</TableHead>
                     <TableHead className="text-right">Số lượng thí sinh</TableHead>
                     <TableHead className="text-center">Chia thí sinh chủ động theo ca thi</TableHead>
                   </TableRow>
@@ -811,7 +849,7 @@ function Page() {
                 <TableBody>
                   {shifts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-slate-400 py-8">Chưa có ca thi nào.</TableCell>
+                      <TableCell colSpan={10} className="text-center text-slate-400 py-8">Chưa có ca thi nào.</TableCell>
                     </TableRow>
                   ) : shifts.map((s, i) => (
                     <TableRow key={s.id}>
@@ -824,7 +862,7 @@ function Page() {
                       </TableCell>
                       <TableCell className="text-center">
                         <button className="text-indigo-700 hover:underline"
-                          onClick={() => { setEditShift(s); setSCode(s.code); setSName(s.name); setSCount(String(s.count)); setShiftOpen(true); }}>
+                          onClick={() => openShift(s)}>
                           Sửa
                         </button>
                       </TableCell>
@@ -835,6 +873,8 @@ function Page() {
                       </TableCell>
                       <TableCell>{s.code}</TableCell>
                       <TableCell>{s.name}</TableCell>
+                      <TableCell className="text-center whitespace-nowrap">{fmtDT(s.start)}</TableCell>
+                      <TableCell className="text-center whitespace-nowrap">{fmtDT(s.end)}</TableCell>
                       <TableCell className="text-right">{s.count}</TableCell>
                       <TableCell className="text-center text-sm">
                         <button className="text-indigo-700 hover:underline" onClick={() => toast.info("Thêm thí sinh vào ca thi.")}>Thêm</button>
@@ -1073,25 +1113,60 @@ function Page() {
 
       {/* Popup ca thi */}
       <Dialog open={shiftOpen} onOpenChange={setShiftOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>{editShift ? "Sửa ca thi" : "Thêm ca thi"}</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editShift ? "Sửa ca thi" : "Thêm ca thi"}</DialogTitle>
+            <p className="text-sm text-slate-500 mt-1">
+              Thời gian học sinh nhìn thấy sẽ là thời gian của ca thi mà học sinh được thêm
+            </p>
+          </DialogHeader>
           <div className="space-y-3">
+            {!editShift && (
+              <div>
+                <Label className="text-sm">Số lượng ca thi</Label>
+                <Input type="number" min={1} className="mt-1" value={sQty} onChange={(e) => setSQty(e.target.value)} />
+              </div>
+            )}
             <div>
               <Label className="text-sm">Mã ca thi <span className="text-rose-500">*</span></Label>
-              <Input className="mt-1" value={sCode} onChange={(e) => setSCode(e.target.value)} />
+              <Input className="mt-1" placeholder="Mã ca thi" value={sCode} onChange={(e) => setSCode(e.target.value)} />
             </div>
             <div>
               <Label className="text-sm">Tên ca thi <span className="text-rose-500">*</span></Label>
-              <Input className="mt-1" value={sName} onChange={(e) => setSName(e.target.value)} />
+              <Input className="mt-1" placeholder="Tên ca thi" value={sName} onChange={(e) => setSName(e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-sm">Ngày giờ bắt đầu ca thi</Label>
+                <Input type="datetime-local" className="mt-1" value={sStart} onChange={(e) => setSStart(e.target.value)} />
+                <p className="text-xs text-slate-500 mt-1">Phải nằm sau thời gian bắt đầu kỳ thi ({fmtDT(startAt)})</p>
+              </div>
+              <div>
+                <Label className="text-sm">Ngày giờ kết thúc ca thi</Label>
+                <Input type="datetime-local" className="mt-1" value={sEnd} onChange={(e) => setSEnd(e.target.value)} />
+                <p className="text-xs text-slate-500 mt-1">Phải nằm trước thời gian đóng đề ({fmtDT(endAt)})</p>
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm">Sinh mã ca thi</Label>
+              <Select value={sGen} onValueChange={setSGen}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Sinh mã ca thi thí sinh nhập tay</SelectItem>
+                  <SelectItem value="auto">Sinh mã ca thi tự động</SelectItem>
+                  <SelectItem value="none">Không sinh mã ca thi</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label className="text-sm">Số lượng thí sinh</Label>
               <Input className="mt-1" value={sCount} onChange={(e) => setSCount(e.target.value)} />
             </div>
+            {shiftErr && <p className="text-xs text-rose-600">{shiftErr}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShiftOpen(false)}>Hủy</Button>
-            <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!sCode || !sName} onClick={saveShift}>Lưu</Button>
+            <Button variant="outline" onClick={() => setShiftOpen(false)}>Đóng</Button>
+            <Button className="bg-indigo-700 hover:bg-indigo-800" disabled={!sCode || !sName || !!shiftErr} onClick={saveShift}>Ghi</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
