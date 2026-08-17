@@ -21,7 +21,7 @@ import {
 import { FilterSelect } from "@/components/ExamBankShared";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
 import {
-  CHAPTERS, getOriginalPapers, type ExamSession, type ExamEffect, type ExamLevel,
+  CHAPTERS, getOriginalPapers, getPermutedPaper, type ExamSession, type ExamEffect, type ExamLevel,
 } from "@/lib/exam-sessions";
 import {
   Search, SlidersHorizontal, Plus, Trash2, CheckCircle2, XCircle, Pencil,
@@ -67,6 +67,7 @@ export function ExamSessionsPage({
   const [selected, setSelected] = useState<string[]>([]);
   const [confirm, setConfirm] = useState<null | "delete" | "unapprove" | "approve">(null);
   const [papersOf, setPapersOf] = useState<ExamSession | null>(null);
+  const [permutedOf, setPermutedOf] = useState<{ session: ExamSession; code: string } | null>(null);
 
   const counts = useMemo(() => {
     const c: Record<ExamLevel, number> = { truong: 0, xa: 0, so: 0 };
@@ -130,7 +131,19 @@ export function ExamSessionsPage({
   const permutedCell = (e: ExamSession) => (
     <TableCell className="text-sm">
       <div>Đề hoán vị: <span className="font-semibold">{e.permutedCodes.length}</span></div>
-      <div className="text-xs text-slate-500 mt-0.5">{e.permutedCodes.join("; ")}</div>
+      <div className="text-xs mt-0.5 flex flex-wrap gap-x-1">
+        {e.permutedCodes.map((c, i) => (
+          <span key={c}>
+            <button
+              onClick={() => setPermutedOf({ session: e, code: c })}
+              className="text-indigo-700 font-medium hover:underline"
+            >
+              {c}
+            </button>
+            {i < e.permutedCodes.length - 1 && <span className="text-slate-400">;</span>}
+          </span>
+        ))}
+      </div>
     </TableCell>
   );
 
@@ -313,7 +326,14 @@ export function ExamSessionsPage({
                       )}
                       <TableCell className="text-center text-sm">
                         <div className="font-medium text-slate-700">{e.date}</div>
-                        <div className="text-xs text-slate-500">{e.timeRange} · {e.minutes} phút</div>
+                        {e.shift ? (
+                          <div className="text-xs text-slate-500">
+                            <span className="font-semibold text-indigo-700">{e.shift.name}</span>
+                            {" · "}{e.shift.start} – {e.shift.end}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-500">{e.timeRange} · {e.minutes} phút</div>
+                        )}
                       </TableCell>
                       <TableCell className="text-center text-sm font-semibold text-indigo-700">
                         {isUpcoming ? e.registered : e.attended}
@@ -371,6 +391,32 @@ export function ExamSessionsPage({
               </Link>
             ))}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!permutedOf} onOpenChange={(v) => !v && setPermutedOf(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Đề hoán vị {permutedOf?.code}</DialogTitle>
+          </DialogHeader>
+          {permutedOf && (
+            <div className="space-y-2">
+              <p className="text-sm text-slate-500">
+                {permutedOf.session.name} · {permutedOf.session.subject} · Khối {permutedOf.session.grade}
+              </p>
+              {getPermutedPaper(permutedOf.session, permutedOf.code).questions.map((q, i) => (
+                <div key={q.no} className="rounded-xl border p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="font-semibold text-slate-800 text-sm">Câu {i + 1}. {q.text}</div>
+                    <span className="shrink-0 text-[11px] font-semibold rounded-full border px-2 py-0.5 text-indigo-700 bg-indigo-50 border-indigo-200">
+                      {q.type}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">Thứ tự đề gốc: câu {q.no} · {q.score} điểm</div>
+                </div>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
