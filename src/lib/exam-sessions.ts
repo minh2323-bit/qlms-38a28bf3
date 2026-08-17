@@ -20,6 +20,8 @@ export type ExamSession = {
   attended: number;
   originalCount: number;
   permutedCodes: string[];
+  /** Ca thi do GV thiết lập (nếu có) – hiển thị thay cho thời gian tổ chức mặc định. */
+  shift?: { name: string; start: string; end: string };
 };
 
 export const CHAPTERS = [
@@ -101,6 +103,24 @@ export function getOriginalPapers(session: ExamSession) {
   }));
 }
 
+
+
+/** Danh sách câu hỏi của một đề hoán vị (thứ tự xáo trộn ổn định theo mã đề). */
+export function getPermutedPaper(session: ExamSession, code: string) {
+  const seed = hash(session.id + code);
+  const total = 10;
+  const base = Array.from({ length: total }, (_, i) => ({
+    no: i + 1,
+    text: `Câu hỏi gốc số ${i + 1} – ${session.subject} khối ${session.grade}`,
+    type: i % 4 === 3 ? "Tự luận" : i % 3 === 1 ? "Đúng/Sai" : "Trắc nghiệm",
+    score: i % 4 === 3 ? 2 : 1,
+  }));
+  const order = base
+    .map((q, i) => ({ q, k: (seed + i * 7919) % 997 }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.q);
+  return { code, questions: order };
+}
 
 /* ---------------- Thí sinh (sinh dữ liệu ổn định theo id) ---------------- */
 
