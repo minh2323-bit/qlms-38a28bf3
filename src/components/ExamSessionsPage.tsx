@@ -25,14 +25,14 @@ import {
 } from "@/lib/exam-sessions";
 import {
   Search, SlidersHorizontal, Plus, Trash2, CheckCircle2, XCircle, Pencil,
-  CalendarIcon, Landmark, Building2, School, RotateCcw, FileText,
+  CalendarIcon, Building2, School, RotateCcw, FileText, UserPlus,
 } from "lucide-react";
+import { ExamRegisterModal } from "@/components/ExamRegisterModal";
 import { toast } from "sonner";
 
 const TABS: { key: ExamLevel; label: string; icon: typeof School }[] = [
   { key: "truong", label: "Kỳ thi cấp Trường", icon: School },
   { key: "xa", label: "Kỳ thi cấp Xã/Phường", icon: Building2 },
-  { key: "so", label: "Kỳ thi cấp Sở", icon: Landmark },
 ];
 
 const EFFECT_TABS: { key: ExamEffect; label: string }[] = [
@@ -115,7 +115,8 @@ export function ExamSessionsPage({
     : "Chọn khoảng ngày";
 
   const isUpcoming = effectTab === "upcoming";
-  const isDesigned = tab === "truong";
+  const isXa = tab === "xa";
+  const xaUpcoming = isXa && isUpcoming;
 
   const papersCell = (e: ExamSession) => (
     <TableCell className="text-center">
@@ -156,7 +157,7 @@ export function ExamSessionsPage({
             <h1 className="text-xl font-bold text-slate-800">{title}</h1>
             <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>
           </div>
-          {isDesigned && isUpcoming && (
+          {tab === "truong" && isUpcoming && (
             <div className="flex flex-wrap gap-2 justify-end">
               <Button variant="outline" className="text-rose-600 border-rose-200 hover:bg-rose-50"
                 disabled={!selected.length} onClick={() => setConfirm("delete")}>
