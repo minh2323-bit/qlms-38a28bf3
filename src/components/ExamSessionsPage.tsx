@@ -326,10 +326,14 @@ export function ExamSessionsPage({
                       )}
                       <TableCell className="text-center text-sm">
                         <div className="font-medium text-slate-700">{e.date}</div>
-                        {e.shift ? (
-                          <div className="text-xs text-slate-500">
-                            <span className="font-semibold text-indigo-700">{e.shift.name}</span>
-                            {" · "}{e.shift.start} – {e.shift.end}
+                        {e.shifts?.length ? (
+                          <div className="text-xs text-slate-500 space-y-0.5 mt-0.5">
+                            {e.shifts.map((s) => (
+                              <div key={s.name}>
+                                <span className="font-semibold text-indigo-700">{s.name}</span>
+                                {" · "}{s.start} – {s.end}
+                              </div>
+                            ))}
                           </div>
                         ) : (
                           <div className="text-xs text-slate-500">{e.timeRange} · {e.minutes} phút</div>
