@@ -300,7 +300,14 @@ export function ExamSessionsPage({
                           <TableCell className="text-center">{e.grade}</TableCell>
                           <TableCell>{e.subject}</TableCell>
                           <TableCell>
-                            <div className="font-semibold text-slate-800">{e.name}</div>
+                            <Link
+                              to="/ky-thi/tao-moi/$kind"
+                              params={{ kind }}
+                              search={{ examId: e.id, mode: "view" }}
+                              className="font-semibold text-slate-800 hover:text-indigo-700 hover:underline"
+                            >
+                              {e.name}
+                            </Link>
                             <div className="text-xs text-slate-500">{e.chapter}</div>
                           </TableCell>
                           <TableCell className="text-center">
