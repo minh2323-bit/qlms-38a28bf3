@@ -387,20 +387,30 @@ export function ExamSessionsPage({
                         </TableCell>
                       )}
                       <TableCell className="text-center">
-                        <button
-                          onClick={() => toast.info(`Sửa kỳ thi: ${e.name}`)}
+                        <Link
+                          to="/ky-thi/tao-moi/$kind"
+                          params={{ kind }}
+                          search={{ examId: e.id, mode: "edit" }}
                           aria-label={`Sửa ${e.name}`}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg border text-indigo-700 hover:bg-indigo-50"
                         >
                           <Pencil className="h-4 w-4" />
-                        </button>
+                        </Link>
                       </TableCell>
                       <TableCell className="text-center">{e.grade}</TableCell>
                       <TableCell>{e.subject}</TableCell>
                       <TableCell>
-                        <div className="font-semibold text-slate-800">{e.name}</div>
+                        <Link
+                          to="/ky-thi/tao-moi/$kind"
+                          params={{ kind }}
+                          search={{ examId: e.id, mode: "view" }}
+                          className="font-semibold text-slate-800 hover:text-indigo-700 hover:underline"
+                        >
+                          {e.name}
+                        </Link>
                         <div className="text-xs text-slate-500">{e.chapter}</div>
                       </TableCell>
+
                       {isUpcoming && (
                         <TableCell className="text-center">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
