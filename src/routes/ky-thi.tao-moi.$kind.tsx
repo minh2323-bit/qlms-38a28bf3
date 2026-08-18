@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
-import { getSession } from "@/lib/exam-sessions";
+import { getSession, getPermutedPaper } from "@/lib/exam-sessions";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 
@@ -185,7 +185,19 @@ function Page() {
   /* ---------- Bước 2 ---------- */
   const [mode, setMode] = useState<"bank-exam" | "compose" | "upload">("bank-exam");
   const [pickedExam, setPickedExam] = useState("");
-  const [questions, setQuestions] = useState<BankQ[]>([]);
+  const [questions, setQuestions] = useState<BankQ[]>(
+    existing
+      ? getPermutedPaper(existing, existing.permutedCodes[0] ?? "DE1").questions.map((q, i) => ({
+          id: `${existing.id}-q${i + 1}`,
+          content: q.text,
+          type: q.type,
+          level: ["Nhận biết", "Thông hiểu", "Vận dụng"][i % 3],
+          grade: existing.grade,
+          subject: existing.subject,
+          topic: existing.chapter,
+        }))
+      : [],
+  );
   const [bankOpen, setBankOpen] = useState(false);
   const [bankGrade, setBankGrade] = useState("4");
   const [bankSubject, setBankSubject] = useState("Toán");
@@ -232,7 +244,9 @@ function Page() {
   const [fClass, setFClass] = useState("all");
   const [fCccd, setFCccd] = useState("");
   const [fName, setFName] = useState("");
-  const [candidates, setCandidates] = useState<string[]>([]);
+  const [candidates, setCandidates] = useState<string[]>(
+    existing ? CANDIDATE_POOL.filter((c) => c.grade === existing.grade).map((c) => c.id) : [],
+  );
   const [addOpen, setAddOpen] = useState(false);
   const [addPicked, setAddPicked] = useState<string[]>([]);
   const [selCand, setSelCand] = useState<string[]>([]);
