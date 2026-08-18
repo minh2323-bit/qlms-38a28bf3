@@ -185,7 +185,7 @@ export function ExamSessionsPage({
                 <CheckCircle2 className="h-4 w-4" /> Duyệt kỳ thi
               </Button>
               <Button asChild className="bg-indigo-700 hover:bg-indigo-800">
-                <Link to="/ky-thi/tao-moi/$kind" params={{ kind }} search={{}}>
+                <Link to="/ky-thi/tao-moi/$kind" params={{ kind }} search={{ examId: undefined, mode: undefined }}>
                   <Plus className="h-4 w-4" /> Thêm mới
                 </Link>
               </Button>
