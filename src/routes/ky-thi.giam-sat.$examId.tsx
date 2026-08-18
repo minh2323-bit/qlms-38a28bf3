@@ -17,7 +17,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/ky-thi/giam-sat/$examId")({
   head: () => ({
     meta: [
-      { title: "Giám sát kỳ thi | Tiểu học Tô Hiệu" },
+      { title: "Giám sát / Theo dõi kỳ thi | Tiểu học Tô Hiệu" },
       { name: "description", content: "Theo dõi trực tiếp tình trạng làm bài của thí sinh trong kỳ thi đang diễn ra." },
       { property: "og:title", content: "Giám sát kỳ thi" },
       { property: "og:description", content: "Theo dõi trực tiếp tình trạng làm bài của thí sinh trong kỳ thi đang diễn ra." },
@@ -67,7 +67,6 @@ function Page() {
   const [grade, setGrade] = useState("all");
   const [klass, setKlass] = useState("all");
   const [status, setStatus] = useState("all");
-  const [shift, setShift] = useState("all");
   const [code, setCode] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -91,6 +90,7 @@ function Page() {
     return <AppShell><div className="p-8 text-slate-500">Không tìm thấy kỳ thi.</div></AppShell>;
   }
 
+  const isXa = session.level === "xa";
   const classes = Array.from(new Set(all.map((c) => c.klass))).sort();
   const allChecked = rows.length > 0 && rows.every((r) => selected.includes(r.cccd));
 
@@ -102,20 +102,26 @@ function Page() {
             <ArrowLeft className="h-4 w-4" /> Quay lại
           </Button>
           <div className="flex-1 min-w-[220px]">
-            <h1 className="text-lg font-bold text-indigo-700">Giám sát kỳ thi – {session.name}</h1>
+            <h1 className="text-lg font-bold text-indigo-700">
+              {isXa ? "Theo dõi kỳ thi" : "Giám sát kỳ thi"} – {session.name}
+            </h1>
             <p className="text-sm text-slate-500">
               {session.date} · {session.timeRange} · Khối {session.grade} · {session.subject}
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" disabled={!selected.length}
-              onClick={() => { toast.success(`Đã ghi nhận vi phạm quy chế cho ${selected.length} thí sinh.`); setSelected([]); }}>
-              <ShieldAlert className="h-4 w-4" /> Vi phạm quy chế thi
-            </Button>
-            <Button variant="outline" disabled={!selected.length}
-              onClick={() => { toast.success(`Đã cho ${selected.length} thí sinh thi lại.`); setSelected([]); }}>
-              <RotateCcw className="h-4 w-4" /> Cho thi lại
-            </Button>
+            {!isXa && (
+              <>
+                <Button variant="outline" disabled={!selected.length}
+                  onClick={() => { toast.success(`Đã ghi nhận vi phạm quy chế cho ${selected.length} thí sinh.`); setSelected([]); }}>
+                  <ShieldAlert className="h-4 w-4" /> Vi phạm quy chế thi
+                </Button>
+                <Button variant="outline" disabled={!selected.length}
+                  onClick={() => { toast.success(`Đã cho ${selected.length} thí sinh thi lại.`); setSelected([]); }}>
+                  <RotateCcw className="h-4 w-4" /> Cho thi lại
+                </Button>
+              </>
+            )}
             <Button className="bg-indigo-700 hover:bg-indigo-800" onClick={() => toast.success("Đang xuất Excel...")}>
               <FileSpreadsheet className="h-4 w-4" /> Xuất excel
             </Button>
@@ -124,15 +130,13 @@ function Page() {
 
         <div className="p-6 grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6">
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <FilterSelect label="Khối" value={grade} onChange={setGrade} allLabel="Tất cả khối"
                 options={["1", "2", "3", "4", "5"].map((g) => ({ value: g, label: `Khối ${g}` }))} />
               <FilterSelect label="Lớp" value={klass} onChange={setKlass} allLabel="Tất cả lớp"
                 options={classes.map((c) => ({ value: c, label: c }))} />
               <FilterSelect label="Trạng thái" value={status} onChange={setStatus} allLabel="Tất cả trạng thái"
                 options={STATUS_KEYS.map((k) => ({ value: k, label: CANDIDATE_STATUS_META[k].label }))} />
-              <FilterSelect label="Ca thi" value={shift} onChange={setShift} allLabel="Tất cả ca thi"
-                options={[{ value: "1", label: "Ca thi 1" }, { value: "2", label: "Ca thi 2" }]} />
             </div>
             <div className="relative max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
