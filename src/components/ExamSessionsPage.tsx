@@ -185,7 +185,7 @@ export function ExamSessionsPage({
                 <CheckCircle2 className="h-4 w-4" /> Duyệt kỳ thi
               </Button>
               <Button asChild className="bg-indigo-700 hover:bg-indigo-800">
-                <Link to="/ky-thi/tao-moi/$kind" params={{ kind }}>
+                <Link to="/ky-thi/tao-moi/$kind" params={{ kind }} search={{ examId: undefined, mode: undefined }}>
                   <Plus className="h-4 w-4" /> Thêm mới
                 </Link>
               </Button>
@@ -300,7 +300,14 @@ export function ExamSessionsPage({
                           <TableCell className="text-center">{e.grade}</TableCell>
                           <TableCell>{e.subject}</TableCell>
                           <TableCell>
-                            <div className="font-semibold text-slate-800">{e.name}</div>
+                            <Link
+                              to="/ky-thi/tao-moi/$kind"
+                              params={{ kind }}
+                              search={{ examId: e.id, mode: "view" }}
+                              className="font-semibold text-slate-800 hover:text-indigo-700 hover:underline"
+                            >
+                              {e.name}
+                            </Link>
                             <div className="text-xs text-slate-500">{e.chapter}</div>
                           </TableCell>
                           <TableCell className="text-center">
@@ -387,20 +394,30 @@ export function ExamSessionsPage({
                         </TableCell>
                       )}
                       <TableCell className="text-center">
-                        <button
-                          onClick={() => toast.info(`Sửa kỳ thi: ${e.name}`)}
+                        <Link
+                          to="/ky-thi/tao-moi/$kind"
+                          params={{ kind }}
+                          search={{ examId: e.id, mode: "edit" }}
                           aria-label={`Sửa ${e.name}`}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg border text-indigo-700 hover:bg-indigo-50"
                         >
                           <Pencil className="h-4 w-4" />
-                        </button>
+                        </Link>
                       </TableCell>
                       <TableCell className="text-center">{e.grade}</TableCell>
                       <TableCell>{e.subject}</TableCell>
                       <TableCell>
-                        <div className="font-semibold text-slate-800">{e.name}</div>
+                        <Link
+                          to="/ky-thi/tao-moi/$kind"
+                          params={{ kind }}
+                          search={{ examId: e.id, mode: "view" }}
+                          className="font-semibold text-slate-800 hover:text-indigo-700 hover:underline"
+                        >
+                          {e.name}
+                        </Link>
                         <div className="text-xs text-slate-500">{e.chapter}</div>
                       </TableCell>
+
                       {isUpcoming && (
                         <TableCell className="text-center">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
@@ -504,9 +521,32 @@ export function ExamSessionsPage({
                       {q.type}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">Thứ tự đề gốc: câu {q.no} · {q.score} điểm</div>
+                  {q.options?.length ? (
+                    <ul className="mt-2 space-y-1">
+                      {q.options.map((o) => {
+                        const correct = q.answer.startsWith(`${o.key}.`);
+                        return (
+                          <li
+                            key={o.key}
+                            className={`text-sm rounded-lg px-2 py-1 ${
+                              correct ? "bg-emerald-50 text-emerald-700 font-semibold" : "text-slate-700"
+                            }`}
+                          >
+                            {o.key}. {o.text}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+                  <div className="mt-2 text-sm">
+                    <span className="text-slate-500">Đáp án: </span>
+                    <span className="font-semibold text-emerald-700">{q.answer}</span>
+                  </div>
+                  <div className="text-xs text-slate-600 mt-1">Giải thích: {q.explain}</div>
+                  <div className="text-xs text-slate-400 mt-1">Thứ tự đề gốc: câu {q.no} · {q.score} điểm</div>
                 </div>
               ))}
+
             </div>
           )}
         </DialogContent>
