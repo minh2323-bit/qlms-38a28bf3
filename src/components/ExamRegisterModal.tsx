@@ -120,7 +120,6 @@ export function ExamRegisterModal({
                 <TableHead className="w-40">Mã CCCD</TableHead>
                 <TableHead className="w-20 text-center">Khối</TableHead>
                 <TableHead className="w-20 text-center">Lớp</TableHead>
-                <TableHead className="w-32 text-center">{tab === "un" ? "Đăng ký" : "Hủy đăng ký"}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -138,21 +137,11 @@ export function ExamRegisterModal({
                   <TableCell>{s.cccd}</TableCell>
                   <TableCell className="text-center">{s.grade}</TableCell>
                   <TableCell className="text-center">{s.klass}</TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      size="sm"
-                      variant={tab === "un" ? "default" : "outline"}
-                      className={tab === "un" ? "bg-indigo-700 hover:bg-indigo-800" : "text-rose-600 border-rose-200 hover:bg-rose-50"}
-                      onClick={() => act(tab === "done", [s.id])}
-                    >
-                      {tab === "un" ? "Đăng ký" : "Hủy đăng ký"}
-                    </Button>
-                  </TableCell>
                 </TableRow>
               ))}
               {rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-slate-500 py-8">Không có học sinh phù hợp.</TableCell>
+                  <TableCell colSpan={6} className="text-center text-slate-500 py-8">Không có học sinh phù hợp.</TableCell>
                 </TableRow>
               )}
             </TableBody>
