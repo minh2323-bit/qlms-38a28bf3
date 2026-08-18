@@ -41,6 +41,16 @@ const EFFECT_TABS: { key: ExamEffect; label: string }[] = [
   { key: "done", label: "Đã diễn ra" },
 ];
 
+function regDeadlineOf(e: ExamSession) {
+  return e.regDeadline ?? `${e.date} 17:00`;
+}
+
+function isRegOpen(e: ExamSession) {
+  const [d] = regDeadlineOf(e).split(" ");
+  const [dd, mm, yyyy] = d.split("/").map(Number);
+  return new Date(yyyy, mm - 1, dd).getTime() >= new Date(2026, 7, 17).getTime();
+}
+
 function parseDate(d: string) {
   const [dd, mm, yyyy] = d.split("/").map(Number);
   return new Date(yyyy, mm - 1, dd);
@@ -87,10 +97,12 @@ export function ExamSessionsPage({
         && (subject === "all" || e.subject === subject)
         && (chapter === "all" || e.chapter === chapter)
         && (approval === "all" || e.approval === approval)
+        && (regStatus === "all" || tab !== "xa" || effectTab !== "upcoming"
+          || (regStatus === "open" ? isRegOpen(e) : !isRegOpen(e)))
         && (!range?.from || d >= range.from)
         && (!range?.to || d <= range.to);
     }),
-    [data, tab, effectTab, q, grade, subject, chapter, approval, range],
+    [data, tab, effectTab, q, grade, subject, chapter, approval, range, regStatus],
   );
 
   const reset = () => {
@@ -263,6 +275,71 @@ export function ExamSessionsPage({
               </div>
             </div>
 
+            {xaUpcoming ? (
+              <div className="rounded-xl border overflow-x-auto">
+                <Table className="min-w-[980px]">
+                  <TableHeader>
+                    <TableRow className="bg-slate-50">
+                      <TableHead className="w-12 text-center">STT</TableHead>
+                      <TableHead className="w-16 text-center">Khối</TableHead>
+                      <TableHead className="w-28">Môn</TableHead>
+                      <TableHead className="min-w-[240px]">Tên kỳ thi</TableHead>
+                      <TableHead className="text-center w-40">Trạng thái đăng ký</TableHead>
+                      <TableHead className="text-center w-44">Số thí sinh</TableHead>
+                      <TableHead className="text-center w-44">Thời hạn đăng ký</TableHead>
+                      <TableHead className="text-center w-36">Đăng ký thí sinh</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {rows.map((e, i) => {
+                      const open = isRegOpen(e);
+                      const [dd, tt] = regDeadlineOf(e).split(" ");
+                      return (
+                        <TableRow key={e.id} className="hover:bg-slate-50 align-top">
+                          <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
+                          <TableCell className="text-center">{e.grade}</TableCell>
+                          <TableCell>{e.subject}</TableCell>
+                          <TableCell>
+                            <div className="font-semibold text-slate-800">{e.name}</div>
+                            <div className="text-xs text-slate-500">{e.chapter}</div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
+                              open
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
+                            }`}>
+                              {open ? "Còn hạn đăng ký" : "Hết hạn đăng ký"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center text-sm">
+                            <div>Dự thi của trường: <span className="font-semibold text-indigo-700">{e.schoolCandidates ?? 0}</span></div>
+                            <div className="text-slate-500">Đăng ký dự thi: <span className="font-semibold text-slate-700">{e.registered}</span></div>
+                          </TableCell>
+                          <TableCell className="text-center text-sm">
+                            <div className="font-medium text-slate-700">{dd}</div>
+                            <div className="text-xs text-slate-500">{tt}</div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button size="sm" className="bg-indigo-700 hover:bg-indigo-800" disabled={!open}
+                              onClick={() => setRegisterOf(e)}>
+                              <UserPlus className="h-4 w-4" /> Đăng ký
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    {rows.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-slate-500 py-10">
+                          Không có kỳ thi nào phù hợp bộ lọc.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
             <div className="rounded-xl border overflow-x-auto">
               <Table className="min-w-[1180px]">
                 <TableHeader>
@@ -381,6 +458,7 @@ export function ExamSessionsPage({
                 </TableBody>
               </Table>
             </div>
+            )}
         </div>
       </section>
 
@@ -474,6 +552,12 @@ export function ExamSessionsPage({
           </div>
         </SheetContent>
       </Sheet>
+
+      <ExamRegisterModal
+        session={registerOf}
+        open={!!registerOf}
+        onOpenChange={(v) => !v && setRegisterOf(null)}
+      />
 
       <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
         <AlertDialogContent>
