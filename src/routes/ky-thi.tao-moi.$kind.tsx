@@ -145,11 +145,11 @@ const fmtDT = (v: string) => {
 
 function Page() {
   const { kind } = useParams({ from: "/ky-thi/tao-moi/$kind" });
-  const { examId, mode } = Route.useSearch();
+  const { examId, mode: viewMode } = Route.useSearch();
   const navigate = useNavigate();
   const existing = examId ? getSession(examId) : undefined;
   /** Chỉ được sửa khi bấm nút Sửa và kỳ thi chưa bắt đầu */
-  const readOnly = !!existing && !(mode === "edit" && existing.effect === "upcoming");
+  const readOnly = !!existing && !(viewMode === "edit" && existing.effect === "upcoming");
   const isPractice = kind === "on-tap";
   const backTo = isPractice ? "/ky-thi/on-tap" : "/ky-thi/chinh-thuc";
   const heading = existing
