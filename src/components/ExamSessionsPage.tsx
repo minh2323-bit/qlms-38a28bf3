@@ -68,6 +68,8 @@ export function ExamSessionsPage({
   const [confirm, setConfirm] = useState<null | "delete" | "unapprove" | "approve">(null);
   const [papersOf, setPapersOf] = useState<ExamSession | null>(null);
   const [permutedOf, setPermutedOf] = useState<{ session: ExamSession; code: string } | null>(null);
+  const [regStatus, setRegStatus] = useState("all");
+  const [registerOf, setRegisterOf] = useState<ExamSession | null>(null);
 
   const counts = useMemo(() => {
     const c: Record<ExamLevel, number> = { truong: 0, xa: 0, so: 0 };
@@ -198,10 +200,7 @@ export function ExamSessionsPage({
           ))}
         </div>
 
-        {!isDesigned ? (
-          <div className="p-16 text-center text-slate-400 text-sm">Đang thiết kế</div>
-        ) : (
-          <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4">
             <div className="flex flex-wrap gap-2">
               {EFFECT_TABS.map((t) => (
                 <button
@@ -243,10 +242,21 @@ export function ExamSessionsPage({
                 label="Chương bài" value={chapter} onChange={setChapter} allLabel="Tất cả chương bài"
                 options={CHAPTERS.map((c) => ({ value: c, label: c }))}
               />
+              {xaUpcoming ? (
+                <FilterSelect
+                  label="Trạng thái kỳ thi" value={regStatus} onChange={setRegStatus} allLabel="Tất cả trạng thái"
+                  options={[
+                    { value: "open", label: "Còn hạn đăng ký" },
+                    { value: "closed", label: "Hết hạn đăng ký" },
+                  ]}
+                />
+              ) : null}
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setAdvOpen(true)}>
-                  <SlidersHorizontal className="h-4 w-4" /> Tìm kiếm nâng cao
-                </Button>
+                {!xaUpcoming && (
+                  <Button variant="outline" className="flex-1" onClick={() => setAdvOpen(true)}>
+                    <SlidersHorizontal className="h-4 w-4" /> Tìm kiếm nâng cao
+                  </Button>
+                )}
                 <Button variant="outline" onClick={reset} title="Đặt lại bộ lọc">
                   <RotateCcw className="h-4 w-4" />
                 </Button>
@@ -273,7 +283,7 @@ export function ExamSessionsPage({
                       {isUpcoming ? "Thí sinh ĐK" : "Thí sinh dự thi"}
                     </TableHead>
                     <TableHead className="text-center w-28">Đề thi gốc</TableHead>
-                    <TableHead className="w-56">Số lượng &amp; Danh sách đề hoán vị</TableHead>
+                    {!isXa && <TableHead className="w-56">Số lượng &amp; Danh sách đề hoán vị</TableHead>}
                     {effectTab === "ongoing" && (
                       <TableHead className="text-center w-28 sticky right-0 bg-slate-50 shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)]">
                         Giám sát
@@ -344,7 +354,7 @@ export function ExamSessionsPage({
                         {isUpcoming ? e.registered : e.attended}
                       </TableCell>
                       {papersCell(e)}
-                      {permutedCell(e)}
+                      {!isXa && permutedCell(e)}
                       {effectTab === "ongoing" && (
                         <TableCell className="text-center sticky right-0 bg-white group-hover:bg-slate-50 shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)]">
                           <Link to="/ky-thi/giam-sat/$examId" params={{ examId: e.id }} className="text-indigo-700 font-semibold hover:underline">
@@ -371,8 +381,7 @@ export function ExamSessionsPage({
                 </TableBody>
               </Table>
             </div>
-          </div>
-        )}
+        </div>
       </section>
 
       <Dialog open={!!papersOf} onOpenChange={(v) => !v && setPapersOf(null)}>
