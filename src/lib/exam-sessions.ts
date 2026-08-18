@@ -109,22 +109,67 @@ export function getOriginalPapers(session: ExamSession) {
 
 
 
+export type PaperQuestion = {
+  no: number;
+  text: string;
+  type: string;
+  score: number;
+  options?: { key: string; text: string }[];
+  answer: string;
+  explain: string;
+};
+
+const QUESTION_POOL: Record<string, Omit<PaperQuestion, "no">[]> = {
+  "Toán": [
+    { text: "Số lớn nhất trong các số 3 210; 3 120; 3 201; 3 102 là số nào?", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "3 210" }, { key: "B", text: "3 120" }, { key: "C", text: "3 201" }, { key: "D", text: "3 102" }], answer: "A. 3 210", explain: "So sánh lần lượt các chữ số từ hàng nghìn: cùng 3 nghìn, so hàng trăm 2 = 2 > 1, sau đó hàng chục 1 > 0." },
+    { text: "Kết quả của phép tính 1 245 + 3 678 là bao nhiêu?", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "4 823" }, { key: "B", text: "4 923" }, { key: "C", text: "4 913" }, { key: "D", text: "5 923" }], answer: "B. 4 923", explain: "1 245 + 3 678 = 4 923 (cộng lần lượt từ hàng đơn vị, nhớ 1 sang hàng chục và hàng trăm)." },
+    { text: "Một hình chữ nhật có chiều dài 12 cm, chiều rộng 7 cm. Chu vi hình chữ nhật đó là:", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "19 cm" }, { key: "B", text: "38 cm" }, { key: "C", text: "84 cm" }, { key: "D", text: "42 cm" }], answer: "B. 38 cm", explain: "Chu vi = (12 + 7) × 2 = 38 (cm)." },
+    { text: "Các phát biểu sau đúng hay sai? a) Mọi số chia hết cho 10 đều chia hết cho 5. b) Số 0 là số lẻ.", type: "Đúng/Sai", score: 1, answer: "a) Đúng – b) Sai", explain: "Số chia hết cho 10 luôn có tận cùng là 0 nên chia hết cho 5. Số 0 là số chẵn." },
+    { text: "Điền số thích hợp vào chỗ trống: 45 × ... = 450", type: "Điền khuyết", score: 1, answer: "10", explain: "450 : 45 = 10." },
+    { text: "Một cửa hàng có 5 thùng sữa, mỗi thùng 24 hộp. Cửa hàng đã bán 37 hộp. Hỏi còn lại bao nhiêu hộp sữa?", type: "Tự luận", score: 2, answer: "83 hộp", explain: "Tổng số hộp: 5 × 24 = 120 (hộp). Số hộp còn lại: 120 − 37 = 83 (hộp)." },
+    { text: "Phân số nào dưới đây bằng phân số 2/4?", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "1/2" }, { key: "B", text: "2/3" }, { key: "C", text: "3/4" }, { key: "D", text: "4/6" }], answer: "A. 1/2", explain: "Rút gọn 2/4 bằng cách chia cả tử và mẫu cho 2 được 1/2." },
+    { text: "Số thập phân 3,05 đọc là:", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "Ba phẩy năm" }, { key: "B", text: "Ba phẩy không năm" }, { key: "C", text: "Ba mươi lăm" }, { key: "D", text: "Ba phẩy năm mươi" }], answer: "B. Ba phẩy không năm", explain: "Phần thập phân gồm hai chữ số 0 và 5 nên đọc là “không năm”." },
+    { text: "Trình bày cách tìm hai số khi biết tổng của chúng là 48 và hiệu là 12.", type: "Tự luận", score: 2, answer: "Số lớn 30, số bé 18", explain: "Số lớn = (48 + 12) : 2 = 30; số bé = 30 − 12 = 18." },
+    { text: "Sắp xếp các số sau theo thứ tự tăng dần: 5,7 ; 5,07 ; 5,70 ; 5,007", type: "Sắp xếp", score: 1, answer: "5,007 < 5,07 < 5,7 = 5,70", explain: "So sánh phần thập phân theo từng hàng: phần mười, phần trăm, phần nghìn." },
+  ],
+  "Tiếng Việt": [
+    { text: "Từ nào dưới đây là từ láy?", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "bạn bè" }, { key: "B", text: "lung linh" }, { key: "C", text: "sách vở" }, { key: "D", text: "học hành" }], answer: "B. lung linh", explain: "“lung linh” lặp lại âm đầu l – đây là từ láy; các từ còn lại là từ ghép." },
+    { text: "Câu “Trên cành cây, những chú chim hót líu lo.” thuộc kiểu câu nào?", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "Câu kể" }, { key: "B", text: "Câu hỏi" }, { key: "C", text: "Câu cảm" }, { key: "D", text: "Câu khiến" }], answer: "A. Câu kể", explain: "Câu dùng để kể lại sự việc, kết thúc bằng dấu chấm." },
+    { text: "Xác định chủ ngữ trong câu: “Những cánh diều no gió bay cao trên bầu trời.”", type: "Điền khuyết", score: 1, answer: "Những cánh diều no gió", explain: "Bộ phận trả lời câu hỏi “Cái gì bay cao?”." },
+    { text: "Các nhận định sau đúng hay sai? a) Danh từ chỉ sự vật. b) Động từ chỉ đặc điểm của sự vật.", type: "Đúng/Sai", score: 1, answer: "a) Đúng – b) Sai", explain: "Động từ chỉ hoạt động, trạng thái; chỉ đặc điểm là tính từ." },
+    { text: "Tìm và ghi lại một hình ảnh so sánh trong câu: “Mặt trời đỏ rực như quả cầu lửa.”", type: "Tự luận", score: 2, answer: "Mặt trời … như quả cầu lửa", explain: "Hình ảnh so sánh dùng từ “như” để so sánh mặt trời với quả cầu lửa." },
+    { text: "Từ trái nghĩa với “chăm chỉ” là:", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "siêng năng" }, { key: "B", text: "cần cù" }, { key: "C", text: "lười biếng" }, { key: "D", text: "chịu khó" }], answer: "C. lười biếng", explain: "Các từ còn lại đều đồng nghĩa với “chăm chỉ”." },
+    { text: "Dấu câu nào thích hợp điền vào cuối câu: “Bạn có thích đọc sách không ...”", type: "Điền khuyết", score: 1, answer: "Dấu chấm hỏi (?)", explain: "Đây là câu hỏi nên kết thúc bằng dấu chấm hỏi." },
+    { text: "Viết đoạn văn 3 – 5 câu tả một người bạn thân của em.", type: "Tự luận", score: 2, answer: "Đoạn văn đủ ý: giới thiệu bạn, tả ngoại hình, tính cách, tình cảm của em", explain: "Chấm theo tiêu chí: đủ số câu, đúng chủ đề, dùng từ ngữ gợi tả, không sai chính tả." },
+    { text: "Sắp xếp các câu sau thành đoạn văn hoàn chỉnh: (1) Em rất yêu quý chú. (2) Nhà em có nuôi một chú mèo. (3) Chú có bộ lông trắng muốt.", type: "Sắp xếp", score: 1, answer: "(2) – (3) – (1)", explain: "Trình tự: giới thiệu – miêu tả – nêu tình cảm." },
+    { text: "Nối từ ở cột A với nghĩa đúng ở cột B: “nhân hậu” – “dũng cảm”.", type: "Nối từ", score: 1, answer: "nhân hậu = giàu lòng thương người; dũng cảm = gan dạ, không sợ nguy hiểm", explain: "Dựa vào nghĩa gốc của mỗi từ trong từ điển Tiếng Việt tiểu học." },
+  ],
+  "Tiếng Anh": [
+    { text: "Choose the correct answer: She ___ to school every morning.", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "go" }, { key: "B", text: "goes" }, { key: "C", text: "going" }, { key: "D", text: "gone" }], answer: "B. goes", explain: "Chủ ngữ ngôi thứ ba số ít ở thì hiện tại đơn nên động từ thêm -es." },
+    { text: "What is the plural form of “child”?", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "childs" }, { key: "B", text: "childes" }, { key: "C", text: "children" }, { key: "D", text: "childrens" }], answer: "C. children", explain: "“child” là danh từ số nhiều bất quy tắc." },
+    { text: "Fill in the blank: There ___ four books on the table.", type: "Điền khuyết", score: 1, answer: "are", explain: "Danh từ số nhiều “books” đi với “are”." },
+    { text: "True or False? a) “Monday” is the first day of the school week. b) “Winter” is a month.", type: "Đúng/Sai", score: 1, answer: "a) True – b) False", explain: "“Winter” là một mùa (season), không phải tháng." },
+    { text: "Write 2 – 3 sentences about your favourite subject.", type: "Tự luận", score: 2, answer: "Ví dụ: My favourite subject is Maths. I like it because it is interesting.", explain: "Chấm theo tiêu chí: đúng cấu trúc câu, đúng chính tả, đủ số câu." },
+    { text: "Choose the odd one out.", type: "Trắc nghiệm", score: 1, options: [{ key: "A", text: "apple" }, { key: "B", text: "banana" }, { key: "C", text: "orange" }, { key: "D", text: "table" }], answer: "D. table", explain: "Ba từ còn lại là trái cây." },
+    { text: "Match the questions with the answers: “How old are you?” – “I'm nine years old.”", type: "Nối từ", score: 1, answer: "How old are you? → I'm nine years old.", explain: "Câu hỏi về tuổi được trả lời bằng số tuổi." },
+    { text: "Put the words in order: /  is / name / My / Nam /", type: "Sắp xếp", score: 1, answer: "My name is Nam.", explain: "Trật tự câu: chủ ngữ – động từ to be – bổ ngữ." },
+    { text: "Complete: I ___ (not like) fish.", type: "Điền khuyết", score: 1, answer: "don't like", explain: "Phủ định thì hiện tại đơn với chủ ngữ “I” dùng “don't”." },
+    { text: "Write about your family (3 sentences).", type: "Tự luận", score: 2, answer: "Ví dụ: There are four people in my family...", explain: "Chấm theo tiêu chí: đủ ý, đúng ngữ pháp cơ bản." },
+  ],
+};
+
 /** Danh sách câu hỏi của một đề hoán vị (thứ tự xáo trộn ổn định theo mã đề). */
 export function getPermutedPaper(session: ExamSession, code: string) {
   const seed = hash(session.id + code);
-  const total = 10;
-  const base = Array.from({ length: total }, (_, i) => ({
-    no: i + 1,
-    text: `Câu hỏi gốc số ${i + 1} – ${session.subject} khối ${session.grade}`,
-    type: i % 4 === 3 ? "Tự luận" : i % 3 === 1 ? "Đúng/Sai" : "Trắc nghiệm",
-    score: i % 4 === 3 ? 2 : 1,
-  }));
+  const pool = QUESTION_POOL[session.subject] ?? QUESTION_POOL["Toán"];
+  const base: PaperQuestion[] = pool.map((q, i) => ({ ...q, no: i + 1 }));
   const order = base
     .map((q, i) => ({ q, k: (seed + i * 7919) % 997 }))
     .sort((a, b) => a.k - b.k)
     .map((x) => x.q);
   return { code, questions: order };
 }
+
 
 /* ---------------- Thí sinh (sinh dữ liệu ổn định theo id) ---------------- */
 
