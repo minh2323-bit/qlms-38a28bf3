@@ -504,9 +504,32 @@ export function ExamSessionsPage({
                       {q.type}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">Thứ tự đề gốc: câu {q.no} · {q.score} điểm</div>
+                  {q.options?.length ? (
+                    <ul className="mt-2 space-y-1">
+                      {q.options.map((o) => {
+                        const correct = q.answer.startsWith(`${o.key}.`);
+                        return (
+                          <li
+                            key={o.key}
+                            className={`text-sm rounded-lg px-2 py-1 ${
+                              correct ? "bg-emerald-50 text-emerald-700 font-semibold" : "text-slate-700"
+                            }`}
+                          >
+                            {o.key}. {o.text}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+                  <div className="mt-2 text-sm">
+                    <span className="text-slate-500">Đáp án: </span>
+                    <span className="font-semibold text-emerald-700">{q.answer}</span>
+                  </div>
+                  <div className="text-xs text-slate-600 mt-1">Giải thích: {q.explain}</div>
+                  <div className="text-xs text-slate-400 mt-1">Thứ tự đề gốc: câu {q.no} · {q.score} điểm</div>
                 </div>
               ))}
+
             </div>
           )}
         </DialogContent>
