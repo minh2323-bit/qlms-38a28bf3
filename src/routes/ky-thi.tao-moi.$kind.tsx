@@ -24,10 +24,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
+import { getSession } from "@/lib/exam-sessions";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
 
 
 export const Route = createFileRoute("/ky-thi/tao-moi/$kind")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    examId: typeof search["examId"] === "string" ? (search["examId"] as string) : undefined,
+    mode: search["mode"] === "edit" ? ("edit" as const) : search["mode"] === "view" ? ("view" as const) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Thêm mới kỳ thi | Tiểu học Tô Hiệu" },
@@ -125,6 +130,12 @@ const SEED_SHIFTS: Shift[] = [
   { id: "ca4", code: "UQG", name: "ág 1", count: 0, start: "2026-08-13T00:00", end: "2026-08-16T00:00" },
 ];
 
+/** dd/mm/yyyy + HH:mm -> yyyy-mm-ddTHH:mm */
+const toLocalDT = (date: string, time: string) => {
+  const [dd, mm, yyyy] = date.split("/");
+  return `${yyyy}-${mm}-${dd}T${(time || "07:30").trim()}`;
+};
+
 const fmtDT = (v: string) => {
   if (!v) return "—";
   const [d, t] = v.split("T");
@@ -134,24 +145,30 @@ const fmtDT = (v: string) => {
 
 function Page() {
   const { kind } = useParams({ from: "/ky-thi/tao-moi/$kind" });
+  const { examId, mode } = Route.useSearch();
   const navigate = useNavigate();
+  const existing = examId ? getSession(examId) : undefined;
+  /** Chỉ được sửa khi bấm nút Sửa và kỳ thi chưa bắt đầu */
+  const readOnly = !!existing && !(mode === "edit" && existing.effect === "upcoming");
   const isPractice = kind === "on-tap";
   const backTo = isPractice ? "/ky-thi/on-tap" : "/ky-thi/chinh-thuc";
-  const heading = isPractice ? "Thêm mới kỳ thi ôn tập" : "Thêm mới kỳ thi chính thức";
+  const heading = existing
+    ? `${readOnly ? "Xem" : "Chỉnh sửa"} kỳ thi – ${existing.name}`
+    : isPractice ? "Thêm mới kỳ thi ôn tập" : "Thêm mới kỳ thi chính thức";
 
   const [step, setStep] = useState(1);
 
   /* ---------- Bước 1 ---------- */
-  const [name, setName] = useState("");
-  const [grade, setGrade] = useState("");
-  const [subject, setSubject] = useState("");
-  const [chapter, setChapter] = useState("");
+  const [name, setName] = useState(existing?.name ?? "");
+  const [grade, setGrade] = useState(existing?.grade ?? "");
+  const [subject, setSubject] = useState(existing?.subject ?? "");
+  const [chapter, setChapter] = useState(existing?.chapter ?? "");
   const [graders, setGraders] = useState<string[]>([CURRENT_TEACHER]);
-  const [startAt, setStartAt] = useState("");
-  const [endAt, setEndAt] = useState("");
-  const [duration, setDuration] = useState("45");
+  const [startAt, setStartAt] = useState(existing ? toLocalDT(existing.date, existing.timeRange.split(" – ")[0]) : "");
+  const [endAt, setEndAt] = useState(existing ? toLocalDT(existing.date, existing.timeRange.split(" – ")[1] ?? "") : "");
+  const [duration, setDuration] = useState(existing ? String(existing.minutes) : "45");
   const [maxScore, setMaxScore] = useState("10");
-  const [scoreType, setScoreType] = useState("");
+  const [scoreType, setScoreType] = useState(existing ? "Điểm thi cuối học kỳ II" : "");
   const [showScore, setShowScore] = useState(true);
   const [showAnswers, setShowAnswers] = useState(false);
   const [showWork, setShowWork] = useState(false);
@@ -163,7 +180,7 @@ function Page() {
     [grade, subject],
   );
 
-  const canNext1 = !!name && !!grade && !!subject && !!startAt && !!duration && !!maxScore && !!scoreType;
+  const canNext1 = !!existing || !!name && !!grade && !!subject && !!startAt && !!duration && !!maxScore && !!scoreType;
 
   /* ---------- Bước 2 ---------- */
   const [mode, setMode] = useState<"bank-exam" | "compose" | "upload">("bank-exam");
@@ -316,17 +333,24 @@ function Page() {
 
 
   const canGo = (n: number) => n === 1 || canNext1;
+  const roCls = readOnly
+    ? "[&_input]:pointer-events-none [&_textarea]:pointer-events-none [&_[role=combobox]]:pointer-events-none [&_[role=switch]]:pointer-events-none [&_[role=radiogroup]]:pointer-events-none"
+    : "";
 
   return (
     <AppShell>
-      <section className="bg-white rounded-2xl border shadow-sm">
+      <section className={`bg-white rounded-2xl border shadow-sm ${roCls}`}>
         <div className="px-6 py-4 border-b flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate({ to: backTo })}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-slate-800">{heading}</h1>
-            <p className="text-sm text-slate-500 mt-0.5">Kỳ thi cấp Trường – hoàn thành {STEPS.length} bước để phát hành kỳ thi.</p>
+            <p className="text-sm text-slate-500 mt-0.5">
+              {readOnly
+                ? "Chế độ xem – kỳ thi đã bắt đầu hoặc đang mở ở chế độ xem, không thể chỉnh sửa."
+                : `Kỳ thi cấp Trường – hoàn thành ${STEPS.length} bước để phát hành kỳ thi.`}
+            </p>
           </div>
 
         </div>
