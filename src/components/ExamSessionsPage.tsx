@@ -41,6 +41,16 @@ const EFFECT_TABS: { key: ExamEffect; label: string }[] = [
   { key: "done", label: "Đã diễn ra" },
 ];
 
+function regDeadlineOf(e: ExamSession) {
+  return e.regDeadline ?? `${e.date} 17:00`;
+}
+
+function isRegOpen(e: ExamSession) {
+  const [d] = regDeadlineOf(e).split(" ");
+  const [dd, mm, yyyy] = d.split("/").map(Number);
+  return new Date(yyyy, mm - 1, dd).getTime() >= new Date(2026, 7, 17).getTime();
+}
+
 function parseDate(d: string) {
   const [dd, mm, yyyy] = d.split("/").map(Number);
   return new Date(yyyy, mm - 1, dd);
@@ -68,6 +78,8 @@ export function ExamSessionsPage({
   const [confirm, setConfirm] = useState<null | "delete" | "unapprove" | "approve">(null);
   const [papersOf, setPapersOf] = useState<ExamSession | null>(null);
   const [permutedOf, setPermutedOf] = useState<{ session: ExamSession; code: string } | null>(null);
+  const [regStatus, setRegStatus] = useState("all");
+  const [registerOf, setRegisterOf] = useState<ExamSession | null>(null);
 
   const counts = useMemo(() => {
     const c: Record<ExamLevel, number> = { truong: 0, xa: 0, so: 0 };
@@ -85,10 +97,12 @@ export function ExamSessionsPage({
         && (subject === "all" || e.subject === subject)
         && (chapter === "all" || e.chapter === chapter)
         && (approval === "all" || e.approval === approval)
+        && (regStatus === "all" || tab !== "xa" || effectTab !== "upcoming"
+          || (regStatus === "open" ? isRegOpen(e) : !isRegOpen(e)))
         && (!range?.from || d >= range.from)
         && (!range?.to || d <= range.to);
     }),
-    [data, tab, effectTab, q, grade, subject, chapter, approval, range],
+    [data, tab, effectTab, q, grade, subject, chapter, approval, range, regStatus],
   );
 
   const reset = () => {
@@ -198,10 +212,7 @@ export function ExamSessionsPage({
           ))}
         </div>
 
-        {!isDesigned ? (
-          <div className="p-16 text-center text-slate-400 text-sm">Đang thiết kế</div>
-        ) : (
-          <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4">
             <div className="flex flex-wrap gap-2">
               {EFFECT_TABS.map((t) => (
                 <button
@@ -243,16 +254,92 @@ export function ExamSessionsPage({
                 label="Chương bài" value={chapter} onChange={setChapter} allLabel="Tất cả chương bài"
                 options={CHAPTERS.map((c) => ({ value: c, label: c }))}
               />
+              {xaUpcoming ? (
+                <FilterSelect
+                  label="Trạng thái kỳ thi" value={regStatus} onChange={setRegStatus} allLabel="Tất cả trạng thái"
+                  options={[
+                    { value: "open", label: "Còn hạn đăng ký" },
+                    { value: "closed", label: "Hết hạn đăng ký" },
+                  ]}
+                />
+              ) : null}
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setAdvOpen(true)}>
-                  <SlidersHorizontal className="h-4 w-4" /> Tìm kiếm nâng cao
-                </Button>
+                {!xaUpcoming && (
+                  <Button variant="outline" className="flex-1" onClick={() => setAdvOpen(true)}>
+                    <SlidersHorizontal className="h-4 w-4" /> Tìm kiếm nâng cao
+                  </Button>
+                )}
                 <Button variant="outline" onClick={reset} title="Đặt lại bộ lọc">
                   <RotateCcw className="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
+            {xaUpcoming ? (
+              <div className="rounded-xl border overflow-x-auto">
+                <Table className="min-w-[980px]">
+                  <TableHeader>
+                    <TableRow className="bg-slate-50">
+                      <TableHead className="w-12 text-center">STT</TableHead>
+                      <TableHead className="w-16 text-center">Khối</TableHead>
+                      <TableHead className="w-28">Môn</TableHead>
+                      <TableHead className="min-w-[240px]">Tên kỳ thi</TableHead>
+                      <TableHead className="text-center w-40">Trạng thái đăng ký</TableHead>
+                      <TableHead className="text-center w-44">Số thí sinh</TableHead>
+                      <TableHead className="text-center w-44">Thời hạn đăng ký</TableHead>
+                      <TableHead className="text-center w-36">Đăng ký thí sinh</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {rows.map((e, i) => {
+                      const open = isRegOpen(e);
+                      const [dd, tt] = regDeadlineOf(e).split(" ");
+                      return (
+                        <TableRow key={e.id} className="hover:bg-slate-50 align-top">
+                          <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
+                          <TableCell className="text-center">{e.grade}</TableCell>
+                          <TableCell>{e.subject}</TableCell>
+                          <TableCell>
+                            <div className="font-semibold text-slate-800">{e.name}</div>
+                            <div className="text-xs text-slate-500">{e.chapter}</div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
+                              open
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
+                            }`}>
+                              {open ? "Còn hạn đăng ký" : "Hết hạn đăng ký"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center text-sm">
+                            <div>Dự thi của trường: <span className="font-semibold text-indigo-700">{e.schoolCandidates ?? 0}</span></div>
+                            <div className="text-slate-500">Đăng ký dự thi: <span className="font-semibold text-slate-700">{e.registered}</span></div>
+                          </TableCell>
+                          <TableCell className="text-center text-sm">
+                            <div className="font-medium text-slate-700">{dd}</div>
+                            <div className="text-xs text-slate-500">{tt}</div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button size="sm" className="bg-indigo-700 hover:bg-indigo-800" disabled={!open}
+                              onClick={() => setRegisterOf(e)}>
+                              <UserPlus className="h-4 w-4" /> Đăng ký
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    {rows.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-slate-500 py-10">
+                          Không có kỳ thi nào phù hợp bộ lọc.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
             <div className="rounded-xl border overflow-x-auto">
               <Table className="min-w-[1180px]">
                 <TableHeader>
@@ -273,7 +360,7 @@ export function ExamSessionsPage({
                       {isUpcoming ? "Thí sinh ĐK" : "Thí sinh dự thi"}
                     </TableHead>
                     <TableHead className="text-center w-28">Đề thi gốc</TableHead>
-                    <TableHead className="w-56">Số lượng &amp; Danh sách đề hoán vị</TableHead>
+                    {!isXa && <TableHead className="w-56">Số lượng &amp; Danh sách đề hoán vị</TableHead>}
                     {effectTab === "ongoing" && (
                       <TableHead className="text-center w-28 sticky right-0 bg-slate-50 shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)]">
                         Giám sát
@@ -344,7 +431,7 @@ export function ExamSessionsPage({
                         {isUpcoming ? e.registered : e.attended}
                       </TableCell>
                       {papersCell(e)}
-                      {permutedCell(e)}
+                      {!isXa && permutedCell(e)}
                       {effectTab === "ongoing" && (
                         <TableCell className="text-center sticky right-0 bg-white group-hover:bg-slate-50 shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)]">
                           <Link to="/ky-thi/giam-sat/$examId" params={{ examId: e.id }} className="text-indigo-700 font-semibold hover:underline">
@@ -371,8 +458,8 @@ export function ExamSessionsPage({
                 </TableBody>
               </Table>
             </div>
-          </div>
-        )}
+            )}
+        </div>
       </section>
 
       <Dialog open={!!papersOf} onOpenChange={(v) => !v && setPapersOf(null)}>
@@ -465,6 +552,12 @@ export function ExamSessionsPage({
           </div>
         </SheetContent>
       </Sheet>
+
+      <ExamRegisterModal
+        session={registerOf}
+        open={!!registerOf}
+        onOpenChange={(v) => !v && setRegisterOf(null)}
+      />
 
       <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
         <AlertDialogContent>
