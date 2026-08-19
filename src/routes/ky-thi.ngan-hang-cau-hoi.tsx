@@ -258,6 +258,7 @@ function Page() {
         </div>
 
         <div className="p-3 flex gap-3 items-start">
+          <StatusSideTabs value={tab} onChange={setTab} counts={counts} />
           <div className="flex-1 min-w-0 overflow-x-auto">
           <Table>
             <TableHeader>
@@ -356,7 +357,6 @@ function Page() {
             </TableBody>
           </Table>
           </div>
-          <StatusSideTabs value={tab} onChange={setTab} counts={counts} />
         </div>
       </div>
 
