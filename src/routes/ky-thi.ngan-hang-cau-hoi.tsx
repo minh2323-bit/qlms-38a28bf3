@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Plus, Search, X, ChevronDown, CircleDot, CheckSquare, FileText, Move,
   TextCursorInput, Link2, ToggleLeft, ArrowUpDown,
-  SlidersHorizontal, Check, Ban, MinusCircle,
+  SlidersHorizontal, Check, Ban, MinusCircle, Eye,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 import {
-  TYPE_LABEL, LEVELS, GRADES, SUBJECTS, PROPOSERS, STATUS_LABEL,
+  TYPE_LABEL, LEVELS, GRADES, SUBJECTS, PROPOSERS,
   type QType, type Level, type ApprovalStatus,
   chapterTitle, lessonTitle,
 } from "@/lib/shared-exam-bank";
@@ -378,9 +378,6 @@ function Page() {
                 />
               </div>
             </div>
-            <FilterSelect label="Trạng thái" value={draft.status} onChange={(v) => setDraft({ ...draft, status: v })}
-              allLabel="Tất cả trạng thái"
-              options={(Object.keys(STATUS_LABEL) as ApprovalStatus[]).map((s) => ({ value: s, label: STATUS_LABEL[s] }))} />
             <FilterSelect label="Người đề xuất" value={draft.proposer} onChange={(v) => setDraft({ ...draft, proposer: v })}
               allLabel="Tất cả giáo viên trong tổ"
               options={PROPOSERS.map((p) => ({ value: p, label: p }))} />
@@ -419,6 +416,19 @@ function Page() {
           onClose={() => setCreating(null)}
           onSave={(q) => { setItems((p) => [q, ...p]); setCreating(null); toast.success("Đã thêm câu hỏi vào ngân hàng dùng chung"); }}
         />
+      )}
+
+      {removing && (
+        <ConfirmRemoveModal
+          message="Bạn xác nhận xóa câu hỏi khỏi kho chung?"
+          onClose={() => setRemoving(null)}
+          onConfirm={() => removeOne(removing)}
+        />
+      )}
+
+      {viewReason && (
+        <ViewRejectReasonModal reason={viewReason.rejectReason} at={viewReason.rejectedAt}
+          onClose={() => setViewReason(null)} />
       )}
 
       {rejecting && (
