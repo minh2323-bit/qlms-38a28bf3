@@ -156,8 +156,15 @@ function Page() {
     [draft.chapter],
   );
 
+  const counts = useMemo(() => ({
+    pending: items.filter((q) => q.status === "pending").length,
+    approved: items.filter((q) => q.status === "approved").length,
+    rejected: items.filter((q) => q.status === "rejected").length,
+  }), [items]);
+
   const filtered = useMemo(() => items.filter((q) => {
     const f = applied;
+    if (q.status !== tab) return false;
     if (f.keyword && !q.content.toLowerCase().includes(f.keyword.toLowerCase())) return false;
     if (f.type !== "all" && q.type !== f.type) return false;
     if (f.level !== "all" && q.level !== f.level) return false;
