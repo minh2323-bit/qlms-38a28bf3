@@ -140,6 +140,7 @@ const EMPTY_FILTERS: Filters = {
 
 function Page() {
   const [items, setItems] = useState<Question[]>(SEED);
+  const [tab, setTab] = useState<ApprovalStatus>("pending");
   const [draft, setDraft] = useState<Filters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<Filters>(EMPTY_FILTERS);
   const [panel, setPanel] = useState(false);
@@ -147,6 +148,8 @@ function Page() {
   const [pickType, setPickType] = useState(false);
   const [creating, setCreating] = useState<QType | null>(null);
   const [rejecting, setRejecting] = useState<Question | null>(null);
+  const [removing, setRemoving] = useState<Question | null>(null);
+  const [viewReason, setViewReason] = useState<Question | null>(null);
 
   const draftLessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === draft.chapter)?.units ?? [],
