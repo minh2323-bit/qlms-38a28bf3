@@ -257,6 +257,8 @@ function Page() {
           </div>
         </div>
 
+        <StatusTabs value={tab} onChange={setTab} counts={counts} />
+
         <div className="p-2 overflow-x-auto">
           <Table>
             <TableHeader>
@@ -269,7 +271,9 @@ function Page() {
                 <TableHead className="w-44">Loại câu hỏi</TableHead>
                 <TableHead className="w-32">Mức độ</TableHead>
                 <TableHead className="w-40">Người đề xuất</TableHead>
-                <TableHead className="w-40 text-center">Hành động</TableHead>
+                <TableHead className="w-44 text-center">
+                  {tab === "rejected" ? "Thời gian từ chối" : "Hành động"}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -281,9 +285,6 @@ function Page() {
                       <span className="text-slate-800 line-clamp-2">{q.content}</span>
                       <ApprovalTag status={q.status} />
                     </div>
-                    {q.status === "rejected" && q.rejectReason && (
-                      <div className="text-[11px] text-rose-600 mt-1 italic">Lý do: {q.rejectReason}</div>
-                    )}
                   </TableCell>
                   <TableCell className="text-center text-sm text-slate-700">{q.grade ? `Khối ${q.grade}` : "—"}</TableCell>
                   <TableCell className="text-sm text-slate-700">{q.subject ?? "—"}</TableCell>
@@ -307,33 +308,42 @@ function Page() {
                   </TableCell>
                   <TableCell className="text-sm text-slate-600">{q.proposer}</TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center gap-1.5">
-                      {q.status === "approved" ? (
+                    {tab === "rejected" ? (
+                      <div className="flex items-center justify-center gap-1.5 text-sm text-slate-700">
+                        <span>{q.rejectedAt ?? "—"}</span>
                         <button
-                          onClick={() => removeOne(q)}
+                          title="Xem lý do từ chối"
+                          onClick={() => setViewReason(q)}
+                          className="p-1 rounded-md text-slate-500 hover:text-indigo-700 hover:bg-indigo-50 cursor-pointer"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : tab === "approved" ? (
+                      <div className="flex items-center justify-center">
+                        <button
+                          onClick={() => setRemoving(q)}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
                         >
                           <MinusCircle className="h-4 w-4" /> Gỡ bỏ
                         </button>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => approve(q)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer"
-                          >
-                            <Check className="h-4 w-4" /> Duyệt
-                          </button>
-                          {q.status !== "rejected" && (
-                            <button
-                              onClick={() => setRejecting(q)}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
-                            >
-                              <Ban className="h-4 w-4" /> Từ chối
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => approve(q)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer"
+                        >
+                          <Check className="h-4 w-4" /> Duyệt
+                        </button>
+                        <button
+                          onClick={() => setRejecting(q)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
+                        >
+                          <Ban className="h-4 w-4" /> Từ chối
+                        </button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
