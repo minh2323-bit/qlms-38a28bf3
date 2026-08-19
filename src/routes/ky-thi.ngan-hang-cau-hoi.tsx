@@ -32,7 +32,7 @@ import {
   chapterTitle, lessonTitle,
 } from "@/lib/shared-exam-bank";
 import {
-  FilterSelect, ApprovalTag, RejectReasonModal, StatusTabs,
+  FilterSelect, ApprovalTag, RejectReasonModal, StatusSideTabs,
   ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
 } from "@/components/ExamBankShared";
 import { toast } from "sonner";
@@ -257,9 +257,8 @@ function Page() {
           </div>
         </div>
 
-        <StatusTabs value={tab} onChange={setTab} counts={counts} />
-
-        <div className="p-2 overflow-x-auto">
+        <div className="p-3 flex gap-3 items-start">
+          <div className="flex-1 min-w-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50">
@@ -356,6 +355,8 @@ function Page() {
               )}
             </TableBody>
           </Table>
+          </div>
+          <StatusSideTabs value={tab} onChange={setTab} counts={counts} />
         </div>
       </div>
 

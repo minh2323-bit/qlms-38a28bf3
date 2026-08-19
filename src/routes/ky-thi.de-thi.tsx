@@ -24,7 +24,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
-  FilterSelect, ApprovalTag, StatusTabs, RejectReasonModal,
+  FilterSelect, ApprovalTag, StatusSideTabs, RejectReasonModal,
   ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
 } from "@/components/ExamBankShared";
 import { listMatrices } from "@/lib/matrix-store";
@@ -125,6 +125,8 @@ function Page() {
     [applied],
   );
 
+  const [mainTab, setMainTab] = useState<"exams" | "matrix">("exams");
+
   return (
     <AppShell>
       <div className="bg-white rounded-2xl border shadow-sm">
@@ -135,186 +137,209 @@ function Page() {
               Kho đề thi dùng chung cả trường, đáp ứng chuyên môn để tổ chức các đề thi, kỳ thi toàn trường.
             </p>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="gap-1.5 bg-indigo-600 hover:bg-indigo-700">
-                <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => setMatrixOpen(true)}>
-                <Grid3x3 className="h-4 w-4 mr-2 text-indigo-600" /> Tạo đề từ khung ma trận
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setCreating(true)}>
-                <FileCheck2 className="h-4 w-4 mr-2 text-emerald-600" /> Tạo mới
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <div className="px-4 py-3 flex items-center gap-3 border-b bg-slate-50/60">
-          <Button variant="outline" className="gap-1.5" onClick={() => { setDraft(applied); setPanel(true); }}>
-            <SlidersHorizontal className="h-4 w-4" /> Bộ lọc
-            {activeCount > 0 && (
-              <span className="ml-1 inline-flex h-5 min-w-5 px-1 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-semibold">
-                {activeCount}
-              </span>
-            )}
-          </Button>
-          {activeCount > 0 && (
-            <button onClick={() => { setApplied(EMPTY); setDraft(EMPTY); }}
-              className="text-xs text-slate-500 hover:text-rose-600 cursor-pointer">Xóa bộ lọc</button>
+          {mainTab === "exams" ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="gap-1.5 bg-indigo-600 hover:bg-indigo-700">
+                  <Plus className="h-4 w-4" /> Thêm mới <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => setMatrixOpen(true)}>
+                  <Grid3x3 className="h-4 w-4 mr-2 text-indigo-600" /> Tạo đề từ khung ma trận
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCreating(true)}>
+                  <FileCheck2 className="h-4 w-4 mr-2 text-emerald-600" /> Tạo mới
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button className="gap-1.5 bg-indigo-600 hover:bg-indigo-700"
+              onClick={() => navigate({ to: "/hoc-lieu/ma-tran/tao-moi" })}>
+              <Plus className="h-4 w-4" /> Thêm ma trận mới
+            </Button>
           )}
-          <Button variant="outline" className="gap-1.5 ml-auto" onClick={() => setMatrixOpen(true)}>
-            <ListChecks className="h-4 w-4" /> Xem danh sách ma trận đề
-          </Button>
-          <div className="text-xs text-slate-500">
-            <span className="font-semibold text-slate-700">{filtered.length}</span> đề thi
-          </div>
         </div>
 
-        <StatusTabs value={tab} onChange={setTab} counts={counts} />
+        {/* Tab chính */}
+        <div className="px-4 pt-3 flex items-center gap-1 border-b bg-white">
+          {([
+            { key: "exams", label: "Đề thi" },
+            { key: "matrix", label: "Khung ma trận đề thi" },
+          ] as const).map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setMainTab(t.key)}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px cursor-pointer transition ${
+                mainTab === t.key
+                  ? "border-indigo-600 text-indigo-700"
+                  : "border-transparent text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
 
-        <div className="p-2 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="w-12 text-center">STT</TableHead>
-                <TableHead className="min-w-[280px]">Tên đề thi</TableHead>
-                <TableHead className="w-20 text-center">Khối</TableHead>
-                <TableHead className="w-28">Môn</TableHead>
-                <TableHead className="w-24 text-center">Số câu</TableHead>
-                <TableHead className="w-28 text-center">Thời gian</TableHead>
-                <TableHead className="w-52">Người đề xuất</TableHead>
-                <TableHead className="w-44 text-center">
-                  {tab === "rejected" ? "Thời gian từ chối" : "Hành động"}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((e, i) => (
-                <TableRow key={e.id} className="hover:bg-indigo-50/40 align-top">
-                  <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
-                  <TableCell>
-                    <div className="flex items-start gap-2">
-                      <span className="text-slate-800 font-medium">{e.name}</span>
-                      <ApprovalTag status={e.status} />
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 inline-flex items-center gap-1">
-                      {e.kind === "Ma trận" ? <LayoutGrid className="h-3 w-3" /> : <FileCheck2 className="h-3 w-3" />} {e.kind}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">Khối {e.grade}</TableCell>
-                  <TableCell className="text-sm text-slate-700">{e.subject}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">{e.questions}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">{e.minutes} phút</TableCell>
-                  <TableCell className="text-sm text-slate-600">
-                    {e.proposer === ME ? (
-                      <span className="text-slate-700">
-                        <b className="text-indigo-700">Tôi</b> - {e.proposer}
-                      </span>
-                    ) : e.proposer}
-                  </TableCell>
-                  <TableCell>
-                    {tab === "rejected" ? (
-                      <div className="flex items-center justify-center gap-1.5 text-sm text-slate-700">
-                        <span>{e.rejectedAt ?? "—"}</span>
-                        <button title="Xem lý do từ chối" onClick={() => setViewReason(e)}
-                          className="p-1 rounded-md text-slate-500 hover:text-indigo-700 hover:bg-indigo-50 cursor-pointer">
-                          <Eye className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : tab === "approved" ? (
-                      <div className="flex items-center justify-center">
-                        <button onClick={() => setRemoving(e)}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
-                          <MinusCircle className="h-4 w-4" /> Gỡ bỏ
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button onClick={() => approve(e)}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer">
-                          <Check className="h-4 w-4" /> Duyệt
-                        </button>
-                        <button onClick={() => setRejecting(e)}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
-                          <Ban className="h-4 w-4" /> Từ chối
-                        </button>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center text-sm text-slate-500 py-10">
-                    Không có đề thi phù hợp.
-                  </TableCell>
-                </TableRow>
+        {mainTab === "exams" ? (
+          <>
+            <div className="px-4 py-3 flex items-center gap-3 border-b bg-slate-50/60">
+              <Button variant="outline" className="gap-1.5" onClick={() => { setDraft(applied); setPanel(true); }}>
+                <SlidersHorizontal className="h-4 w-4" /> Bộ lọc
+                {activeCount > 0 && (
+                  <span className="ml-1 inline-flex h-5 min-w-5 px-1 items-center justify-center rounded-full bg-indigo-600 text-white text-[11px] font-semibold">
+                    {activeCount}
+                  </span>
+                )}
+              </Button>
+              {activeCount > 0 && (
+                <button onClick={() => { setApplied(EMPTY); setDraft(EMPTY); }}
+                  className="text-xs text-slate-500 hover:text-rose-600 cursor-pointer">Xóa bộ lọc</button>
               )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+              <Button variant="outline" className="gap-1.5 ml-auto" onClick={() => setMatrixOpen(true)}>
+                <ListChecks className="h-4 w-4" /> Xem danh sách ma trận đề
+              </Button>
+              <div className="text-xs text-slate-500">
+                <span className="font-semibold text-slate-700">{filtered.length}</span> đề thi
+              </div>
+            </div>
 
-      {/* Khung ma trận đề thi */}
-      <section className="mt-6 bg-white rounded-2xl border shadow-sm">
-        <div className="p-4 border-b flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-base font-bold text-slate-800">Khung ma trận đề thi</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <div className="p-3 flex gap-3 items-start">
+              <div className="flex-1 min-w-0 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50">
+                      <TableHead className="w-12 text-center">STT</TableHead>
+                      <TableHead className="min-w-[280px]">Tên đề thi</TableHead>
+                      <TableHead className="w-20 text-center">Khối</TableHead>
+                      <TableHead className="w-28">Môn</TableHead>
+                      <TableHead className="w-24 text-center">Số câu</TableHead>
+                      <TableHead className="w-28 text-center">Thời gian</TableHead>
+                      <TableHead className="w-52">Người đề xuất</TableHead>
+                      <TableHead className="w-44 text-center">
+                        {tab === "rejected" ? "Thời gian từ chối" : "Hành động"}
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((e, i) => (
+                      <TableRow key={e.id} className="hover:bg-indigo-50/40 align-top">
+                        <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
+                        <TableCell>
+                          <div className="flex items-start gap-2">
+                            <span className="text-slate-800 font-medium">{e.name}</span>
+                            <ApprovalTag status={e.status} />
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 inline-flex items-center gap-1">
+                            {e.kind === "Ma trận" ? <LayoutGrid className="h-3 w-3" /> : <FileCheck2 className="h-3 w-3" />} {e.kind}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center text-sm text-slate-700">Khối {e.grade}</TableCell>
+                        <TableCell className="text-sm text-slate-700">{e.subject}</TableCell>
+                        <TableCell className="text-center text-sm text-slate-700">{e.questions}</TableCell>
+                        <TableCell className="text-center text-sm text-slate-700">{e.minutes} phút</TableCell>
+                        <TableCell className="text-sm text-slate-600">
+                          {e.proposer === ME ? (
+                            <span className="text-slate-700">
+                              <b className="text-indigo-700">Tôi</b> - {e.proposer}
+                            </span>
+                          ) : e.proposer}
+                        </TableCell>
+                        <TableCell>
+                          {tab === "rejected" ? (
+                            <div className="flex items-center justify-center gap-1.5 text-sm text-slate-700">
+                              <span>{e.rejectedAt ?? "—"}</span>
+                              <button title="Xem lý do từ chối" onClick={() => setViewReason(e)}
+                                className="p-1 rounded-md text-slate-500 hover:text-indigo-700 hover:bg-indigo-50 cursor-pointer">
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ) : tab === "approved" ? (
+                            <div className="flex items-center justify-center">
+                              <button onClick={() => setRemoving(e)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
+                                <MinusCircle className="h-4 w-4" /> Gỡ bỏ
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button onClick={() => approve(e)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer">
+                                <Check className="h-4 w-4" /> Duyệt
+                              </button>
+                              <button onClick={() => setRejecting(e)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
+                                <Ban className="h-4 w-4" /> Từ chối
+                              </button>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {filtered.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-sm text-slate-500 py-10">
+                          Không có đề thi phù hợp.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              <StatusSideTabs value={tab} onChange={setTab} counts={counts} />
+            </div>
+          </>
+        ) : (
+          <div className="p-3">
+            <p className="px-1 pb-2 text-xs text-slate-500">
               Các khung ma trận dùng chung để sinh đề thi cho kỳ thi toàn trường.
             </p>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead className="w-12 text-center">STT</TableHead>
+                    <TableHead className="min-w-[260px]">Tên khung ma trận</TableHead>
+                    <TableHead className="w-20 text-center">Khối</TableHead>
+                    <TableHead className="w-28">Môn</TableHead>
+                    <TableHead className="w-24 text-center">Số câu</TableHead>
+                    <TableHead className="w-28 text-center">Thời gian</TableHead>
+                    <TableHead className="w-28 text-center">Điểm</TableHead>
+                    <TableHead className="w-32 text-center">Hành động</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {listMatrices().map((m, i) => (
+                    <TableRow key={m.id} className="hover:bg-indigo-50/40">
+                      <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
+                      <TableCell>
+                        <button
+                          onClick={() => navigate({ to: "/hoc-lieu/ma-tran/$matrixId/chi-tiet", params: { matrixId: m.id } })}
+                          className="text-slate-800 font-medium hover:text-indigo-700 cursor-pointer text-left"
+                        >
+                          {m.name}
+                        </button>
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-slate-700">Khối {m.grade}</TableCell>
+                      <TableCell className="text-sm text-slate-700">{m.subject}</TableCell>
+                      <TableCell className="text-center text-sm text-slate-700">{m.count}</TableCell>
+                      <TableCell className="text-center text-sm text-slate-700">{m.minutes} phút</TableCell>
+                      <TableCell className="text-center text-sm text-slate-700">{m.maxScore}</TableCell>
+                      <TableCell className="text-center">
+                        <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700"
+                          onClick={() => navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } })}>
+                          Sinh đề →
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-          <Button variant="outline" className="gap-1.5"
-            onClick={() => navigate({ to: "/hoc-lieu/ma-tran/tao-moi" })}>
-            <Plus className="h-4 w-4" /> Thêm ma trận mới
-          </Button>
-        </div>
-        <div className="p-2 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50">
-                <TableHead className="w-12 text-center">STT</TableHead>
-                <TableHead className="min-w-[260px]">Tên khung ma trận</TableHead>
-                <TableHead className="w-20 text-center">Khối</TableHead>
-                <TableHead className="w-28">Môn</TableHead>
-                <TableHead className="w-24 text-center">Số câu</TableHead>
-                <TableHead className="w-28 text-center">Thời gian</TableHead>
-                <TableHead className="w-28 text-center">Điểm</TableHead>
-                <TableHead className="w-32 text-center">Hành động</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {listMatrices().map((m, i) => (
-                <TableRow key={m.id} className="hover:bg-indigo-50/40">
-                  <TableCell className="text-center text-slate-500">{i + 1}</TableCell>
-                  <TableCell>
-                    <button
-                      onClick={() => navigate({ to: "/hoc-lieu/ma-tran/$matrixId/chi-tiet", params: { matrixId: m.id } })}
-                      className="text-slate-800 font-medium hover:text-indigo-700 cursor-pointer text-left"
-                    >
-                      {m.name}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">Khối {m.grade}</TableCell>
-                  <TableCell className="text-sm text-slate-700">{m.subject}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">{m.count}</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">{m.minutes} phút</TableCell>
-                  <TableCell className="text-center text-sm text-slate-700">{m.maxScore}</TableCell>
-                  <TableCell className="text-center">
-                    <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700"
-                      onClick={() => navigate({ to: "/hoc-lieu/ma-tran/$matrixId/sinh-de", params: { matrixId: m.id } })}>
-                      Sinh đề →
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+        )}
+      </div>
+
 
       <Sheet open={panel} onOpenChange={setPanel}>
         <SheetContent side="left" className="w-[380px] sm:max-w-[380px] flex flex-col p-0">
