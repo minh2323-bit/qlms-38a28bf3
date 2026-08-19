@@ -133,6 +133,48 @@ export function StatusTabs({
   );
 }
 
+/** Bộ lọc trạng thái duyệt dạng dọc (radio) đặt bên phải bảng. */
+export function StatusSideTabs({
+  value, onChange, counts,
+}: {
+  value: ApprovalStatus;
+  onChange: (v: ApprovalStatus) => void;
+  counts: Record<ApprovalStatus, number>;
+}) {
+  const tabs: { key: ApprovalStatus; label: string; color: string }[] = [
+    { key: "pending", label: "Chờ duyệt", color: "text-amber-600" },
+    { key: "approved", label: "Đã duyệt", color: "text-emerald-600" },
+    { key: "rejected", label: "Đã từ chối", color: "text-rose-600" },
+  ];
+  return (
+    <aside className="w-[220px] shrink-0 rounded-xl border bg-white p-3 h-fit">
+      <div className="text-sm font-bold text-slate-800 mb-2">Lọc theo trạng thái</div>
+      <div className="space-y-1">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => onChange(t.key)}
+            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm cursor-pointer transition text-left ${
+              value === t.key ? "bg-indigo-50" : "hover:bg-slate-50"
+            }`}
+          >
+            <span
+              className={`h-4 w-4 shrink-0 rounded-full border-2 flex items-center justify-center ${
+                value === t.key ? "border-indigo-600" : "border-slate-300"
+              }`}
+            >
+              {value === t.key && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
+            </span>
+            <span className={`font-medium ${value === t.key ? "text-indigo-700" : t.color}`}>
+              {t.label} ({counts[t.key]})
+            </span>
+          </button>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
 /** Popup xác nhận gỡ bỏ khỏi kho chung. */
 export function ConfirmRemoveModal({
   message, onClose, onConfirm,
