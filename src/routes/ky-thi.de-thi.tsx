@@ -24,7 +24,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
-  FilterSelect, ApprovalTag, StatusTabs, RejectReasonModal,
+  FilterSelect, ApprovalTag, StatusSideTabs, RejectReasonModal,
   ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
 } from "@/components/ExamBankShared";
 import { listMatrices } from "@/lib/matrix-store";
