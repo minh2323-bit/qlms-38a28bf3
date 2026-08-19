@@ -186,12 +186,14 @@ function Page() {
     toast.success("Đã duyệt câu hỏi vào ngân hàng dùng chung");
   };
   const doReject = (q: Question, reason: string) => {
-    setItems((p) => p.map((x) => x.id === q.id ? { ...x, status: "rejected", rejectReason: reason } : x));
+    setItems((p) => p.map((x) => x.id === q.id
+      ? { ...x, status: "rejected", rejectReason: reason, rejectedAt: nowStamp() } : x));
     setRejecting(null);
     toast.success("Đã từ chối câu hỏi");
   };
   const removeOne = (q: Question) => {
     setItems((p) => p.filter((x) => x.id !== q.id));
+    setRemoving(null);
     toast.success("Đã gỡ câu hỏi khỏi ngân hàng dùng chung");
   };
 
