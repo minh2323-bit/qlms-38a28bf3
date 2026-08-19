@@ -31,7 +31,10 @@ import {
   type QType, type Level, type ApprovalStatus,
   chapterTitle, lessonTitle,
 } from "@/lib/shared-exam-bank";
-import { FilterSelect, ApprovalTag, RejectReasonModal } from "@/components/ExamBankShared";
+import {
+  FilterSelect, ApprovalTag, RejectReasonModal, StatusTabs,
+  ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
+} from "@/components/ExamBankShared";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/ky-thi/ngan-hang-cau-hoi")({
