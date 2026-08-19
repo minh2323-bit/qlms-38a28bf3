@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Plus, Search, SlidersHorizontal, FileCheck2, LayoutGrid, ChevronDown, ListChecks, Grid3x3,
+  Check, Ban, MinusCircle, Eye,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -22,10 +23,13 @@ import {
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { FilterSelect, ApprovalTag } from "@/components/ExamBankShared";
+import {
+  FilterSelect, ApprovalTag, StatusTabs, RejectReasonModal,
+  ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
+} from "@/components/ExamBankShared";
 import { listMatrices } from "@/lib/matrix-store";
 import {
-  GRADES, SUBJECTS, PROPOSERS, STATUS_LABEL, type ApprovalStatus,
+  GRADES, SUBJECTS, PROPOSERS, type ApprovalStatus,
 } from "@/lib/shared-exam-bank";
 import { toast } from "sonner";
 
@@ -55,13 +59,14 @@ type Exam = {
   proposer: string;
   status: ApprovalStatus;
   rejectReason?: string;
+  rejectedAt?: string;
 };
 
 const SEED: Exam[] = [
   { id: "se1", name: "Đề thi cuối kỳ I – Toán 4", grade: "4", subject: "Toán", questions: 25, minutes: 45, kind: "Ma trận", proposer: ME, status: "approved" },
   { id: "se2", name: "Đề thi giữa kỳ – Tiếng Việt 4", grade: "4", subject: "Tiếng Việt", questions: 20, minutes: 40, kind: "Tạo mới", proposer: "Trần Thị Bích", status: "pending" },
   { id: "se3", name: "Đề khảo sát chất lượng đầu năm – Toán 3", grade: "3", subject: "Toán", questions: 18, minutes: 40, kind: "Ma trận", proposer: "Nguyễn Văn A", status: "pending" },
-  { id: "se4", name: "Đề thi thử học sinh giỏi – Tiếng Anh 5", grade: "5", subject: "Tiếng Anh", questions: 30, minutes: 60, kind: "Tạo mới", proposer: "Lê Minh Châu", status: "rejected", rejectReason: "Cấu trúc đề chưa bám sát ma trận của tổ chuyên môn." },
+  { id: "se4", name: "Đề thi thử học sinh giỏi – Tiếng Anh 5", grade: "5", subject: "Tiếng Anh", questions: 30, minutes: 60, kind: "Tạo mới", proposer: "Lê Minh Châu", status: "rejected", rejectReason: "Cấu trúc đề chưa bám sát ma trận của tổ chuyên môn.", rejectedAt: "10/08/2026 14:20" },
   { id: "se5", name: "Đề thi cuối kỳ II – Toán 4 (đề xuất)", grade: "4", subject: "Toán", questions: 22, minutes: 45, kind: "Ma trận", proposer: ME, status: "pending" },
 ];
 
@@ -77,17 +82,43 @@ function Page() {
   const [creating, setCreating] = useState(false);
   const [matrixOpen, setMatrixOpen] = useState(false);
   const [matrixQ, setMatrixQ] = useState("");
+  const [tab, setTab] = useState<ApprovalStatus>("pending");
+  const [rejecting, setRejecting] = useState<Exam | null>(null);
+  const [removing, setRemoving] = useState<Exam | null>(null);
+  const [viewReason, setViewReason] = useState<Exam | null>(null);
+
+  const counts = useMemo(() => ({
+    pending: items.filter((e) => e.status === "pending").length,
+    approved: items.filter((e) => e.status === "approved").length,
+    rejected: items.filter((e) => e.status === "rejected").length,
+  }), [items]);
+
+  const approve = (e: Exam) => {
+    setItems((p) => p.map((x) => x.id === e.id ? { ...x, status: "approved", rejectReason: undefined } : x));
+    toast.success("Đã duyệt đề thi vào kho chung");
+  };
+  const doReject = (e: Exam, reason: string) => {
+    setItems((p) => p.map((x) => x.id === e.id
+      ? { ...x, status: "rejected", rejectReason: reason, rejectedAt: nowStamp() } : x));
+    setRejecting(null);
+    toast.success("Đã từ chối đề thi");
+  };
+  const removeOne = (e: Exam) => {
+    setItems((p) => p.filter((x) => x.id !== e.id));
+    setRemoving(null);
+    toast.success("Đã gỡ đề thi khỏi kho chung");
+  };
 
   const filtered = useMemo(() => items.filter((e) => {
     const f = applied;
+    if (e.status !== tab) return false;
     if (f.keyword && !e.name.toLowerCase().includes(f.keyword.toLowerCase())) return false;
     if (f.grade !== "all" && e.grade !== f.grade) return false;
     if (f.subject !== "all" && e.subject !== f.subject) return false;
-    if (f.status !== "all" && e.status !== f.status) return false;
     if (f.proposer !== "all" && e.proposer !== f.proposer) return false;
     if (f.kind !== "all" && e.kind !== f.kind) return false;
     return true;
-  }), [items, applied]);
+  }), [items, applied, tab]);
 
   const activeCount = useMemo(
     () => Object.entries(applied).filter(([k, v]) => (k === "keyword" ? v !== "" : v !== "all")).length,
@@ -142,6 +173,8 @@ function Page() {
           </div>
         </div>
 
+        <StatusTabs value={tab} onChange={setTab} counts={counts} />
+
         <div className="p-2 overflow-x-auto">
           <Table>
             <TableHeader>
@@ -153,6 +186,9 @@ function Page() {
                 <TableHead className="w-24 text-center">Số câu</TableHead>
                 <TableHead className="w-28 text-center">Thời gian</TableHead>
                 <TableHead className="w-52">Người đề xuất</TableHead>
+                <TableHead className="w-44 text-center">
+                  {tab === "rejected" ? "Thời gian từ chối" : "Hành động"}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -167,9 +203,6 @@ function Page() {
                     <div className="text-[11px] text-slate-500 mt-0.5 inline-flex items-center gap-1">
                       {e.kind === "Ma trận" ? <LayoutGrid className="h-3 w-3" /> : <FileCheck2 className="h-3 w-3" />} {e.kind}
                     </div>
-                    {e.status === "rejected" && e.rejectReason && (
-                      <div className="text-[11px] text-rose-600 mt-1 italic">Lý do: {e.rejectReason}</div>
-                    )}
                   </TableCell>
                   <TableCell className="text-center text-sm text-slate-700">Khối {e.grade}</TableCell>
                   <TableCell className="text-sm text-slate-700">{e.subject}</TableCell>
@@ -182,11 +215,40 @@ function Page() {
                       </span>
                     ) : e.proposer}
                   </TableCell>
+                  <TableCell>
+                    {tab === "rejected" ? (
+                      <div className="flex items-center justify-center gap-1.5 text-sm text-slate-700">
+                        <span>{e.rejectedAt ?? "—"}</span>
+                        <button title="Xem lý do từ chối" onClick={() => setViewReason(e)}
+                          className="p-1 rounded-md text-slate-500 hover:text-indigo-700 hover:bg-indigo-50 cursor-pointer">
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : tab === "approved" ? (
+                      <div className="flex items-center justify-center">
+                        <button onClick={() => setRemoving(e)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
+                          <MinusCircle className="h-4 w-4" /> Gỡ bỏ
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button onClick={() => approve(e)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer">
+                          <Check className="h-4 w-4" /> Duyệt
+                        </button>
+                        <button onClick={() => setRejecting(e)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer">
+                          <Ban className="h-4 w-4" /> Từ chối
+                        </button>
+                      </div>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-sm text-slate-500 py-10">
+                  <TableCell colSpan={8} className="text-center text-sm text-slate-500 py-10">
                     Không có đề thi phù hợp.
                   </TableCell>
                 </TableRow>
@@ -269,9 +331,6 @@ function Page() {
                   placeholder="Tìm theo tên đề thi..." />
               </div>
             </div>
-            <FilterSelect label="Trạng thái" value={draft.status} onChange={(v) => setDraft({ ...draft, status: v })}
-              allLabel="Tất cả trạng thái"
-              options={(Object.keys(STATUS_LABEL) as ApprovalStatus[]).map((s) => ({ value: s, label: STATUS_LABEL[s] }))} />
             <FilterSelect label="Người đề xuất" value={draft.proposer} onChange={(v) => setDraft({ ...draft, proposer: v })}
               allLabel="Tất cả giáo viên trong tổ"
               options={PROPOSERS.map((p) => ({ value: p, label: p === ME ? `Tôi - ${p}` : p }))} />
@@ -338,6 +397,22 @@ function Page() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {removing && (
+        <ConfirmRemoveModal message="Bạn xác nhận xóa đề thi khỏi kho chung?"
+          onClose={() => setRemoving(null)} onConfirm={() => removeOne(removing)} />
+      )}
+
+      {viewReason && (
+        <ViewRejectReasonModal reason={viewReason.rejectReason} at={viewReason.rejectedAt}
+          onClose={() => setViewReason(null)} />
+      )}
+
+      {rejecting && (
+        <RejectReasonModal name={rejecting.name} proposer={rejecting.proposer}
+          onClose={() => setRejecting(null)}
+          onConfirm={(reason) => doReject(rejecting, reason)} />
+      )}
 
       {creating && (
         <CreateExamModal
