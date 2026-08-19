@@ -101,6 +101,7 @@ const SEED: Question[] = [
     type: "truefalse", level: "Nhận biết", proposer: "Lê Minh Châu",
     grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b3", status: "rejected",
     rejectReason: "Nội dung trùng với câu hỏi đã có trong ngân hàng.",
+    rejectedAt: "12/08/2026 09:15",
     tfTitle: "Xét các mệnh đề về số tự nhiên",
     tfItems: [
       { text: "Số 0 là số tự nhiên bé nhất.", correct: true },
