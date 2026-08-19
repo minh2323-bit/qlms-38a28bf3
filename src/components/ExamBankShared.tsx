@@ -97,3 +97,85 @@ export function RejectReasonModal({
     </Dialog>
   );
 }
+
+/** Tabs trạng thái duyệt dùng chung cho Ngân hàng câu hỏi / Đề thi kỳ thi. */
+export function StatusTabs({
+  value, onChange, counts,
+}: {
+  value: ApprovalStatus;
+  onChange: (v: ApprovalStatus) => void;
+  counts: Record<ApprovalStatus, number>;
+}) {
+  const tabs: { key: ApprovalStatus; label: string }[] = [
+    { key: "pending", label: "Chờ duyệt" },
+    { key: "approved", label: "Đã duyệt" },
+    { key: "rejected", label: "Đã từ chối" },
+  ];
+  return (
+    <div className="px-4 pt-3 flex items-center gap-1 border-b bg-white">
+      {tabs.map((t) => (
+        <button
+          key={t.key}
+          onClick={() => onChange(t.key)}
+          className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px cursor-pointer transition ${
+            value === t.key
+              ? "border-indigo-600 text-indigo-700"
+              : "border-transparent text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          {t.label}
+          <span className={`ml-1.5 text-xs font-bold ${value === t.key ? "text-rose-600" : "text-slate-400"}`}>
+            ({counts[t.key]})
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Popup xác nhận gỡ bỏ khỏi kho chung. */
+export function ConfirmRemoveModal({
+  message, onClose, onConfirm,
+}: { message: string; onClose: () => void; onConfirm: () => void }) {
+  return (
+    <Dialog open onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader><DialogTitle className="text-rose-600">Xác nhận gỡ bỏ</DialogTitle></DialogHeader>
+        <p className="text-sm text-slate-700">{message}</p>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Hủy</Button>
+          <Button className="bg-rose-600 hover:bg-rose-700" onClick={onConfirm}>Xác nhận</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Popup xem nội dung lý do từ chối do giáo viên nhập (có thể trống). */
+export function ViewRejectReasonModal({
+  reason, at, onClose,
+}: { reason?: string; at?: string; onClose: () => void }) {
+  return (
+    <Dialog open onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle className="text-rose-600">Lý do từ chối</DialogTitle></DialogHeader>
+        {at && <div className="text-xs text-slate-500">Thời gian từ chối: <b className="text-slate-700">{at}</b></div>}
+        <div className="rounded-lg border bg-slate-50 p-3 text-sm min-h-[90px] whitespace-pre-wrap">
+          {reason?.trim()
+            ? <span className="text-slate-800">{reason}</span>
+            : <span className="italic text-slate-400">Người duyệt không nhập lý do từ chối.</span>}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Đóng</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Chuỗi thời gian hiện tại dạng dd/MM/yyyy HH:mm. */
+export function nowStamp() {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}

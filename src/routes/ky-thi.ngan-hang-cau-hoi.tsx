@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Plus, Search, X, ChevronDown, CircleDot, CheckSquare, FileText, Move,
   TextCursorInput, Link2, ToggleLeft, ArrowUpDown,
-  SlidersHorizontal, Check, Ban, MinusCircle,
+  SlidersHorizontal, Check, Ban, MinusCircle, Eye,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -27,11 +27,14 @@ import {
 } from "@/components/ui/table";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 import {
-  TYPE_LABEL, LEVELS, GRADES, SUBJECTS, PROPOSERS, STATUS_LABEL,
+  TYPE_LABEL, LEVELS, GRADES, SUBJECTS, PROPOSERS,
   type QType, type Level, type ApprovalStatus,
   chapterTitle, lessonTitle,
 } from "@/lib/shared-exam-bank";
-import { FilterSelect, ApprovalTag, RejectReasonModal } from "@/components/ExamBankShared";
+import {
+  FilterSelect, ApprovalTag, RejectReasonModal, StatusTabs,
+  ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
+} from "@/components/ExamBankShared";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/ky-thi/ngan-hang-cau-hoi")({
@@ -63,6 +66,7 @@ type Question = {
   lesson?: string;
   status: ApprovalStatus;
   rejectReason?: string;
+  rejectedAt?: string;
   answers?: Answer[];
   tfTitle?: string;
   tfItems?: TFItem[];
@@ -97,6 +101,7 @@ const SEED: Question[] = [
     type: "truefalse", level: "Nhận biết", proposer: "Lê Minh Châu",
     grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b3", status: "rejected",
     rejectReason: "Nội dung trùng với câu hỏi đã có trong ngân hàng.",
+    rejectedAt: "12/08/2026 09:15",
     tfTitle: "Xét các mệnh đề về số tự nhiên",
     tfItems: [
       { text: "Số 0 là số tự nhiên bé nhất.", correct: true },
@@ -135,6 +140,7 @@ const EMPTY_FILTERS: Filters = {
 
 function Page() {
   const [items, setItems] = useState<Question[]>(SEED);
+  const [tab, setTab] = useState<ApprovalStatus>("pending");
   const [draft, setDraft] = useState<Filters>(EMPTY_FILTERS);
   const [applied, setApplied] = useState<Filters>(EMPTY_FILTERS);
   const [panel, setPanel] = useState(false);
@@ -142,14 +148,23 @@ function Page() {
   const [pickType, setPickType] = useState(false);
   const [creating, setCreating] = useState<QType | null>(null);
   const [rejecting, setRejecting] = useState<Question | null>(null);
+  const [removing, setRemoving] = useState<Question | null>(null);
+  const [viewReason, setViewReason] = useState<Question | null>(null);
 
   const draftLessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === draft.chapter)?.units ?? [],
     [draft.chapter],
   );
 
+  const counts = useMemo(() => ({
+    pending: items.filter((q) => q.status === "pending").length,
+    approved: items.filter((q) => q.status === "approved").length,
+    rejected: items.filter((q) => q.status === "rejected").length,
+  }), [items]);
+
   const filtered = useMemo(() => items.filter((q) => {
     const f = applied;
+    if (q.status !== tab) return false;
     if (f.keyword && !q.content.toLowerCase().includes(f.keyword.toLowerCase())) return false;
     if (f.type !== "all" && q.type !== f.type) return false;
     if (f.level !== "all" && q.level !== f.level) return false;
@@ -157,10 +172,9 @@ function Page() {
     if (f.subject !== "all" && q.subject !== f.subject) return false;
     if (f.chapter !== "all" && q.chapter !== f.chapter) return false;
     if (f.lesson !== "all" && q.lesson !== f.lesson) return false;
-    if (f.status !== "all" && q.status !== f.status) return false;
     if (f.proposer !== "all" && q.proposer !== f.proposer) return false;
     return true;
-  }), [items, applied]);
+  }), [items, applied, tab]);
 
   const activeCount = useMemo(
     () => Object.entries(applied).filter(([k, v]) => (k === "keyword" ? v !== "" : v !== "all")).length,
@@ -172,12 +186,14 @@ function Page() {
     toast.success("Đã duyệt câu hỏi vào ngân hàng dùng chung");
   };
   const doReject = (q: Question, reason: string) => {
-    setItems((p) => p.map((x) => x.id === q.id ? { ...x, status: "rejected", rejectReason: reason } : x));
+    setItems((p) => p.map((x) => x.id === q.id
+      ? { ...x, status: "rejected", rejectReason: reason, rejectedAt: nowStamp() } : x));
     setRejecting(null);
     toast.success("Đã từ chối câu hỏi");
   };
   const removeOne = (q: Question) => {
     setItems((p) => p.filter((x) => x.id !== q.id));
+    setRemoving(null);
     toast.success("Đã gỡ câu hỏi khỏi ngân hàng dùng chung");
   };
 
@@ -241,6 +257,8 @@ function Page() {
           </div>
         </div>
 
+        <StatusTabs value={tab} onChange={setTab} counts={counts} />
+
         <div className="p-2 overflow-x-auto">
           <Table>
             <TableHeader>
@@ -253,7 +271,9 @@ function Page() {
                 <TableHead className="w-44">Loại câu hỏi</TableHead>
                 <TableHead className="w-32">Mức độ</TableHead>
                 <TableHead className="w-40">Người đề xuất</TableHead>
-                <TableHead className="w-40 text-center">Hành động</TableHead>
+                <TableHead className="w-44 text-center">
+                  {tab === "rejected" ? "Thời gian từ chối" : "Hành động"}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -265,9 +285,6 @@ function Page() {
                       <span className="text-slate-800 line-clamp-2">{q.content}</span>
                       <ApprovalTag status={q.status} />
                     </div>
-                    {q.status === "rejected" && q.rejectReason && (
-                      <div className="text-[11px] text-rose-600 mt-1 italic">Lý do: {q.rejectReason}</div>
-                    )}
                   </TableCell>
                   <TableCell className="text-center text-sm text-slate-700">{q.grade ? `Khối ${q.grade}` : "—"}</TableCell>
                   <TableCell className="text-sm text-slate-700">{q.subject ?? "—"}</TableCell>
@@ -291,33 +308,42 @@ function Page() {
                   </TableCell>
                   <TableCell className="text-sm text-slate-600">{q.proposer}</TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center gap-1.5">
-                      {q.status === "approved" ? (
+                    {tab === "rejected" ? (
+                      <div className="flex items-center justify-center gap-1.5 text-sm text-slate-700">
+                        <span>{q.rejectedAt ?? "—"}</span>
                         <button
-                          onClick={() => removeOne(q)}
+                          title="Xem lý do từ chối"
+                          onClick={() => setViewReason(q)}
+                          className="p-1 rounded-md text-slate-500 hover:text-indigo-700 hover:bg-indigo-50 cursor-pointer"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : tab === "approved" ? (
+                      <div className="flex items-center justify-center">
+                        <button
+                          onClick={() => setRemoving(q)}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
                         >
                           <MinusCircle className="h-4 w-4" /> Gỡ bỏ
                         </button>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => approve(q)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer"
-                          >
-                            <Check className="h-4 w-4" /> Duyệt
-                          </button>
-                          {q.status !== "rejected" && (
-                            <button
-                              onClick={() => setRejecting(q)}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
-                            >
-                              <Ban className="h-4 w-4" /> Từ chối
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => approve(q)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-emerald-700 hover:bg-emerald-50 cursor-pointer"
+                        >
+                          <Check className="h-4 w-4" /> Duyệt
+                        </button>
+                        <button
+                          onClick={() => setRejecting(q)}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer"
+                        >
+                          <Ban className="h-4 w-4" /> Từ chối
+                        </button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -352,9 +378,6 @@ function Page() {
                 />
               </div>
             </div>
-            <FilterSelect label="Trạng thái" value={draft.status} onChange={(v) => setDraft({ ...draft, status: v })}
-              allLabel="Tất cả trạng thái"
-              options={(Object.keys(STATUS_LABEL) as ApprovalStatus[]).map((s) => ({ value: s, label: STATUS_LABEL[s] }))} />
             <FilterSelect label="Người đề xuất" value={draft.proposer} onChange={(v) => setDraft({ ...draft, proposer: v })}
               allLabel="Tất cả giáo viên trong tổ"
               options={PROPOSERS.map((p) => ({ value: p, label: p }))} />
@@ -393,6 +416,19 @@ function Page() {
           onClose={() => setCreating(null)}
           onSave={(q) => { setItems((p) => [q, ...p]); setCreating(null); toast.success("Đã thêm câu hỏi vào ngân hàng dùng chung"); }}
         />
+      )}
+
+      {removing && (
+        <ConfirmRemoveModal
+          message="Bạn xác nhận xóa câu hỏi khỏi kho chung?"
+          onClose={() => setRemoving(null)}
+          onConfirm={() => removeOne(removing)}
+        />
+      )}
+
+      {viewReason && (
+        <ViewRejectReasonModal reason={viewReason.rejectReason} at={viewReason.rejectedAt}
+          onClose={() => setViewReason(null)} />
       )}
 
       {rejecting && (
