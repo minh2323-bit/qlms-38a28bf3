@@ -66,6 +66,7 @@ type Question = {
   lesson?: string;
   status: ApprovalStatus;
   rejectReason?: string;
+  rejectedAt?: string;
   answers?: Answer[];
   tfTitle?: string;
   tfItems?: TFItem[];
