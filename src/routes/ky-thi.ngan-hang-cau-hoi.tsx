@@ -172,10 +172,9 @@ function Page() {
     if (f.subject !== "all" && q.subject !== f.subject) return false;
     if (f.chapter !== "all" && q.chapter !== f.chapter) return false;
     if (f.lesson !== "all" && q.lesson !== f.lesson) return false;
-    if (f.status !== "all" && q.status !== f.status) return false;
     if (f.proposer !== "all" && q.proposer !== f.proposer) return false;
     return true;
-  }), [items, applied]);
+  }), [items, applied, tab]);
 
   const activeCount = useMemo(
     () => Object.entries(applied).filter(([k, v]) => (k === "keyword" ? v !== "" : v !== "all")).length,
