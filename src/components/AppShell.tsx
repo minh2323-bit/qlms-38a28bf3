@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import studentAvatar from "@/assets/student-avatar.jpg";
+import principalAvatar from "@/assets/principal-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
