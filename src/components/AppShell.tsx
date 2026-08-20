@@ -231,12 +231,13 @@ export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
   );
 }
 
-export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
+export function TopBar({ role = "teacher" }: { role?: AppRole }) {
   const isStudent = role === "student";
-  const name = isStudent ? "Phí Song Ngân" : "G/v Phùng Thúy Hằng";
-  const subtitle = isStudent ? "Học sinh · Lớp 4A" : "Giáo viên";
+  const isPrincipal = role === "principal";
+  const name = isStudent ? "Phí Song Ngân" : isPrincipal ? "H/t Nguyễn Thị Mai Lan" : "G/v Phùng Thúy Hằng";
+  const subtitle = isStudent ? "Học sinh · Lớp 4A" : isPrincipal ? "Hiệu trưởng" : "Giáo viên";
   const greeting = isStudent ? "Chào mừng," : "Xin chào,";
-  const avatar = isStudent ? studentAvatar : teacherAvatar;
+  const avatar = isStudent ? studentAvatar : isPrincipal ? principalAvatar : teacherAvatar;
   const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
   const [year, setYear] = useState(YEARS[0]);
 
