@@ -6,9 +6,11 @@ import {
   ClipboardList, Video, School, Landmark,
   Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
+  CalendarDays, Share2, Database, FileBarChart, ShieldCheck,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import studentAvatar from "@/assets/student-avatar.jpg";
+import principalAvatar from "@/assets/principal-avatar.jpg";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
@@ -109,9 +111,75 @@ const STUDENT_NAV: NavItem[] = [
   },
 ];
 
-export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" }) {
+const PRINCIPAL_NAV: NavItem[] = [
+  { icon: Home, label: "Trang chủ", to: "/hieu-truong" },
+  {
+    icon: GraduationCap,
+    label: "Hoạt động\ngiảng dạy",
+    submenu: [
+      { icon: CalendarDays, label: "Lịch báo giảng", to: "/" },
+      { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
+      { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
+      { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
+      { icon: ClipboardList, label: "Nhiệm vụ, bài tập", to: "/giao-bai-tap" },
+    ],
+  },
+  {
+    icon: BookOpen,
+    label: "Học liệu",
+    submenu: [
+      { icon: Tag, label: "Học liệu bản quyền", to: "/hoc-lieu/ban-quyen", highlight: true },
+      { icon: Library, label: "Học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/hoc-lieu/ngan-hang-cau-hoi" },
+      { icon: ListChecks, label: "Đề & Bài kiểm tra", to: "/hoc-lieu/de-kiem-tra" },
+    ],
+  },
+  {
+    icon: Share2,
+    label: "Chia sẻ\nhọc liệu",
+    submenu: [
+      { icon: Library, label: "Kho học liệu chia sẻ" },
+      { icon: UsersRound, label: "Học liệu chia sẻ" },
+    ],
+  },
+  {
+    icon: FolderKanban,
+    label: "Kỳ thi",
+    submenu: [
+      { icon: Landmark, label: "Kỳ thi chính thức", to: "/ky-thi/chinh-thuc" },
+      { icon: School, label: "Kỳ thi ôn tập", to: "/ky-thi/on-tap" },
+      { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/ky-thi/ngan-hang-cau-hoi" },
+      { icon: FileCheck2, label: "Đề thi và ma trận đề", to: "/ky-thi/de-thi" },
+    ],
+  },
+  {
+    icon: BarChart3,
+    label: "Thống kê\n& Báo cáo",
+    submenu: [
+      { icon: TrendingUp, label: "Thống kê của trường", to: "/hieu-truong" },
+      { icon: BarChart3, label: "Hoạt động giảng dạy", to: "/thong-ke" },
+      { icon: FileBarChart, label: "Báo cáo DTI" },
+    ],
+  },
+  {
+    icon: Settings,
+    label: "Hệ thống",
+    submenu: [
+      { icon: BookOpen, label: "Danh mục", to: "/he-thong/danh-muc" },
+      { icon: SlidersHorizontal, label: "Cấu hình hệ thống" },
+      { icon: Users, label: "Tài khoản học sinh" },
+      { icon: UserCog, label: "Tài khoản nhân sự" },
+      { icon: Database, label: "Đồng bộ dữ liệu CSDL" },
+      { icon: HardDrive, label: "Quản lý dung lượng" },
+    ],
+  },
+];
+
+export type AppRole = "teacher" | "student" | "principal";
+
+export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const NAV = role === "student" ? STUDENT_NAV : TEACHER_NAV;
+  const NAV = role === "student" ? STUDENT_NAV : role === "principal" ? PRINCIPAL_NAV : TEACHER_NAV;
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
       <div className="w-16 h-16 flex items-center justify-center mb-1">
@@ -163,12 +231,13 @@ export function SidebarNav({ role = "teacher" }: { role?: "teacher" | "student" 
   );
 }
 
-export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
+export function TopBar({ role = "teacher" }: { role?: AppRole }) {
   const isStudent = role === "student";
-  const name = isStudent ? "Phí Song Ngân" : "G/v Phùng Thúy Hằng";
-  const subtitle = isStudent ? "Học sinh · Lớp 4A" : "Giáo viên";
+  const isPrincipal = role === "principal";
+  const name = isStudent ? "Phí Song Ngân" : isPrincipal ? "H/t Nguyễn Thị Mai Lan" : "G/v Phùng Thúy Hằng";
+  const subtitle = isStudent ? "Học sinh · Lớp 4A" : isPrincipal ? "Hiệu trưởng" : "Giáo viên";
   const greeting = isStudent ? "Chào mừng," : "Xin chào,";
-  const avatar = isStudent ? studentAvatar : teacherAvatar;
+  const avatar = isStudent ? studentAvatar : isPrincipal ? principalAvatar : teacherAvatar;
   const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
   const [year, setYear] = useState(YEARS[0]);
 
@@ -250,6 +319,15 @@ export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
                 </div>
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/hieu-truong" className="flex items-center gap-2 cursor-pointer">
+                <img src={principalAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Hiệu trưởng</span>
+                  <span className="text-[11px] text-slate-500">Nguyễn Thị Mai Lan</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -257,9 +335,12 @@ export function TopBar({ role = "teacher" }: { role?: "teacher" | "student" }) {
   );
 }
 
-export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: "teacher" | "student" }) {
+export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: AppRole }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const role: "teacher" | "student" = roleProp ?? (pathname.startsWith("/hoc-sinh") ? "student" : "teacher");
+  const role: AppRole = roleProp
+    ?? (pathname.startsWith("/hoc-sinh") ? "student"
+      : pathname.startsWith("/hieu-truong") ? "principal"
+      : "teacher");
   return (
     <div className="min-h-screen bg-slate-50 flex">
       <SidebarNav role={role} />
