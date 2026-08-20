@@ -319,6 +319,15 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
                 </div>
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/hieu-truong" className="flex items-center gap-2 cursor-pointer">
+                <img src={principalAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Hiệu trưởng</span>
+                  <span className="text-[11px] text-slate-500">Nguyễn Thị Mai Lan</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -326,9 +335,12 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
   );
 }
 
-export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: "teacher" | "student" }) {
+export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: AppRole }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const role: "teacher" | "student" = roleProp ?? (pathname.startsWith("/hoc-sinh") ? "student" : "teacher");
+  const role: AppRole = roleProp
+    ?? (pathname.startsWith("/hoc-sinh") ? "student"
+      : pathname.startsWith("/hieu-truong") ? "principal"
+      : "teacher");
   return (
     <div className="min-h-screen bg-slate-50 flex">
       <SidebarNav role={role} />
