@@ -6,6 +6,7 @@ import {
   ClipboardList, Video, School, Landmark,
   Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
+  CalendarDays, Share2, Database, FileBarChart, ShieldCheck,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import studentAvatar from "@/assets/student-avatar.jpg";
