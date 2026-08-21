@@ -115,6 +115,36 @@ const SEED: Question[] = [
   },
 ];
 
+/** Bộ câu hỏi hệ thống bóc tách được từ tệp Word/PDF/Excel người dùng tải lên. */
+const IMPORT_TEMPLATE: Omit<Question, "id" | "proposer" | "status">[] = [
+  {
+    content: "Số 45 678 đọc là gì?", type: "single", level: "Nhận biết",
+    grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b1",
+    answers: [
+      { text: "Bốn mươi lăm nghìn sáu trăm bảy mươi tám", correct: true },
+      { text: "Bốn nghìn năm trăm sáu mươi bảy tám", correct: false },
+      { text: "Bốn trăm năm mươi sáu nghìn bảy tám", correct: false },
+      { text: "Bốn mươi lăm nghìn bảy trăm sáu mươi tám", correct: false },
+    ],
+  },
+  {
+    content: "Chọn các số chia hết cho 5:", type: "multiple", level: "Thông hiểu",
+    grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b2",
+    answers: [
+      { text: "125", correct: true }, { text: "232", correct: false },
+      { text: "540", correct: true }, { text: "705", correct: true },
+    ],
+  },
+  {
+    content: "Điền số thích hợp vào chỗ trống: 2 km 300 m = ... m", type: "fill",
+    level: "Thông hiểu", grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b3",
+  },
+  {
+    content: "Nêu cách tính chu vi hình chữ nhật và cho một ví dụ minh họa.", type: "essay",
+    level: "Vận dụng", grade: "4", subject: "Toán", chapter: "t4-ch1", lesson: "t4-b5",
+  },
+];
+
 export function TypeIcon({ type }: { type: QType }) {
   const map = {
     single: <CircleDot className="h-4 w-4 text-indigo-600" />,
