@@ -150,6 +150,22 @@ function Page() {
   const [rejecting, setRejecting] = useState<Question | null>(null);
   const [removing, setRemoving] = useState<Question | null>(null);
   const [viewReason, setViewReason] = useState<Question | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  /** Đọc bộ câu hỏi trong tệp và chuyển thành câu hỏi trên hệ thống (chờ duyệt). */
+  const importFromFile = (fileName: string) => {
+    const stamp = Date.now();
+    const parsed: Question[] = IMPORT_TEMPLATE.map((q, i) => ({
+      ...q,
+      id: `imp-${stamp}-${i}`,
+      proposer: PROPOSERS[0],
+      status: "pending",
+    }));
+    setItems((p) => [...parsed, ...p]);
+    setImporting(false);
+    setTab("pending");
+    toast.success(`Đã đọc ${parsed.length} câu hỏi từ tệp "${fileName}" và thêm vào danh sách chờ duyệt`);
+  };
 
   const draftLessons = useMemo(
     () => KNOWLEDGE_TREE.find((c) => c.id === draft.chapter)?.units ?? [],
