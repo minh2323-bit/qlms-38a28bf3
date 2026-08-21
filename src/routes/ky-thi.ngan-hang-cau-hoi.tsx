@@ -483,6 +483,9 @@ function Page() {
           onClose={() => setRejecting(null)}
           onConfirm={(reason) => doReject(rejecting, reason)} />
       )}
+      {importing && (
+        <ImportQuestionsModal onClose={() => setImporting(false)} onConfirm={importFromFile} />
+      )}
     </AppShell>
   );
 }
