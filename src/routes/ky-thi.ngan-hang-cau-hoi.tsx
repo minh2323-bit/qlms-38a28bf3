@@ -219,8 +219,8 @@ function Page() {
                   <DropdownMenuItem onClick={() => toast.info("Mở Kho chia sẻ...")}>
                     Thêm từ Kho chia sẻ
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info("Chọn tệp câu hỏi...")}>
-                    Thêm từ tệp
+                  <DropdownMenuItem onClick={() => setImporting(true)}>
+                    Thêm mới từ tệp
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setPickType(true)}>Thêm mới</DropdownMenuItem>
