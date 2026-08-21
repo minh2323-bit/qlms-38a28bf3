@@ -35,6 +35,7 @@ import {
   FilterSelect, ApprovalTag, RejectReasonModal, StatusSideTabs,
   ConfirmRemoveModal, ViewRejectReasonModal, nowStamp,
 } from "@/components/ExamBankShared";
+import { ImportQuestionsModal } from "@/components/ImportQuestionsModal";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/ky-thi/ngan-hang-cau-hoi")({
