@@ -36,6 +36,7 @@ import { AnnouncementSection } from "@/components/AnnouncementSection";
 import { BarChart3 } from "lucide-react";
 import { useCompletion } from "@/lib/material-progress-store";
 import { ExamWizard } from "@/routes/hoc-lieu.de-kiem-tra";
+import { CURRENT_TEACHER } from "@/lib/teacher-permissions";
 
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
@@ -2338,3 +2339,217 @@ function AddTestModal({
   );
 }
 
+
+/* ============================ Tab: Thảo luận ============================ */
+
+type Discussion = { id: string; author: string; role: string; at: string; text: string; replies: number };
+
+const SEED_DISCUSSIONS: Discussion[] = [
+  { id: "d1", author: "Nguyễn Thị Hà Anh", role: "Học sinh", at: "18/08 09:12", text: "Thưa cô, bài tập phần cộng số tự nhiên em nộp lại được không ạ?", replies: 2 },
+  { id: "d2", author: "Cô Nguyễn Thị Hoa", role: "Giáo viên", at: "18/08 10:04", text: "Các em xem lại video bài giảng phần phân số trước buổi học tới nhé.", replies: 4 },
+  { id: "d3", author: "Phạm Vũ Bình An", role: "Học sinh", at: "19/08 20:31", text: "Em chưa hiểu ví dụ 3 trong phiếu bài tập ạ.", replies: 1 },
+];
+
+function DiscussionSection({ subject }: { subject: string }) {
+  const [items, setItems] = useState<Discussion[]>(SEED_DISCUSSIONS);
+  const [text, setText] = useState("");
+
+  const send = () => {
+    const t = text.trim();
+    if (!t) return;
+    setItems((prev) => [
+      { id: `d${Date.now()}`, author: CURRENT_TEACHER.name, role: "Giáo viên", at: "Vừa xong", text: t, replies: 0 },
+      ...prev,
+    ]);
+    setText("");
+    toast.success("Đã đăng thảo luận");
+  };
+
+  return (
+    <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+      <h2 className="text-lg font-bold text-slate-800">Thảo luận — {subject}</h2>
+      <p className="text-sm text-slate-500 mt-0.5">Trao đổi giữa giáo viên và học sinh trong lớp học.</p>
+
+      <div className="mt-4 flex items-start gap-2">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={2}
+          placeholder="Nhập nội dung thảo luận gửi tới cả lớp..."
+          className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        />
+        <button
+          onClick={send}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          <Send className="h-4 w-4" /> Gửi
+        </button>
+      </div>
+
+      <ul className="mt-5 space-y-3">
+        {items.map((d) => (
+          <li key={d.id} className="rounded-xl border border-slate-200 p-4 hover:bg-slate-50 transition">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-slate-800 text-sm">{d.author}</span>
+              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                d.role === "Giáo viên" ? "bg-indigo-50 text-indigo-700" : "bg-slate-100 text-slate-600"
+              }`}>{d.role}</span>
+              <span className="text-xs text-slate-400">{d.at}</span>
+            </div>
+            <p className="mt-1.5 text-sm text-slate-700">{d.text}</p>
+            <div className="mt-2 text-xs font-semibold text-indigo-600">{d.replies} phản hồi</div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ============================ Tab: Học sinh ============================ */
+
+type ClassStudent = { id: string; name: string; code: string; lop: string; addedBy: string };
+
+const SEED_STUDENTS: ClassStudent[] = [
+  { id: "s1", name: "Lê Bảo An", code: "001319022540", lop: "4A", addedBy: "Cô Nguyễn Thị Hoa" },
+  { id: "s2", name: "Ngô Bảo An", code: "001219038735", lop: "4A", addedBy: "Cô Nguyễn Thị Hoa" },
+  { id: "s3", name: "Phạm Phương Mỹ An", code: "001319047229", lop: "4A", addedBy: "Cô Phùng Thuý Hằng" },
+  { id: "s4", name: "Phạm Vũ Bình An", code: "001219074235", lop: "4A", addedBy: "Cô Phùng Thuý Hằng" },
+  { id: "s5", name: "Nguyễn Thị Hà Anh", code: "001319033769", lop: "4A", addedBy: "Thầy Trần Minh Quân" },
+  { id: "s6", name: "Phạm Linh Anh", code: "001319015935", lop: "4A", addedBy: "Cô Nguyễn Thị Hoa" },
+];
+
+function ClassStudentsTab({ classInfo }: { classInfo: ClassInfo }) {
+  const isOwner = classInfo.teacher === CURRENT_TEACHER.name;
+  const [rows, setRows] = useState<ClassStudent[]>(SEED_STUDENTS);
+  const [q, setQ] = useState("");
+  const [target, setTarget] = useState<ClassStudent | null>(null);
+
+  const filtered = rows.filter(
+    (s) => !q.trim() || s.name.toLowerCase().includes(q.toLowerCase()) || s.code.includes(q.trim()),
+  );
+
+  const canDelete = (s: ClassStudent) => isOwner || s.addedBy === CURRENT_TEACHER.name;
+
+  return (
+    <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">Học sinh lớp {classInfo.lop}</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {isOwner
+              ? "Bạn là giáo viên tạo lớp — có toàn quyền xóa học sinh trong lớp."
+              : "Bạn là giáo viên phụ trách — chỉ xóa được học sinh do bạn thêm vào."}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            to="/lop-hoc-so/$classId/hoc-sinh"
+            params={{ classId: classInfo.id }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          >
+            <Users className="h-4 w-4" /> Quản lý tài khoản
+          </Link>
+          <button
+            onClick={() => {
+              const id = `s${Date.now()}`;
+              setRows((p) => [
+                ...p,
+                { id, name: `Học sinh mới ${p.length + 1}`, code: "0013190000" + (p.length + 1), lop: classInfo.lop, addedBy: CURRENT_TEACHER.name },
+              ]);
+              toast.success("Đã thêm học sinh vào lớp");
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+          >
+            <UserPlus className="h-4 w-4" /> Thêm học sinh
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 max-w-sm">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Tìm tên học sinh / mã học sinh"
+          className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        />
+      </div>
+
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-slate-500 border-b border-slate-200">
+              <th className="py-2 px-3 font-semibold">STT</th>
+              <th className="py-2 px-3 font-semibold">Họ và tên</th>
+              <th className="py-2 px-3 font-semibold">Mã học sinh</th>
+              <th className="py-2 px-3 font-semibold">Lớp</th>
+              <th className="py-2 px-3 font-semibold">Người thêm</th>
+              <th className="py-2 px-3 font-semibold text-center">Xóa khỏi lớp</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {filtered.map((s, i) => (
+              <tr key={s.id} className="hover:bg-slate-50">
+                <td className="py-2.5 px-3 text-slate-500">{String(i + 1).padStart(2, "0")}</td>
+                <td className="py-2.5 px-3 font-medium text-slate-800">{s.name}</td>
+                <td className="py-2.5 px-3 text-slate-600">{s.code}</td>
+                <td className="py-2.5 px-3 text-slate-600">{s.lop}</td>
+                <td className="py-2.5 px-3 text-slate-600">{s.addedBy}</td>
+                <td className="py-2.5 px-3 text-center">
+                  {canDelete(s) ? (
+                    <button
+                      onClick={() => setTarget(s)}
+                      title="Xóa học sinh khỏi lớp"
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-rose-600 hover:bg-rose-50"
+                    >
+                      <UserMinus className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <span
+                      title={`Học sinh do ${s.addedBy} thêm — bạn không có quyền xóa`}
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-lg text-slate-300"
+                    >
+                      <Lock className="h-4 w-4" />
+                    </span>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="py-8 text-center text-slate-400 italic">Không có học sinh phù hợp.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Dialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-800">Xóa học sinh khỏi lớp</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-700">
+            Bạn xác nhận xóa <b>{target?.name}</b> khỏi lớp học? Học sinh sẽ không còn thấy nội dung của lớp.
+          </p>
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <button onClick={() => setTarget(null)} className="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50">
+              Hủy
+            </button>
+            <button
+              onClick={() => {
+                if (target) {
+                  setRows((p) => p.filter((x) => x.id !== target.id));
+                  toast.success(`Đã xóa ${target.name} khỏi lớp`);
+                }
+                setTarget(null);
+              }}
+              className="px-4 py-2 text-sm font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700"
+            >
+              Xác nhận
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
