@@ -304,12 +304,56 @@ function ClassDetailPage() {
           </div>
         </div>
       </section>
+      {/* Main tabs */}
+      <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm px-2 pt-2">
+        <div className="flex items-center gap-1 overflow-x-auto">
+          {MAIN_TABS.map((t) => {
+            const active = tab === t.key;
+            const count = t.key === "tests" ? 12 : t.key === "discuss" ? 5 : t.key === "students" ? info.students : null;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg whitespace-nowrap border-b-2 transition ${
+                  active
+                    ? "border-indigo-600 text-indigo-700 bg-indigo-50/60"
+                    : "border-transparent text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                <t.Icon className="h-4 w-4" />
+                {t.label}
+                {count !== null && (
+                  <span className={`text-xs font-bold ${active ? "text-indigo-600" : "text-slate-400"}`}>{count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
+        {(info.subjectsTaught?.length ?? 0) > 1 && (
+          <div className="flex items-center gap-1 border-t border-slate-100 px-2 py-2 overflow-x-auto">
+            {info.subjectsTaught.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSelectedSubject(s)}
+                className={`px-3 py-1.5 text-sm font-semibold rounded-lg whitespace-nowrap transition ${
+                  selectedSubject === s
+                    ? "bg-indigo-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
+      {tab === "tests" && <TestsSection classInfo={info} />}
+      {tab === "discuss" && <DiscussionSection subject={selectedSubject} />}
+      {tab === "students" && <ClassStudentsTab classInfo={info} />}
 
-
-
-
+      {tab === "content" && (<>
       {/* White content section */}
       <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
