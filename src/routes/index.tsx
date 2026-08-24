@@ -287,9 +287,51 @@ function findEveningSlot(startAt: string): { week: number; day: number } | null 
   return null;
 }
 
+/** Dịch chuyển lịch theo "seed" để mô phỏng lịch báo giảng của giáo viên khác. */
+function shiftGrid(g: WeekGrid, seed: number): WeekGrid {
+  if (!seed) return g;
+  const out: WeekGrid = {};
+  for (const wk of Object.keys(g)) {
+    const w = Number(wk);
+    out[w] = {};
+    for (let d = 0; d < 7; d++) {
+      out[w][d] = {};
+      for (let p = 1; p <= 10; p++) out[w][d][p] = null;
+    }
+  }
+  for (const wk of Object.keys(g)) {
+    const w = Number(wk);
+    for (let d = 0; d < 7; d++) {
+      for (let p = 1; p <= 10; p++) {
+        const les = g[w][d][p];
+        if (!les) continue;
+        const nd = (d + seed) % 6;
+        const np = ((p - 1 + seed) % 8) + 1;
+        if (!out[w][nd][np]) out[w][nd][np] = les;
+        else out[w][d][p] = les;
+      }
+    }
+  }
+  return out;
+}
+
 function TeacherHome() {
-  const [grid, setGrid] = useState<WeekGrid>(() => buildGrid());
+  return <TeacherHomeView />;
+}
+
+export function TeacherHomeView({
+  role = "teacher",
+  teacherPicker,
+  teacherSeed = 0,
+}: {
+  role?: "teacher" | "principal";
+  teacherPicker?: React.ReactNode;
+  teacherSeed?: number;
+}) {
+  const [grid, setGrid] = useState<WeekGrid>(() => shiftGrid(buildGrid(), teacherSeed));
+  useEffect(() => { setGrid(shiftGrid(buildGrid(), teacherSeed)); }, [teacherSeed]);
   const [weekIdx, setWeekIdx] = useState(30); // Tuần 30 (cuối tháng 3) — nơi có sẵn dữ liệu demo
+
   const [classFilter, setClassFilter] = useState<"ALL" | ClassId>("ALL");
   const [showTree, setShowTree] = useState(false);
   const [focusUnit, setFocusUnit] = useState<string | null>(null);
@@ -347,10 +389,11 @@ function TeacherHome() {
   };
 
   return (
-    <AppShell>
+    <AppShell role={role}>
       <>
 
-          <DashboardSection />
+          {role !== "principal" && <DashboardSection />}
+
 
           {/* Schedule Section */}
           <section className="bg-white rounded-2xl border shadow-sm">
@@ -412,7 +455,10 @@ function TeacherHome() {
                   <Database className="h-4 w-4" /> Cập nhật từ CSDL
                 </Button>
               </div>
+              <div className="flex flex-col items-end gap-2">
+              {teacherPicker}
               <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
+
                 <Button variant="ghost" size="icon" className="h-7 w-7"
                   onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
                   <ChevronLeft className="h-4 w-4" />
@@ -443,6 +489,8 @@ function TeacherHome() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+              </div>
+
 
             </div>
 

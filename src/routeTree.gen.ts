@@ -39,6 +39,7 @@ import { Route as HocSinhHocLieuRouteImport } from './routes/hoc-sinh.hoc-lieu'
 import { Route as HocLieuNganHangCauHoiRouteImport } from './routes/hoc-lieu.ngan-hang-cau-hoi'
 import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc-lieu'
 import { Route as HocLieuDeKiemTraRouteImport } from './routes/hoc-lieu.de-kiem-tra'
+import { Route as HieuTruongLichBaoGiangRouteImport } from './routes/hieu-truong.lich-bao-giang'
 import { Route as HeThongDanhMucRouteImport } from './routes/he-thong.danh-muc'
 import { Route as GiaoBaiTapTaskIdRouteImport } from './routes/giao-bai-tap.$taskId'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -215,6 +216,11 @@ const HocLieuDeKiemTraRoute = HocLieuDeKiemTraRouteImport.update({
   path: '/hoc-lieu/de-kiem-tra',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HieuTruongLichBaoGiangRoute = HieuTruongLichBaoGiangRouteImport.update({
+  id: '/lich-bao-giang',
+  path: '/lich-bao-giang',
+  getParentRoute: () => HieuTruongRoute,
+} as any)
 const HeThongDanhMucRoute = HeThongDanhMucRouteImport.update({
   id: '/he-thong/danh-muc',
   path: '/he-thong/danh-muc',
@@ -355,7 +361,7 @@ const HocLieuBanQuyenTaoMoiModeRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/giao-bai-tap': typeof GiaoBaiTapRouteWithChildren
-  '/hieu-truong': typeof HieuTruongRoute
+  '/hieu-truong': typeof HieuTruongRouteWithChildren
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
@@ -365,6 +371,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
+  '/hieu-truong/lich-bao-giang': typeof HieuTruongLichBaoGiangRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
@@ -411,13 +418,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/hieu-truong': typeof HieuTruongRoute
+  '/hieu-truong': typeof HieuTruongRouteWithChildren
   '/mcp': typeof McpRoute
   '/thong-ke': typeof ThongKeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
+  '/hieu-truong/lich-bao-giang': typeof HieuTruongLichBaoGiangRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
@@ -466,7 +474,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/giao-bai-tap': typeof GiaoBaiTapRouteWithChildren
-  '/hieu-truong': typeof HieuTruongRoute
+  '/hieu-truong': typeof HieuTruongRouteWithChildren
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
   '/lop-truc-tuyen': typeof LopTrucTuyenRouteWithChildren
@@ -476,6 +484,7 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
+  '/hieu-truong/lich-bao-giang': typeof HieuTruongLichBaoGiangRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
@@ -535,6 +544,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
+    | '/hieu-truong/lich-bao-giang'
     | '/hoc-lieu/de-kiem-tra'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-lieu/ngan-hang-cau-hoi'
@@ -588,6 +598,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
+    | '/hieu-truong/lich-bao-giang'
     | '/hoc-lieu/de-kiem-tra'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-lieu/ngan-hang-cau-hoi'
@@ -645,6 +656,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
+    | '/hieu-truong/lich-bao-giang'
     | '/hoc-lieu/de-kiem-tra'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-lieu/ngan-hang-cau-hoi'
@@ -693,7 +705,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GiaoBaiTapRoute: typeof GiaoBaiTapRouteWithChildren
-  HieuTruongRoute: typeof HieuTruongRoute
+  HieuTruongRoute: typeof HieuTruongRouteWithChildren
   HocSinhRoute: typeof HocSinhRouteWithChildren
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
   LopTrucTuyenRoute: typeof LopTrucTuyenRouteWithChildren
@@ -938,6 +950,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocLieuDeKiemTraRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hieu-truong/lich-bao-giang': {
+      id: '/hieu-truong/lich-bao-giang'
+      path: '/lich-bao-giang'
+      fullPath: '/hieu-truong/lich-bao-giang'
+      preLoaderRoute: typeof HieuTruongLichBaoGiangRouteImport
+      parentRoute: typeof HieuTruongRoute
+    }
     '/he-thong/danh-muc': {
       id: '/he-thong/danh-muc'
       path: '/he-thong/danh-muc'
@@ -1134,6 +1153,18 @@ const GiaoBaiTapRouteWithChildren = GiaoBaiTapRoute._addFileChildren(
   GiaoBaiTapRouteChildren,
 )
 
+interface HieuTruongRouteChildren {
+  HieuTruongLichBaoGiangRoute: typeof HieuTruongLichBaoGiangRoute
+}
+
+const HieuTruongRouteChildren: HieuTruongRouteChildren = {
+  HieuTruongLichBaoGiangRoute: HieuTruongLichBaoGiangRoute,
+}
+
+const HieuTruongRouteWithChildren = HieuTruongRoute._addFileChildren(
+  HieuTruongRouteChildren,
+)
+
 interface HocSinhRouteChildren {
   HocSinhHocLieuRoute: typeof HocSinhHocLieuRoute
   HocSinhKyThiChinhThucRoute: typeof HocSinhKyThiChinhThucRoute
@@ -1212,7 +1243,7 @@ const LopTrucTuyenRouteWithChildren = LopTrucTuyenRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GiaoBaiTapRoute: GiaoBaiTapRouteWithChildren,
-  HieuTruongRoute: HieuTruongRoute,
+  HieuTruongRoute: HieuTruongRouteWithChildren,
   HocSinhRoute: HocSinhRouteWithChildren,
   LopHocSoRoute: LopHocSoRouteWithChildren,
   LopTrucTuyenRoute: LopTrucTuyenRouteWithChildren,
