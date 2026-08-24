@@ -88,6 +88,7 @@ function ClassDetailPage() {
   const [editOpen, setEditOpen] = useState(false);
 
   const [selectedSubject, setSelectedSubject] = useState<string>(info.subject);
+  const [tab, setTab] = useState<MainTab>("content");
   const [status, setStatus] = useState<ClassStatus>(info.status);
   const [locked, setLocked] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<null | "deploy" | "lock" | "unlock">(null);
