@@ -6,7 +6,7 @@ import {
   ClipboardList, Video, School, Landmark,
   Grid3x3, FileCheck2, BookMarked, UserCog, UsersRound, SlidersHorizontal, Brain, Tag, HardDrive, Star,
   ChevronDown, Sparkles, Route as RouteIcon, BookOpen as BookOpenIcon,
-  CalendarDays, Share2, Database, FileBarChart, ShieldCheck,
+  CalendarDays, Share2, Database, FileBarChart, ShieldCheck, CalendarRange,
 } from "lucide-react";
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import studentAvatar from "@/assets/student-avatar.jpg";
@@ -142,6 +142,7 @@ const PRINCIPAL_NAV: NavItem[] = [
       { icon: UsersRound, label: "Học liệu chia sẻ" },
     ],
   },
+  { icon: CalendarRange, label: "Thời khóa\nbiểu trường", to: "/hieu-truong/thoi-khoa-bieu" },
   {
     icon: FolderKanban,
     label: "Kỳ thi",
@@ -175,11 +176,22 @@ const PRINCIPAL_NAV: NavItem[] = [
   },
 ];
 
-export type AppRole = "teacher" | "student" | "principal";
+const HOMEROOM_NAV: NavItem[] = TEACHER_NAV.map((it) =>
+  it.label === "Trang chủ" ? { ...it, to: "/gvcn" } : it,
+).flatMap((it) =>
+  it.label === "Kỳ thi"
+    ? [{ icon: CalendarRange, label: "Thời khóa\nbiểu", to: "/thoi-khoa-bieu" } as NavItem, it]
+    : [it],
+);
+
+export type AppRole = "teacher" | "student" | "principal" | "homeroom";
 
 export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const NAV = role === "student" ? STUDENT_NAV : role === "principal" ? PRINCIPAL_NAV : TEACHER_NAV;
+  const NAV = role === "student" ? STUDENT_NAV
+    : role === "principal" ? PRINCIPAL_NAV
+    : role === "homeroom" ? HOMEROOM_NAV
+    : TEACHER_NAV;
   return (
     <aside className="w-24 bg-slate-100 border-r flex flex-col items-center py-4 gap-1 shrink-0">
       <div className="w-16 h-16 flex items-center justify-center mb-1">
@@ -234,8 +246,9 @@ export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
 export function TopBar({ role = "teacher" }: { role?: AppRole }) {
   const isStudent = role === "student";
   const isPrincipal = role === "principal";
-  const name = isStudent ? "Phí Song Ngân" : isPrincipal ? "H/t Nguyễn Thị Mai Lan" : "G/v Phùng Thúy Hằng";
-  const subtitle = isStudent ? "Học sinh · Lớp 4A" : isPrincipal ? "Hiệu trưởng" : "Giáo viên";
+  const isHomeroom = role === "homeroom";
+  const name = isStudent ? "Phí Song Ngân" : isPrincipal ? "H/t Nguyễn Thị Mai Lan" : isHomeroom ? "GVCN Trần Bích Ngọc" : "G/v Phùng Thúy Hằng";
+  const subtitle = isStudent ? "Học sinh · Lớp 4A" : isPrincipal ? "Hiệu trưởng" : isHomeroom ? "Giáo viên chủ nhiệm · Lớp 4A" : "Giáo viên";
   const greeting = isStudent ? "Chào mừng," : "Xin chào,";
   const avatar = isStudent ? studentAvatar : isPrincipal ? principalAvatar : teacherAvatar;
   const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
@@ -311,6 +324,15 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
+              <Link to="/gvcn" className="flex items-center gap-2 cursor-pointer">
+                <img src={teacherAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Giáo viên chủ nhiệm</span>
+                  <span className="text-[11px] text-slate-500">Trần Bích Ngọc · 4A</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to="/hoc-sinh" className="flex items-center gap-2 cursor-pointer">
                 <img src={studentAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
                 <div className="flex flex-col">
@@ -340,6 +362,7 @@ export function AppShell({ children, role: roleProp }: { children: React.ReactNo
   const role: AppRole = roleProp
     ?? (pathname.startsWith("/hoc-sinh") ? "student"
       : pathname.startsWith("/hieu-truong") ? "principal"
+      : pathname.startsWith("/gvcn") || pathname.startsWith("/thoi-khoa-bieu") ? "homeroom"
       : "teacher");
   return (
     <div className="min-h-screen bg-slate-50 flex">
