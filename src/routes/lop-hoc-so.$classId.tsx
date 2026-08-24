@@ -73,6 +73,16 @@ export const CLASS_DB: Record<string, ClassInfo> = {
 };
 
 
+/* ============================ Tabs ============================ */
+
+type MainTab = "content" | "tests" | "discuss" | "students";
+const MAIN_TABS: { key: MainTab; label: string; Icon: typeof BookOpen }[] = [
+  { key: "content", label: "Nội dung giảng dạy", Icon: List },
+  { key: "tests", label: "Bài kiểm tra", Icon: FileText },
+  { key: "discuss", label: "Thảo luận", Icon: MessageSquare },
+  { key: "students", label: "Học sinh", Icon: Users },
+];
+
 /* ============================ Page ============================ */
 
 function ClassDetailPage() {
