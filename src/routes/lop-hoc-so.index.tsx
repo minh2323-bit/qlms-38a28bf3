@@ -19,6 +19,9 @@ import thumbLop3B from "@/assets/thumb-lop-3b.jpg";
 import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
 import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
 import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
+import {
+  CURRENT_TEACHER, isLeaderOrAbove, SCHOOL_SUBJECTS, assignableTeachers,
+} from "@/lib/teacher-permissions";
 
 export const Route = createFileRoute("/lop-hoc-so/")({
   head: () => ({
@@ -353,29 +356,20 @@ function CreateClassModal({
   // Step 1
   const autoCode = useMemo(() => (initial ? `LH-${initial.id.slice(-6).toUpperCase()}` : `LH-${Date.now().toString().slice(-6)}`), [initial]);
   const [tenLop, setTenLop] = useState(initial?.name ?? "");
-  const [ganLop, setGanLop] = useState(initial?.lop ?? "");
   const [moTa, setMoTa] = useState("");
   const [khoi, setKhoi] = useState("");
-  const [mon, setMon] = useState("");
+  const canPickAnySubject = isLeaderOrAbove();
+  const subjectOptions = canPickAnySubject ? SCHOOL_SUBJECTS : CURRENT_TEACHER.pccm;
+  const [monList, setMonList] = useState<string[]>(
+    canPickAnySubject ? [] : [...CURRENT_TEACHER.pccm],
+  );
+  const [coTeachers, setCoTeachers] = useState<string[]>([]);
   const [coverUrl, setCoverUrl] = useState<string | null>(initial?.thumb ?? null);
-
 
   // Step 2
   const [pickedClass, setPickedClass] = useState<string>(initial?.lop ?? "");
   const [selectedStudents, setSelectedStudents] = useState<Record<string, { name: string; code: string; lop: string }>>({});
   const [studentSearch, setStudentSearch] = useState("");
-
-  // Khi user chọn "Gán lớp học" ở bước 1 → tự đồng bộ lớp và tick full học sinh
-  useEffect(() => {
-    if (!ganLop) return;
-    setPickedClass(ganLop);
-    const list = genStudents(ganLop);
-    setSelectedStudents((prev) => {
-      const next = { ...prev };
-      list.forEach((s) => { next[s.id] = { name: s.name, code: s.code, lop: ganLop }; });
-      return next;
-    });
-  }, [ganLop]);
 
   const students = pickedClass ? genStudents(pickedClass) : [];
   const filteredStudents = students.filter((s) => !studentSearch || s.name.toLowerCase().includes(studentSearch.toLowerCase()) || s.code.includes(studentSearch));
@@ -401,14 +395,14 @@ function CreateClassModal({
     });
   };
 
-  const canNext = tenLop.trim().length > 0;
+  const canNext = tenLop.trim().length > 0 && monList.length > 0;
   const totalStudents = Object.keys(selectedStudents).length;
 
   const buildRow = (status: ClassStatus): ClassRow => ({
     id: generateId(),
     name: tenLop || "Lớp học mới",
-    lop: ganLop || pickedClass || "—",
-    subject: "Toán",
+    lop: pickedClass || "—",
+    subject: monList[0] ?? "Toán",
     baiGiang: 0,
     hocLieu: 0,
     hocSinh: totalStudents,
@@ -459,23 +453,6 @@ function CreateClassModal({
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </Field>
-              <Field label="Gán lớp học">
-                <div className="relative">
-                  <select
-                    value={ganLop}
-                    onChange={(e) => setGanLop(e.target.value)}
-                    className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  >
-                    <option value="">-- Gán lớp học số với 1 lớp học thực tế --</option>
-                    {TEACHER_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                  <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
-                <p className="mt-1 text-xs text-slate-500 italic">
-                  Chọn khi bạn muốn đồng bộ các học liệu của lớp lên lịch báo giảng
-                </p>
-              </Field>
-
               <Field label="Mô tả">
                 <input
                   value={moTa}
@@ -499,21 +476,34 @@ function CreateClassModal({
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
               </Field>
-              <Field label="Môn">
-                <div className="relative">
-                  <select
-                    value={mon}
-                    onChange={(e) => setMon(e.target.value)}
-                    className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  >
-                    <option value="">-- Chọn môn --</option>
-                    {["Toán", "Tiếng Việt", "Tiếng Anh", "Khoa học", "Lịch sử & Địa lý", "Đạo đức"].map((m) => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
+              <Field label="Môn" required>
+                <CheckboxDropdown
+                  values={monList}
+                  onChange={setMonList}
+                  options={subjectOptions}
+                  placeholder="-- Chọn môn học --"
+                  disabled={!canPickAnySubject}
+                />
+                <p className="mt-1 text-xs text-slate-500 italic">
+                  {canPickAnySubject
+                    ? "Tổ trưởng chuyên môn trở lên được chọn toàn bộ môn học của trường (chọn ít nhất 1 môn)."
+                    : "Lớp học của bạn mặc định theo môn được phân công chuyên môn (PCCM)."}
+                </p>
               </Field>
+
+              {canPickAnySubject && (
+                <Field label="Thêm giáo viên phụ trách">
+                  <CheckboxDropdown
+                    values={coTeachers}
+                    onChange={setCoTeachers}
+                    options={assignableTeachers().map((t) => t.name)}
+                    placeholder="-- Chọn giáo viên phụ trách --"
+                  />
+                  <p className="mt-1 text-xs text-slate-500 italic">
+                    GV được thêm có thể thêm nội dung và thêm học sinh (chỉ xóa được học sinh do mình thêm).
+                  </p>
+                </Field>
+              )}
               <div className="col-span-2">
                 <Field label="Ảnh nền">
                   <label className="flex items-center justify-center gap-2 h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-500 text-sm overflow-hidden">
@@ -686,5 +676,59 @@ function StepDot({ index, label, active, done, onClick }: { index: number; label
         {label}
       </span>
     </button>
+  );
+}
+
+/* ---------- Dropdown checkbox chọn nhiều ---------- */
+function CheckboxDropdown({
+  values, onChange, options, placeholder, disabled,
+}: {
+  values: string[];
+  onChange: (v: string[]) => void;
+  options: string[];
+  placeholder: string;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const toggle = (o: string) =>
+    onChange(values.includes(o) ? values.filter((v) => v !== o) : [...values, o]);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-left ${
+          disabled ? "bg-slate-50 text-slate-600 cursor-not-allowed" : "bg-white hover:border-indigo-300"
+        }`}
+      >
+        <span className={values.length ? "text-slate-800" : "text-slate-400"}>
+          {values.length ? values.join(", ") : placeholder}
+        </span>
+        <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+      </button>
+      {open && !disabled && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg p-1">
+            {options.map((o) => (
+              <label key={o} className="flex items-center gap-2 px-2.5 py-2 text-sm rounded-md hover:bg-slate-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={values.includes(o)}
+                  onChange={() => toggle(o)}
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                <span className="text-slate-700">{o}</span>
+              </label>
+            ))}
+            {options.length === 0 && (
+              <div className="px-3 py-3 text-sm text-slate-400 italic">Không có lựa chọn.</div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
