@@ -324,7 +324,7 @@ export function TeacherHomeView({
   teacherPicker,
   teacherSeed = 0,
 }: {
-  role?: "teacher" | "principal";
+  role?: "teacher" | "principal" | "homeroom";
   teacherPicker?: React.ReactNode;
   teacherSeed?: number;
 }) {
