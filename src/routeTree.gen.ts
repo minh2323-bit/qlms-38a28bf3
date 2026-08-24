@@ -15,6 +15,7 @@ import { Route as LopTrucTuyenRouteImport } from './routes/lop-truc-tuyen'
 import { Route as LopHocSoRouteImport } from './routes/lop-hoc-so'
 import { Route as HocSinhRouteImport } from './routes/hoc-sinh'
 import { Route as HieuTruongRouteImport } from './routes/hieu-truong'
+import { Route as GvcnRouteImport } from './routes/gvcn'
 import { Route as GiaoBaiTapRouteImport } from './routes/giao-bai-tap'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LopTrucTuyenIndexRouteImport } from './routes/lop-truc-tuyen.index'
@@ -94,6 +95,11 @@ const HocSinhRoute = HocSinhRouteImport.update({
 const HieuTruongRoute = HieuTruongRouteImport.update({
   id: '/hieu-truong',
   path: '/hieu-truong',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GvcnRoute = GvcnRouteImport.update({
+  id: '/gvcn',
+  path: '/gvcn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GiaoBaiTapRoute = GiaoBaiTapRouteImport.update({
@@ -361,6 +367,7 @@ const HocLieuBanQuyenTaoMoiModeRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/giao-bai-tap': typeof GiaoBaiTapRouteWithChildren
+  '/gvcn': typeof GvcnRoute
   '/hieu-truong': typeof HieuTruongRoute
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
@@ -418,6 +425,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gvcn': typeof GvcnRoute
   '/hieu-truong': typeof HieuTruongRoute
   '/mcp': typeof McpRoute
   '/thong-ke': typeof ThongKeRoute
@@ -474,6 +482,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/giao-bai-tap': typeof GiaoBaiTapRouteWithChildren
+  '/gvcn': typeof GvcnRoute
   '/hieu-truong': typeof HieuTruongRoute
   '/hoc-sinh': typeof HocSinhRouteWithChildren
   '/lop-hoc-so': typeof LopHocSoRouteWithChildren
@@ -534,6 +543,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/giao-bai-tap'
+    | '/gvcn'
     | '/hieu-truong'
     | '/hoc-sinh'
     | '/lop-hoc-so'
@@ -591,6 +601,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/gvcn'
     | '/hieu-truong'
     | '/mcp'
     | '/thong-ke'
@@ -646,6 +657,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/giao-bai-tap'
+    | '/gvcn'
     | '/hieu-truong'
     | '/hoc-sinh'
     | '/lop-hoc-so'
@@ -705,6 +717,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GiaoBaiTapRoute: typeof GiaoBaiTapRouteWithChildren
+  GvcnRoute: typeof GvcnRoute
   HieuTruongRoute: typeof HieuTruongRoute
   HocSinhRoute: typeof HocSinhRouteWithChildren
   LopHocSoRoute: typeof LopHocSoRouteWithChildren
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       path: '/hieu-truong'
       fullPath: '/hieu-truong'
       preLoaderRoute: typeof HieuTruongRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gvcn': {
+      id: '/gvcn'
+      path: '/gvcn'
+      fullPath: '/gvcn'
+      preLoaderRoute: typeof GvcnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/giao-bai-tap': {
@@ -1232,6 +1252,7 @@ const LopTrucTuyenRouteWithChildren = LopTrucTuyenRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GiaoBaiTapRoute: GiaoBaiTapRouteWithChildren,
+  GvcnRoute: GvcnRoute,
   HieuTruongRoute: HieuTruongRoute,
   HocSinhRoute: HocSinhRouteWithChildren,
   LopHocSoRoute: LopHocSoRouteWithChildren,
