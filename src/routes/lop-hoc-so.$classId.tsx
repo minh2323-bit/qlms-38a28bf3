@@ -4,6 +4,7 @@ import {
   ArrowLeft, Copy, Users, ChevronDown, ChevronRight, Plus, MoveVertical,
   Video, FileText, ClipboardList, BookOpen, Image as ImageIcon, Presentation,
   GripVertical, MoreVertical, Check, Pencil, Trash2, X, FileCheck2, Clock,
+  List, MessageSquare, Send, UserPlus, UserMinus, Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
