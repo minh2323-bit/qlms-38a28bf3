@@ -455,7 +455,10 @@ export function TeacherHomeView({
                   <Database className="h-4 w-4" /> Cập nhật từ CSDL
                 </Button>
               </div>
+              <div className="flex flex-col items-end gap-2">
+              {teacherPicker}
               <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
+
                 <Button variant="ghost" size="icon" className="h-7 w-7"
                   onClick={() => setWeekIdx(Math.max(1, weekIdx - 1))}>
                   <ChevronLeft className="h-4 w-4" />
