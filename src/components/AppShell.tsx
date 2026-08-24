@@ -117,7 +117,7 @@ const PRINCIPAL_NAV: NavItem[] = [
     icon: GraduationCap,
     label: "Hoạt động\ngiảng dạy",
     submenu: [
-      { icon: CalendarDays, label: "Lịch báo giảng", to: "/" },
+      { icon: CalendarDays, label: "Lịch báo giảng", to: "/hieu-truong/lich-bao-giang" },
       { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
       { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
