@@ -9,8 +9,6 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -24,6 +22,10 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
+import {
+  PickQuestionTypeModal, QuestionFormModal, QuestionTypeIcon,
+  QUESTION_TYPE_LABEL, type QuestionType, type QuestionDraft,
+} from "@/components/QuestionFormModal";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
@@ -36,7 +38,7 @@ export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
   component: NganHangCauHoiPage,
 });
 
-type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match" | "order";
+type QType = QuestionType;
 type Level = "Nhận biết" | "Thông hiểu" | "Vận dụng" | "Vận dụng cao";
 type ShareStatus = "none" | "pending" | "approved";
 
@@ -59,16 +61,7 @@ type Question = {
   tfItems?: TFItem[];
 };
 
-const TYPE_LABEL: Record<QType, string> = {
-  single: "Trắc nghiệm 1 đáp án",
-  multiple: "Trắc nghiệm nhiều đáp án",
-  essay: "Tự luận",
-  truefalse: "Đúng - Sai",
-  drag: "Kéo thả",
-  fill: "Điền khuyết",
-  match: "Nối",
-  order: "Sắp xếp",
-};
+const TYPE_LABEL = QUESTION_TYPE_LABEL;
 
 const LEVELS: Level[] = ["Nhận biết", "Thông hiểu", "Vận dụng", "Vận dụng cao"];
 const GRADES = ["1", "2", "3", "4", "5"];
@@ -128,18 +121,25 @@ function today() {
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 }
 
+/** Chuyển dữ liệu popup thêm mới thành câu hỏi trong ngân hàng của giáo viên. */
+function draftToQuestion(d: QuestionDraft): Question {
+  return {
+    id: `q_${Date.now()}`,
+    content: d.title || d.content,
+    type: d.type,
+    level: d.level as Level,
+    source: "Phùng Thúy Hằng",
+    updatedAt: today(),
+    grade: d.grade, subject: d.subject, chapter: d.chapter, lesson: d.lesson,
+    shareStatus: "none",
+    answers: d.answers,
+    tfTitle: d.type === "truefalse" ? d.content : undefined,
+    tfItems: d.tfItems,
+  };
+}
+
 function TypeIcon({ type }: { type: QType }) {
-  const map = {
-    single: <CircleDot className="h-4 w-4 text-indigo-600" />,
-    multiple: <CheckSquare className="h-4 w-4 text-violet-600" />,
-    essay: <FileText className="h-4 w-4 text-amber-600" />,
-    truefalse: <ToggleLeft className="h-4 w-4 text-emerald-600" />,
-    drag: <Move className="h-4 w-4 text-sky-600" />,
-    fill: <TextCursorInput className="h-4 w-4 text-teal-600" />,
-    match: <Link2 className="h-4 w-4 text-rose-600" />,
-    order: <ArrowUpDown className="h-4 w-4 text-fuchsia-600" />,
-  } as const;
-  return map[type];
+  return <QuestionTypeIcon type={type} />;
 }
 
 function ShareStatusTag({ status }: { status: ShareStatus }) {
@@ -443,7 +443,7 @@ function NganHangCauHoiPage() {
       </div>
 
       {/* Pick type modal */}
-      <PickTypeModal
+      <PickQuestionTypeModal
         open={pickType}
         onClose={() => setPickType(false)}
         onPick={(t) => { setPickType(false); setCreating(t); }}
@@ -454,10 +454,10 @@ function NganHangCauHoiPage() {
 
       {/* Create modal */}
       {creating && (
-        <CreateQuestionModal
+        <QuestionFormModal
           type={creating}
           onClose={() => setCreating(null)}
-          onSave={handleCreated}
+          onSave={(d) => handleCreated(draftToQuestion(d))}
         />
       )}
 
@@ -479,46 +479,6 @@ function NganHangCauHoiPage() {
         />
       )}
     </AppShell>
-  );
-}
-
-/* ─────────────────  Pick type modal  ───────────────── */
-function PickTypeModal({
-  open, onClose, onPick,
-}: { open: boolean; onClose: () => void; onPick: (t: QType) => void }) {
-  const options: { key: QType; title: string; desc: string; Icon: typeof CircleDot; bg: string; color: string }[] = [
-    { key: "single", title: "Trắc nghiệm 1 đáp án", desc: "Chọn 1 phương án đúng", Icon: CircleDot, bg: "bg-indigo-50", color: "text-indigo-600" },
-    { key: "multiple", title: "Trắc nghiệm nhiều đáp án", desc: "Chọn nhiều phương án đúng", Icon: CheckSquare, bg: "bg-violet-50", color: "text-violet-600" },
-    { key: "essay", title: "Tự luận", desc: "Học sinh trả lời tự luận", Icon: FileText, bg: "bg-amber-50", color: "text-amber-600" },
-    { key: "truefalse", title: "Đúng - Sai", desc: "Chọn Đ hoặc S cho từng mệnh đề", Icon: ToggleLeft, bg: "bg-emerald-50", color: "text-emerald-600" },
-    { key: "drag", title: "Kéo thả", desc: "Sắp xếp các mục theo thứ tự", Icon: Move, bg: "bg-sky-50", color: "text-sky-600" },
-    { key: "fill", title: "Điền khuyết", desc: "Điền từ vào chỗ trống", Icon: TextCursorInput, bg: "bg-teal-50", color: "text-teal-600" },
-    { key: "match", title: "Nối", desc: "Nối các đáp án tương ứng", Icon: Link2, bg: "bg-rose-50", color: "text-rose-600" },
-    { key: "order", title: "Sắp xếp", desc: "Sắp xếp các mục theo thứ tự đúng", Icon: ArrowUpDown, bg: "bg-fuchsia-50", color: "text-fuchsia-600" },
-  ];
-  return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle className="text-indigo-700">Chọn dạng câu hỏi</DialogTitle>
-        </DialogHeader>
-        <div className="grid grid-cols-3 gap-3">
-          {options.map(({ key, title, desc, Icon, bg, color }) => (
-            <button
-              key={key}
-              onClick={() => onPick(key)}
-              className="text-left rounded-xl border border-slate-200 p-4 hover:border-indigo-400 hover:shadow-md transition cursor-pointer"
-            >
-              <span className={`inline-flex h-11 w-11 rounded-xl items-center justify-center ${bg} mb-3`}>
-                <Icon className={`h-5 w-5 ${color}`} />
-              </span>
-              <div className="font-semibold text-slate-800 text-sm">{title}</div>
-              <div className="text-xs text-slate-500 mt-1">{desc}</div>
-            </button>
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -580,288 +540,6 @@ function ShareQuestionModal({
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Hủy</Button>
           <Button className="bg-indigo-600 hover:bg-indigo-700" onClick={() => onConfirm(questions.map((q) => q.id))}>Xác nhận</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-/* ─────────────────  Create question modal  ───────────────── */
-function CreateQuestionModal({
-  type, onClose, onSave,
-}: { type: QType; onClose: () => void; onSave: (q: Question) => void }) {
-  const [grade, setGrade] = useState("4");
-  const [subject, setSubject] = useState("Toán");
-  const [chapter, setChapter] = useState("");
-  const [lesson, setLesson] = useState("");
-  const [level, setLevel] = useState<Level>("Nhận biết");
-  const [content, setContent] = useState("");
-  const [shuffle, setShuffle] = useState(true);
-
-  const lessons = useMemo(
-    () => KNOWLEDGE_TREE.find((c) => c.id === chapter)?.units ?? [],
-    [chapter],
-  );
-
-  const [answers, setAnswers] = useState<Answer[]>([
-    { text: "", correct: false }, { text: "", correct: false },
-    { text: "", correct: false }, { text: "", correct: false },
-  ]);
-  const [tfTitle, setTfTitle] = useState("");
-  const [tfItems, setTfItems] = useState<TFItem[]>([
-    { text: "", correct: true },
-    { text: "", correct: true },
-    { text: "", correct: true },
-  ]);
-
-  const isSingle = type === "single";
-  const isMultiple = type === "multiple";
-  const isTF = type === "truefalse";
-  const isChoice = isSingle || isMultiple;
-
-  const setAnswer = (idx: number, patch: Partial<Answer>) => {
-    setAnswers((prev) => prev.map((a, i) => {
-      if (i !== idx) {
-        if (isSingle && patch.correct === true) return { ...a, correct: false };
-        return a;
-      }
-      return { ...a, ...patch };
-    }));
-  };
-  const addAnswer = () => setAnswers((p) => [...p, { text: "", correct: false }]);
-  const removeAnswer = (i: number) => setAnswers((p) => p.filter((_, idx) => idx !== i));
-
-  const setTf = (i: number, patch: Partial<TFItem>) =>
-    setTfItems((prev) => prev.map((t, idx) => idx === i ? { ...t, ...patch } : t));
-  const addTf = () => setTfItems((p) => [...p, { text: "", correct: true }]);
-  const removeTf = (i: number) => setTfItems((p) => p.filter((_, idx) => idx !== i));
-
-  const submit = () => {
-    if (!grade || !subject) return toast.error("Vui lòng chọn Khối và Môn học");
-    if (!chapter) return toast.error("Vui lòng chọn Chương học");
-    if (isTF && !tfTitle.trim()) return toast.error("Nhập tiêu đề nhóm câu hỏi Đúng - Sai");
-    if (!isTF && !content.trim()) return toast.error("Nhập nội dung câu hỏi");
-    if (isChoice && answers.filter((a) => a.text.trim()).length < 2) {
-      return toast.error("Cần ít nhất 2 phương án trả lời");
-    }
-    if (isChoice && !answers.some((a) => a.correct)) {
-      return toast.error("Chọn ít nhất 1 đáp án đúng");
-    }
-
-    const q: Question = {
-      id: `q_${Date.now()}`,
-      content: isTF ? tfTitle : content,
-      type,
-      level,
-      source: "Phùng Thúy Hằng",
-      updatedAt: today(),
-      grade, subject, chapter, lesson,
-      shareStatus: "none",
-      answers: isChoice ? answers.filter((a) => a.text.trim()) : undefined,
-      tfTitle: isTF ? tfTitle : undefined,
-      tfItems: isTF ? tfItems.filter((t) => t.text.trim()) : undefined,
-    };
-    onSave(q);
-  };
-
-  return (
-    <Dialog open onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-indigo-700">Thêm mới · {TYPE_LABEL[type]}</DialogTitle>
-        </DialogHeader>
-
-        <div className="grid grid-cols-12 gap-6">
-          {/* Left column */}
-          <div className="col-span-4 space-y-4">
-            <div>
-              <Label className="text-sm">Khối học <span className="text-rose-500">*</span></Label>
-              <Select value={grade} onValueChange={setGrade}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {GRADES.map((g) => <SelectItem key={g} value={g}>Khối {g}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-sm">Môn học <span className="text-rose-500">*</span></Label>
-              <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {SUBJECTS.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-sm">Chương học <span className="text-rose-500">*</span></Label>
-              <Select value={chapter} onValueChange={(v) => { setChapter(v); setLesson(""); }}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Chọn chương" /></SelectTrigger>
-                <SelectContent>
-                  {KNOWLEDGE_TREE.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-sm">Bài học</Label>
-              <Select value={lesson} onValueChange={setLesson} disabled={!chapter}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder={chapter ? "Chọn bài học" : "Chọn chương trước"} /></SelectTrigger>
-                <SelectContent>
-                  {lessons.map((u) => (
-                    <SelectItem key={u.id} value={u.id}>{u.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-sm">Chia sẻ nội bộ</Label>
-              <Select defaultValue="none">
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Không chia sẻ</SelectItem>
-                  <SelectItem value="school">Chia sẻ toàn trường</SelectItem>
-                  <SelectItem value="group">Chia sẻ tổ chuyên môn</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className="col-span-8 space-y-4">
-            <div>
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">
-                  {isTF ? "Tiêu đề nhóm câu hỏi" : "Nội dung câu hỏi"} <span className="text-rose-500">*</span>
-                </Label>
-                <div className="flex gap-1">
-                  {LEVELS.map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => setLevel(l)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
-                        level === l ? "bg-indigo-600 text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                      }`}
-                    >
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {isTF ? (
-                <Input
-                  value={tfTitle}
-                  onChange={(e) => setTfTitle(e.target.value)}
-                  placeholder="Ví dụ: Xét tính đúng - sai của các mệnh đề sau..."
-                  className="mt-2"
-                />
-              ) : (
-                <Textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Nhập nội dung câu hỏi..."
-                  className="mt-2 min-h-[120px]"
-                />
-              )}
-            </div>
-
-            {isChoice && (
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Label className="text-sm">Câu trả lời <span className="text-rose-500">*</span></Label>
-                  <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-                    <input type="checkbox" checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} className="accent-indigo-600" />
-                    Hoán vị đáp án
-                  </label>
-                </div>
-                <div className="space-y-2">
-                  {answers.map((a, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <span className="w-6 text-sm font-semibold text-slate-600">{String.fromCharCode(65 + i)}.</span>
-                      {isSingle ? (
-                        <input
-                          type="radio"
-                          checked={a.correct}
-                          onChange={() => setAnswer(i, { correct: true })}
-                          className="accent-indigo-600 h-4 w-4"
-                        />
-                      ) : (
-                        <input
-                          type="checkbox"
-                          checked={a.correct}
-                          onChange={(e) => setAnswer(i, { correct: e.target.checked })}
-                          className="accent-indigo-600 h-4 w-4"
-                        />
-                      )}
-                      <Input
-                        value={a.text}
-                        onChange={(e) => setAnswer(i, { text: e.target.value })}
-                        placeholder={`Phương án ${String.fromCharCode(65 + i)}`}
-                      />
-                      <button onClick={() => removeAnswer(i)} className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <Button variant="outline" onClick={addAnswer} className="mt-3 gap-1.5">
-                  <Plus className="h-4 w-4" /> Thêm câu trả lời
-                </Button>
-              </div>
-            )}
-
-            {isTF && (
-              <div>
-                <Label className="text-sm mb-2 block">Các mệnh đề <span className="text-rose-500">*</span></Label>
-                <div className="space-y-2">
-                  {tfItems.map((t, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <span className="w-6 text-sm font-semibold text-slate-600">{i + 1}.</span>
-                      <Input
-                        value={t.text}
-                        onChange={(e) => setTf(i, { text: e.target.value })}
-                        placeholder="Nhập mệnh đề..."
-                        className="flex-1"
-                      />
-                      <div className="flex items-center gap-1 border rounded-md overflow-hidden">
-                        <button
-                          onClick={() => setTf(i, { correct: true })}
-                          className={`px-3 py-1.5 text-xs font-semibold cursor-pointer transition ${
-                            t.correct ? "bg-emerald-600 text-white" : "bg-white text-slate-600 hover:bg-slate-100"
-                          }`}
-                        >Đ</button>
-                        <button
-                          onClick={() => setTf(i, { correct: false })}
-                          className={`px-3 py-1.5 text-xs font-semibold cursor-pointer transition ${
-                            !t.correct ? "bg-rose-600 text-white" : "bg-white text-slate-600 hover:bg-slate-100"
-                          }`}
-                        >S</button>
-                      </div>
-                      <button onClick={() => removeTf(i)} className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <Button variant="outline" onClick={addTf} className="mt-3 gap-1.5">
-                  <Plus className="h-4 w-4" /> Thêm mệnh đề
-                </Button>
-              </div>
-            )}
-
-            {!isChoice && !isTF && (
-              <div className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500 bg-slate-50">
-                Dạng câu hỏi <span className="font-semibold text-slate-700">{TYPE_LABEL[type]}</span> – nội dung sẽ được cấu hình trong biên tập chi tiết.
-              </div>
-            )}
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Đóng</Button>
-          <Button onClick={submit} className="bg-indigo-600 hover:bg-indigo-700">Ghi</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

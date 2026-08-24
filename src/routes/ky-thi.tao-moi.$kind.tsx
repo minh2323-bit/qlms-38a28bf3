@@ -80,6 +80,7 @@ const NEW_TYPES = [
   { label: "Trắc nghiệm 1 đáp án", icon: Target, cls: "bg-rose-50 text-rose-600" },
   { label: "Trắc nghiệm nhiều đáp án", icon: ListChecks, cls: "bg-emerald-50 text-emerald-600" },
   { label: "Tự luận", icon: TypeIcon, cls: "bg-slate-100 text-slate-600" },
+  { label: "Trả lời ngắn", icon: PenLine, cls: "bg-orange-50 text-orange-600" },
   { label: "Kéo thả", icon: GripVertical, cls: "bg-violet-50 text-violet-600" },
   { label: "Điền khuyết", icon: PenLine, cls: "bg-amber-50 text-amber-600" },
   { label: "Đúng/Sai", icon: ToggleLeft, cls: "bg-sky-50 text-sky-600" },

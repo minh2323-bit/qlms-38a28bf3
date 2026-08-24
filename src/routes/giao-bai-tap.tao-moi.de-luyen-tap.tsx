@@ -81,11 +81,12 @@ const STUDENT_DB: Record<string, Student[]> = {
 };
 
 /* ---------- Types ---------- */
-type QKind = "single" | "multi" | "essay" | "drag" | "fill" | "match" | "order";
+type QKind = "single" | "multi" | "essay" | "short" | "drag" | "fill" | "match" | "order";
 const Q_LABEL: Record<QKind, string> = {
   single: "Trắc nghiệm 1 đáp án",
   multi: "Trắc nghiệm nhiều đáp án",
   essay: "Tự luận",
+  short: "Trả lời ngắn",
   drag: "Kéo thả",
   fill: "Điền khuyết",
   match: "Nối",
@@ -95,6 +96,7 @@ const Q_BADGE: Record<QKind, string> = {
   single: "bg-indigo-100 text-indigo-700",
   multi: "bg-violet-100 text-violet-700",
   essay: "bg-amber-100 text-amber-700",
+  short: "bg-orange-100 text-orange-700",
   drag: "bg-sky-100 text-sky-700",
   fill: "bg-emerald-100 text-emerald-700",
   match: "bg-rose-100 text-rose-700",
