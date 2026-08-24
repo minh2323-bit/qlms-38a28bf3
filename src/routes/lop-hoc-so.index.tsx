@@ -453,23 +453,6 @@ function CreateClassModal({
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </Field>
-              <Field label="Gán lớp học">
-                <div className="relative">
-                  <select
-                    value={ganLop}
-                    onChange={(e) => setGanLop(e.target.value)}
-                    className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  >
-                    <option value="">-- Gán lớp học số với 1 lớp học thực tế --</option>
-                    {TEACHER_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                  <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
-                <p className="mt-1 text-xs text-slate-500 italic">
-                  Chọn khi bạn muốn đồng bộ các học liệu của lớp lên lịch báo giảng
-                </p>
-              </Field>
-
               <Field label="Mô tả">
                 <input
                   value={moTa}
@@ -493,21 +476,34 @@ function CreateClassModal({
                   <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
               </Field>
-              <Field label="Môn">
-                <div className="relative">
-                  <select
-                    value={mon}
-                    onChange={(e) => setMon(e.target.value)}
-                    className="appearance-none w-full rounded-lg border border-slate-200 bg-white px-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  >
-                    <option value="">-- Chọn môn --</option>
-                    {["Toán", "Tiếng Việt", "Tiếng Anh", "Khoa học", "Lịch sử & Địa lý", "Đạo đức"].map((m) => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
+              <Field label="Môn" required>
+                <CheckboxDropdown
+                  values={monList}
+                  onChange={setMonList}
+                  options={subjectOptions}
+                  placeholder="-- Chọn môn học --"
+                  disabled={!canPickAnySubject}
+                />
+                <p className="mt-1 text-xs text-slate-500 italic">
+                  {canPickAnySubject
+                    ? "Tổ trưởng chuyên môn trở lên được chọn toàn bộ môn học của trường (chọn ít nhất 1 môn)."
+                    : "Lớp học của bạn mặc định theo môn được phân công chuyên môn (PCCM)."}
+                </p>
               </Field>
+
+              {canPickAnySubject && (
+                <Field label="Thêm giáo viên phụ trách">
+                  <CheckboxDropdown
+                    values={coTeachers}
+                    onChange={setCoTeachers}
+                    options={assignableTeachers().map((t) => t.name)}
+                    placeholder="-- Chọn giáo viên phụ trách --"
+                  />
+                  <p className="mt-1 text-xs text-slate-500 italic">
+                    GV được thêm có thể thêm nội dung và thêm học sinh (chỉ xóa được học sinh do mình thêm).
+                  </p>
+                </Field>
+              )}
               <div className="col-span-2">
                 <Field label="Ảnh nền">
                   <label className="flex items-center justify-center gap-2 h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 cursor-pointer text-slate-500 text-sm overflow-hidden">
