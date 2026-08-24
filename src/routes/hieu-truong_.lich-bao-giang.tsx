@@ -6,7 +6,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/hieu-truong/lich-bao-giang")({
+export const Route = createFileRoute("/hieu-truong_/lich-bao-giang")({
   head: () => ({
     meta: [
       { title: "Lịch báo giảng – Hiệu trưởng | QLMS" },
