@@ -1,7 +1,7 @@
 // Hằng số & tiện ích dùng chung cho Ngân hàng câu hỏi kỳ thi và Đề thi kỳ thi.
 import { KNOWLEDGE_TREE } from "@/lib/knowledge-tree";
 
-export type QType = "single" | "multiple" | "essay" | "truefalse" | "drag" | "fill" | "match" | "order";
+export type QType = "single" | "multiple" | "essay" | "short" | "truefalse" | "drag" | "fill" | "match" | "order";
 export type Level = "Nhận biết" | "Thông hiểu" | "Vận dụng" | "Vận dụng cao";
 export type ApprovalStatus = "pending" | "approved" | "rejected";
 
@@ -9,6 +9,7 @@ export const TYPE_LABEL: Record<QType, string> = {
   single: "Trắc nghiệm 1 đáp án",
   multiple: "Trắc nghiệm nhiều đáp án",
   essay: "Tự luận",
+  short: "Trả lời ngắn",
   truefalse: "Đúng - Sai",
   drag: "Kéo thả",
   fill: "Điền khuyết",
