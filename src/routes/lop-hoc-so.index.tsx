@@ -678,3 +678,57 @@ function StepDot({ index, label, active, done, onClick }: { index: number; label
     </button>
   );
 }
+
+/* ---------- Dropdown checkbox chọn nhiều ---------- */
+function CheckboxDropdown({
+  values, onChange, options, placeholder, disabled,
+}: {
+  values: string[];
+  onChange: (v: string[]) => void;
+  options: string[];
+  placeholder: string;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const toggle = (o: string) =>
+    onChange(values.includes(o) ? values.filter((v) => v !== o) : [...values, o]);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-left ${
+          disabled ? "bg-slate-50 text-slate-600 cursor-not-allowed" : "bg-white hover:border-indigo-300"
+        }`}
+      >
+        <span className={values.length ? "text-slate-800" : "text-slate-400"}>
+          {values.length ? values.join(", ") : placeholder}
+        </span>
+        <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+      </button>
+      {open && !disabled && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg p-1">
+            {options.map((o) => (
+              <label key={o} className="flex items-center gap-2 px-2.5 py-2 text-sm rounded-md hover:bg-slate-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={values.includes(o)}
+                  onChange={() => toggle(o)}
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                <span className="text-slate-700">{o}</span>
+              </label>
+            ))}
+            {options.length === 0 && (
+              <div className="px-3 py-3 text-sm text-slate-400 italic">Không có lựa chọn.</div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
