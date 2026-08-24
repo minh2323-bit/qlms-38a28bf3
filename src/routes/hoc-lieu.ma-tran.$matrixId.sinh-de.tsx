@@ -13,7 +13,6 @@ import {
 import {
   ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown, ChevronUp,
   CheckSquare, FileText, ToggleLeft, Move, TextCursorInput, Link2, ArrowUpDown,
-  PenLine as PenLineIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
