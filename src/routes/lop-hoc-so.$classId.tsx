@@ -467,9 +467,6 @@ function ClassDetailPage() {
         </div>
       </section>
 
-      {/* Bài kiểm tra */}
-      <TestsSection classInfo={info} />
-
       {/* Lớp học trực tuyến */}
       <section className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
         <div className="mb-3 flex items-start justify-between gap-3 flex-wrap">
@@ -495,7 +492,6 @@ function ClassDetailPage() {
         )}
       </section>
 
-
       {/* Hồ sơ giáo dục */}
       <EducationRecordsSection className={info.name} />
 
@@ -504,6 +500,9 @@ function ClassDetailPage() {
         subject={selectedSubject}
         teacherName={info.teacher}
       />
+      </>)}
+
+
 
 
 
