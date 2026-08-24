@@ -395,14 +395,14 @@ function CreateClassModal({
     });
   };
 
-  const canNext = tenLop.trim().length > 0;
+  const canNext = tenLop.trim().length > 0 && monList.length > 0;
   const totalStudents = Object.keys(selectedStudents).length;
 
   const buildRow = (status: ClassStatus): ClassRow => ({
     id: generateId(),
     name: tenLop || "Lớp học mới",
-    lop: ganLop || pickedClass || "—",
-    subject: "Toán",
+    lop: pickedClass || "—",
+    subject: monList[0] ?? "Toán",
     baiGiang: 0,
     hocLieu: 0,
     hocSinh: totalStudents,
