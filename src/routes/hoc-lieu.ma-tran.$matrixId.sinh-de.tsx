@@ -13,6 +13,7 @@ import {
 import {
   ArrowLeft, CircleDot, RefreshCw, PenLine, FileCheck2, Library, ChevronDown, ChevronUp,
   CheckSquare, FileText, ToggleLeft, Move, TextCursorInput, Link2, ArrowUpDown,
+  PenLine as PenLineIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -23,6 +24,7 @@ const QUESTION_TYPES = [
   { key: "single", label: "Trắc nghiệm 1 đáp án", Icon: CircleDot },
   { key: "multiple", label: "Trắc nghiệm nhiều đáp án", Icon: CheckSquare },
   { key: "essay", label: "Tự luận", Icon: FileText },
+  { key: "short", label: "Trả lời ngắn", Icon: PenLine },
   { key: "truefalse", label: "Đúng - Sai", Icon: ToggleLeft },
   { key: "drag", label: "Kéo thả", Icon: Move },
   { key: "fill", label: "Điền khuyết", Icon: TextCursorInput },
