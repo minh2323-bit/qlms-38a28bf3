@@ -389,10 +389,11 @@ export function TeacherHomeView({
   };
 
   return (
-    <AppShell>
+    <AppShell role={role}>
       <>
 
-          <DashboardSection />
+          {role !== "principal" && <DashboardSection />}
+
 
           {/* Schedule Section */}
           <section className="bg-white rounded-2xl border shadow-sm">
