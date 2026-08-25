@@ -41,6 +41,7 @@ import { Route as HocSinhHocLieuRouteImport } from './routes/hoc-sinh.hoc-lieu'
 import { Route as HocLieuNganHangCauHoiRouteImport } from './routes/hoc-lieu.ngan-hang-cau-hoi'
 import { Route as HocLieuKhoHocLieuRouteImport } from './routes/hoc-lieu.kho-hoc-lieu'
 import { Route as HocLieuDeKiemTraRouteImport } from './routes/hoc-lieu.de-kiem-tra'
+import { Route as HieuTruongThongKeTruongRouteImport } from './routes/hieu-truong_.thong-ke-truong'
 import { Route as HieuTruongThoiKhoaBieuRouteImport } from './routes/hieu-truong_.thoi-khoa-bieu'
 import { Route as HieuTruongLichBaoGiangRouteImport } from './routes/hieu-truong_.lich-bao-giang'
 import { Route as HeThongDanhMucRouteImport } from './routes/he-thong.danh-muc'
@@ -229,6 +230,11 @@ const HocLieuDeKiemTraRoute = HocLieuDeKiemTraRouteImport.update({
   path: '/hoc-lieu/de-kiem-tra',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HieuTruongThongKeTruongRoute = HieuTruongThongKeTruongRouteImport.update({
+  id: '/hieu-truong_/thong-ke-truong',
+  path: '/hieu-truong/thong-ke-truong',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HieuTruongThoiKhoaBieuRoute = HieuTruongThoiKhoaBieuRouteImport.update({
   id: '/hieu-truong_/thoi-khoa-bieu',
   path: '/hieu-truong/thoi-khoa-bieu',
@@ -393,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
   '/hieu-truong/lich-bao-giang': typeof HieuTruongLichBaoGiangRoute
   '/hieu-truong/thoi-khoa-bieu': typeof HieuTruongThoiKhoaBieuRoute
+  '/hieu-truong/thong-ke-truong': typeof HieuTruongThongKeTruongRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
@@ -450,6 +457,7 @@ export interface FileRoutesByTo {
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
   '/hieu-truong/lich-bao-giang': typeof HieuTruongLichBaoGiangRoute
   '/hieu-truong/thoi-khoa-bieu': typeof HieuTruongThoiKhoaBieuRoute
+  '/hieu-truong/thong-ke-truong': typeof HieuTruongThongKeTruongRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
@@ -512,6 +520,7 @@ export interface FileRoutesById {
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
   '/hieu-truong_/lich-bao-giang': typeof HieuTruongLichBaoGiangRoute
   '/hieu-truong_/thoi-khoa-bieu': typeof HieuTruongThoiKhoaBieuRoute
+  '/hieu-truong_/thong-ke-truong': typeof HieuTruongThongKeTruongRoute
   '/hoc-lieu/de-kiem-tra': typeof HocLieuDeKiemTraRoute
   '/hoc-lieu/kho-hoc-lieu': typeof HocLieuKhoHocLieuRoute
   '/hoc-lieu/ngan-hang-cau-hoi': typeof HocLieuNganHangCauHoiRoute
@@ -575,6 +584,7 @@ export interface FileRouteTypes {
     | '/he-thong/danh-muc'
     | '/hieu-truong/lich-bao-giang'
     | '/hieu-truong/thoi-khoa-bieu'
+    | '/hieu-truong/thong-ke-truong'
     | '/hoc-lieu/de-kiem-tra'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-lieu/ngan-hang-cau-hoi'
@@ -632,6 +642,7 @@ export interface FileRouteTypes {
     | '/he-thong/danh-muc'
     | '/hieu-truong/lich-bao-giang'
     | '/hieu-truong/thoi-khoa-bieu'
+    | '/hieu-truong/thong-ke-truong'
     | '/hoc-lieu/de-kiem-tra'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-lieu/ngan-hang-cau-hoi'
@@ -693,6 +704,7 @@ export interface FileRouteTypes {
     | '/he-thong/danh-muc'
     | '/hieu-truong_/lich-bao-giang'
     | '/hieu-truong_/thoi-khoa-bieu'
+    | '/hieu-truong_/thong-ke-truong'
     | '/hoc-lieu/de-kiem-tra'
     | '/hoc-lieu/kho-hoc-lieu'
     | '/hoc-lieu/ngan-hang-cau-hoi'
@@ -754,6 +766,7 @@ export interface RootRouteChildren {
   HeThongDanhMucRoute: typeof HeThongDanhMucRoute
   HieuTruongLichBaoGiangRoute: typeof HieuTruongLichBaoGiangRoute
   HieuTruongThoiKhoaBieuRoute: typeof HieuTruongThoiKhoaBieuRoute
+  HieuTruongThongKeTruongRoute: typeof HieuTruongThongKeTruongRoute
   HocLieuDeKiemTraRoute: typeof HocLieuDeKiemTraRoute
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
   HocLieuNganHangCauHoiRoute: typeof HocLieuNganHangCauHoiRoute
@@ -1002,6 +1015,13 @@ declare module '@tanstack/react-router' {
       path: '/hoc-lieu/de-kiem-tra'
       fullPath: '/hoc-lieu/de-kiem-tra'
       preLoaderRoute: typeof HocLieuDeKiemTraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hieu-truong_/thong-ke-truong': {
+      id: '/hieu-truong_/thong-ke-truong'
+      path: '/hieu-truong/thong-ke-truong'
+      fullPath: '/hieu-truong/thong-ke-truong'
+      preLoaderRoute: typeof HieuTruongThongKeTruongRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hieu-truong_/thoi-khoa-bieu': {
@@ -1306,6 +1326,7 @@ const rootRouteChildren: RootRouteChildren = {
   HeThongDanhMucRoute: HeThongDanhMucRoute,
   HieuTruongLichBaoGiangRoute: HieuTruongLichBaoGiangRoute,
   HieuTruongThoiKhoaBieuRoute: HieuTruongThoiKhoaBieuRoute,
+  HieuTruongThongKeTruongRoute: HieuTruongThongKeTruongRoute,
   HocLieuDeKiemTraRoute: HocLieuDeKiemTraRoute,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
   HocLieuNganHangCauHoiRoute: HocLieuNganHangCauHoiRoute,
