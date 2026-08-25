@@ -44,7 +44,10 @@ const PENDING_EXAMS_SEED: PendingExam[] = [
 const ROW1 = [
   { label: "HL đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
   { label: "BG đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
-  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600" },
+  {
+    label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
+    storage: { used: 324, total: 500 },
+  },
   {
     label: "Lượt sử dụng Học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
     sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
