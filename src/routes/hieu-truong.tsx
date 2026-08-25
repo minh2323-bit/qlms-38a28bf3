@@ -1,28 +1,22 @@
-import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Fragment, useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  PieChart, Pie, Cell,
+  ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
 } from "recharts";
 import {
-  Users, BookOpen, Video, ClipboardList, FileCheck2, AlertTriangle,
-  ShieldCheck, TrendingUp, CalendarCheck, Search, ArrowRight, CheckCircle2,
+  Video, BookOpen, HelpCircle, Crown, UserX, FileWarning,
+  CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User,
 } from "lucide-react";
 
 export const Route = createFileRoute("/hieu-truong")({
   head: () => ({
     meta: [
       { title: "Trang chủ Hiệu trưởng – Giám sát hoạt động giảng dạy | QLMS" },
-      { name: "description", content: "Bảng điều hành của Hiệu trưởng: theo dõi hoạt động hằng ngày của toàn bộ giáo viên trên LMS, tiến độ lịch báo giảng, học liệu, bài kiểm tra và các nội dung chờ duyệt." },
+      { name: "description", content: "Bảng điều hành của Hiệu trưởng: kỳ thi cần duyệt, thống kê hoạt động của trường trên EneStudy và tiến độ soạn nội dung theo tiết học của từng lớp." },
       { property: "og:title", content: "Trang chủ Hiệu trưởng – Giám sát hoạt động giảng dạy" },
-      { property: "og:description", content: "Theo dõi hoạt động hằng ngày của toàn bộ giáo viên trên LMS: lịch báo giảng, học liệu, bài kiểm tra và nội dung chờ duyệt." },
+      { property: "og:description", content: "Kỳ thi cần duyệt, thống kê hoạt động trường và tiến độ soạn nội dung theo lớp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,28 +25,34 @@ export const Route = createFileRoute("/hieu-truong")({
 });
 
 /* ---------------- Mock data ---------------- */
-const KPI = [
-  { label: "Giáo viên hoạt động hôm nay", value: "38/42", sub: "90% tổng số giáo viên", icon: Users, color: "bg-indigo-50 text-indigo-600" },
-  { label: "Tiết đã báo giảng hôm nay", value: "186", sub: "12 tiết chưa gán bài học", icon: CalendarCheck, color: "bg-sky-50 text-sky-600" },
-  { label: "Bài giảng mới trong tuần", value: "57", sub: "+14 so với tuần trước", icon: BookOpen, color: "bg-violet-50 text-violet-600" },
-  { label: "Học liệu tải lên trong tuần", value: "243", sub: "68 học liệu bản quyền", icon: Video, color: "bg-teal-50 text-teal-600" },
-  { label: "Bài tập / nhiệm vụ đã giao", value: "129", sub: "94 đã chấm xong", icon: ClipboardList, color: "bg-amber-50 text-amber-600" },
-  { label: "Bài kiểm tra đang mở", value: "18", sub: "6 kỳ thi ôn tập cấp trường", icon: FileCheck2, color: "bg-emerald-50 text-emerald-600" },
-  { label: "Nội dung chờ duyệt", value: "23", sub: "15 câu hỏi · 8 đề thi", icon: ShieldCheck, color: "bg-rose-50 text-rose-600" },
-  { label: "Giáo viên chưa hoạt động ≥ 3 ngày", value: "4", sub: "Cần nhắc nhở", icon: AlertTriangle, color: "bg-orange-50 text-orange-600" },
+type PendingExam = {
+  id: string; name: string; grade: string; subject: string; start: string; to: string;
+};
+
+const PENDING_EXAMS_SEED: PendingExam[] = [
+  { id: "e1", name: "[HEID] Ngoại ngữ - Ôn luyện", grade: "Khối 4", subject: "Tiếng Anh", start: "31/08/2026, 00:00", to: "/ky-thi/on-tap" },
+  { id: "e2", name: "Khảo sát giữa kỳ II – Toán 5", grade: "Khối 5", subject: "Toán", start: "12/09/2026, 07:30", to: "/ky-thi/chinh-thuc" },
+  { id: "e3", name: "Kiểm tra cuối kỳ – Tiếng Việt 3", grade: "Khối 3", subject: "Tiếng Việt", start: "20/09/2026, 08:00", to: "/ky-thi/chinh-thuc" },
 ];
 
-const WEEK_ACTIVITY = [
-  { day: "T2", "Bài giảng": 12, "Học liệu": 41, "Bài tập": 23 },
-  { day: "T3", "Bài giảng": 9, "Học liệu": 36, "Bài tập": 19 },
-  { day: "T4", "Bài giảng": 14, "Học liệu": 52, "Bài tập": 28 },
-  { day: "T5", "Bài giảng": 8, "Học liệu": 33, "Bài tập": 21 },
-  { day: "T6", "Bài giảng": 10, "Học liệu": 45, "Bài tập": 26 },
-  { day: "T7", "Bài giảng": 4, "Học liệu": 21, "Bài tập": 9 },
-  { day: "CN", "Bài giảng": 2, "Học liệu": 15, "Bài tập": 3 },
+const ROW1 = [
+  { label: "HL đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
+  { label: "BG đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
+  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600" },
+  {
+    label: "Lượt sử dụng Học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
+    sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
+  },
 ];
 
-const GROUP_SHARE = [
+const ROW2 = [
+  { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600" },
+  { label: "G/v chưa từng tạo nội dung", value: "3", icon: FileWarning, color: "bg-orange-50 text-orange-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
+  { label: "Tiết học chưa tạo nội dung", value: "127", icon: CalendarX2, color: "bg-violet-50 text-violet-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
+  { label: "Học sinh chưa tham gia học", value: "42", icon: GraduationCap, color: "bg-teal-50 text-teal-600", sub: "Số học sinh chưa từng tham gia học và làm bài trên LMS" },
+];
+
+const HL_SHARE = [
   { name: "Tổ Toán", value: 34, color: "#6366f1" },
   { name: "Tổ Tiếng Việt", value: 28, color: "#10b981" },
   { name: "Tổ Tiếng Anh", value: 18, color: "#0ea5e9" },
@@ -60,245 +60,219 @@ const GROUP_SHARE = [
   { name: "Tổ khác", value: 8, color: "#f43f5e" },
 ];
 
-type TeacherRow = {
-  name: string; group: string; grade: string;
-  lbg: string; lectures: number; materials: number; tasks: number; graded: string;
-  lastActive: string; status: "active" | "low" | "idle";
-};
-
-const TEACHERS: TeacherRow[] = [
-  { name: "Phùng Thúy Hằng", group: "Tổ Toán", grade: "Khối 4", lbg: "5/5", lectures: 4, materials: 18, tasks: 6, graded: "42/45", lastActive: "5 phút trước", status: "active" },
-  { name: "Nguyễn Thu Trang", group: "Tổ Tiếng Việt", grade: "Khối 3", lbg: "4/5", lectures: 3, materials: 12, tasks: 4, graded: "30/38", lastActive: "22 phút trước", status: "active" },
-  { name: "Lê Minh Đức", group: "Tổ Tiếng Anh", grade: "Khối 5", lbg: "5/5", lectures: 2, materials: 9, tasks: 5, graded: "51/51", lastActive: "1 giờ trước", status: "active" },
-  { name: "Trần Bích Ngọc", group: "Tổ Toán", grade: "Khối 3", lbg: "3/5", lectures: 1, materials: 4, tasks: 2, graded: "12/26", lastActive: "3 giờ trước", status: "low" },
-  { name: "Hoàng Văn Sơn", group: "Tổ Năng khiếu", grade: "Khối 1", lbg: "2/4", lectures: 0, materials: 2, tasks: 1, graded: "8/10", lastActive: "Hôm qua", status: "low" },
-  { name: "Đỗ Thanh Huyền", group: "Tổ Tiếng Việt", grade: "Khối 2", lbg: "5/5", lectures: 5, materials: 21, tasks: 7, graded: "60/60", lastActive: "12 phút trước", status: "active" },
-  { name: "Vũ Quang Hải", group: "Tổ Tiếng Anh", grade: "Khối 4", lbg: "0/4", lectures: 0, materials: 0, tasks: 0, graded: "0/14", lastActive: "4 ngày trước", status: "idle" },
-  { name: "Phạm Hồng Nhung", group: "Tổ Năng khiếu", grade: "Khối 5", lbg: "0/3", lectures: 0, materials: 1, tasks: 0, graded: "3/9", lastActive: "5 ngày trước", status: "idle" },
+const NHCH_SHARE = [
+  { name: "Tổ Toán", value: 41, color: "#6366f1" },
+  { name: "Tổ Tiếng Việt", value: 24, color: "#10b981" },
+  { name: "Tổ Tiếng Anh", value: 21, color: "#0ea5e9" },
+  { name: "Tổ Năng khiếu", value: 9, color: "#f59e0b" },
+  { name: "Tổ khác", value: 5, color: "#f43f5e" },
 ];
 
-const STATUS_META: Record<TeacherRow["status"], { label: string; cls: string }> = {
-  active: { label: "Hoạt động tốt", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  low: { label: "Hoạt động thấp", cls: "bg-amber-50 text-amber-700 border-amber-200" },
-  idle: { label: "Chưa hoạt động", cls: "bg-rose-50 text-rose-700 border-rose-200" },
-};
-
-const PENDING = [
-  { type: "Câu hỏi", title: "Bộ 15 câu hỏi Toán 4 – Phân số", author: "Trần Bích Ngọc", time: "Hôm nay 08:12", to: "/ky-thi/ngan-hang-cau-hoi" },
-  { type: "Đề thi", title: "Đề khảo sát giữa kỳ II – Tiếng Việt 3", author: "Nguyễn Thu Trang", time: "Hôm nay 07:40", to: "/ky-thi/de-thi" },
-  { type: "Đề thi", title: "Đề ôn tập cuối năm – Toán 5", author: "Lê Minh Đức", time: "Hôm qua 16:05", to: "/ky-thi/de-thi" },
-  { type: "Câu hỏi", title: "Bộ 8 câu hỏi Tiếng Anh 4 – Unit 12", author: "Vũ Quang Hải", time: "Hôm qua 14:22", to: "/ky-thi/ngan-hang-cau-hoi" },
+const DAYS = [
+  { label: "Thứ 2", date: "10/8/2026" },
+  { label: "Thứ 3", date: "11/8/2026" },
+  { label: "Thứ 4", date: "12/8/2026", today: true },
+  { label: "Thứ 5", date: "13/8/2026" },
+  { label: "Thứ 6", date: "14/8/2026" },
+  { label: "Thứ 7", date: "15/8/2026" },
 ];
+
+const GRADES = [1, 2, 3, 4, 5].map((g) => ({
+  grade: g,
+  classes: ["A", "B", "C", "D", "E", "G", "H"].map((s) => `${g}${s}`),
+}));
+
+/** Tiến độ soạn nội dung giả lập, ổn định theo tên lớp + ngày */
+function slotStat(cls: string, dayIdx: number) {
+  let h = dayIdx * 31;
+  for (const ch of cls) h = (h * 33 + ch.charCodeAt(0)) % 997;
+  const total = 3 + (h % 4); // 3..6
+  const done = Math.max(2, total - (h % 3));
+  return { done: Math.min(done, total), total };
+}
 
 /* ---------------- Page ---------------- */
 function PrincipalHome() {
-  const [q, setQ] = useState("");
-  const [group, setGroup] = useState("all");
-  const [status, setStatus] = useState("all");
+  const navigate = useNavigate();
+  const [pending, setPending] = useState<PendingExam[]>(PENDING_EXAMS_SEED);
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
 
-  const rows = useMemo(() => TEACHERS.filter((t) => {
-    if (q.trim() && !t.name.toLowerCase().includes(q.trim().toLowerCase())) return false;
-    if (group !== "all" && t.group !== group) return false;
-    if (status !== "all" && t.status !== status) return false;
-    return true;
-  }), [q, group, status]);
+  const removeExam = (id: string) => setPending((p) => p.filter((e) => e.id !== id));
+
+  const gradeBlocks = useMemo(() => GRADES, []);
 
   return (
     <AppShell role="principal">
-      {/* Header */}
-      <section className="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 py-5 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold">Bảng điều hành Hiệu trưởng</h1>
-          <p className="text-sm text-indigo-100 mt-1">
-            Tình hình hoạt động của toàn bộ giáo viên trên LMS – Trường Tiểu học Tô Hiệu · Năm học 2025 - 2026
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge className="bg-white/15 border border-white/30 text-white text-[12px] font-medium">
-            <ShieldCheck className="h-3.5 w-3.5 mr-1" /> Toàn quyền tạo kỳ thi &amp; đề thi (không cần duyệt)
-          </Badge>
-        </div>
-      </section>
-
-      {/* KPI */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {KPI.map((k) => (
-          <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3">
-            <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
-              <k.icon className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[13px] text-slate-500 leading-tight">{k.label}</p>
-              <p className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{k.value}</p>
-              <p className="text-[12px] text-slate-400 mt-0.5">{k.sub}</p>
-            </div>
+      {/* Kỳ thi cần duyệt */}
+      {pending.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-[15px] font-semibold text-slate-800">Kỳ thi cần duyệt</h2>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+            {pending.map((e) => (
+              <div
+                key={e.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate({ to: e.to })}
+                onKeyDown={(ev) => ev.key === "Enter" && navigate({ to: e.to })}
+                className="bg-white rounded-xl border p-4 flex flex-wrap items-center gap-3 cursor-pointer hover:border-indigo-300 hover:shadow-sm transition"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-bold text-slate-800 flex items-center gap-1.5 truncate">
+                    {e.name} <Crown className="h-4 w-4 text-amber-500 shrink-0" />
+                  </p>
+                  <p className="text-[13px] text-slate-500 mt-1">
+                    {e.grade} · {e.subject} · Bắt đầu: {e.start}
+                  </p>
+                  <p className="text-[13px] text-slate-500 mt-0.5 flex items-center gap-1">
+                    <User className="h-3.5 w-3.5" /> Người đề xuất: Nguyễn Tuấn Thành
+                  </p>
+                </div>
+                <div className="flex items-center gap-2" onClick={(ev) => ev.stopPropagation()}>
+                  <Button
+                    variant="outline"
+                    className="h-9 text-[13px] border-rose-200 text-rose-600 hover:bg-rose-50"
+                    onClick={() => removeExam(e.id)}
+                  >
+                    <X className="h-4 w-4 mr-1" /> Từ chối
+                  </Button>
+                  <Button className="h-9 text-[13px]" onClick={() => removeExam(e.id)}>
+                    <Check className="h-4 w-4 mr-1" /> Duyệt
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </section>
+        </section>
+      )}
 
-      {/* Charts */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border p-4 lg:col-span-2">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[15px] font-semibold text-slate-800">Hoạt động giáo viên trong tuần</h2>
-            <span className="text-[12px] text-slate-400 flex items-center gap-1">
-              <TrendingUp className="h-3.5 w-3.5" /> Toàn trường
-            </span>
-          </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={WEEK_ACTIVITY} barCategoryGap="22%">
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f7" />
-              <XAxis dataKey="day" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="Học liệu" fill="#6366f1" radius={[4, 4, 0, 0]} barSize={22} />
-              <Bar dataKey="Bài giảng" fill="#10b981" radius={[4, 4, 0, 0]} barSize={22} />
-              <Bar dataKey="Bài tập" fill="#f59e0b" radius={[4, 4, 0, 0]} barSize={22} />
-            </BarChart>
-          </ResponsiveContainer>
+      {/* Thống kê hoạt động của trường */}
+      <section className="space-y-3">
+        <h2 className="text-[15px] font-semibold text-slate-800">
+          Thống kê hoạt động của trường trên EneStudy
+        </h2>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[...ROW1, ...ROW2].map((k) => (
+            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3">
+              <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
+                <k.icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[13px] text-slate-500 leading-tight">{k.label}</p>
+                <p className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{k.value}</p>
+                {"sub" in k && k.sub && (
+                  <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="bg-white rounded-xl border p-4">
-          <h2 className="text-[15px] font-semibold text-slate-800 mb-2">Tỷ trọng đóng góp học liệu theo tổ</h2>
-          <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
-              <Pie data={GROUP_SHARE} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                {GROUP_SHARE.map((g) => <Cell key={g.name} fill={g.color} />)}
-              </Pie>
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v: number) => `${v}%`} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-            </PieChart>
-          </ResponsiveContainer>
+        {/* 2 biểu đồ tròn */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {[
+            { title: "HL đóng góp theo tổ môn", data: HL_SHARE },
+            { title: "NHCH đóng góp theo tổ môn", data: NHCH_SHARE },
+          ].map((c) => (
+            <div key={c.title} className="bg-white rounded-xl border p-4">
+              <h3 className="text-[15px] font-semibold text-slate-800 mb-2">{c.title}</h3>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie data={c.data} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
+                    {c.data.map((g) => <Cell key={g.name} fill={g.color} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v: number) => `${v}%`} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Teacher activity table */}
+      {/* Bảng TKB theo ngày */}
       <section className="bg-white rounded-xl border">
-        <div className="p-4 flex flex-wrap items-center gap-2 border-b">
-          <h2 className="text-[15px] font-semibold text-slate-800 mr-auto">Hoạt động của giáo viên hôm nay</h2>
-          <div className="relative">
-            <Search className="h-4 w-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-            <Input
-              value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Tìm theo tên giáo viên"
-              className="pl-8 h-9 w-56 text-[13px]"
-            />
-          </div>
-          <Select value={group} onValueChange={setGroup}>
-            <SelectTrigger className="h-9 w-44 text-[13px]"><SelectValue placeholder="Tổ chuyên môn" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả tổ chuyên môn</SelectItem>
-              {GROUP_SHARE.filter((g) => g.name !== "Tổ khác").map((g) => (
-                <SelectItem key={g.name} value={g.name}>{g.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="h-9 w-40 text-[13px]"><SelectValue placeholder="Trạng thái" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="active">Hoạt động tốt</SelectItem>
-              <SelectItem value="low">Hoạt động thấp</SelectItem>
-              <SelectItem value="idle">Chưa hoạt động</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button asChild variant="outline" className="h-9 text-[13px]">
-            <Link to="/thong-ke">Xem thống kê chi tiết <ArrowRight className="h-4 w-4 ml-1" /></Link>
-          </Button>
+        <div className="p-4 border-b flex flex-wrap items-center gap-2">
+          <h2 className="text-[15px] font-semibold text-slate-800 mr-auto">
+            Tiến độ soạn nội dung theo tiết học – Tuần 10/8 – 15/8/2026
+          </h2>
+          <span className="text-[12px] text-slate-400">Số tiết có ít nhất 1 nội dung / Tổng số tiết trong ngày</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
-                <th className="px-3 py-2 text-center font-semibold w-12">STT</th>
-                <th className="px-3 py-2 text-left font-semibold">Giáo viên</th>
-                <th className="px-3 py-2 text-left font-semibold">Tổ / Khối</th>
-                <th className="px-3 py-2 text-center font-semibold">Tiết đã báo giảng</th>
-                <th className="px-3 py-2 text-center font-semibold">Bài giảng mới</th>
-                <th className="px-3 py-2 text-center font-semibold">Học liệu tải lên</th>
-                <th className="px-3 py-2 text-center font-semibold">Bài tập đã giao</th>
-                <th className="px-3 py-2 text-center font-semibold">Tiến độ chấm</th>
-                <th className="px-3 py-2 text-left font-semibold">Truy cập gần nhất</th>
-                <th className="px-3 py-2 text-center font-semibold">Trạng thái</th>
+                <th className="px-3 py-2 text-left font-semibold w-24">Lớp</th>
+                {DAYS.map((d) => (
+                  <th key={d.label} className={`px-3 py-2 font-semibold text-center ${d.today ? "bg-indigo-50" : ""}`}>
+                    <div>{d.label}</div>
+                    <div className="text-[12px] font-normal text-slate-400">{d.date}</div>
+                    {d.today && (
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[11px]">
+                        Hôm nay
+                      </span>
+                    )}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((t, i) => (
-                <tr key={t.name} className="border-t hover:bg-slate-50/60">
-                  <td className="px-3 py-2 text-center text-slate-500">{i + 1}</td>
-                  <td className="px-3 py-2 font-semibold text-slate-800">{t.name}</td>
-                  <td className="px-3 py-2 text-slate-600">{t.group} · {t.grade}</td>
-                  <td className="px-3 py-2 text-center text-slate-700">{t.lbg}</td>
-                  <td className="px-3 py-2 text-center text-slate-700">{t.lectures}</td>
-                  <td className="px-3 py-2 text-center text-slate-700">{t.materials}</td>
-                  <td className="px-3 py-2 text-center text-slate-700">{t.tasks}</td>
-                  <td className="px-3 py-2 text-center text-slate-700">{t.graded}</td>
-                  <td className="px-3 py-2 text-slate-500">{t.lastActive}</td>
-                  <td className="px-3 py-2 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded-full border text-[12px] ${STATUS_META[t.status].cls}`}>
-                      {STATUS_META[t.status].label}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {!rows.length && (
-                <tr><td colSpan={10} className="px-3 py-8 text-center text-slate-400">Không có giáo viên phù hợp bộ lọc.</td></tr>
-              )}
+              {gradeBlocks.map((g) => {
+                const open = !!expanded[g.grade];
+                const shown = open ? g.classes : g.classes.slice(0, 5);
+                return (
+                  <Fragment key={g.grade}>
+                    <tr key={`h-${g.grade}`} className="bg-amber-50/60">
+                      <td colSpan={DAYS.length + 1} className="px-3 py-1.5 text-[13px] font-semibold text-amber-700">
+                        Khối {g.grade} · {g.classes.length} lớp
+                      </td>
+                    </tr>
+                    {shown.map((cls) => (
+                      <tr key={cls} className="border-t">
+                        <td className="px-3 py-2 font-semibold text-slate-800">{cls}</td>
+                        {DAYS.map((d, i) => {
+                          const { done, total } = slotStat(cls, i);
+                          const full = done === total;
+                          return (
+                            <td key={d.label} className="px-2 py-2">
+                              <div className={`rounded-lg border text-center py-2 ${
+                                full
+                                  ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                  : "bg-amber-50 border-amber-200 text-amber-700"
+                              }`}>
+                                <div className="font-bold">{done}/{total}</div>
+                                <div className="text-[12px]">tiết đã soạn</div>
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                    {g.classes.length > 5 && (
+                      <tr key={`m-${g.grade}`} className="border-t">
+                        <td colSpan={DAYS.length + 1} className="px-3 py-2 text-center">
+                          <Button
+                            variant="ghost"
+                            className="h-8 text-[13px] text-indigo-600"
+                            onClick={() => setExpanded((p) => ({ ...p, [g.grade]: !open }))}
+                          >
+                            {open ? (<>Thu gọn <ChevronUp className="h-4 w-4 ml-1" /></>)
+                              : (<>Xem thêm {g.classes.length - 5} lớp <ChevronDown className="h-4 w-4 ml-1" /></>)}
+                          </Button>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      </section>
-
-      {/* Pending approvals + reminders */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border lg:col-span-2">
-          <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-[15px] font-semibold text-slate-800">Nội dung giáo viên đề xuất chờ duyệt</h2>
-            <Badge variant="secondary" className="text-[12px]">{PENDING.length} mục mới</Badge>
-          </div>
-          <ul className="divide-y">
-            {PENDING.map((p) => (
-              <li key={p.title} className="px-4 py-3 flex items-center gap-3">
-                <span className={`px-2 py-0.5 rounded-full text-[12px] border shrink-0 ${
-                  p.type === "Đề thi" ? "bg-indigo-50 text-indigo-700 border-indigo-200" : "bg-sky-50 text-sky-700 border-sky-200"}`}>
-                  {p.type}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-semibold text-slate-800 truncate">{p.title}</p>
-                  <p className="text-[12px] text-slate-500">{p.author} · {p.time}</p>
-                </div>
-                <Button asChild size="sm" variant="outline" className="h-8 text-[12px]">
-                  <Link to={p.to}>Xem &amp; duyệt</Link>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="bg-white rounded-xl border p-4 space-y-3">
-          <h2 className="text-[15px] font-semibold text-slate-800">Cần lưu ý hôm nay</h2>
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-            <p className="text-[13px] font-semibold text-rose-700 flex items-center gap-1">
-              <AlertTriangle className="h-4 w-4" /> 4 giáo viên chưa hoạt động ≥ 3 ngày
-            </p>
-            <p className="text-[12px] text-rose-600 mt-1">Vũ Quang Hải, Phạm Hồng Nhung, và 2 giáo viên khác.</p>
-          </div>
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-            <p className="text-[13px] font-semibold text-amber-700 flex items-center gap-1">
-              <CalendarCheck className="h-4 w-4" /> 12 tiết báo giảng chưa gán bài học
-            </p>
-            <p className="text-[12px] text-amber-600 mt-1">Chủ yếu ở Khối 1 và Khối 5.</p>
-          </div>
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-            <p className="text-[13px] font-semibold text-emerald-700 flex items-center gap-1">
-              <CheckCircle2 className="h-4 w-4" /> 94/129 bài tập đã chấm xong
-            </p>
-            <p className="text-[12px] text-emerald-600 mt-1">Tỷ lệ chấm đúng hạn đạt 87%.</p>
-          </div>
-          <Button asChild className="w-full h-9 text-[13px]">
-            <Link to="/ky-thi/chinh-thuc">Tạo kỳ thi cấp trường</Link>
+        <div className="p-3 border-t text-right">
+          <Button asChild variant="outline" className="h-9 text-[13px]">
+            <Link to="/thong-ke">Xem thống kê chi tiết</Link>
           </Button>
         </div>
       </section>
