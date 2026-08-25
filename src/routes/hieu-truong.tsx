@@ -136,9 +136,10 @@ function PrincipalHome() {
                   >
                     <X className="h-4 w-4 mr-1" /> Từ chối
                   </Button>
-                  <Button className="h-9 text-[13px]" onClick={() => removeExam(e.id)}>
+                  <Button className="h-9 text-[13px] bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => removeExam(e.id)}>
                     <Check className="h-4 w-4 mr-1" /> Duyệt
                   </Button>
+
                 </div>
               </div>
             ))}
