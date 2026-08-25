@@ -184,7 +184,13 @@ function SchoolStatsPage() {
                 </div>
                 <div className="text-2xl font-black text-slate-800">{k.value}</div>
                 <div className="text-[13px] font-semibold text-slate-700 mt-1">{k.label}</div>
-                {"sub" in k && k.sub && <div className="text-xs text-slate-500 mt-0.5">{k.sub}</div>}
+                {k.growth !== undefined && (
+                  <div className={`mt-1.5 flex items-center gap-1 text-xs font-bold ${k.growth >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                    {k.growth >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                    <span>{Math.abs(k.growth).toLocaleString("vi-VN")} so với tháng trước</span>
+                  </div>
+                )}
+                {k.sub && <div className="text-xs text-slate-500 mt-0.5">{k.sub}</div>}
               </div>
             ))}
           </div>
