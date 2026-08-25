@@ -177,20 +177,35 @@ function PrincipalHome() {
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[...ROW1, ...ROW2].map((k) => (
-            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3">
+          {[...ROW1, ...ROW2].map((k) => {
+            const action = "action" in k ? k.action : undefined;
+            return (
+            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
                 <k.icon className="h-5 w-5" />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 pr-7">
                 <p className="text-[13px] text-slate-500 leading-tight">{k.label}</p>
                 <p className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{k.value}</p>
                 {"sub" in k && k.sub && (
                   <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
                 )}
               </div>
+              {action && (
+                <button
+                  type="button"
+                  aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
+                  title={action === "view-students" ? "Xem danh sách" : "Nhắc nhở"}
+                  onClick={() => setDialog(action)}
+                  className="absolute top-3 right-3 h-8 w-8 rounded-lg border flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-indigo-600"
+                >
+                  {action === "view-students" ? <Eye className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
+                </button>
+              )}
             </div>
-          ))}
+            );
+          })}
+
         </div>
 
         {/* 2 biểu đồ tròn */}
