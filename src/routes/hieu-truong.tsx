@@ -235,36 +235,54 @@ function PrincipalHome() {
 
         </div>
 
-        {/* 2 biểu đồ tròn */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {[
-            { title: "HL đóng góp theo tổ môn", data: HL_SHARE },
-            { title: "NHCH đóng góp theo tổ môn", data: NHCH_SHARE },
-          ].map((c) => (
-            <div key={c.title} className="bg-white rounded-xl border p-4">
-              <h3 className="text-[15px] font-semibold text-slate-800 mb-2">{c.title}</h3>
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie data={c.data} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                    {c.data.map((g) => <Cell key={g.name} fill={g.color} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v: number) => `${v}%`} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ))}
-        </div>
       </section>
 
-      {/* Bảng TKB theo ngày */}
-      <section className="bg-white rounded-xl border">
-        <div className="p-4 border-b flex flex-wrap items-center gap-2">
-          <h2 className="text-[15px] font-semibold text-slate-800 mr-auto">
-            Tiến độ soạn nội dung theo tiết học – Tuần 10/8 – 15/8/2026
-          </h2>
-          <span className="text-[12px] text-slate-400">Số tiết có ít nhất 1 nội dung / Tổng số tiết trong ngày</span>
-        </div>
+      {/* Tiến độ soạn nội dung cho tuần học */}
+      <section className="space-y-3">
+        <h2 className="text-[15px] font-semibold text-slate-800">
+          Tiến độ soạn nội dung cho tuần học
+        </h2>
+
+        <div className="bg-white rounded-xl border">
+          <div className="p-3 border-b flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1 rounded-lg border px-1 py-0.5">
+              <Button
+                variant="ghost" size="icon" className="h-8 w-8"
+                aria-label="Tuần trước"
+                disabled={weekIdx <= 1}
+                onClick={() => setWeekIdx((w) => Math.max(1, w - 1))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="px-2 text-center min-w-[190px]">
+                <div className="text-[13px] font-semibold text-slate-800">{week.label}</div>
+                <div className="text-[12px] text-slate-500">{week.range}</div>
+              </div>
+              <Button
+                variant="ghost" size="icon" className="h-8 w-8"
+                aria-label="Tuần sau"
+                disabled={weekIdx >= WEEKS.length}
+                onClick={() => setWeekIdx((w) => Math.min(WEEKS.length, w + 1))}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <Select value={grade} onValueChange={setGrade}>
+              <SelectTrigger className="h-9 w-[150px] text-[13px]">
+                <SelectValue placeholder="Lọc theo khối" />
+              </SelectTrigger>
+              <SelectContent>
+                {GRADES.map((g) => (
+                  <SelectItem key={g.grade} value={String(g.grade)}>Khối {g.grade}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <span className="ml-auto text-[12px] text-slate-400">
+              Số tiết có ít nhất 1 nội dung / Tổng số tiết trong ngày
+            </span>
+          </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
