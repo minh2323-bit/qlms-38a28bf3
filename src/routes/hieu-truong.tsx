@@ -195,7 +195,7 @@ function PrincipalHome() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[...ROW1, ...ROW2].map((k) => {
-            const action = "action" in k ? k.action : undefined;
+            const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | undefined;
             return (
             <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
