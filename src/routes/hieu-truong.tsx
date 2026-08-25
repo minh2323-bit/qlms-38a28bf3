@@ -46,11 +46,34 @@ const ROW1 = [
 ];
 
 const ROW2 = [
-  { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600" },
-  { label: "G/v chưa từng tạo nội dung", value: "3", icon: FileWarning, color: "bg-orange-50 text-orange-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
+  { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600", action: "remind-login" as const },
+  { label: "G/v chưa từng tạo nội dung", value: "3", icon: FileWarning, color: "bg-orange-50 text-orange-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra", action: "remind-content" as const },
   { label: "Tiết học chưa tạo nội dung", value: "127", icon: CalendarX2, color: "bg-violet-50 text-violet-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
-  { label: "Học sinh chưa tham gia học", value: "42", icon: GraduationCap, color: "bg-teal-50 text-teal-600", sub: "Số học sinh chưa từng tham gia học và làm bài trên LMS" },
+  { label: "Học sinh chưa tham gia học", value: "42", icon: GraduationCap, color: "bg-teal-50 text-teal-600", sub: "Số học sinh chưa từng tham gia học và làm bài trên LMS", action: "view-students" as const },
 ];
+
+const TEACHERS_NO_LOGIN = [
+  { id: "t1", name: "Nguyễn Thị Lan", team: "Tổ Toán", info: "Đăng nhập gần nhất: 12/8/2026" },
+  { id: "t2", name: "Trần Văn Hải", team: "Tổ Tiếng Việt", info: "Đăng nhập gần nhất: 10/8/2026" },
+  { id: "t3", name: "Phạm Thu Hà", team: "Tổ Tiếng Anh", info: "Đăng nhập gần nhất: 08/8/2026" },
+  { id: "t4", name: "Lê Minh Đức", team: "Tổ Năng khiếu", info: "Đăng nhập gần nhất: 05/8/2026" },
+  { id: "t5", name: "Đỗ Quang Huy", team: "Tổ Toán", info: "Đăng nhập gần nhất: 02/8/2026" },
+];
+
+const TEACHERS_NO_CONTENT = [
+  { id: "c1", name: "Vũ Thị Mai", team: "Tổ Tiếng Việt", info: "Chưa có nội dung nào" },
+  { id: "c2", name: "Hoàng Văn Nam", team: "Tổ Toán", info: "Chưa có nội dung nào" },
+  { id: "c3", name: "Ngô Thị Hạnh", team: "Tổ Năng khiếu", info: "Chưa có nội dung nào" },
+];
+
+const STUDENTS_INACTIVE = [
+  { id: "s1", name: "Nguyễn Bảo An", team: "Lớp 1A", info: "Chưa từng đăng nhập" },
+  { id: "s2", name: "Trần Gia Bảo", team: "Lớp 2B", info: "Chưa làm bài nào" },
+  { id: "s3", name: "Lê Khánh Chi", team: "Lớp 3C", info: "Chưa từng đăng nhập" },
+  { id: "s4", name: "Phạm Minh Dũng", team: "Lớp 4A", info: "Chưa làm bài nào" },
+  { id: "s5", name: "Đặng Thùy Dương", team: "Lớp 5B", info: "Chưa từng đăng nhập" },
+];
+
 
 const HL_SHARE = [
   { name: "Tổ Toán", value: 34, color: "#6366f1" },
