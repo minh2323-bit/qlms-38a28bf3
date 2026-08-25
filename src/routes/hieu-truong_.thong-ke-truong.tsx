@@ -3,11 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from "recharts";
 import {
   Video, BookOpen, HelpCircle, Crown, FileText, ClipboardList, FileCheck2, Landmark,
+  TrendingUp, TrendingDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/hieu-truong_/thong-ke-truong")({
@@ -25,17 +29,22 @@ export const Route = createFileRoute("/hieu-truong_/thong-ke-truong")({
 });
 
 /* ---------------- Mock data ---------------- */
-const INDEXES = [
-  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
-  { label: "Bài giảng", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
-  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600" },
+type Idx = {
+  label: string; value: string; icon: typeof Video; color: string;
+  sub?: string; growth?: number;
+};
+
+const INDEXES: Idx[] = [
+  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", growth: 15 },
+  { label: "Bài giảng", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", growth: 24 },
+  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600", growth: 312 },
   {
     label: "Lượt sử dụng học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
     sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
   },
-  { label: "Đề kiểm tra", value: "512", icon: FileText, color: "bg-violet-50 text-violet-600" },
-  { label: "Bài tập về nhà đã giao", value: "1.874", icon: ClipboardList, color: "bg-orange-50 text-orange-600" },
-  { label: "Bài kiểm tra đã tạo", value: "946", icon: FileCheck2, color: "bg-rose-50 text-rose-600" },
+  { label: "Đề kiểm tra", value: "512", icon: FileText, color: "bg-violet-50 text-violet-600", growth: 18 },
+  { label: "Bài tập về nhà đã giao", value: "1.874", icon: ClipboardList, color: "bg-orange-50 text-orange-600", growth: 46 },
+  { label: "Bài kiểm tra đã tạo", value: "946", icon: FileCheck2, color: "bg-rose-50 text-rose-600", growth: -8 },
   { label: "Kỳ thi đã tạo", value: "38", icon: Landmark, color: "bg-teal-50 text-teal-600" },
 ];
 
@@ -99,33 +108,58 @@ const MONTHLY = [
   { month: "T4", baiGiang: 98, baiTap: 172, kiemTra: 52 },
   { month: "T5", baiGiang: 136, baiTap: 246, kiemTra: 88 },
   { month: "T6", baiGiang: 128, baiTap: 214, kiemTra: 74 },
+  { month: "T7", baiGiang: 84, baiTap: 132, kiemTra: 36 },
+  { month: "T8", baiGiang: 156, baiTap: 288, kiemTra: 102 },
+  { month: "T9", baiGiang: 182, baiTap: 324, kiemTra: 128 },
+  { month: "T10", baiGiang: 164, baiTap: 302, kiemTra: 116 },
+  { month: "T11", baiGiang: 148, baiTap: 276, kiemTra: 98 },
+  { month: "T12", baiGiang: 132, baiTap: 238, kiemTra: 84 },
 ];
+
+/** Nếu truy cập trong cùng ngày -> hiển thị dạng "5 phút trước". */
+function formatLastSeen(lastSeen: string, minsAgo?: number) {
+  if (minsAgo === undefined) return lastSeen;
+  if (minsAgo < 1) return "Vừa xong";
+  if (minsAgo < 60) return `${minsAgo} phút trước`;
+  return `${Math.floor(minsAgo / 60)} tiếng trước`;
+}
 
 type TRow = {
   name: string; team: string; classes: string;
   lectures: number; shared: number; materials: number;
-  homework: number; tests: number; lastSeen: string;
+  homework: number; tests: number; lastSeen: string; minsAgo?: number;
 };
 
 const TEACHERS: TRow[] = [
-  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, homework: 88, tests: 34, lastSeen: "25/8/2026 08:12" },
+  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, homework: 88, tests: 34, lastSeen: "25/8/2026 08:12", minsAgo: 5 },
   { name: "Phùng Thuý Hằng", team: "Tổ Tiểu học 1", classes: "3A, 3B", lectures: 36, shared: 12, materials: 98, homework: 74, tests: 28, lastSeen: "24/8/2026 16:40" },
-  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, homework: 52, tests: 19, lastSeen: "25/8/2026 07:55" },
+  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, homework: 52, tests: 19, lastSeen: "25/8/2026 07:55", minsAgo: 62 },
   { name: "Trần Minh Quân", team: "Tổ Tiểu học 1", classes: "3C, 4A", lectures: 29, shared: 9, materials: 81, homework: 63, tests: 22, lastSeen: "23/8/2026 14:05" },
   { name: "Đỗ Văn Nam", team: "Tổ Tiểu học 2", classes: "5A", lectures: 18, shared: 4, materials: 47, homework: 41, tests: 12, lastSeen: "22/8/2026 09:30" },
-  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, homework: 70, tests: 26, lastSeen: "25/8/2026 06:48" },
+  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, homework: 70, tests: 26, lastSeen: "25/8/2026 06:48", minsAgo: 180 },
   { name: "Phạm Quốc Anh", team: "Tổ Tiểu học 2", classes: "2A", lectures: 12, shared: 2, materials: 38, homework: 25, tests: 8, lastSeen: "18/8/2026 15:20" },
   { name: "Vũ Bích Ngọc", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 9, shared: 3, materials: 44, homework: 16, tests: 5, lastSeen: "21/8/2026 10:02" },
   { name: "Trần Thanh Thảo", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 7, shared: 1, materials: 31, homework: 11, tests: 3, lastSeen: "19/8/2026 13:44" },
   { name: "Hoàng Văn Nam", team: "Tổ Toán", classes: "2B, 2C", lectures: 24, shared: 8, materials: 69, homework: 57, tests: 17, lastSeen: "24/8/2026 11:15" },
 ];
 
+const TEAMS = Array.from(new Set(TEACHERS.map((t) => t.team)));
+const CLASSES = Array.from(
+  new Set(TEACHERS.flatMap((t) => t.classes.split(",").map((c) => c.trim()))),
+).sort();
+
 /* ---------------- Page ---------------- */
 function SchoolStatsPage() {
   const [q, setQ] = useState("");
+  const [team, setTeam] = useState("all");
+  const [cls, setCls] = useState("all");
   const rows = useMemo(
-    () => TEACHERS.filter((t) => t.name.toLowerCase().includes(q.trim().toLowerCase())),
-    [q],
+    () => TEACHERS.filter((t) =>
+      t.name.toLowerCase().includes(q.trim().toLowerCase()) &&
+      (team === "all" || t.team === team) &&
+      (cls === "all" || t.classes.split(",").map((c) => c.trim()).includes(cls)),
+    ),
+    [q, team, cls],
   );
 
   return (
@@ -150,7 +184,13 @@ function SchoolStatsPage() {
                 </div>
                 <div className="text-2xl font-black text-slate-800">{k.value}</div>
                 <div className="text-[13px] font-semibold text-slate-700 mt-1">{k.label}</div>
-                {"sub" in k && k.sub && <div className="text-xs text-slate-500 mt-0.5">{k.sub}</div>}
+                {k.growth !== undefined && (
+                  <div className={`mt-1.5 flex items-center gap-1 text-xs font-bold ${k.growth >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                    {k.growth >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                    <span>{Math.abs(k.growth).toLocaleString("vi-VN")} so với tháng trước</span>
+                  </div>
+                )}
+                {k.sub && <div className="text-xs text-slate-500 mt-0.5">{k.sub}</div>}
               </div>
             ))}
           </div>
@@ -179,7 +219,8 @@ function SchoolStatsPage() {
           {/* Biểu đồ cột theo tháng */}
           <div>
             <h3 className="text-sm font-bold text-slate-700 mb-2">Nội dung đã tạo theo tháng</h3>
-            <div className="h-[320px] rounded-xl border p-3">
+            <div className="rounded-xl border p-3 overflow-x-auto">
+              <div className="h-[320px]" style={{ minWidth: Math.max(640, MONTHLY.length * 96) }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={MONTHLY} barGap={10} barCategoryGap="14%">
                   <defs>
@@ -203,6 +244,7 @@ function SchoolStatsPage() {
                   <Bar dataKey="kiemTra" name="Bài kiểm tra" fill="url(#sKT)" radius={[6, 6, 0, 0]} maxBarSize={56} />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </section>
@@ -211,12 +253,28 @@ function SchoolStatsPage() {
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của giáo viên</h2>
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Tìm giáo viên..."
-              className="h-9 w-64"
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <Select value={team} onValueChange={setTeam}>
+                <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Tổ môn" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả tổ môn</SelectItem>
+                  {TEAMS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={cls} onValueChange={setCls}>
+                <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Lớp phụ trách" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả lớp phụ trách</SelectItem>
+                  {CLASSES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Tìm giáo viên..."
+                className="h-9 w-56"
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -248,7 +306,9 @@ function SchoolStatsPage() {
                     <td className="text-center py-2.5 px-3">{t.materials}</td>
                     <td className="text-center py-2.5 px-3">{t.homework}</td>
                     <td className="text-center py-2.5 px-3">{t.tests}</td>
-                    <td className="text-center py-2.5 px-3 text-slate-600">{t.lastSeen}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600" title={t.lastSeen}>
+                      {formatLastSeen(t.lastSeen, t.minsAgo)}
+                    </td>
                   </tr>
                 ))}
                 {rows.length === 0 && (
