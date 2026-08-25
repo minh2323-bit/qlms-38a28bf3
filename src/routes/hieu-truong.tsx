@@ -140,7 +140,15 @@ function PrincipalHome() {
 
   const removeExam = (id: string) => setPending((p) => p.filter((e) => e.id !== id));
 
-  const gradeBlocks = useMemo(() => GRADES, []);
+  const [weekIdx, setWeekIdx] = useState(getCurrentWeekIdx());
+  const [grade, setGrade] = useState("1");
+
+  const week = WEEKS.find((w) => w.idx === weekIdx) ?? WEEKS[0];
+  const DAYS = useMemo(() => buildDays(weekIdx), [weekIdx]);
+  const gradeBlocks = useMemo(
+    () => GRADES.filter((g) => String(g.grade) === grade),
+    [grade],
+  );
 
 
   return (
