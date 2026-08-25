@@ -357,8 +357,9 @@ function PrincipalHome() {
         </div>
         <div className="p-3 border-t text-right">
           <Button asChild variant="outline" className="h-9 text-[13px]">
-            <Link to="/thong-ke">Xem thống kê chi tiết</Link>
+            <Link to="/hieu-truong/thong-ke-truong">Xem thống kê chi tiết</Link>
           </Button>
+        </div>
         </div>
       </section>
 
