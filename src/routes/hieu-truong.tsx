@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -223,7 +223,7 @@ function PrincipalHome() {
                 const open = !!expanded[g.grade];
                 const shown = open ? g.classes : g.classes.slice(0, 5);
                 return (
-                  <>
+                  <Fragment key={g.grade}>
                     <tr key={`h-${g.grade}`} className="bg-amber-50/60">
                       <td colSpan={DAYS.length + 1} className="px-3 py-1.5 text-[13px] font-semibold text-amber-700">
                         Khối {g.grade} · {g.classes.length} lớp
@@ -264,7 +264,7 @@ function PrincipalHome() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
