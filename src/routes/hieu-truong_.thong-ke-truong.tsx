@@ -127,28 +127,39 @@ function formatLastSeen(lastSeen: string, minsAgo?: number) {
 type TRow = {
   name: string; team: string; classes: string;
   lectures: number; shared: number; materials: number;
-  homework: number; tests: number; lastSeen: string;
+  homework: number; tests: number; lastSeen: string; minsAgo?: number;
 };
 
 const TEACHERS: TRow[] = [
-  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, homework: 88, tests: 34, lastSeen: "25/8/2026 08:12" },
+  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, homework: 88, tests: 34, lastSeen: "25/8/2026 08:12", minsAgo: 5 },
   { name: "Phùng Thuý Hằng", team: "Tổ Tiểu học 1", classes: "3A, 3B", lectures: 36, shared: 12, materials: 98, homework: 74, tests: 28, lastSeen: "24/8/2026 16:40" },
-  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, homework: 52, tests: 19, lastSeen: "25/8/2026 07:55" },
+  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, homework: 52, tests: 19, lastSeen: "25/8/2026 07:55", minsAgo: 62 },
   { name: "Trần Minh Quân", team: "Tổ Tiểu học 1", classes: "3C, 4A", lectures: 29, shared: 9, materials: 81, homework: 63, tests: 22, lastSeen: "23/8/2026 14:05" },
   { name: "Đỗ Văn Nam", team: "Tổ Tiểu học 2", classes: "5A", lectures: 18, shared: 4, materials: 47, homework: 41, tests: 12, lastSeen: "22/8/2026 09:30" },
-  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, homework: 70, tests: 26, lastSeen: "25/8/2026 06:48" },
+  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, homework: 70, tests: 26, lastSeen: "25/8/2026 06:48", minsAgo: 180 },
   { name: "Phạm Quốc Anh", team: "Tổ Tiểu học 2", classes: "2A", lectures: 12, shared: 2, materials: 38, homework: 25, tests: 8, lastSeen: "18/8/2026 15:20" },
   { name: "Vũ Bích Ngọc", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 9, shared: 3, materials: 44, homework: 16, tests: 5, lastSeen: "21/8/2026 10:02" },
   { name: "Trần Thanh Thảo", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 7, shared: 1, materials: 31, homework: 11, tests: 3, lastSeen: "19/8/2026 13:44" },
   { name: "Hoàng Văn Nam", team: "Tổ Toán", classes: "2B, 2C", lectures: 24, shared: 8, materials: 69, homework: 57, tests: 17, lastSeen: "24/8/2026 11:15" },
 ];
 
+const TEAMS = Array.from(new Set(TEACHERS.map((t) => t.team)));
+const CLASSES = Array.from(
+  new Set(TEACHERS.flatMap((t) => t.classes.split(",").map((c) => c.trim()))),
+).sort();
+
 /* ---------------- Page ---------------- */
 function SchoolStatsPage() {
   const [q, setQ] = useState("");
+  const [team, setTeam] = useState("all");
+  const [cls, setCls] = useState("all");
   const rows = useMemo(
-    () => TEACHERS.filter((t) => t.name.toLowerCase().includes(q.trim().toLowerCase())),
-    [q],
+    () => TEACHERS.filter((t) =>
+      t.name.toLowerCase().includes(q.trim().toLowerCase()) &&
+      (team === "all" || t.team === team) &&
+      (cls === "all" || t.classes.split(",").map((c) => c.trim()).includes(cls)),
+    ),
+    [q, team, cls],
   );
 
   return (
