@@ -22,7 +22,7 @@ function HomeroomTimetable() {
       <TimetableView
         className="Lớp 4A"
         classId="4A"
-        subtitle="Lớp chủ nhiệm · Năm học 2025 - 2026 · Tiểu học Tô Hiệu"
+        subtitle="Ngày cập nhật: 24/08/2026"
       />
     </AppShell>
   );

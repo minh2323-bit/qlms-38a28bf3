@@ -34,7 +34,7 @@ function SchoolTimetable() {
         key={cls}
         className={`Lớp ${cls}`}
         classId={cls}
-        subtitle="Năm học 2025 - 2026 · Tiểu học Tô Hiệu"
+        subtitle="Ngày cập nhật: 24/08/2026"
         filter={
           <div className="flex items-center gap-2">
             <span className="text-[12px] font-semibold text-slate-500 flex items-center gap-1">
