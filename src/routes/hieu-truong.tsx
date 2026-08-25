@@ -123,10 +123,23 @@ function PrincipalHome() {
   const navigate = useNavigate();
   const [pending, setPending] = useState<PendingExam[]>(PENDING_EXAMS_SEED);
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [dialog, setDialog] = useState<"remind-login" | "remind-content" | "view-students" | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const dialogCfg = useMemo(() => {
+    if (dialog === "remind-content")
+      return { title: "Giáo viên chưa từng tạo nội dung", desc: "Chọn giáo viên để gửi nhắc nhở tạo nội dung.", rows: TEACHERS_NO_CONTENT, colTeam: "Tổ môn" };
+    if (dialog === "view-students")
+      return { title: "Học sinh chưa tham gia học", desc: "Chọn học sinh để gửi nhắc nhở tham gia học trên LMS.", rows: STUDENTS_INACTIVE, colTeam: "Lớp" };
+    return { title: "Giáo viên chưa đăng nhập trên 7 ngày", desc: "Chọn giáo viên để gửi nhắc nhở đăng nhập hệ thống.", rows: TEACHERS_NO_LOGIN, colTeam: "Tổ môn" };
+  }, [dialog]);
+
+  useEffect(() => { setSelected([]); }, [dialog]);
 
   const removeExam = (id: string) => setPending((p) => p.filter((e) => e.id !== id));
 
   const gradeBlocks = useMemo(() => GRADES, []);
+
 
   return (
     <AppShell role="principal">
