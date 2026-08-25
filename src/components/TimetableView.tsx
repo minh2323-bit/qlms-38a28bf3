@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sun, Moon, Database } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { WEEKS, getCurrentWeekIdx } from "@/lib/school-weeks";
 
 /** Môn học + GV dạy theo phân công chuyên môn (PCCM) */
@@ -22,7 +24,7 @@ const PCCM: Record<string, string> = {
 
 const SUBJECTS = Object.keys(PCCM);
 
-const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
+const DAYS = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
 
 const MORNING = [1, 2, 3, 4, 5];
 const AFTERNOON = [6, 7, 8];
@@ -35,10 +37,9 @@ function hash(s: string): number {
 
 function buildTimetable(classId: string): Record<string, Slot | null> {
   const map: Record<string, Slot | null> = {};
-  for (let d = 0; d < 7; d++) {
+  for (let d = 0; d < 6; d++) {
     for (const p of [...MORNING, ...AFTERNOON]) {
       const key = `${d}-${p}`;
-      if (d === 6) { map[key] = null; continue; } // Chủ nhật nghỉ
       if (d === 5 && p > 4) { map[key] = null; continue; } // Thứ 7 chỉ học sáng
       const h = hash(`${classId}|${d}|${p}`);
       // Ưu tiên Toán / Tiếng Việt buổi sáng
@@ -65,7 +66,7 @@ export function TimetableView({
   const week = WEEKS.find((w) => w.idx === weekIdx) ?? WEEKS[0];
   const table = useMemo(() => buildTimetable(classId), [classId]);
 
-  const dayDates = Array.from({ length: 7 }, (_, i) => {
+  const dayDates = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(week.start);
     d.setDate(d.getDate() + i);
     return d;
@@ -83,7 +84,7 @@ export function TimetableView({
             {slot ? (
               <div className="rounded-lg bg-indigo-50/70 border border-indigo-100 px-2 py-1.5">
                 <p className="text-[13px] font-semibold text-indigo-800 leading-tight">{slot.subject}</p>
-                <p className="text-[12px] text-slate-600 leading-tight mt-0.5">{slot.teacher}</p>
+                <p className="text-[12px] text-slate-600 leading-tight mt-0.5">G/v {slot.teacher}</p>
               </div>
             ) : (
               <div className="h-9" />
@@ -101,7 +102,15 @@ export function TimetableView({
           <h1 className="text-lg font-bold text-slate-800">Thời khóa biểu {className}</h1>
           {subtitle && <p className="text-[12px] text-slate-500 mt-0.5">{subtitle}</p>}
         </div>
-        {filter}
+        <div className="flex items-center gap-3">
+          {filter}
+          <Button
+            onClick={() => toast.success("Đã đồng bộ thời khóa biểu từ CSDL")}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-9 px-4 font-bold shadow-md"
+          >
+            <Database className="h-4 w-4" /> Đồng bộ từ CSDL
+          </Button>
+        </div>
       </div>
 
       <div className="px-5 py-3 flex items-center gap-3">
@@ -131,7 +140,7 @@ export function TimetableView({
               <th className="w-28 px-3 py-2 text-[12px] text-slate-500" />
               {dayDates.map((d, i) => (
                 <th key={i} className="border-l px-2 py-2 text-center">
-                  <p className={`text-[15px] font-bold ${i === 6 ? "text-indigo-600" : "text-slate-800"}`}>
+                  <p className={`text-[15px] font-bold text-slate-800`}>
                     {d.getDate()}
                   </p>
                   <p className="text-[12px] text-slate-500">{DAYS[i]}</p>
@@ -141,11 +150,11 @@ export function TimetableView({
           </thead>
           <tbody>
             <tr className="bg-amber-50/60">
-              <td colSpan={8} className="px-3 py-1.5 text-[12px] font-semibold text-amber-700">Buổi sáng</td>
+              <td colSpan={7} className="px-3 py-1.5 text-[12px] font-semibold text-amber-700"><span className="inline-flex items-center gap-1.5"><Sun className="h-4 w-4" /> Buổi sáng</span></td>
             </tr>
             {MORNING.map((p) => renderRow(p, `Tiết ${p}`))}
             <tr className="bg-sky-50/60">
-              <td colSpan={8} className="px-3 py-1.5 text-[12px] font-semibold text-sky-700">Buổi chiều</td>
+              <td colSpan={7} className="px-3 py-1.5 text-[12px] font-semibold text-sky-700"><span className="inline-flex items-center gap-1.5"><Moon className="h-4 w-4" /> Buổi chiều</span></td>
             </tr>
             {AFTERNOON.map((p) => renderRow(p, `Tiết ${p}`))}
           </tbody>
