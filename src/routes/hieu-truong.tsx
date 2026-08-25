@@ -217,6 +217,20 @@ function PrincipalHome() {
                 {"sub" in k && k.sub && (
                   <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
                 )}
+                {"storage" in k && k.storage && (
+                  <div className="mt-2">
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-sky-500"
+                        style={{ width: `${Math.round((k.storage.used / k.storage.total) * 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-[12px] text-slate-400 mt-1">
+                      {k.storage.used} GB / {k.storage.total} GB tổng dung lượng trường
+                      ({Math.round((k.storage.used / k.storage.total) * 100)}%)
+                    </p>
+                  </div>
+                )}
               </div>
               {action && (
                 <button
