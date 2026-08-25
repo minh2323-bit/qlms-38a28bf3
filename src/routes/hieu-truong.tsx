@@ -6,12 +6,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
-  ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
-} from "recharts";
-import {
-  Video, BookOpen, HelpCircle, Crown, UserX, FileWarning,
+  Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User, Bell, Eye,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { WEEKS, getCurrentWeekIdx } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/hieu-truong")({
@@ -42,7 +44,10 @@ const PENDING_EXAMS_SEED: PendingExam[] = [
 const ROW1 = [
   { label: "HL đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
   { label: "BG đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
-  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600" },
+  {
+    label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
+    storage: { used: 324, total: 500 },
+  },
   {
     label: "Lượt sử dụng Học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
     sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
@@ -79,30 +84,27 @@ const STUDENTS_INACTIVE = [
 ];
 
 
-const HL_SHARE = [
-  { name: "Tổ Toán", value: 34, color: "#6366f1" },
-  { name: "Tổ Tiếng Việt", value: 28, color: "#10b981" },
-  { name: "Tổ Tiếng Anh", value: 18, color: "#0ea5e9" },
-  { name: "Tổ Năng khiếu", value: 12, color: "#f59e0b" },
-  { name: "Tổ khác", value: 8, color: "#f43f5e" },
-];
+type DayCol = { label: string; date: string; today?: boolean };
 
-const NHCH_SHARE = [
-  { name: "Tổ Toán", value: 41, color: "#6366f1" },
-  { name: "Tổ Tiếng Việt", value: 24, color: "#10b981" },
-  { name: "Tổ Tiếng Anh", value: 21, color: "#0ea5e9" },
-  { name: "Tổ Năng khiếu", value: 9, color: "#f59e0b" },
-  { name: "Tổ khác", value: 5, color: "#f43f5e" },
-];
-
-const DAYS = [
-  { label: "Thứ 2", date: "10/8/2026" },
-  { label: "Thứ 3", date: "11/8/2026" },
-  { label: "Thứ 4", date: "12/8/2026", today: true },
-  { label: "Thứ 5", date: "13/8/2026" },
-  { label: "Thứ 6", date: "14/8/2026" },
-  { label: "Thứ 7", date: "15/8/2026" },
-];
+/** 6 ngày (Thứ 2 → Thứ 7) của tuần học được chọn */
+function buildDays(weekIdx: number): DayCol[] {
+  const w = WEEKS.find((x) => x.idx === weekIdx) ?? WEEKS[0];
+  const start = new Date(w.start);
+  // lùi về thứ 2 của tuần chứa ngày bắt đầu
+  const shift = (start.getDay() + 6) % 7;
+  const monday = new Date(start);
+  monday.setDate(start.getDate() - shift);
+  const todayKey = new Date().toDateString();
+  return Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return {
+      label: `Thứ ${i + 2}`,
+      date: `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`,
+      today: d.toDateString() === todayKey,
+    };
+  });
+}
 
 const GRADES = [1, 2, 3, 4, 5].map((g) => ({
   grade: g,
@@ -138,7 +140,15 @@ function PrincipalHome() {
 
   const removeExam = (id: string) => setPending((p) => p.filter((e) => e.id !== id));
 
-  const gradeBlocks = useMemo(() => GRADES, []);
+  const [weekIdx, setWeekIdx] = useState(getCurrentWeekIdx());
+  const [grade, setGrade] = useState("1");
+
+  const week = WEEKS.find((w) => w.idx === weekIdx) ?? WEEKS[0];
+  const DAYS = useMemo(() => buildDays(weekIdx), [weekIdx]);
+  const gradeBlocks = useMemo(
+    () => GRADES.filter((g) => String(g.grade) === grade),
+    [grade],
+  );
 
 
   return (
@@ -207,6 +217,20 @@ function PrincipalHome() {
                 {"sub" in k && k.sub && (
                   <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
                 )}
+                {"storage" in k && k.storage && (
+                  <div className="mt-2">
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-sky-500"
+                        style={{ width: `${Math.round((k.storage.used / k.storage.total) * 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-[12px] text-slate-400 mt-1">
+                      {k.storage.used} GB / {k.storage.total} GB tổng dung lượng trường
+                      ({Math.round((k.storage.used / k.storage.total) * 100)}%)
+                    </p>
+                  </div>
+                )}
               </div>
               {action && (
                 <button
@@ -225,36 +249,54 @@ function PrincipalHome() {
 
         </div>
 
-        {/* 2 biểu đồ tròn */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {[
-            { title: "HL đóng góp theo tổ môn", data: HL_SHARE },
-            { title: "NHCH đóng góp theo tổ môn", data: NHCH_SHARE },
-          ].map((c) => (
-            <div key={c.title} className="bg-white rounded-xl border p-4">
-              <h3 className="text-[15px] font-semibold text-slate-800 mb-2">{c.title}</h3>
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie data={c.data} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                    {c.data.map((g) => <Cell key={g.name} fill={g.color} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v: number) => `${v}%`} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ))}
-        </div>
       </section>
 
-      {/* Bảng TKB theo ngày */}
-      <section className="bg-white rounded-xl border">
-        <div className="p-4 border-b flex flex-wrap items-center gap-2">
-          <h2 className="text-[15px] font-semibold text-slate-800 mr-auto">
-            Tiến độ soạn nội dung theo tiết học – Tuần 10/8 – 15/8/2026
-          </h2>
-          <span className="text-[12px] text-slate-400">Số tiết có ít nhất 1 nội dung / Tổng số tiết trong ngày</span>
-        </div>
+      {/* Tiến độ soạn nội dung cho tuần học */}
+      <section className="space-y-3">
+        <h2 className="text-[15px] font-semibold text-slate-800">
+          Tiến độ soạn nội dung cho tuần học
+        </h2>
+
+        <div className="bg-white rounded-xl border">
+          <div className="p-3 border-b flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1 rounded-lg border px-1 py-0.5">
+              <Button
+                variant="ghost" size="icon" className="h-8 w-8"
+                aria-label="Tuần trước"
+                disabled={weekIdx <= 1}
+                onClick={() => setWeekIdx((w) => Math.max(1, w - 1))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="px-2 text-center min-w-[190px]">
+                <div className="text-[13px] font-semibold text-slate-800">{week.label}</div>
+                <div className="text-[12px] text-slate-500">{week.range}</div>
+              </div>
+              <Button
+                variant="ghost" size="icon" className="h-8 w-8"
+                aria-label="Tuần sau"
+                disabled={weekIdx >= WEEKS.length}
+                onClick={() => setWeekIdx((w) => Math.min(WEEKS.length, w + 1))}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <Select value={grade} onValueChange={setGrade}>
+              <SelectTrigger className="h-9 w-[150px] text-[13px]">
+                <SelectValue placeholder="Lọc theo khối" />
+              </SelectTrigger>
+              <SelectContent>
+                {GRADES.map((g) => (
+                  <SelectItem key={g.grade} value={String(g.grade)}>Khối {g.grade}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <span className="ml-auto text-[12px] text-slate-400">
+              Số tiết có ít nhất 1 nội dung / Tổng số tiết trong ngày
+            </span>
+          </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
@@ -329,8 +371,9 @@ function PrincipalHome() {
         </div>
         <div className="p-3 border-t text-right">
           <Button asChild variant="outline" className="h-9 text-[13px]">
-            <Link to="/thong-ke">Xem thống kê chi tiết</Link>
+            <Link to="/hieu-truong/thong-ke-truong">Xem thống kê chi tiết</Link>
           </Button>
+        </div>
         </div>
       </section>
 
