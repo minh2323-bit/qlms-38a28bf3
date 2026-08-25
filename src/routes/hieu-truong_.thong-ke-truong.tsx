@@ -29,17 +29,22 @@ export const Route = createFileRoute("/hieu-truong_/thong-ke-truong")({
 });
 
 /* ---------------- Mock data ---------------- */
-const INDEXES = [
-  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
-  { label: "Bài giảng", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
-  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600" },
+type Idx = {
+  label: string; value: string; icon: typeof Video; color: string;
+  sub?: string; growth?: number;
+};
+
+const INDEXES: Idx[] = [
+  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", growth: 15 },
+  { label: "Bài giảng", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", growth: 24 },
+  { label: "Ngân hàng câu hỏi", value: "12.507", icon: HelpCircle, color: "bg-sky-50 text-sky-600", growth: 312 },
   {
     label: "Lượt sử dụng học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
     sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
   },
-  { label: "Đề kiểm tra", value: "512", icon: FileText, color: "bg-violet-50 text-violet-600" },
-  { label: "Bài tập về nhà đã giao", value: "1.874", icon: ClipboardList, color: "bg-orange-50 text-orange-600" },
-  { label: "Bài kiểm tra đã tạo", value: "946", icon: FileCheck2, color: "bg-rose-50 text-rose-600" },
+  { label: "Đề kiểm tra", value: "512", icon: FileText, color: "bg-violet-50 text-violet-600", growth: 18 },
+  { label: "Bài tập về nhà đã giao", value: "1.874", icon: ClipboardList, color: "bg-orange-50 text-orange-600", growth: 46 },
+  { label: "Bài kiểm tra đã tạo", value: "946", icon: FileCheck2, color: "bg-rose-50 text-rose-600", growth: -8 },
   { label: "Kỳ thi đã tạo", value: "38", icon: Landmark, color: "bg-teal-50 text-teal-600" },
 ];
 
