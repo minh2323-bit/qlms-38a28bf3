@@ -39,6 +39,7 @@ import { ImportQuestionsModal } from "@/components/ImportQuestionsModal";
 import {
   PickQuestionTypeModal, QuestionFormModal, QuestionTypeIcon, type QuestionDraft,
 } from "@/components/QuestionFormModal";
+import { draftExtras, type QuestionExtras } from "@/components/QuestionExtras";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/ky-thi/ngan-hang-cau-hoi")({
@@ -58,7 +59,7 @@ const CAN_CREATE = true;
 
 type Answer = { text: string; correct: boolean };
 type TFItem = { text: string; correct: boolean };
-type Question = {
+type Question = QuestionExtras & {
   id: string;
   content: string;
   type: QType;
@@ -166,6 +167,7 @@ function draftToShared(d: QuestionDraft): Question {
     answers: d.answers,
     tfTitle: d.type === "truefalse" ? d.content : undefined,
     tfItems: d.tfItems,
+    ...draftExtras(d),
   };
 }
 

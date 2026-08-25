@@ -26,6 +26,7 @@ import {
   PickQuestionTypeModal, QuestionFormModal, QuestionTypeIcon,
   QUESTION_TYPE_LABEL, type QuestionType, type QuestionDraft,
 } from "@/components/QuestionFormModal";
+import { draftExtras, QuestionExtraDetails, type QuestionExtras } from "@/components/QuestionExtras";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
@@ -44,7 +45,7 @@ type ShareStatus = "none" | "pending" | "approved";
 
 type Answer = { text: string; correct: boolean };
 type TFItem = { text: string; correct: boolean };
-type Question = {
+type Question = QuestionExtras & {
   id: string;
   content: string;
   type: QType;
@@ -135,6 +136,7 @@ function draftToQuestion(d: QuestionDraft): Question {
     answers: d.answers,
     tfTitle: d.type === "truefalse" ? d.content : undefined,
     tfItems: d.tfItems,
+    ...draftExtras(d),
   };
 }
 
@@ -617,6 +619,8 @@ function ViewQuestionModal({
               ))}
             </div>
           )}
+
+          <QuestionExtraDetails q={question} />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Đóng</Button>
