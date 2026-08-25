@@ -84,30 +84,27 @@ const STUDENTS_INACTIVE = [
 ];
 
 
-const HL_SHARE = [
-  { name: "Tổ Toán", value: 34, color: "#6366f1" },
-  { name: "Tổ Tiếng Việt", value: 28, color: "#10b981" },
-  { name: "Tổ Tiếng Anh", value: 18, color: "#0ea5e9" },
-  { name: "Tổ Năng khiếu", value: 12, color: "#f59e0b" },
-  { name: "Tổ khác", value: 8, color: "#f43f5e" },
-];
+type DayCol = { label: string; date: string; today?: boolean };
 
-const NHCH_SHARE = [
-  { name: "Tổ Toán", value: 41, color: "#6366f1" },
-  { name: "Tổ Tiếng Việt", value: 24, color: "#10b981" },
-  { name: "Tổ Tiếng Anh", value: 21, color: "#0ea5e9" },
-  { name: "Tổ Năng khiếu", value: 9, color: "#f59e0b" },
-  { name: "Tổ khác", value: 5, color: "#f43f5e" },
-];
-
-const DAYS = [
-  { label: "Thứ 2", date: "10/8/2026" },
-  { label: "Thứ 3", date: "11/8/2026" },
-  { label: "Thứ 4", date: "12/8/2026", today: true },
-  { label: "Thứ 5", date: "13/8/2026" },
-  { label: "Thứ 6", date: "14/8/2026" },
-  { label: "Thứ 7", date: "15/8/2026" },
-];
+/** 6 ngày (Thứ 2 → Thứ 7) của tuần học được chọn */
+function buildDays(weekIdx: number): DayCol[] {
+  const w = WEEKS.find((x) => x.idx === weekIdx) ?? WEEKS[0];
+  const start = new Date(w.start);
+  // lùi về thứ 2 của tuần chứa ngày bắt đầu
+  const shift = (start.getDay() + 6) % 7;
+  const monday = new Date(start);
+  monday.setDate(start.getDate() - shift);
+  const todayKey = new Date().toDateString();
+  return Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return {
+      label: `Thứ ${i + 2}`,
+      date: `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`,
+      today: d.toDateString() === todayKey,
+    };
+  });
+}
 
 const GRADES = [1, 2, 3, 4, 5].map((g) => ({
   grade: g,
