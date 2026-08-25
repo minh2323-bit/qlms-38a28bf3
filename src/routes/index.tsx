@@ -397,40 +397,44 @@ export function TeacherHomeView({
 
           {/* Schedule Section */}
           <section className="bg-white rounded-2xl border shadow-sm">
-            {/* Row 1: Class filter (above title) */}
-            <div className="px-6 pt-4 pb-3 flex items-center gap-2 flex-wrap border-b">
-              <span className="text-xs font-semibold text-slate-500 uppercase mr-1">Lớp:</span>
-              <button
-                onClick={() => setClassFilter("ALL")}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
-                  classFilter === "ALL"
-                    ? "bg-indigo-700 text-white border-indigo-700 shadow"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
-                }`}
-              >
-                Tất cả các lớp
-              </button>
-              {CLASSES.map((c) => {
-                const active = classFilter === c;
-                return (
-                  <button
-                    key={c}
-                    onClick={() => setClassFilter(c)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition flex items-center gap-1.5 ${
-                      active
-                        ? "bg-indigo-700 text-white border-indigo-700 shadow"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
-                    }`}
-                  >
-                    <span className={`h-2 w-2 rounded-full ${
-                      active ? "bg-white" :
-                        c.startsWith("3") ? "bg-blue-500" : "bg-violet-500"
-                    }`} />
-                    Lớp {c}
-                  </button>
-                );
-              })}
+            {/* Row 1: Teacher picker (left) · Class filter (right, scrollable) */}
+            <div className="px-6 pt-4 pb-3 flex items-center gap-4 border-b">
+              {teacherPicker && <div className="shrink-0">{teacherPicker}</div>}
+              <div className="flex-1 min-w-0 flex items-center gap-2 overflow-x-auto flex-nowrap pb-1">
+                <span className="text-xs font-semibold text-slate-500 uppercase mr-1 shrink-0">Lớp:</span>
+                <button
+                  onClick={() => setClassFilter("ALL")}
+                  className={`shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full border transition ${
+                    classFilter === "ALL"
+                      ? "bg-indigo-700 text-white border-indigo-700 shadow"
+                      : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
+                  }`}
+                >
+                  Tất cả các lớp
+                </button>
+                {CLASSES.map((c) => {
+                  const active = classFilter === c;
+                  return (
+                    <button
+                      key={c}
+                      onClick={() => setClassFilter(c)}
+                      className={`shrink-0 px-3 py-1.5 text-xs font-semibold rounded-full border transition flex items-center gap-1.5 ${
+                        active
+                          ? "bg-indigo-700 text-white border-indigo-700 shadow"
+                          : "bg-white text-slate-600 border-slate-200 hover:border-indigo-400 hover:text-indigo-700"
+                      }`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${
+                        active ? "bg-white" :
+                          c.startsWith("3") ? "bg-blue-500" : "bg-violet-500"
+                      }`} />
+                      Lớp {c}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
 
             {/* Row 2: Knowledge tree toggle (left) · Title (center) · Week nav (right) */}
             <div className="px-6 py-3 border-b flex items-center justify-between gap-4">
@@ -456,7 +460,7 @@ export function TeacherHomeView({
                 </Button>
               </div>
               <div className="flex flex-col items-end gap-2">
-              {teacherPicker}
+
               <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
 
                 <Button variant="ghost" size="icon" className="h-7 w-7"
