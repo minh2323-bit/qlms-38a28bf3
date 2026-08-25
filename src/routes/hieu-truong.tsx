@@ -320,6 +320,68 @@ function PrincipalHome() {
           </Button>
         </div>
       </section>
+
+      {/* Popup nhắc nhở / xem danh sách */}
+      <Dialog open={dialog !== null} onOpenChange={(o) => !o && setDialog(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-[16px]">{dialogCfg.title}</DialogTitle>
+            <DialogDescription className="text-[13px]">{dialogCfg.desc}</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[380px] overflow-auto border rounded-lg">
+            <table className="w-full text-[13px]">
+              <thead className="bg-slate-50 text-slate-500">
+                <tr>
+                  <th className="w-10 px-3 py-2">
+                    <Checkbox
+                      checked={selected.length > 0 && selected.length === dialogCfg.rows.length}
+                      onCheckedChange={(v) =>
+                        setSelected(v ? dialogCfg.rows.map((r) => r.id) : [])
+                      }
+                    />
+                  </th>
+                  <th className="px-3 py-2 text-left">Họ và tên</th>
+                  <th className="px-3 py-2 text-left">{dialogCfg.colTeam}</th>
+                  <th className="px-3 py-2 text-left">Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dialogCfg.rows.map((r) => (
+                  <tr key={r.id} className="border-t">
+                    <td className="px-3 py-2">
+                      <Checkbox
+                        checked={selected.includes(r.id)}
+                        onCheckedChange={(v) =>
+                          setSelected((p) => (v ? [...p, r.id] : p.filter((x) => x !== r.id)))
+                        }
+                      />
+                    </td>
+                    <td className="px-3 py-2 font-semibold text-slate-800">{r.name}</td>
+                    <td className="px-3 py-2 text-slate-600">{r.team}</td>
+                    <td className="px-3 py-2 text-slate-500">{r.info}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="h-9 text-[13px]" onClick={() => setDialog(null)}>
+              Đóng
+            </Button>
+            <Button
+              className="h-9 text-[13px]"
+              disabled={selected.length === 0}
+              onClick={() => {
+                toast.success(`Đã gửi nhắc nhở tới ${selected.length} người`);
+                setDialog(null);
+              }}
+            >
+              <Bell className="h-4 w-4 mr-1" /> Gửi nhắc nhở ({selected.length})
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+
