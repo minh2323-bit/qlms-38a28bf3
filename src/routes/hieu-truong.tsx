@@ -224,10 +224,11 @@ function PrincipalHome() {
                 const shown = open ? g.classes : g.classes.slice(0, 5);
                 return (
                   <Fragment key={g.grade}>
-                    <tr key={`h-${g.grade}`} className="bg-amber-50/60">
-                      <td colSpan={DAYS.length + 1} className="px-3 py-1.5 text-[13px] font-semibold text-amber-700">
+                    <tr key={`h-${g.grade}`} className="bg-sky-50">
+                      <td colSpan={DAYS.length + 1} className="px-3 py-1.5 text-[13px] font-semibold text-sky-700">
                         Khối {g.grade} · {g.classes.length} lớp
                       </td>
+
                     </tr>
                     {shown.map((cls) => (
                       <tr key={cls} className="border-t">
