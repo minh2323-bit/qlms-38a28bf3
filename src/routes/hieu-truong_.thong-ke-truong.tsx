@@ -306,7 +306,9 @@ function SchoolStatsPage() {
                     <td className="text-center py-2.5 px-3">{t.materials}</td>
                     <td className="text-center py-2.5 px-3">{t.homework}</td>
                     <td className="text-center py-2.5 px-3">{t.tests}</td>
-                    <td className="text-center py-2.5 px-3 text-slate-600">{t.lastSeen}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600" title={t.lastSeen}>
+                      {formatLastSeen(t.lastSeen, t.minsAgo)}
+                    </td>
                   </tr>
                 ))}
                 {rows.length === 0 && (
