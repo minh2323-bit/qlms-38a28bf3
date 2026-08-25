@@ -3,11 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from "recharts";
 import {
   Video, BookOpen, HelpCircle, Crown, FileText, ClipboardList, FileCheck2, Landmark,
+  TrendingUp, TrendingDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/hieu-truong_/thong-ke-truong")({
