@@ -167,6 +167,7 @@ function draftToShared(d: QuestionDraft): Question {
     answers: d.answers,
     tfTitle: d.type === "truefalse" ? d.content : undefined,
     tfItems: d.tfItems,
+    ...draftExtras(d),
   };
 }
 
