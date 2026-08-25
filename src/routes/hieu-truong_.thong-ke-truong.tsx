@@ -108,7 +108,21 @@ const MONTHLY = [
   { month: "T4", baiGiang: 98, baiTap: 172, kiemTra: 52 },
   { month: "T5", baiGiang: 136, baiTap: 246, kiemTra: 88 },
   { month: "T6", baiGiang: 128, baiTap: 214, kiemTra: 74 },
+  { month: "T7", baiGiang: 84, baiTap: 132, kiemTra: 36 },
+  { month: "T8", baiGiang: 156, baiTap: 288, kiemTra: 102 },
+  { month: "T9", baiGiang: 182, baiTap: 324, kiemTra: 128 },
+  { month: "T10", baiGiang: 164, baiTap: 302, kiemTra: 116 },
+  { month: "T11", baiGiang: 148, baiTap: 276, kiemTra: 98 },
+  { month: "T12", baiGiang: 132, baiTap: 238, kiemTra: 84 },
 ];
+
+/** Nếu truy cập trong cùng ngày -> hiển thị dạng "5 phút trước". */
+function formatLastSeen(lastSeen: string, minsAgo?: number) {
+  if (minsAgo === undefined) return lastSeen;
+  if (minsAgo < 1) return "Vừa xong";
+  if (minsAgo < 60) return `${minsAgo} phút trước`;
+  return `${Math.floor(minsAgo / 60)} tiếng trước`;
+}
 
 type TRow = {
   name: string; team: string; classes: string;
