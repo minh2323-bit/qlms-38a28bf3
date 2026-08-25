@@ -219,7 +219,8 @@ function SchoolStatsPage() {
           {/* Biểu đồ cột theo tháng */}
           <div>
             <h3 className="text-sm font-bold text-slate-700 mb-2">Nội dung đã tạo theo tháng</h3>
-            <div className="h-[320px] rounded-xl border p-3">
+            <div className="rounded-xl border p-3 overflow-x-auto">
+              <div className="h-[320px]" style={{ minWidth: Math.max(640, MONTHLY.length * 96) }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={MONTHLY} barGap={10} barCategoryGap="14%">
                   <defs>
