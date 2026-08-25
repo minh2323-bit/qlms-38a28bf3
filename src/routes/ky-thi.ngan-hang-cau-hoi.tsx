@@ -59,7 +59,7 @@ const CAN_CREATE = true;
 
 type Answer = { text: string; correct: boolean };
 type TFItem = { text: string; correct: boolean };
-type Question = {
+type Question = QuestionExtras & {
   id: string;
   content: string;
   type: QType;
