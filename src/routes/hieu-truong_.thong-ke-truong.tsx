@@ -244,6 +244,7 @@ function SchoolStatsPage() {
                   <Bar dataKey="kiemTra" name="Bài kiểm tra" fill="url(#sKT)" radius={[6, 6, 0, 0]} maxBarSize={56} />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </section>
@@ -252,12 +253,28 @@ function SchoolStatsPage() {
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của giáo viên</h2>
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Tìm giáo viên..."
-              className="h-9 w-64"
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <Select value={team} onValueChange={setTeam}>
+                <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Tổ môn" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả tổ môn</SelectItem>
+                  {TEAMS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={cls} onValueChange={setCls}>
+                <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Lớp phụ trách" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả lớp phụ trách</SelectItem>
+                  {CLASSES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Tìm giáo viên..."
+                className="h-9 w-56"
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto">
