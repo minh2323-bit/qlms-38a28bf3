@@ -9,9 +9,14 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
 } from "recharts";
 import {
-  Video, BookOpen, HelpCircle, Crown, UserX, FileWarning,
+  Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User, Bell, Eye,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { WEEKS, getCurrentWeekIdx } from "@/lib/school-weeks";
 
 
 export const Route = createFileRoute("/hieu-truong")({
