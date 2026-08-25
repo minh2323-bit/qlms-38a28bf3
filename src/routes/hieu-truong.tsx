@@ -1,14 +1,18 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { toast } from "sonner";
 import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
 } from "recharts";
 import {
   Video, BookOpen, HelpCircle, Crown, UserX, FileWarning,
-  CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User,
+  CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User, Bell, Eye,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/hieu-truong")({
   head: () => ({
@@ -46,11 +50,34 @@ const ROW1 = [
 ];
 
 const ROW2 = [
-  { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600" },
-  { label: "G/v chưa từng tạo nội dung", value: "3", icon: FileWarning, color: "bg-orange-50 text-orange-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
+  { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600", action: "remind-login" as const },
+  { label: "G/v chưa từng tạo nội dung", value: "3", icon: FileWarning, color: "bg-orange-50 text-orange-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra", action: "remind-content" as const },
   { label: "Tiết học chưa tạo nội dung", value: "127", icon: CalendarX2, color: "bg-violet-50 text-violet-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
-  { label: "Học sinh chưa tham gia học", value: "42", icon: GraduationCap, color: "bg-teal-50 text-teal-600", sub: "Số học sinh chưa từng tham gia học và làm bài trên LMS" },
+  { label: "Học sinh chưa tham gia học", value: "42", icon: GraduationCap, color: "bg-teal-50 text-teal-600", sub: "Số học sinh chưa từng tham gia học và làm bài trên LMS", action: "view-students" as const },
 ];
+
+const TEACHERS_NO_LOGIN = [
+  { id: "t1", name: "Nguyễn Thị Lan", team: "Tổ Toán", info: "Đăng nhập gần nhất: 12/8/2026" },
+  { id: "t2", name: "Trần Văn Hải", team: "Tổ Tiếng Việt", info: "Đăng nhập gần nhất: 10/8/2026" },
+  { id: "t3", name: "Phạm Thu Hà", team: "Tổ Tiếng Anh", info: "Đăng nhập gần nhất: 08/8/2026" },
+  { id: "t4", name: "Lê Minh Đức", team: "Tổ Năng khiếu", info: "Đăng nhập gần nhất: 05/8/2026" },
+  { id: "t5", name: "Đỗ Quang Huy", team: "Tổ Toán", info: "Đăng nhập gần nhất: 02/8/2026" },
+];
+
+const TEACHERS_NO_CONTENT = [
+  { id: "c1", name: "Vũ Thị Mai", team: "Tổ Tiếng Việt", info: "Chưa có nội dung nào" },
+  { id: "c2", name: "Hoàng Văn Nam", team: "Tổ Toán", info: "Chưa có nội dung nào" },
+  { id: "c3", name: "Ngô Thị Hạnh", team: "Tổ Năng khiếu", info: "Chưa có nội dung nào" },
+];
+
+const STUDENTS_INACTIVE = [
+  { id: "s1", name: "Nguyễn Bảo An", team: "Lớp 1A", info: "Chưa từng đăng nhập" },
+  { id: "s2", name: "Trần Gia Bảo", team: "Lớp 2B", info: "Chưa làm bài nào" },
+  { id: "s3", name: "Lê Khánh Chi", team: "Lớp 3C", info: "Chưa từng đăng nhập" },
+  { id: "s4", name: "Phạm Minh Dũng", team: "Lớp 4A", info: "Chưa làm bài nào" },
+  { id: "s5", name: "Đặng Thùy Dương", team: "Lớp 5B", info: "Chưa từng đăng nhập" },
+];
+
 
 const HL_SHARE = [
   { name: "Tổ Toán", value: 34, color: "#6366f1" },
@@ -96,10 +123,23 @@ function PrincipalHome() {
   const navigate = useNavigate();
   const [pending, setPending] = useState<PendingExam[]>(PENDING_EXAMS_SEED);
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [dialog, setDialog] = useState<"remind-login" | "remind-content" | "view-students" | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const dialogCfg = useMemo(() => {
+    if (dialog === "remind-content")
+      return { title: "Giáo viên chưa từng tạo nội dung", desc: "Chọn giáo viên để gửi nhắc nhở tạo nội dung.", rows: TEACHERS_NO_CONTENT, colTeam: "Tổ môn" };
+    if (dialog === "view-students")
+      return { title: "Học sinh chưa tham gia học", desc: "Chọn học sinh để gửi nhắc nhở tham gia học trên LMS.", rows: STUDENTS_INACTIVE, colTeam: "Lớp" };
+    return { title: "Giáo viên chưa đăng nhập trên 7 ngày", desc: "Chọn giáo viên để gửi nhắc nhở đăng nhập hệ thống.", rows: TEACHERS_NO_LOGIN, colTeam: "Tổ môn" };
+  }, [dialog]);
+
+  useEffect(() => { setSelected([]); }, [dialog]);
 
   const removeExam = (id: string) => setPending((p) => p.filter((e) => e.id !== id));
 
   const gradeBlocks = useMemo(() => GRADES, []);
+
 
   return (
     <AppShell role="principal">
@@ -136,9 +176,10 @@ function PrincipalHome() {
                   >
                     <X className="h-4 w-4 mr-1" /> Từ chối
                   </Button>
-                  <Button className="h-9 text-[13px]" onClick={() => removeExam(e.id)}>
+                  <Button className="h-9 text-[13px] bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => removeExam(e.id)}>
                     <Check className="h-4 w-4 mr-1" /> Duyệt
                   </Button>
+
                 </div>
               </div>
             ))}
@@ -153,20 +194,35 @@ function PrincipalHome() {
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[...ROW1, ...ROW2].map((k) => (
-            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3">
+          {[...ROW1, ...ROW2].map((k) => {
+            const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | undefined;
+            return (
+            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
                 <k.icon className="h-5 w-5" />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 pr-7">
                 <p className="text-[13px] text-slate-500 leading-tight">{k.label}</p>
                 <p className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{k.value}</p>
                 {"sub" in k && k.sub && (
                   <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
                 )}
               </div>
+              {action && (
+                <button
+                  type="button"
+                  aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
+                  title={action === "view-students" ? "Xem danh sách" : "Nhắc nhở"}
+                  onClick={() => setDialog(action)}
+                  className="absolute top-3 right-3 h-8 w-8 rounded-lg border flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-indigo-600"
+                >
+                  {action === "view-students" ? <Eye className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
+                </button>
+              )}
             </div>
-          ))}
+            );
+          })}
+
         </div>
 
         {/* 2 biểu đồ tròn */}
@@ -224,10 +280,11 @@ function PrincipalHome() {
                 const shown = open ? g.classes : g.classes.slice(0, 5);
                 return (
                   <Fragment key={g.grade}>
-                    <tr key={`h-${g.grade}`} className="bg-amber-50/60">
-                      <td colSpan={DAYS.length + 1} className="px-3 py-1.5 text-[13px] font-semibold text-amber-700">
+                    <tr key={`h-${g.grade}`} className="bg-sky-50">
+                      <td colSpan={DAYS.length + 1} className="px-3 py-1.5 text-[13px] font-semibold text-sky-700">
                         Khối {g.grade} · {g.classes.length} lớp
                       </td>
+
                     </tr>
                     {shown.map((cls) => (
                       <tr key={cls} className="border-t">
@@ -276,6 +333,68 @@ function PrincipalHome() {
           </Button>
         </div>
       </section>
+
+      {/* Popup nhắc nhở / xem danh sách */}
+      <Dialog open={dialog !== null} onOpenChange={(o) => !o && setDialog(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-[16px]">{dialogCfg.title}</DialogTitle>
+            <DialogDescription className="text-[13px]">{dialogCfg.desc}</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[380px] overflow-auto border rounded-lg">
+            <table className="w-full text-[13px]">
+              <thead className="bg-slate-50 text-slate-500">
+                <tr>
+                  <th className="w-10 px-3 py-2">
+                    <Checkbox
+                      checked={selected.length > 0 && selected.length === dialogCfg.rows.length}
+                      onCheckedChange={(v) =>
+                        setSelected(v ? dialogCfg.rows.map((r) => r.id) : [])
+                      }
+                    />
+                  </th>
+                  <th className="px-3 py-2 text-left">Họ và tên</th>
+                  <th className="px-3 py-2 text-left">{dialogCfg.colTeam}</th>
+                  <th className="px-3 py-2 text-left">Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dialogCfg.rows.map((r) => (
+                  <tr key={r.id} className="border-t">
+                    <td className="px-3 py-2">
+                      <Checkbox
+                        checked={selected.includes(r.id)}
+                        onCheckedChange={(v) =>
+                          setSelected((p) => (v ? [...p, r.id] : p.filter((x) => x !== r.id)))
+                        }
+                      />
+                    </td>
+                    <td className="px-3 py-2 font-semibold text-slate-800">{r.name}</td>
+                    <td className="px-3 py-2 text-slate-600">{r.team}</td>
+                    <td className="px-3 py-2 text-slate-500">{r.info}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="h-9 text-[13px]" onClick={() => setDialog(null)}>
+              Đóng
+            </Button>
+            <Button
+              className="h-9 text-[13px]"
+              disabled={selected.length === 0}
+              onClick={() => {
+                toast.success(`Đã gửi nhắc nhở tới ${selected.length} người`);
+                setDialog(null);
+              }}
+            >
+              <Bell className="h-4 w-4 mr-1" /> Gửi nhắc nhở ({selected.length})
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
+
