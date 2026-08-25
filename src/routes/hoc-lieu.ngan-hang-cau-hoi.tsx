@@ -619,6 +619,8 @@ function ViewQuestionModal({
               ))}
             </div>
           )}
+
+          <QuestionExtraDetails q={question} />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Đóng</Button>
