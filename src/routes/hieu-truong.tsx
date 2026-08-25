@@ -6,9 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
-  ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
-} from "recharts";
-import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User, Bell, Eye,
   ChevronLeft, ChevronRight,
