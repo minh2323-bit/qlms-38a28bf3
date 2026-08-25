@@ -26,6 +26,7 @@ import {
   PickQuestionTypeModal, QuestionFormModal, QuestionTypeIcon,
   QUESTION_TYPE_LABEL, type QuestionType, type QuestionDraft,
 } from "@/components/QuestionFormModal";
+import { draftExtras, QuestionExtraDetails, type QuestionExtras } from "@/components/QuestionExtras";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/hoc-lieu/ngan-hang-cau-hoi")({
