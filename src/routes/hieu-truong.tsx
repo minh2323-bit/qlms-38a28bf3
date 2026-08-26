@@ -318,8 +318,6 @@ function PrincipalHome() {
             </thead>
             <tbody>
               {gradeBlocks.map((g) => {
-                const open = !!expanded[g.grade];
-                const shown = open ? g.classes : g.classes.slice(0, 5);
                 return (
                   <Fragment key={g.grade}>
                     <tr key={`h-${g.grade}`} className="bg-sky-50">
@@ -328,18 +326,21 @@ function PrincipalHome() {
                       </td>
 
                     </tr>
-                    {shown.map((cls) => (
+                    {g.classes.map((cls) => (
                       <tr key={cls} className="border-t">
                         <td className="px-3 py-2 font-semibold text-slate-800">{cls}</td>
                         {DAYS.map((d, i) => {
                           const { done, total } = slotStat(cls, i);
                           const full = done === total;
+                          const empty = done === 0;
                           return (
                             <td key={d.label} className="px-2 py-2">
                               <div className={`rounded-lg border text-center py-2 ${
-                                full
-                                  ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                  : "bg-amber-50 border-amber-200 text-amber-700"
+                                empty
+                                  ? "bg-rose-50 border-rose-300 text-rose-700"
+                                  : full
+                                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                    : "bg-amber-50 border-amber-200 text-amber-700"
                               }`}>
                                 <div className="font-bold">{done}/{total}</div>
                                 <div className="text-[12px]">tiết đã soạn</div>
@@ -349,20 +350,6 @@ function PrincipalHome() {
                         })}
                       </tr>
                     ))}
-                    {g.classes.length > 5 && (
-                      <tr key={`m-${g.grade}`} className="border-t">
-                        <td colSpan={DAYS.length + 1} className="px-3 py-2 text-center">
-                          <Button
-                            variant="ghost"
-                            className="h-8 text-[13px] text-indigo-600"
-                            onClick={() => setExpanded((p) => ({ ...p, [g.grade]: !open }))}
-                          >
-                            {open ? (<>Thu gọn <ChevronUp className="h-4 w-4 ml-1" /></>)
-                              : (<>Xem thêm {g.classes.length - 5} lớp <ChevronDown className="h-4 w-4 ml-1" /></>)}
-                          </Button>
-                        </td>
-                      </tr>
-                    )}
                   </Fragment>
                 );
               })}
