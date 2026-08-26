@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, Check, X, User, Bell, Eye,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, TrendingUp,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -42,8 +42,8 @@ const PENDING_EXAMS_SEED: PendingExam[] = [
 ];
 
 const ROW1 = [
-  { label: "HL đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
-  { label: "BG đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
+  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", trend: 15 },
+  { label: "Bài giảng đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", trend: 8 },
   {
     label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
     storage: { used: 324, total: 500 },
@@ -116,7 +116,9 @@ function slotStat(cls: string, dayIdx: number) {
   let h = dayIdx * 31;
   for (const ch of cls) h = (h * 33 + ch.charCodeAt(0)) % 997;
   const total = 3 + (h % 4); // 3..6
-  const done = Math.max(2, total - (h % 3));
+  // một vài ngày chưa soạn nội dung nào (0 tiết) để cảnh báo
+  if (h % 7 === 0) return { done: 0, total };
+  const done = Math.max(1, total - (h % 3));
   return { done: Math.min(done, total), total };
 }
 
@@ -213,6 +215,11 @@ function PrincipalHome() {
               <div className="min-w-0 pr-7">
                 <p className="text-[13px] text-slate-500 leading-tight">{k.label}</p>
                 <p className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{k.value}</p>
+                {"trend" in k && typeof k.trend === "number" && (
+                  <p className="text-[12px] font-semibold text-emerald-600 mt-0.5 flex items-center gap-1">
+                    <TrendingUp className="h-3.5 w-3.5" /> +{k.trend}% so với tháng trước
+                  </p>
+                )}
                 {"sub" in k && k.sub && (
                   <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
                 )}

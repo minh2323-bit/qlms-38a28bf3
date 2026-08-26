@@ -158,7 +158,7 @@ const PRINCIPAL_NAV: NavItem[] = [
     label: "Thống kê\n& Báo cáo",
     submenu: [
       { icon: TrendingUp, label: "Thống kê của trường", to: "/hieu-truong/thong-ke-truong" },
-      { icon: BarChart3, label: "Hoạt động giảng dạy", to: "/thong-ke" },
+      { icon: BarChart3, label: "Hoạt động giảng dạy cá nhân", to: "/hieu-truong/hoat-dong-ca-nhan" },
       { icon: FileBarChart, label: "Báo cáo DTI" },
     ],
   },
