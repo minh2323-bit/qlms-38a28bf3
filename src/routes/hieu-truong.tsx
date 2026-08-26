@@ -240,7 +240,16 @@ function PrincipalHome() {
                   </div>
                 )}
               </div>
-              {action && (
+              {action === "storage" ? (
+                <Link
+                  to="/he-thong/quan-ly-dung-luong"
+                  aria-label="Sang trang Quản lý dung lượng"
+                  title="Quản lý dung lượng"
+                  className="absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition bg-sky-500 hover:bg-sky-600"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
+              ) : action ? (
                 <button
                   type="button"
                   aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
@@ -257,7 +266,8 @@ function PrincipalHome() {
                     <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
                   )}
                 </button>
-              )}
+              ) : null}
+
             </div>
             );
           })}
