@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, Check, X, User, Bell, Eye,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, TrendingUp,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -116,7 +116,9 @@ function slotStat(cls: string, dayIdx: number) {
   let h = dayIdx * 31;
   for (const ch of cls) h = (h * 33 + ch.charCodeAt(0)) % 997;
   const total = 3 + (h % 4); // 3..6
-  const done = Math.max(2, total - (h % 3));
+  // một vài ngày chưa soạn nội dung nào (0 tiết) để cảnh báo
+  if (h % 7 === 0) return { done: 0, total };
+  const done = Math.max(1, total - (h % 3));
   return { done: Math.min(done, total), total };
 }
 

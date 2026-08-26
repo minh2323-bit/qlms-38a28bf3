@@ -127,20 +127,20 @@ function formatLastSeen(lastSeen: string, minsAgo?: number) {
 type TRow = {
   name: string; team: string; classes: string;
   lectures: number; shared: number; materials: number;
-  homework: number; tests: number; lastSeen: string; minsAgo?: number;
+  questions: number; homework: number; tests: number; lastSeen: string; minsAgo?: number;
 };
 
 const TEACHERS: TRow[] = [
-  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, homework: 88, tests: 34, lastSeen: "25/8/2026 08:12", minsAgo: 5 },
-  { name: "Phùng Thuý Hằng", team: "Tổ Tiểu học 1", classes: "3A, 3B", lectures: 36, shared: 12, materials: 98, homework: 74, tests: 28, lastSeen: "24/8/2026 16:40" },
-  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, homework: 52, tests: 19, lastSeen: "25/8/2026 07:55", minsAgo: 62 },
-  { name: "Trần Minh Quân", team: "Tổ Tiểu học 1", classes: "3C, 4A", lectures: 29, shared: 9, materials: 81, homework: 63, tests: 22, lastSeen: "23/8/2026 14:05" },
-  { name: "Đỗ Văn Nam", team: "Tổ Tiểu học 2", classes: "5A", lectures: 18, shared: 4, materials: 47, homework: 41, tests: 12, lastSeen: "22/8/2026 09:30" },
-  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, homework: 70, tests: 26, lastSeen: "25/8/2026 06:48", minsAgo: 180 },
-  { name: "Phạm Quốc Anh", team: "Tổ Tiểu học 2", classes: "2A", lectures: 12, shared: 2, materials: 38, homework: 25, tests: 8, lastSeen: "18/8/2026 15:20" },
-  { name: "Vũ Bích Ngọc", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 9, shared: 3, materials: 44, homework: 16, tests: 5, lastSeen: "21/8/2026 10:02" },
-  { name: "Trần Thanh Thảo", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 7, shared: 1, materials: 31, homework: 11, tests: 3, lastSeen: "19/8/2026 13:44" },
-  { name: "Hoàng Văn Nam", team: "Tổ Toán", classes: "2B, 2C", lectures: 24, shared: 8, materials: 69, homework: 57, tests: 17, lastSeen: "24/8/2026 11:15" },
+  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, questions: 395, homework: 88, tests: 34, lastSeen: "25/8/2026 08:12", minsAgo: 5 },
+  { name: "Phùng Thuý Hằng", team: "Tổ Tiểu học 1", classes: "3A, 3B", lectures: 36, shared: 12, materials: 98, questions: 311, homework: 74, tests: 28, lastSeen: "24/8/2026 16:40" },
+  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, questions: 209, homework: 52, tests: 19, lastSeen: "25/8/2026 07:55", minsAgo: 62 },
+  { name: "Trần Minh Quân", team: "Tổ Tiểu học 1", classes: "3C, 4A", lectures: 29, shared: 9, materials: 81, questions: 260, homework: 63, tests: 22, lastSeen: "23/8/2026 14:05" },
+  { name: "Đỗ Văn Nam", team: "Tổ Tiểu học 2", classes: "5A", lectures: 18, shared: 4, materials: 47, questions: 158, homework: 41, tests: 12, lastSeen: "22/8/2026 09:30" },
+  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, questions: 293, homework: 70, tests: 26, lastSeen: "25/8/2026 06:48", minsAgo: 180 },
+  { name: "Phạm Quốc Anh", team: "Tổ Tiểu học 2", classes: "2A", lectures: 12, shared: 2, materials: 38, questions: 131, homework: 25, tests: 8, lastSeen: "18/8/2026 15:20" },
+  { name: "Vũ Bích Ngọc", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 9, shared: 3, materials: 44, questions: 149, homework: 16, tests: 5, lastSeen: "21/8/2026 10:02" },
+  { name: "Trần Thanh Thảo", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 7, shared: 1, materials: 31, questions: 110, homework: 11, tests: 3, lastSeen: "19/8/2026 13:44" },
+  { name: "Hoàng Văn Nam", team: "Tổ Toán", classes: "2B, 2C", lectures: 24, shared: 8, materials: 69, questions: 224, homework: 57, tests: 17, lastSeen: "24/8/2026 11:15" },
 ];
 
 const TEAMS = Array.from(new Set(TEACHERS.map((t) => t.team)));
@@ -287,6 +287,7 @@ function SchoolStatsPage() {
                   <th className="text-left font-semibold py-2.5 px-3">Lớp phụ trách</th>
                   <th className="text-center font-semibold py-2.5 px-3">Bài giảng đã tạo</th>
                   <th className="text-center font-semibold py-2.5 px-3">Học liệu tải lên</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Ngân hàng câu hỏi</th>
                   <th className="text-center font-semibold py-2.5 px-3">Bài tập đã giao</th>
                   <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã tạo</th>
                   <th className="text-center font-semibold py-2.5 px-3">Truy cập gần nhất</th>
@@ -304,6 +305,7 @@ function SchoolStatsPage() {
                       <div className="text-xs text-slate-500">Đã chia sẻ: {t.shared}</div>
                     </td>
                     <td className="text-center py-2.5 px-3">{t.materials}</td>
+                    <td className="text-center py-2.5 px-3">{t.questions}</td>
                     <td className="text-center py-2.5 px-3">{t.homework}</td>
                     <td className="text-center py-2.5 px-3">{t.tests}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600" title={t.lastSeen}>
@@ -312,7 +314,7 @@ function SchoolStatsPage() {
                   </tr>
                 ))}
                 {rows.length === 0 && (
-                  <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
+                  <tr><td colSpan={10} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
                 )}
               </tbody>
             </table>
