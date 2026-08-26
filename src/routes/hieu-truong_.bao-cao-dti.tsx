@@ -11,6 +11,9 @@ import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/
 
 
 export const Route = createFileRoute("/hieu-truong_/bao-cao-dti")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: typeof search.tab === "string" ? search.tab : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Báo cáo DTI – Giáo viên & Học sinh | QLMS" },
@@ -135,7 +138,10 @@ const TABS = [
 type TabKey = (typeof TABS)[number][0];
 
 function DtiReportPage() {
-  const [tab, setTab] = useState<TabKey>("teacher");
+  const { tab: initialTab } = Route.useSearch();
+  const [tab, setTab] = useState<TabKey>(
+    TABS.some(([k]) => k === initialTab) ? (initialTab as TabKey) : "teacher",
+  );
 
   return (
     <AppShell role="principal">
