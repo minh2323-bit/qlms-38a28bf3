@@ -221,6 +221,62 @@ function SchoolStatsPage() {
           </div>
         </section>
 
+        {/* Section: Thống kê Học liệu bản quyền */}
+        <section id="hlbq" className="bg-white rounded-2xl border shadow-sm p-6 space-y-5 scroll-mt-4">
+          <h2 className="text-lg font-bold text-amber-700 flex items-center gap-2">
+            <Crown className="h-5 w-5 text-amber-500" /> Thống kê Học liệu bản quyền
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { title: "Phân loại theo mục đích sử dụng của Giáo viên", data: HLBQ_PURPOSE },
+              { title: "Phân loại theo định dạng", data: HLBQ_FORMAT },
+            ].map((p) => (
+              <div key={p.title} className="rounded-xl border p-4">
+                <h3 className="text-sm font-bold text-slate-700 mb-1 min-h-[40px]">{p.title}</h3>
+                <ResponsiveContainer width="100%" height={230}>
+                  <PieChart>
+                    <Pie data={p.data} dataKey="value" nameKey="name" innerRadius={44} outerRadius={72} paddingAngle={2} stroke="#fff" strokeWidth={2}>
+                      {p.data.map((_, i) => <Cell key={i} fill={C[i % C.length]} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v: number) => v.toLocaleString("vi-VN")} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ))}
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-slate-500 border-b bg-slate-50/60">
+                  <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
+                  <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Khối</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Môn</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Nhà cung cấp</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Định dạng</th>
+                </tr>
+              </thead>
+              <tbody>
+                {HLBQ_ROWS.map((r, i) => (
+                  <tr key={r.name} className="border-b last:border-0 hover:bg-slate-50">
+                    <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
+                    <td className="py-2.5 px-3 font-semibold text-indigo-700">{r.name}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600">{r.grade}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600">{r.subject}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600">{r.provider}</td>
+                    <td className="text-center py-2.5 px-3">
+                      <span className={`inline-block rounded-md text-xs font-semibold px-2 py-1 ${FORMAT_COLOR[r.format]}`}>{r.format}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
       </div>
     </AppShell>
   );
