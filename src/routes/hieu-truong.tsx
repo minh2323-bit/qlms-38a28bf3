@@ -209,8 +209,25 @@ function PrincipalHome() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[...ROW1, ...ROW2].map((k) => {
             const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | "storage" | undefined;
+            const link = ("link" in k ? k.link : undefined) as "report-material" | "report-lecture" | "stats-hlbq" | "scroll-progress" | undefined;
+            const onCardClick = link === "report-material"
+              ? () => navigate({ to: "/hieu-truong/bao-cao-dti", search: { tab: "material" } })
+              : link === "report-lecture"
+                ? () => navigate({ to: "/hieu-truong/bao-cao-dti", search: { tab: "lecture" } })
+                : link === "stats-hlbq"
+                  ? () => navigate({ to: "/hieu-truong/thong-ke-truong", hash: "hlbq" })
+                  : link === "scroll-progress"
+                    ? () => document.getElementById("tien-do-soan")?.scrollIntoView({ behavior: "smooth" })
+                    : undefined;
             return (
-            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
+            <div
+              key={k.label}
+              role={onCardClick ? "button" : undefined}
+              tabIndex={onCardClick ? 0 : undefined}
+              onClick={onCardClick}
+              onKeyDown={onCardClick ? (ev) => ev.key === "Enter" && onCardClick() : undefined}
+              className={`bg-white rounded-xl border p-4 flex items-start gap-3 relative ${onCardClick ? "cursor-pointer hover:border-indigo-300 hover:shadow-md transition" : ""}`}
+            >
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
                 <k.icon className="h-5 w-5" />
               </div>
