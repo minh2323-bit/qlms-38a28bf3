@@ -42,8 +42,8 @@ const PENDING_EXAMS_SEED: PendingExam[] = [
 ];
 
 const ROW1 = [
-  { label: "HL đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600" },
-  { label: "BG đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600" },
+  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", trend: 15 },
+  { label: "Bài giảng đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", trend: 8 },
   {
     label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
     storage: { used: 324, total: 500 },
