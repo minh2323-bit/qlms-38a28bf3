@@ -102,15 +102,15 @@ const HLBQ_FORMAT = [
 ];
 
 const HLBQ_ROWS = [
-  { name: "Bộ câu hỏi Toán 3 - Ôn tập các số đến 1000", grade: "Khối 3", subject: "Toán", provider: "HEID", format: "Bộ câu hỏi" },
-  { name: "Video tương tác Tiếng Việt 4 - Luyện từ và câu", grade: "Khối 4", subject: "Tiếng Việt", provider: "OLM", format: "Video tương tác" },
-  { name: "Sách giáo viên Toán 4 - Phân số và phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Sách giáo viên" },
-  { name: "Bộ câu hỏi Tiếng Anh 5 - My Family", grade: "Khối 5", subject: "Tiếng Anh", provider: "HEID", format: "Bộ câu hỏi" },
-  { name: "Video tương tác Toán 3 - Bảng nhân 3, bảng chia 3", grade: "Khối 3", subject: "Toán", provider: "OLM", format: "Video tương tác" },
-  { name: "Sách giáo viên Tiếng Việt 3 - Đọc hiểu văn bản", grade: "Khối 3", subject: "Tiếng Việt", provider: "HEID", format: "Sách giáo viên" },
-  { name: "Bộ câu hỏi Tự nhiên và xã hội 4 - Cây xanh", grade: "Khối 4", subject: "Tự nhiên và xã hội", provider: "OLM", format: "Bộ câu hỏi" },
-  { name: "Video tương tác Toán 4 - Tìm thành phần trong phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Video tương tác" },
-];
+  { name: "Bộ câu hỏi Toán 3 - Ôn tập các số đến 1000", grade: "Khối 3", subject: "Toán", provider: "HEID", format: "Bộ câu hỏi", uses: 384 },
+  { name: "Video tương tác Toán 3 - Bảng nhân 3, bảng chia 3", grade: "Khối 3", subject: "Toán", provider: "OLM", format: "Video tương tác", uses: 318 },
+  { name: "Sách giáo viên Toán 4 - Phân số và phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Sách giáo viên", uses: 276 },
+  { name: "Bộ câu hỏi Tiếng Anh 5 - My Family", grade: "Khối 5", subject: "Tiếng Anh", provider: "HEID", format: "Bộ câu hỏi", uses: 231 },
+  { name: "Video tương tác Tiếng Việt 4 - Luyện từ và câu", grade: "Khối 4", subject: "Tiếng Việt", provider: "OLM", format: "Video tương tác", uses: 198 },
+  { name: "Sách giáo viên Tiếng Việt 3 - Đọc hiểu văn bản", grade: "Khối 3", subject: "Tiếng Việt", provider: "HEID", format: "Sách giáo viên", uses: 164 },
+  { name: "Bộ câu hỏi Tự nhiên và xã hội 4 - Cây xanh", grade: "Khối 4", subject: "Tự nhiên và xã hội", provider: "OLM", format: "Bộ câu hỏi", uses: 132 },
+  { name: "Video tương tác Toán 4 - Tìm thành phần trong phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Video tương tác", uses: 96 },
+].sort((a, b) => b.uses - a.uses);
 
 const FORMAT_COLOR: Record<string, string> = {
   "Bộ câu hỏi": "bg-violet-50 text-violet-700",
