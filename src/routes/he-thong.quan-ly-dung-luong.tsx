@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 export const Route = createFileRoute("/he-thong/quan-ly-dung-luong")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    role: search.role === "principal" ? ("principal" as const) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Quản lý dung lượng lưu trữ | QLMS" },
@@ -66,7 +69,7 @@ function StoragePage() {
   );
 
   return (
-    <AppShell role="principal">
+    <AppShell role={role}>
       <section className="space-y-4">
         <h1 className="text-[19px] font-bold text-slate-800">Quản lý dung lượng</h1>
 
