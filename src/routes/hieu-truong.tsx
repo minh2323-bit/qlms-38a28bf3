@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, Check, X, User, Bell, Eye,
-  ChevronLeft, ChevronRight, TrendingUp,
+  ChevronLeft, ChevronRight, TrendingUp, ExternalLink,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -159,7 +159,7 @@ function PrincipalHome() {
       {/* Kỳ thi cần duyệt */}
       {pending.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-[15px] font-semibold text-slate-800">Kỳ thi cần duyệt</h2>
+          <h2 className="text-[18px] font-bold text-slate-800">Kỳ thi cần duyệt</h2>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
             {pending.map((e) => (
               <div
@@ -202,13 +202,13 @@ function PrincipalHome() {
 
       {/* Thống kê hoạt động của trường */}
       <section className="space-y-3">
-        <h2 className="text-[15px] font-semibold text-slate-800">
+        <h2 className="text-[18px] font-bold text-slate-800">
           Thống kê hoạt động của trường trên EneStudy
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[...ROW1, ...ROW2].map((k) => {
-            const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | undefined;
+            const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | "storage" | undefined;
             return (
             <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
@@ -254,7 +254,7 @@ function PrincipalHome() {
                   type="button"
                   aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
                   title={action === "view-students" ? "Xem danh sách" : "Nhắc nhở"}
-                  onClick={() => setDialog(action)}
+                  onClick={() => setDialog(action as "remind-login" | "remind-content" | "view-students")}
                   className={`absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition ${
                     action === "view-students"
                       ? "bg-teal-500 hover:bg-teal-600"
@@ -278,7 +278,7 @@ function PrincipalHome() {
 
       {/* Tiến độ soạn nội dung cho tuần học */}
       <section className="space-y-3">
-        <h2 className="text-[15px] font-semibold text-slate-800">
+        <h2 className="text-[18px] font-bold text-slate-800">
           Tiến độ soạn nội dung cho tuần học
         </h2>
 
