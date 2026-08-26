@@ -256,14 +256,15 @@ function SchoolStatsPage() {
           <div className="overflow-x-auto rounded-xl border">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-500 border-b bg-slate-50/60">
-                  <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
-                  <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Khối</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Môn</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Nhà cung cấp</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Định dạng</th>
-                </tr>
+              <tr className="text-slate-500 border-b bg-slate-50/60">
+                <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
+                <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
+                <th className="text-center font-semibold py-2.5 px-3">Lượt sử dụng</th>
+                <th className="text-center font-semibold py-2.5 px-3">Khối</th>
+                <th className="text-center font-semibold py-2.5 px-3">Môn</th>
+                <th className="text-center font-semibold py-2.5 px-3">Nhà cung cấp</th>
+                <th className="text-center font-semibold py-2.5 px-3">Định dạng</th>
+              </tr>
               </thead>
               <tbody>
                 {HLBQ_ROWS.map((r, i) => (
