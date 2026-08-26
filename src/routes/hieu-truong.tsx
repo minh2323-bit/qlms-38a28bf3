@@ -45,14 +45,16 @@ const ROW1 = [
   { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", trend: 15 },
   { label: "Bài giảng đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", trend: 8 },
   {
-    label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
-    storage: { used: 324, total: 500 },
-  },
-  {
     label: "Lượt sử dụng Học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
     sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
   },
+  {
+    label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
+    storage: { used: 324, total: 500 },
+    action: "storage" as const,
+  },
 ];
+
 
 const ROW2 = [
   { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600", action: "remind-login" as const },
