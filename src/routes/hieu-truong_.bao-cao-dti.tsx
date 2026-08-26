@@ -7,6 +7,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
+import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
+
 
 export const Route = createFileRoute("/hieu-truong_/bao-cao-dti")({
   head: () => ({
@@ -122,8 +124,18 @@ function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => v
 }
 
 /* ---------------- Page ---------------- */
+const TABS = [
+  ["teacher", "Báo cáo Giáo viên"],
+  ["student", "Báo cáo Học sinh"],
+  ["material", "Báo cáo Học liệu"],
+  ["question", "Báo cáo Ngân hàng câu hỏi"],
+  ["lecture", "Báo cáo Bài giảng"],
+] as const;
+
+type TabKey = (typeof TABS)[number][0];
+
 function DtiReportPage() {
-  const [tab, setTab] = useState<"teacher" | "student">("teacher");
+  const [tab, setTab] = useState<TabKey>("teacher");
 
   return (
     <AppShell role="principal">
@@ -131,12 +143,12 @@ function DtiReportPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-800">Báo cáo DTI</h1>
           <p className="text-sm text-slate-500">
-            Báo cáo chuyển đổi số của trường theo giáo viên và học sinh.
+            Báo cáo chuyển đổi số của trường theo giáo viên, học sinh và nội dung số.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 border-b">
-          {([["teacher", "Báo cáo Giáo viên"], ["student", "Báo cáo Học sinh"]] as const).map(([k, label]) => (
+        <div className="flex flex-wrap items-center gap-2 border-b">
+          {TABS.map(([k, label]) => (
             <button
               key={k}
               onClick={() => setTab(k)}
@@ -149,11 +161,16 @@ function DtiReportPage() {
           ))}
         </div>
 
-        {tab === "teacher" ? <TeacherReport /> : <StudentReport />}
+        {tab === "teacher" && <TeacherReport />}
+        {tab === "student" && <StudentReport />}
+        {tab === "material" && <MaterialReport />}
+        {tab === "question" && <QuestionBankReport />}
+        {tab === "lecture" && <LectureReport />}
       </div>
     </AppShell>
   );
 }
+
 
 function TeacherReport() {
   const [q, setQ] = useState("");
