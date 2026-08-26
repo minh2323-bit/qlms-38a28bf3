@@ -243,6 +243,7 @@ function PrincipalHome() {
               {action === "storage" ? (
                 <Link
                   to="/he-thong/quan-ly-dung-luong"
+                  search={{ role: "principal" }}
                   aria-label="Sang trang Quản lý dung lượng"
                   title="Quản lý dung lượng"
                   className="absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition bg-sky-500 hover:bg-sky-600"

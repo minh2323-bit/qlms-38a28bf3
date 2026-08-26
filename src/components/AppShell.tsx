@@ -16,7 +16,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-type SubItem = { icon: typeof Home; label: string; to?: string; highlight?: boolean };
+type SubItem = { icon: typeof Home; label: string; to?: string; highlight?: boolean; search?: Record<string, unknown> };
 type NavItem = {
   icon: typeof Home;
   label: string;
@@ -171,7 +171,7 @@ const PRINCIPAL_NAV: NavItem[] = [
       { icon: Users, label: "Tài khoản học sinh" },
       { icon: UserCog, label: "Tài khoản nhân sự" },
       { icon: Database, label: "Đồng bộ dữ liệu CSDL" },
-      { icon: HardDrive, label: "Quản lý dung lượng", to: "/he-thong/quan-ly-dung-luong" },
+      { icon: HardDrive, label: "Quản lý dung lượng", to: "/he-thong/quan-ly-dung-luong", search: { role: "principal" } },
     ],
   },
 ];
@@ -228,7 +228,7 @@ export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
                       </>
                     );
                     return s.to ? (
-                      <Link key={s.label} to={s.to} className={subCls}>{inner}</Link>
+                      <Link key={s.label} to={s.to} search={(s.search ?? {}) as never} className={subCls}>{inner}</Link>
                     ) : (
                       <button key={s.label} className={subCls}>{inner}</button>
                     );
