@@ -58,6 +58,7 @@ function fmt(n: number) {
 }
 
 function StoragePage() {
+  const { role } = Route.useSearch();
   const [tab, setTab] = useState<"school" | "personal">("school");
   const [q, setQ] = useState("");
   const data = tab === "school" ? SCHOOL : PERSONAL;
