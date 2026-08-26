@@ -146,7 +146,7 @@ function SchoolStatsPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-800">Thống kê của trường</h1>
           <p className="text-sm text-slate-500">
-            Tổng hợp tài nguyên số và hoạt động của toàn bộ giáo viên trong trường.
+            Thống kê tổng hợp tài nguyên trên LMS của nhà trường và nhà cung cấp học liệu bản quyền.
           </p>
         </div>
 
