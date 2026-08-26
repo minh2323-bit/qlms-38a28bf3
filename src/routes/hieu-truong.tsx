@@ -124,7 +124,6 @@ function slotStat(cls: string, dayIdx: number) {
 function PrincipalHome() {
   const navigate = useNavigate();
   const [pending, setPending] = useState<PendingExam[]>(PENDING_EXAMS_SEED);
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const [dialog, setDialog] = useState<"remind-login" | "remind-content" | "view-students" | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
 
