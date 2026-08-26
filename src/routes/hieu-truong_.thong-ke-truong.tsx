@@ -271,6 +271,7 @@ function SchoolStatsPage() {
                   <tr key={r.name} className="border-b last:border-0 hover:bg-slate-50">
                     <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
                     <td className="py-2.5 px-3 font-semibold text-indigo-700">{r.name}</td>
+                    <td className="text-center py-2.5 px-3 font-bold text-amber-600">{r.uses.toLocaleString("vi-VN")}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600">{r.grade}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600">{r.subject}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600">{r.provider}</td>
