@@ -7,6 +7,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
+import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
+
 
 export const Route = createFileRoute("/hieu-truong_/bao-cao-dti")({
   head: () => ({
