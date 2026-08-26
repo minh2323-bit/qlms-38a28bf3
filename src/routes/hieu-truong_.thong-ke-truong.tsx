@@ -47,7 +47,7 @@ const C = ["#6366f1", "#10b981", "#0ea5e9", "#f59e0b", "#f43f5e", "#8b5cf6"];
 
 const PIES: { title: string; data: { name: string; value: number }[]; unit?: string }[] = [
   {
-    title: "HL đóng góp theo tổ môn",
+    title: "Học liệu đóng góp theo tổ môn",
     data: [
       { name: "Tổ Toán", value: 34 }, { name: "Tổ Tiếng Việt", value: 28 },
       { name: "Tổ Tiếng Anh", value: 18 }, { name: "Tổ Năng khiếu", value: 12 },
@@ -65,10 +65,11 @@ const PIES: { title: string; data: { name: string; value: number }[]; unit?: str
     unit: "%",
   },
   {
-    title: "Phân loại mục đích sử dụng Học liệu bản quyền",
+    title: "Học liệu theo loại",
     data: [
-      { name: "Tạo bài giảng", value: 486 }, { name: "Tạo bài tập", value: 352 },
-      { name: "Tạo đề kiểm tra", value: 264 }, { name: "Tạo kỳ thi", value: 134 },
+      { name: "Video", value: 862 }, { name: "Bài giảng", value: 640 },
+      { name: "Tài liệu", value: 512 }, { name: "Âm thanh", value: 218 },
+      { name: "Scorm / IFrame", value: 186 },
     ],
   },
   {
@@ -86,15 +87,35 @@ const PIES: { title: string; data: { name: string; value: number }[]; unit?: str
       { name: "Vận dụng", value: 2660 }, { name: "Vận dụng cao", value: 817 },
     ],
   },
-  {
-    title: "Học liệu theo loại",
-    data: [
-      { name: "Video", value: 862 }, { name: "Bài giảng", value: 640 },
-      { name: "Tài liệu", value: 512 }, { name: "Âm thanh", value: 218 },
-      { name: "Scorm / IFrame", value: 186 },
-    ],
-  },
 ];
+
+/* ---------------- Học liệu bản quyền ---------------- */
+const HLBQ_PURPOSE = [
+  { name: "Tạo bài giảng", value: 486 }, { name: "Tạo bài tập", value: 352 },
+  { name: "Tạo đề kiểm tra", value: 264 }, { name: "Tạo kỳ thi", value: 134 },
+];
+
+const HLBQ_FORMAT = [
+  { name: "Bộ câu hỏi", value: 512 }, { name: "Video tương tác", value: 348 },
+  { name: "Sách giáo viên", value: 376 },
+];
+
+const HLBQ_ROWS = [
+  { name: "Bộ câu hỏi Toán 3 - Ôn tập các số đến 1000", grade: "Khối 3", subject: "Toán", provider: "HEID", format: "Bộ câu hỏi" },
+  { name: "Video tương tác Tiếng Việt 4 - Luyện từ và câu", grade: "Khối 4", subject: "Tiếng Việt", provider: "OLM", format: "Video tương tác" },
+  { name: "Sách giáo viên Toán 4 - Phân số và phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Sách giáo viên" },
+  { name: "Bộ câu hỏi Tiếng Anh 5 - My Family", grade: "Khối 5", subject: "Tiếng Anh", provider: "HEID", format: "Bộ câu hỏi" },
+  { name: "Video tương tác Toán 3 - Bảng nhân 3, bảng chia 3", grade: "Khối 3", subject: "Toán", provider: "OLM", format: "Video tương tác" },
+  { name: "Sách giáo viên Tiếng Việt 3 - Đọc hiểu văn bản", grade: "Khối 3", subject: "Tiếng Việt", provider: "HEID", format: "Sách giáo viên" },
+  { name: "Bộ câu hỏi Tự nhiên và xã hội 4 - Cây xanh", grade: "Khối 4", subject: "Tự nhiên và xã hội", provider: "OLM", format: "Bộ câu hỏi" },
+  { name: "Video tương tác Toán 4 - Tìm thành phần trong phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Video tương tác" },
+];
+
+const FORMAT_COLOR: Record<string, string> = {
+  "Bộ câu hỏi": "bg-violet-50 text-violet-700",
+  "Video tương tác": "bg-rose-50 text-rose-700",
+  "Sách giáo viên": "bg-sky-50 text-sky-700",
+};
 
 const MONTHLY = [
   { month: "T1", baiGiang: 62, baiTap: 128, kiemTra: 41 },
