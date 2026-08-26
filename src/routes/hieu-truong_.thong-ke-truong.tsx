@@ -292,6 +292,7 @@ function SchoolStatsPage() {
                   <th className="text-center font-semibold py-2.5 px-3">Ngân hàng câu hỏi</th>
                   <th className="text-center font-semibold py-2.5 px-3">Bài tập đã giao</th>
                   <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã tạo</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ tiết có nội dung</th>
                   <th className="text-center font-semibold py-2.5 px-3">Truy cập gần nhất</th>
                 </tr>
               </thead>
@@ -308,15 +309,26 @@ function SchoolStatsPage() {
                     </td>
                     <td className="text-center py-2.5 px-3">{t.materials}</td>
                     <td className="text-center py-2.5 px-3">{t.questions}</td>
-                    <td className="text-center py-2.5 px-3">{t.homework}</td>
-                    <td className="text-center py-2.5 px-3">{t.tests}</td>
+                    <td className="text-center py-2.5 px-3">
+                      <div className="font-bold text-orange-600">{t.homework}</div>
+                      <div className="text-xs text-slate-500">Đã chấm: {t.gradedHomework}</div>
+                    </td>
+                    <td className="text-center py-2.5 px-3">
+                      <div className="font-bold text-rose-600">{t.tests}</div>
+                      <div className="text-xs text-slate-500">Đã chấm: {t.gradedTests}</div>
+                    </td>
+                    <td className="text-center py-2.5 px-3">
+                      <span className={`font-bold ${t.contentRate >= 80 ? "text-emerald-600" : t.contentRate >= 60 ? "text-amber-600" : "text-rose-600"}`}>
+                        {t.contentRate}%
+                      </span>
+                    </td>
                     <td className="text-center py-2.5 px-3 text-slate-600" title={t.lastSeen}>
                       {formatLastSeen(t.lastSeen, t.minsAgo)}
                     </td>
                   </tr>
                 ))}
                 {rows.length === 0 && (
-                  <tr><td colSpan={10} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
+                  <tr><td colSpan={11} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
                 )}
               </tbody>
             </table>
