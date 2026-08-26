@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { toast } from "sonner";
 import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
-  CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User, Bell, Eye,
+  CalendarX2, GraduationCap, Check, X, User, Bell, Eye,
   ChevronLeft, ChevronRight,
 } from "lucide-react";
 import {
