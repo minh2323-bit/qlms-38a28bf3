@@ -213,6 +213,11 @@ function PrincipalHome() {
               <div className="min-w-0 pr-7">
                 <p className="text-[13px] text-slate-500 leading-tight">{k.label}</p>
                 <p className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{k.value}</p>
+                {"trend" in k && typeof k.trend === "number" && (
+                  <p className="text-[12px] font-semibold text-emerald-600 mt-0.5 flex items-center gap-1">
+                    <TrendingUp className="h-3.5 w-3.5" /> +{k.trend}% so với tháng trước
+                  </p>
+                )}
                 {"sub" in k && k.sub && (
                   <p className="text-[12px] text-slate-400 mt-0.5 leading-snug">{k.sub}</p>
                 )}
