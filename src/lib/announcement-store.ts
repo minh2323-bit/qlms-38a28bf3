@@ -56,16 +56,24 @@ function seed() {
     },
   ];
 }
-seed();
+
+let seeded = false;
+function ensureSeeded() {
+  if (seeded) return;
+  seeded = true;
+  seed();
+}
 
 /* ---------- API ---------- */
 export function listAnnouncements(classRealId: string, subject: string) {
+  ensureSeeded();
   return items
     .filter((a) => a.classRealId === classRealId && a.subject === subject)
     .sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export function addAnnouncement(input: Omit<Announcement, "id" | "createdAt" | "comments">) {
+  ensureSeeded();
   const next: Announcement = { ...input, id: uid(), createdAt: Date.now(), comments: [] };
   items = [next, ...items];
   emit();
@@ -73,6 +81,7 @@ export function addAnnouncement(input: Omit<Announcement, "id" | "createdAt" | "
 }
 
 export function addComment(annId: string, c: Omit<Comment, "id" | "createdAt">) {
+  ensureSeeded();
   items = items.map((a) =>
     a.id === annId
       ? { ...a, comments: [...a.comments, { ...c, id: uid(), createdAt: Date.now() }] }
@@ -82,11 +91,13 @@ export function addComment(annId: string, c: Omit<Comment, "id" | "createdAt">) 
 }
 
 export function removeAnnouncement(id: string) {
+  ensureSeeded();
   items = items.filter((a) => a.id !== id);
   emit();
 }
 
 export function useAnnouncements(classRealId: string, subject: string): Announcement[] {
+  ensureSeeded();
   const all = useSyncExternalStore(
     (l) => { listeners.add(l); return () => { listeners.delete(l); }; },
     () => items,

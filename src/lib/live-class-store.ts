@@ -25,7 +25,15 @@ function nowOffset(minutes: number): string {
 
 // Seed một lớp trực tuyến để demo đồng bộ sang Lịch báo giảng.
 // 2/4/2026 08:00 -> trùng Tiết 1, Thứ 4, Tuần 1 của lớp 4A – Toán.
-let items: LiveClass[] = [
+let items: LiveClass[] = [];
+let seeded = false;
+function ensureSeeded() {
+  if (seeded) return;
+  seeded = true;
+  items = buildSeed();
+}
+function buildSeed(): LiveClass[] {
+  return [
   {
     id: "lc-seed-1",
     classRealId: "4A",
@@ -160,7 +168,8 @@ let items: LiveClass[] = [
     studentCount: 29,
     createdAt: new Date().toISOString(),
   },
-];
+  ];
+}
 
 const listeners = new Set<Listener>();
 function emit() { listeners.forEach((l) => l()); }
@@ -170,6 +179,7 @@ function uid() {
 }
 
 export function addLiveClass(lc: Omit<LiveClass, "id" | "createdAt">): LiveClass {
+  ensureSeeded();
   const next: LiveClass = { ...lc, id: uid(), createdAt: new Date().toISOString() };
   items = [...items, next];
   emit();
@@ -177,19 +187,23 @@ export function addLiveClass(lc: Omit<LiveClass, "id" | "createdAt">): LiveClass
 }
 
 export function updateLiveClass(id: string, patch: Partial<Omit<LiveClass, "id" | "createdAt">>): void {
+  ensureSeeded();
   items = items.map((it) => (it.id === id ? { ...it, ...patch } : it));
   emit();
 }
 
 export function getLiveClassById(id: string): LiveClass | undefined {
+  ensureSeeded();
   return items.find((l) => l.id === id);
 }
 
 export function listLiveClassesForClass(classRealId: string, subject: string): LiveClass[] {
+  ensureSeeded();
   return items.filter((l) => l.classRealId === classRealId && l.subject === subject);
 }
 
 export function getAllLiveClasses(): LiveClass[] {
+  ensureSeeded();
   return items;
 }
 
@@ -199,6 +213,7 @@ export function subscribe(l: Listener) {
 }
 
 export function useLiveClasses(): LiveClass[] {
+  ensureSeeded();
   return useSyncExternalStore(
     (l) => subscribe(l),
     () => items,
