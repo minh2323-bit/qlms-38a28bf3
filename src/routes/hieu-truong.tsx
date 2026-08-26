@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { toast } from "sonner";
 import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
-  CalendarX2, GraduationCap, ChevronDown, ChevronUp, Check, X, User, Bell, Eye,
+  CalendarX2, GraduationCap, Check, X, User, Bell, Eye,
   ChevronLeft, ChevronRight,
 } from "lucide-react";
 import {
@@ -124,7 +124,6 @@ function slotStat(cls: string, dayIdx: number) {
 function PrincipalHome() {
   const navigate = useNavigate();
   const [pending, setPending] = useState<PendingExam[]>(PENDING_EXAMS_SEED);
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const [dialog, setDialog] = useState<"remind-login" | "remind-content" | "view-students" | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -238,9 +237,16 @@ function PrincipalHome() {
                   aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
                   title={action === "view-students" ? "Xem danh sách" : "Nhắc nhở"}
                   onClick={() => setDialog(action)}
-                  className="absolute top-3 right-3 h-8 w-8 rounded-lg border flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-indigo-600"
+                  className={`absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition ${
+                    action === "view-students"
+                      ? "bg-teal-500 hover:bg-teal-600"
+                      : "bg-indigo-500 hover:bg-indigo-600 animate-pulse"
+                  }`}
                 >
                   {action === "view-students" ? <Eye className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
+                  {action !== "view-students" && (
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+                  )}
                 </button>
               )}
             </div>
@@ -318,8 +324,6 @@ function PrincipalHome() {
             </thead>
             <tbody>
               {gradeBlocks.map((g) => {
-                const open = !!expanded[g.grade];
-                const shown = open ? g.classes : g.classes.slice(0, 5);
                 return (
                   <Fragment key={g.grade}>
                     <tr key={`h-${g.grade}`} className="bg-sky-50">
@@ -328,18 +332,21 @@ function PrincipalHome() {
                       </td>
 
                     </tr>
-                    {shown.map((cls) => (
+                    {g.classes.map((cls) => (
                       <tr key={cls} className="border-t">
                         <td className="px-3 py-2 font-semibold text-slate-800">{cls}</td>
                         {DAYS.map((d, i) => {
                           const { done, total } = slotStat(cls, i);
                           const full = done === total;
+                          const empty = done === 0;
                           return (
                             <td key={d.label} className="px-2 py-2">
                               <div className={`rounded-lg border text-center py-2 ${
-                                full
-                                  ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                  : "bg-amber-50 border-amber-200 text-amber-700"
+                                empty
+                                  ? "bg-rose-50 border-rose-300 text-rose-700"
+                                  : full
+                                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                    : "bg-amber-50 border-amber-200 text-amber-700"
                               }`}>
                                 <div className="font-bold">{done}/{total}</div>
                                 <div className="text-[12px]">tiết đã soạn</div>
@@ -349,20 +356,6 @@ function PrincipalHome() {
                         })}
                       </tr>
                     ))}
-                    {g.classes.length > 5 && (
-                      <tr key={`m-${g.grade}`} className="border-t">
-                        <td colSpan={DAYS.length + 1} className="px-3 py-2 text-center">
-                          <Button
-                            variant="ghost"
-                            className="h-8 text-[13px] text-indigo-600"
-                            onClick={() => setExpanded((p) => ({ ...p, [g.grade]: !open }))}
-                          >
-                            {open ? (<>Thu gọn <ChevronUp className="h-4 w-4 ml-1" /></>)
-                              : (<>Xem thêm {g.classes.length - 5} lớp <ChevronDown className="h-4 w-4 ml-1" /></>)}
-                          </Button>
-                        </td>
-                      </tr>
-                    )}
                   </Fragment>
                 );
               })}
