@@ -102,15 +102,15 @@ const HLBQ_FORMAT = [
 ];
 
 const HLBQ_ROWS = [
-  { name: "Bộ câu hỏi Toán 3 - Ôn tập các số đến 1000", grade: "Khối 3", subject: "Toán", provider: "HEID", format: "Bộ câu hỏi" },
-  { name: "Video tương tác Tiếng Việt 4 - Luyện từ và câu", grade: "Khối 4", subject: "Tiếng Việt", provider: "OLM", format: "Video tương tác" },
-  { name: "Sách giáo viên Toán 4 - Phân số và phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Sách giáo viên" },
-  { name: "Bộ câu hỏi Tiếng Anh 5 - My Family", grade: "Khối 5", subject: "Tiếng Anh", provider: "HEID", format: "Bộ câu hỏi" },
-  { name: "Video tương tác Toán 3 - Bảng nhân 3, bảng chia 3", grade: "Khối 3", subject: "Toán", provider: "OLM", format: "Video tương tác" },
-  { name: "Sách giáo viên Tiếng Việt 3 - Đọc hiểu văn bản", grade: "Khối 3", subject: "Tiếng Việt", provider: "HEID", format: "Sách giáo viên" },
-  { name: "Bộ câu hỏi Tự nhiên và xã hội 4 - Cây xanh", grade: "Khối 4", subject: "Tự nhiên và xã hội", provider: "OLM", format: "Bộ câu hỏi" },
-  { name: "Video tương tác Toán 4 - Tìm thành phần trong phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Video tương tác" },
-];
+  { name: "Bộ câu hỏi Toán 3 - Ôn tập các số đến 1000", grade: "Khối 3", subject: "Toán", provider: "HEID", format: "Bộ câu hỏi", uses: 384 },
+  { name: "Video tương tác Toán 3 - Bảng nhân 3, bảng chia 3", grade: "Khối 3", subject: "Toán", provider: "OLM", format: "Video tương tác", uses: 318 },
+  { name: "Sách giáo viên Toán 4 - Phân số và phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Sách giáo viên", uses: 276 },
+  { name: "Bộ câu hỏi Tiếng Anh 5 - My Family", grade: "Khối 5", subject: "Tiếng Anh", provider: "HEID", format: "Bộ câu hỏi", uses: 231 },
+  { name: "Video tương tác Tiếng Việt 4 - Luyện từ và câu", grade: "Khối 4", subject: "Tiếng Việt", provider: "OLM", format: "Video tương tác", uses: 198 },
+  { name: "Sách giáo viên Tiếng Việt 3 - Đọc hiểu văn bản", grade: "Khối 3", subject: "Tiếng Việt", provider: "HEID", format: "Sách giáo viên", uses: 164 },
+  { name: "Bộ câu hỏi Tự nhiên và xã hội 4 - Cây xanh", grade: "Khối 4", subject: "Tự nhiên và xã hội", provider: "OLM", format: "Bộ câu hỏi", uses: 132 },
+  { name: "Video tương tác Toán 4 - Tìm thành phần trong phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Video tương tác", uses: 96 },
+].sort((a, b) => b.uses - a.uses);
 
 const FORMAT_COLOR: Record<string, string> = {
   "Bộ câu hỏi": "bg-violet-50 text-violet-700",
@@ -256,20 +256,22 @@ function SchoolStatsPage() {
           <div className="overflow-x-auto rounded-xl border">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-500 border-b bg-slate-50/60">
-                  <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
-                  <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Khối</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Môn</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Nhà cung cấp</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Định dạng</th>
-                </tr>
+              <tr className="text-slate-500 border-b bg-slate-50/60">
+                <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
+                <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
+                <th className="text-center font-semibold py-2.5 px-3">Lượt sử dụng</th>
+                <th className="text-center font-semibold py-2.5 px-3">Khối</th>
+                <th className="text-center font-semibold py-2.5 px-3">Môn</th>
+                <th className="text-center font-semibold py-2.5 px-3">Nhà cung cấp</th>
+                <th className="text-center font-semibold py-2.5 px-3">Định dạng</th>
+              </tr>
               </thead>
               <tbody>
                 {HLBQ_ROWS.map((r, i) => (
                   <tr key={r.name} className="border-b last:border-0 hover:bg-slate-50">
                     <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
                     <td className="py-2.5 px-3 font-semibold text-indigo-700">{r.name}</td>
+                    <td className="text-center py-2.5 px-3 font-bold text-amber-600">{r.uses.toLocaleString("vi-VN")}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600">{r.grade}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600">{r.subject}</td>
                     <td className="text-center py-2.5 px-3 text-slate-600">{r.provider}</td>
