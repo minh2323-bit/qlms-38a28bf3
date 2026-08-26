@@ -304,17 +304,17 @@ function SchoolStatsPage() {
                     <td className="py-2.5 px-3 text-slate-600">{t.team}</td>
                     <td className="py-2.5 px-3 text-slate-600">{t.classes}</td>
                     <td className="text-center py-2.5 px-3">
-                      <div className="font-bold text-indigo-700">{t.lectures} bài giảng</div>
+                      <div className="text-sky-600">{t.lectures} bài giảng</div>
                       <div className="text-xs text-slate-500">Đã chia sẻ: {t.shared}</div>
                     </td>
                     <td className="text-center py-2.5 px-3">{t.materials}</td>
                     <td className="text-center py-2.5 px-3">{t.questions}</td>
                     <td className="text-center py-2.5 px-3">
-                      <div className="font-bold text-orange-600">{t.homework}</div>
+                      <div className="text-sky-600">{t.homework}</div>
                       <div className="text-xs text-slate-500">Đã chấm: {t.gradedHomework}</div>
                     </td>
                     <td className="text-center py-2.5 px-3">
-                      <div className="font-bold text-rose-600">{t.tests}</div>
+                      <div className="text-sky-600">{t.tests}</div>
                       <div className="text-xs text-slate-500">Đã chấm: {t.gradedTests}</div>
                     </td>
                     <td className="text-center py-2.5 px-3">
