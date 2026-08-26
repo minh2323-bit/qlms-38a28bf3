@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -47,7 +48,7 @@ const C = ["#6366f1", "#10b981", "#0ea5e9", "#f59e0b", "#f43f5e", "#8b5cf6"];
 
 const PIES: { title: string; data: { name: string; value: number }[]; unit?: string }[] = [
   {
-    title: "HL đóng góp theo tổ môn",
+    title: "Học liệu đóng góp theo tổ môn",
     data: [
       { name: "Tổ Toán", value: 34 }, { name: "Tổ Tiếng Việt", value: 28 },
       { name: "Tổ Tiếng Anh", value: 18 }, { name: "Tổ Năng khiếu", value: 12 },
@@ -65,10 +66,11 @@ const PIES: { title: string; data: { name: string; value: number }[]; unit?: str
     unit: "%",
   },
   {
-    title: "Phân loại mục đích sử dụng Học liệu bản quyền",
+    title: "Học liệu theo loại",
     data: [
-      { name: "Tạo bài giảng", value: 486 }, { name: "Tạo bài tập", value: 352 },
-      { name: "Tạo đề kiểm tra", value: 264 }, { name: "Tạo kỳ thi", value: 134 },
+      { name: "Video", value: 862 }, { name: "Bài giảng", value: 640 },
+      { name: "Tài liệu", value: 512 }, { name: "Âm thanh", value: 218 },
+      { name: "Scorm / IFrame", value: 186 },
     ],
   },
   {
@@ -86,15 +88,35 @@ const PIES: { title: string; data: { name: string; value: number }[]; unit?: str
       { name: "Vận dụng", value: 2660 }, { name: "Vận dụng cao", value: 817 },
     ],
   },
-  {
-    title: "Học liệu theo loại",
-    data: [
-      { name: "Video", value: 862 }, { name: "Bài giảng", value: 640 },
-      { name: "Tài liệu", value: 512 }, { name: "Âm thanh", value: 218 },
-      { name: "Scorm / IFrame", value: 186 },
-    ],
-  },
 ];
+
+/* ---------------- Học liệu bản quyền ---------------- */
+const HLBQ_PURPOSE = [
+  { name: "Tạo bài giảng", value: 486 }, { name: "Tạo bài tập", value: 352 },
+  { name: "Tạo đề kiểm tra", value: 264 }, { name: "Tạo kỳ thi", value: 134 },
+];
+
+const HLBQ_FORMAT = [
+  { name: "Bộ câu hỏi", value: 512 }, { name: "Video tương tác", value: 348 },
+  { name: "Sách giáo viên", value: 376 },
+];
+
+const HLBQ_ROWS = [
+  { name: "Bộ câu hỏi Toán 3 - Ôn tập các số đến 1000", grade: "Khối 3", subject: "Toán", provider: "HEID", format: "Bộ câu hỏi" },
+  { name: "Video tương tác Tiếng Việt 4 - Luyện từ và câu", grade: "Khối 4", subject: "Tiếng Việt", provider: "OLM", format: "Video tương tác" },
+  { name: "Sách giáo viên Toán 4 - Phân số và phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Sách giáo viên" },
+  { name: "Bộ câu hỏi Tiếng Anh 5 - My Family", grade: "Khối 5", subject: "Tiếng Anh", provider: "HEID", format: "Bộ câu hỏi" },
+  { name: "Video tương tác Toán 3 - Bảng nhân 3, bảng chia 3", grade: "Khối 3", subject: "Toán", provider: "OLM", format: "Video tương tác" },
+  { name: "Sách giáo viên Tiếng Việt 3 - Đọc hiểu văn bản", grade: "Khối 3", subject: "Tiếng Việt", provider: "HEID", format: "Sách giáo viên" },
+  { name: "Bộ câu hỏi Tự nhiên và xã hội 4 - Cây xanh", grade: "Khối 4", subject: "Tự nhiên và xã hội", provider: "OLM", format: "Bộ câu hỏi" },
+  { name: "Video tương tác Toán 4 - Tìm thành phần trong phép tính", grade: "Khối 4", subject: "Toán", provider: "HEID", format: "Video tương tác" },
+];
+
+const FORMAT_COLOR: Record<string, string> = {
+  "Bộ câu hỏi": "bg-violet-50 text-violet-700",
+  "Video tương tác": "bg-rose-50 text-rose-700",
+  "Sách giáo viên": "bg-sky-50 text-sky-700",
+};
 
 const MONTHLY = [
   { month: "T1", baiGiang: 62, baiTap: 128, kiemTra: 41 },
@@ -113,6 +135,11 @@ const MONTHLY = [
 
 /* ---------------- Page ---------------- */
 function SchoolStatsPage() {
+  useEffect(() => {
+    if (window.location.hash === "#hlbq") {
+      setTimeout(() => document.getElementById("hlbq")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  }, []);
   return (
     <AppShell role="principal">
       <div className="space-y-4">
@@ -123,9 +150,9 @@ function SchoolStatsPage() {
           </p>
         </div>
 
-        {/* Section: Thống kê Tài nguyên số */}
+        {/* Section: Thống kê tài nguyên nhà trường */}
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-5">
-          <h2 className="text-lg font-bold text-indigo-700">Thống kê Tài nguyên số</h2>
+          <h2 className="text-lg font-bold text-indigo-700">Thống kê tài nguyên nhà trường</h2>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {INDEXES.map((k) => (
@@ -197,6 +224,62 @@ function SchoolStatsPage() {
               </ResponsiveContainer>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Section: Thống kê Học liệu bản quyền */}
+        <section id="hlbq" className="bg-white rounded-2xl border shadow-sm p-6 space-y-5 scroll-mt-4">
+          <h2 className="text-lg font-bold text-amber-700 flex items-center gap-2">
+            <Crown className="h-5 w-5 text-amber-500" /> Thống kê Học liệu bản quyền
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { title: "Phân loại theo mục đích sử dụng của Giáo viên", data: HLBQ_PURPOSE },
+              { title: "Phân loại theo định dạng", data: HLBQ_FORMAT },
+            ].map((p) => (
+              <div key={p.title} className="rounded-xl border p-4">
+                <h3 className="text-sm font-bold text-slate-700 mb-1 min-h-[40px]">{p.title}</h3>
+                <ResponsiveContainer width="100%" height={230}>
+                  <PieChart>
+                    <Pie data={p.data} dataKey="value" nameKey="name" innerRadius={44} outerRadius={72} paddingAngle={2} stroke="#fff" strokeWidth={2}>
+                      {p.data.map((_, i) => <Cell key={i} fill={C[i % C.length]} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v: number) => v.toLocaleString("vi-VN")} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ))}
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-slate-500 border-b bg-slate-50/60">
+                  <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
+                  <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Khối</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Môn</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Nhà cung cấp</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Định dạng</th>
+                </tr>
+              </thead>
+              <tbody>
+                {HLBQ_ROWS.map((r, i) => (
+                  <tr key={r.name} className="border-b last:border-0 hover:bg-slate-50">
+                    <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
+                    <td className="py-2.5 px-3 font-semibold text-indigo-700">{r.name}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600">{r.grade}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600">{r.subject}</td>
+                    <td className="text-center py-2.5 px-3 text-slate-600">{r.provider}</td>
+                    <td className="text-center py-2.5 px-3">
+                      <span className={`inline-block rounded-md text-xs font-semibold px-2 py-1 ${FORMAT_COLOR[r.format]}`}>{r.format}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 

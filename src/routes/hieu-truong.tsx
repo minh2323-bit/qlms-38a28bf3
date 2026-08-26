@@ -42,11 +42,11 @@ const PENDING_EXAMS_SEED: PendingExam[] = [
 ];
 
 const ROW1 = [
-  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", trend: 15 },
-  { label: "Bài giảng đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", trend: 8 },
+  { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", trend: 15, link: "report-material" as const },
+  { label: "Bài giảng đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", trend: 8, link: "report-lecture" as const },
   {
     label: "Lượt sử dụng Học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
-    sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
+    sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra", link: "stats-hlbq" as const,
   },
   {
     label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
@@ -59,7 +59,7 @@ const ROW1 = [
 const ROW2 = [
   { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600", action: "remind-login" as const },
   { label: "G/v chưa từng tạo nội dung", value: "3", icon: FileWarning, color: "bg-orange-50 text-orange-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra", action: "remind-content" as const },
-  { label: "Tiết học chưa tạo nội dung", value: "127", icon: CalendarX2, color: "bg-violet-50 text-violet-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra" },
+  { label: "Tiết học chưa tạo nội dung", value: "127", icon: CalendarX2, color: "bg-violet-50 text-violet-600", sub: "Bao gồm bài giảng, học liệu, bài tập, bài kiểm tra", link: "scroll-progress" as const },
   { label: "Học sinh chưa tham gia học", value: "42", icon: GraduationCap, color: "bg-teal-50 text-teal-600", sub: "Số học sinh chưa từng tham gia học và làm bài trên LMS", action: "view-students" as const },
 ];
 
@@ -209,8 +209,25 @@ function PrincipalHome() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[...ROW1, ...ROW2].map((k) => {
             const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | "storage" | undefined;
+            const link = ("link" in k ? k.link : undefined) as "report-material" | "report-lecture" | "stats-hlbq" | "scroll-progress" | undefined;
+            const onCardClick = link === "report-material"
+              ? () => navigate({ to: "/hieu-truong/bao-cao-dti", search: { tab: "material" } })
+              : link === "report-lecture"
+                ? () => navigate({ to: "/hieu-truong/bao-cao-dti", search: { tab: "lecture" } })
+                : link === "stats-hlbq"
+                  ? () => navigate({ to: "/hieu-truong/thong-ke-truong", hash: "hlbq" })
+                  : link === "scroll-progress"
+                    ? () => document.getElementById("tien-do-soan")?.scrollIntoView({ behavior: "smooth" })
+                    : undefined;
             return (
-            <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
+            <div
+              key={k.label}
+              role={onCardClick ? "button" : undefined}
+              tabIndex={onCardClick ? 0 : undefined}
+              onClick={onCardClick}
+              onKeyDown={onCardClick ? (ev) => ev.key === "Enter" && onCardClick() : undefined}
+              className={`bg-white rounded-xl border p-4 flex items-start gap-3 relative ${onCardClick ? "cursor-pointer hover:border-indigo-300 hover:shadow-md transition" : ""}`}
+            >
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
                 <k.icon className="h-5 w-5" />
               </div>
@@ -278,7 +295,7 @@ function PrincipalHome() {
       </section>
 
       {/* Tiến độ soạn nội dung cho tuần học */}
-      <section className="space-y-3">
+      <section id="tien-do-soan" className="space-y-3 scroll-mt-4">
         <h2 className="text-[18px] font-bold text-slate-800">
           Tiến độ soạn nội dung cho tuần học
         </h2>
