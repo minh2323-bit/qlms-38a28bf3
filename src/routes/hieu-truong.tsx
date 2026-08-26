@@ -295,7 +295,7 @@ function PrincipalHome() {
       </section>
 
       {/* Tiến độ soạn nội dung cho tuần học */}
-      <section className="space-y-3">
+      <section id="tien-do-soan" className="space-y-3 scroll-mt-4">
         <h2 className="text-[18px] font-bold text-slate-800">
           Tiến độ soạn nội dung cho tuần học
         </h2>
