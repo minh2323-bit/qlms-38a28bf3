@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   Video, BookOpen, HardDrive, Crown, UserX, FileWarning,
   CalendarX2, GraduationCap, Check, X, User, Bell, Eye,
-  ChevronLeft, ChevronRight, TrendingUp,
+  ChevronLeft, ChevronRight, TrendingUp, ExternalLink,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -45,14 +45,16 @@ const ROW1 = [
   { label: "Học liệu đã tải lên", value: "2.418", icon: Video, color: "bg-indigo-50 text-indigo-600", trend: 15 },
   { label: "Bài giảng đã tạo", value: "864", icon: BookOpen, color: "bg-emerald-50 text-emerald-600", trend: 8 },
   {
-    label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
-    storage: { used: 324, total: 500 },
-  },
-  {
     label: "Lượt sử dụng Học liệu bản quyền", value: "1.236", icon: Crown, color: "bg-amber-50 text-amber-600",
     sub: "Số lượt sử dụng HLBQ để tạo bài tập, bài giảng, đề kiểm tra",
   },
+  {
+    label: "Dung lượng đã sử dụng", value: "324 GB", icon: HardDrive, color: "bg-sky-50 text-sky-600",
+    storage: { used: 324, total: 500 },
+    action: "storage" as const,
+  },
 ];
+
 
 const ROW2 = [
   { label: "G/v chưa đăng nhập trên 7 ngày", value: "5", icon: UserX, color: "bg-rose-50 text-rose-600", action: "remind-login" as const },
@@ -157,7 +159,7 @@ function PrincipalHome() {
       {/* Kỳ thi cần duyệt */}
       {pending.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-[15px] font-semibold text-slate-800">Kỳ thi cần duyệt</h2>
+          <h2 className="text-[18px] font-bold text-slate-800">Kỳ thi cần duyệt</h2>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
             {pending.map((e) => (
               <div
@@ -200,13 +202,13 @@ function PrincipalHome() {
 
       {/* Thống kê hoạt động của trường */}
       <section className="space-y-3">
-        <h2 className="text-[15px] font-semibold text-slate-800">
+        <h2 className="text-[18px] font-bold text-slate-800">
           Thống kê hoạt động của trường trên EneStudy
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[...ROW1, ...ROW2].map((k) => {
-            const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | undefined;
+            const action = ("action" in k ? k.action : undefined) as "remind-login" | "remind-content" | "view-students" | "storage" | undefined;
             return (
             <div key={k.label} className="bg-white rounded-xl border p-4 flex items-start gap-3 relative">
               <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${k.color}`}>
@@ -238,12 +240,21 @@ function PrincipalHome() {
                   </div>
                 )}
               </div>
-              {action && (
+              {action === "storage" ? (
+                <Link
+                  to="/he-thong/quan-ly-dung-luong"
+                  aria-label="Sang trang Quản lý dung lượng"
+                  title="Quản lý dung lượng"
+                  className="absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition bg-sky-500 hover:bg-sky-600"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
+              ) : action ? (
                 <button
                   type="button"
                   aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
                   title={action === "view-students" ? "Xem danh sách" : "Nhắc nhở"}
-                  onClick={() => setDialog(action)}
+                  onClick={() => setDialog(action as "remind-login" | "remind-content" | "view-students")}
                   className={`absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition ${
                     action === "view-students"
                       ? "bg-teal-500 hover:bg-teal-600"
@@ -255,7 +266,8 @@ function PrincipalHome() {
                     <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
                   )}
                 </button>
-              )}
+              ) : null}
+
             </div>
             );
           })}
@@ -266,7 +278,7 @@ function PrincipalHome() {
 
       {/* Tiến độ soạn nội dung cho tuần học */}
       <section className="space-y-3">
-        <h2 className="text-[15px] font-semibold text-slate-800">
+        <h2 className="text-[18px] font-bold text-slate-800">
           Tiến độ soạn nội dung cho tuần học
         </h2>
 
