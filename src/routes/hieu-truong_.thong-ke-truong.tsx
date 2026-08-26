@@ -144,9 +144,9 @@ function SchoolStatsPage() {
           </p>
         </div>
 
-        {/* Section: Thống kê Tài nguyên số */}
+        {/* Section: Thống kê tài nguyên nhà trường */}
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-5">
-          <h2 className="text-lg font-bold text-indigo-700">Thống kê Tài nguyên số</h2>
+          <h2 className="text-lg font-bold text-indigo-700">Thống kê tài nguyên nhà trường</h2>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {INDEXES.map((k) => (
