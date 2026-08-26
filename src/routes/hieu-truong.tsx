@@ -238,9 +238,16 @@ function PrincipalHome() {
                   aria-label={action === "view-students" ? "Xem danh sách học sinh" : "Nhắc nhở giáo viên"}
                   title={action === "view-students" ? "Xem danh sách" : "Nhắc nhở"}
                   onClick={() => setDialog(action)}
-                  className="absolute top-3 right-3 h-8 w-8 rounded-lg border flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-indigo-600"
+                  className={`absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white shadow-sm transition ${
+                    action === "view-students"
+                      ? "bg-teal-500 hover:bg-teal-600"
+                      : "bg-indigo-500 hover:bg-indigo-600 animate-pulse"
+                  }`}
                 >
                   {action === "view-students" ? <Eye className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
+                  {action !== "view-students" && (
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+                  )}
                 </button>
               )}
             </div>
