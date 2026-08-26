@@ -149,7 +149,7 @@ function DtiReportPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-800">Báo cáo DTI</h1>
           <p className="text-sm text-slate-500">
-            Báo cáo chuyển đổi số của trường theo giáo viên, học sinh và nội dung số.
+            Báo cáo tổng hợp nội dung số và hoạt động của giáo viên, học sinh trên LMS.
           </p>
         </div>
 
@@ -290,10 +290,8 @@ function StudentReport() {
     [q, cls],
   );
 
-  const header = ["STT", "Mã HS", "Họ và tên", "Lớp", "Bài giảng/Học liệu đã học", "Đã hoàn thành (học liệu)", "Học liệu bản quyền đã học", "Đã hoàn thành (bản quyền)", "Bài tập đã nộp", "Điểm TB bài tập", "Tỷ lệ nộp đúng hạn", "Bài kiểm tra đã nộp", "Điểm TB kiểm tra"];
-  const data = rows.map((s, i) => [i + 1, s.code, s.name, s.cls, s.materials, s.materialsDone, s.copyright, s.copyrightDone, s.homework, s.homeworkAvg.toFixed(1), `${s.onTime}%`, s.tests, s.testAvg.toFixed(1)]);
-
-  const score = (v: number) => v >= 8 ? "text-emerald-600" : v >= 6.5 ? "text-amber-600" : "text-rose-600";
+  const header = ["STT", "Mã HS", "Họ và tên", "Lớp", "Bài giảng/Học liệu đã học", "Đã hoàn thành (học liệu)", "Học liệu bản quyền đã học", "Đã hoàn thành (bản quyền)", "Bài tập đã nộp", "Tỷ lệ nộp đúng hạn", "Bài kiểm tra đã nộp"];
+  const data = rows.map((s, i) => [i + 1, s.code, s.name, s.cls, s.materials, s.materialsDone, s.copyright, s.copyrightDone, s.homework, `${s.onTime}%`, s.tests]);
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
@@ -326,10 +324,8 @@ function StudentReport() {
               <th className="text-center font-semibold py-2.5 px-3">Bài giảng / Học liệu đã học</th>
               <th className="text-center font-semibold py-2.5 px-3">Học liệu bản quyền đã học</th>
               <th className="text-center font-semibold py-2.5 px-3">Bài tập đã nộp</th>
-              <th className="text-center font-semibold py-2.5 px-3">Điểm TB</th>
               <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ nộp đúng hạn</th>
               <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã nộp</th>
-              <th className="text-center font-semibold py-2.5 px-3">Điểm TB</th>
             </tr>
           </thead>
           <tbody>
@@ -348,18 +344,16 @@ function StudentReport() {
                   <div className="text-xs text-slate-500">Đã hoàn thành: {s.copyrightDone}</div>
                 </td>
                 <td className="text-center py-2.5 px-3 text-sky-600">{s.homework}</td>
-                <td className={`text-center py-2.5 px-3 font-bold ${score(s.homeworkAvg)}`}>{s.homeworkAvg.toFixed(1)}</td>
                 <td className="text-center py-2.5 px-3">
                   <span className={`font-bold ${s.onTime >= 90 ? "text-emerald-600" : s.onTime >= 70 ? "text-amber-600" : "text-rose-600"}`}>
                     {s.onTime}%
                   </span>
                 </td>
                 <td className="text-center py-2.5 px-3 text-sky-600">{s.tests}</td>
-                <td className={`text-center py-2.5 px-3 font-bold ${score(s.testAvg)}`}>{s.testAvg.toFixed(1)}</td>
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={11} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
+              <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
             )}
           </tbody>
         </table>
