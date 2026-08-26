@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import {
@@ -134,6 +135,11 @@ const MONTHLY = [
 
 /* ---------------- Page ---------------- */
 function SchoolStatsPage() {
+  useEffect(() => {
+    if (window.location.hash === "#hlbq") {
+      setTimeout(() => document.getElementById("hlbq")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  }, []);
   return (
     <AppShell role="principal">
       <div className="space-y-4">
