@@ -382,6 +382,7 @@ function StudentReport() {
               <th className="text-center font-semibold py-2.5 px-3">Bài tập đã nộp</th>
               <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ nộp đúng hạn</th>
               <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã nộp</th>
+              <th className="text-center font-semibold py-2.5 px-3">Enetpoint</th>
             </tr>
           </thead>
           <tbody>
@@ -406,12 +407,31 @@ function StudentReport() {
                   </span>
                 </td>
                 <td className="text-center py-2.5 px-3 text-sky-600">{s.tests}</td>
+                <td className="text-center py-2.5 px-3"><EnetPoint value={s.enet} /></td>
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
+              <tr><td colSpan={10} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={4}>Tổng số ({rows.length} học sinh)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.materials}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.materialsDone}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.copyright}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.copyrightDone}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.homework}</td>
+              <td className={`${totalCell} text-center`}>{totals.onTime}%</td>
+              <td className={`${totalCell} text-center`}>{totals.tests}</td>
+              <td className={`${totalCell} text-center`}>{totals.enet.toLocaleString("vi-VN")}</td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>
