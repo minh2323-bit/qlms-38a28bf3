@@ -1,5 +1,6 @@
 // Ba bảng báo cáo nội dung số: Học liệu, Ngân hàng câu hỏi, Bài giảng.
 import { useMemo, useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +8,8 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { downloadCsv, printPdf } from "@/lib/report-export";
+import { UnitFilter, DateRangeFilter, totalCell } from "@/components/ReportFilters";
+
 
 function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => void }) {
   return (
