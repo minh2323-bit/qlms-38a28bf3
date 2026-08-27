@@ -80,5 +80,12 @@ export function EnetPoint({ value }: { value: number }) {
   );
 }
 
-/** Class cho ô của dòng Tổng số (ghim đáy bảng). */
-export const totalCell = "sticky bottom-0 bg-indigo-50/95 backdrop-blur border-t-2 border-indigo-200 py-2.5 px-3 font-bold text-indigo-800";
+/** Class cho ô của dòng Tổng số (ghim đáy bảng, có line ngăn cách nhỏ phía trên). */
+export const totalCell =
+  "sticky bottom-0 z-10 bg-indigo-50/95 backdrop-blur border-t-2 border-indigo-300 shadow-[0_-2px_8px_-4px_rgba(99,102,241,0.35)] py-2.5 px-3 font-bold text-indigo-800";
+
+/** Bọc bảng cho phép cuộn dọc + ngang, giữ header và dòng Tổng số cố định khi cuộn. */
+export const tableScrollWrap = "overflow-auto max-h-[460px] rounded-b-xl";
+
+/** Dòng tiêu đề bảng dính phía trên khi cuộn dọc. */
+export const stickyHeadRow = "sticky top-0 z-10 bg-slate-50 shadow-[0_1px_0_0_#e2e8f0]";
