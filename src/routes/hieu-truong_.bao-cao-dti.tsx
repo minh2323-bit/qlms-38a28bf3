@@ -268,6 +268,8 @@ function TeacherReport() {
                 </td>
                 <td className="text-center py-2.5 px-3">{t.materials}</td>
                 <td className="text-center py-2.5 px-3">{t.questions}</td>
+                <td className="text-center py-2.5 px-3 text-violet-600 font-semibold">{t.copyrightUses}</td>
+
                 <td className="text-center py-2.5 px-3">
                   <div className="text-sky-600">{t.homework}</div>
                   <div className="text-xs text-slate-500">Đã chấm: {t.gradedHomework}</div>
