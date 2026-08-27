@@ -289,11 +289,34 @@ function TeacherReport() {
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={11} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
+              <tr><td colSpan={12} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={4}>Tổng số ({rows.length} giáo viên)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.lectures}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã chia sẻ: {totals.shared}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.materials}</td>
+              <td className={`${totalCell} text-center`}>{totals.questions}</td>
+              <td className={`${totalCell} text-center`}>{totals.copyrightUses}</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.homework}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã chấm: {totals.gradedHomework}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.tests}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã chấm: {totals.gradedTests}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.contentRate}%</td>
+              <td className={`${totalCell} text-center`}>—</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
+
     </section>
   );
 }
