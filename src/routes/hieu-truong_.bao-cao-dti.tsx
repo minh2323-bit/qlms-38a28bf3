@@ -182,6 +182,8 @@ function TeacherReport() {
   const [q, setQ] = useState("");
   const [team, setTeam] = useState("all");
   const [cls, setCls] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => TEACHERS.filter((t) =>
       t.name.toLowerCase().includes(q.trim().toLowerCase()) &&
@@ -191,15 +193,28 @@ function TeacherReport() {
     [q, team, cls],
   );
 
-  const header = ["STT", "Giáo viên", "Tổ môn", "Lớp phụ trách", "Bài giảng đã tạo", "Đã chia sẻ", "Học liệu tải lên", "Ngân hàng câu hỏi", "Bài tập đã giao", "Đã chấm (bài tập)", "Bài kiểm tra đã tạo", "Đã chấm (kiểm tra)", "Tỷ lệ tiết có nội dung", "Truy cập gần nhất"];
-  const data = rows.map((t, i) => [i + 1, t.name, t.team, t.classes, t.lectures, t.shared, t.materials, t.questions, t.homework, t.gradedHomework, t.tests, t.gradedTests, `${t.contentRate}%`, formatLastSeen(t.lastSeen, t.minsAgo)]);
+  const sum = (f: (t: TRow) => number) => rows.reduce((s, t) => s + f(t), 0);
+  const totals = useMemo(() => ({
+    lectures: sum((t) => t.lectures), shared: sum((t) => t.shared),
+    materials: sum((t) => t.materials), questions: sum((t) => t.questions),
+    copyrightUses: sum((t) => t.copyrightUses),
+    homework: sum((t) => t.homework), gradedHomework: sum((t) => t.gradedHomework),
+    tests: sum((t) => t.tests), gradedTests: sum((t) => t.gradedTests),
+    contentRate: rows.length ? Math.round(sum((t) => t.contentRate) / rows.length) : 0,
+  }), [rows]);
+
+  const header = ["STT", "Giáo viên", "Tổ môn", "Lớp phụ trách", "Bài giảng đã tạo", "Đã chia sẻ", "Học liệu tải lên", "Ngân hàng câu hỏi", "Lượt sử dụng HLBQ", "Bài tập đã giao", "Đã chấm (bài tập)", "Bài kiểm tra đã tạo", "Đã chấm (kiểm tra)", "Tỷ lệ tiết có nội dung", "Truy cập gần nhất"];
+  const data = rows.map((t, i) => [i + 1, t.name, t.team, t.classes, t.lectures, t.shared, t.materials, t.questions, t.copyrightUses, t.homework, t.gradedHomework, t.tests, t.gradedTests, `${t.contentRate}%`, formatLastSeen(t.lastSeen, t.minsAgo)]);
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của giáo viên</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={team} onValueChange={setTeam}>
+
             <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Tổ môn" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả tổ môn</SelectItem>
