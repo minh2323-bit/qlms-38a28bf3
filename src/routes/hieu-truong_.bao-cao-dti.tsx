@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
+import type { DateRange } from "react-day-picker";
+import { UnitFilter, DateRangeFilter, EnetPoint, totalCell } from "@/components/ReportFilters";
+
 
 
 export const Route = createFileRoute("/hieu-truong_/bao-cao-dti")({
