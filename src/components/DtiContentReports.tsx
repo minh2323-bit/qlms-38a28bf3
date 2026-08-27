@@ -305,11 +305,19 @@ const L_AUTHORS = Array.from(new Set(LECTURES.map((l) => l.author)));
 export function LectureReport() {
   const [q, setQ] = useState("");
   const [author, setAuthor] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => LECTURES.filter((l) =>
       l.name.toLowerCase().includes(q.trim().toLowerCase()) && (author === "all" || l.author === author)),
     [q, author],
   );
+  const totals = useMemo(() => {
+    const learners = rows.reduce((s, l) => s + l.learners, 0);
+    const done = rows.reduce((s, l) => s + l.done, 0);
+    return { learners, done, pct: learners ? Math.round((done / learners) * 100) : 0 };
+  }, [rows]);
+
 
   const header = ["STT", "Tên bài giảng", "Khối", "Môn", "Tác giả", "Ngày PH", "Lớp đã giao", "Học sinh tham gia học", "Tỷ lệ hoàn thành"];
   const data = rows.map((l, i) => [
