@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { downloadCsv, printPdf } from "@/lib/report-export";
-import { UnitFilter, DateRangeFilter, totalCell } from "@/components/ReportFilters";
+import { UnitFilter, DateRangeFilter, totalCell, tableScrollWrap, stickyHeadRow } from "@/components/ReportFilters";
 
 
 function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => void }) {
@@ -97,10 +97,10 @@ export function MaterialReport() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className={tableScrollWrap}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-slate-500 border-b bg-slate-50/60">
+            <tr className={`text-slate-500 ${stickyHeadRow}`}>
               <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
               <th className="text-left font-semibold py-2.5 px-3">Tên học liệu</th>
               <th className="text-center font-semibold py-2.5 px-3">Khối - Môn</th>
@@ -227,10 +227,10 @@ export function QuestionBankReport() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className={tableScrollWrap}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-slate-500 border-b bg-slate-50/60">
+            <tr className={`text-slate-500 ${stickyHeadRow}`}>
               <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
               <th className="text-left font-semibold py-2.5 px-3">Câu hỏi</th>
               <th className="text-center font-semibold py-2.5 px-3">Khối</th>
@@ -349,10 +349,10 @@ export function LectureReport() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className={tableScrollWrap}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-slate-500 border-b bg-slate-50/60">
+            <tr className={`text-slate-500 ${stickyHeadRow}`}>
               <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
               <th className="text-left font-semibold py-2.5 px-3">Tên bài giảng</th>
               <th className="text-center font-semibold py-2.5 px-3">Khối</th>
