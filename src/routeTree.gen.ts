@@ -47,7 +47,6 @@ import { Route as HieuTruongLichBaoGiangRouteImport } from './routes/hieu-truong
 import { Route as HieuTruongHoatDongCaNhanRouteImport } from './routes/hieu-truong_.hoat-dong-ca-nhan'
 import { Route as HieuTruongBaoCaoDtiRouteImport } from './routes/hieu-truong_.bao-cao-dti'
 import { Route as HeThongQuanLyDungLuongRouteImport } from './routes/he-thong.quan-ly-dung-luong'
-import { Route as HeThongDungLuongCaNhanRouteImport } from './routes/he-thong.dung-luong-ca-nhan'
 import { Route as HeThongDanhMucRouteImport } from './routes/he-thong.danh-muc'
 import { Route as GiaoBaiTapTaskIdRouteImport } from './routes/giao-bai-tap.$taskId'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -265,11 +264,6 @@ const HeThongQuanLyDungLuongRoute = HeThongQuanLyDungLuongRouteImport.update({
   path: '/he-thong/quan-ly-dung-luong',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HeThongDungLuongCaNhanRoute = HeThongDungLuongCaNhanRouteImport.update({
-  id: '/he-thong/dung-luong-ca-nhan',
-  path: '/he-thong/dung-luong-ca-nhan',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const HeThongDanhMucRoute = HeThongDanhMucRouteImport.update({
   id: '/he-thong/danh-muc',
   path: '/he-thong/danh-muc',
@@ -422,7 +416,6 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
-  '/he-thong/dung-luong-ca-nhan': typeof HeThongDungLuongCaNhanRoute
   '/he-thong/quan-ly-dung-luong': typeof HeThongQuanLyDungLuongRoute
   '/hieu-truong/bao-cao-dti': typeof HieuTruongBaoCaoDtiRoute
   '/hieu-truong/hoat-dong-ca-nhan': typeof HieuTruongHoatDongCaNhanRoute
@@ -484,7 +477,6 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
-  '/he-thong/dung-luong-ca-nhan': typeof HeThongDungLuongCaNhanRoute
   '/he-thong/quan-ly-dung-luong': typeof HeThongQuanLyDungLuongRoute
   '/hieu-truong/bao-cao-dti': typeof HieuTruongBaoCaoDtiRoute
   '/hieu-truong/hoat-dong-ca-nhan': typeof HieuTruongHoatDongCaNhanRoute
@@ -551,7 +543,6 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/giao-bai-tap/$taskId': typeof GiaoBaiTapTaskIdRoute
   '/he-thong/danh-muc': typeof HeThongDanhMucRoute
-  '/he-thong/dung-luong-ca-nhan': typeof HeThongDungLuongCaNhanRoute
   '/he-thong/quan-ly-dung-luong': typeof HeThongQuanLyDungLuongRoute
   '/hieu-truong_/bao-cao-dti': typeof HieuTruongBaoCaoDtiRoute
   '/hieu-truong_/hoat-dong-ca-nhan': typeof HieuTruongHoatDongCaNhanRoute
@@ -619,7 +610,6 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
-    | '/he-thong/dung-luong-ca-nhan'
     | '/he-thong/quan-ly-dung-luong'
     | '/hieu-truong/bao-cao-dti'
     | '/hieu-truong/hoat-dong-ca-nhan'
@@ -681,7 +671,6 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
-    | '/he-thong/dung-luong-ca-nhan'
     | '/he-thong/quan-ly-dung-luong'
     | '/hieu-truong/bao-cao-dti'
     | '/hieu-truong/hoat-dong-ca-nhan'
@@ -747,7 +736,6 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/giao-bai-tap/$taskId'
     | '/he-thong/danh-muc'
-    | '/he-thong/dung-luong-ca-nhan'
     | '/he-thong/quan-ly-dung-luong'
     | '/hieu-truong_/bao-cao-dti'
     | '/hieu-truong_/hoat-dong-ca-nhan'
@@ -813,7 +801,6 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   HeThongDanhMucRoute: typeof HeThongDanhMucRoute
-  HeThongDungLuongCaNhanRoute: typeof HeThongDungLuongCaNhanRoute
   HeThongQuanLyDungLuongRoute: typeof HeThongQuanLyDungLuongRoute
   HieuTruongBaoCaoDtiRoute: typeof HieuTruongBaoCaoDtiRoute
   HieuTruongHoatDongCaNhanRoute: typeof HieuTruongHoatDongCaNhanRoute
@@ -1112,13 +1099,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeThongQuanLyDungLuongRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/he-thong/dung-luong-ca-nhan': {
-      id: '/he-thong/dung-luong-ca-nhan'
-      path: '/he-thong/dung-luong-ca-nhan'
-      fullPath: '/he-thong/dung-luong-ca-nhan'
-      preLoaderRoute: typeof HeThongDungLuongCaNhanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/he-thong/danh-muc': {
       id: '/he-thong/danh-muc'
       path: '/he-thong/danh-muc'
@@ -1405,7 +1385,6 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   HeThongDanhMucRoute: HeThongDanhMucRoute,
-  HeThongDungLuongCaNhanRoute: HeThongDungLuongCaNhanRoute,
   HeThongQuanLyDungLuongRoute: HeThongQuanLyDungLuongRoute,
   HieuTruongBaoCaoDtiRoute: HieuTruongBaoCaoDtiRoute,
   HieuTruongHoatDongCaNhanRoute: HieuTruongHoatDongCaNhanRoute,
