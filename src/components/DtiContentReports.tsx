@@ -309,11 +309,15 @@ export function LectureReport() {
   const [author, setAuthor] = useState("all");
   const [unit, setUnit] = useState("all");
   const [range, setRange] = useState<DateRange | undefined>();
-  const rows = useMemo(
+  const filtered = useMemo(
     () => LECTURES.filter((l) =>
       l.name.toLowerCase().includes(q.trim().toLowerCase()) && (author === "all" || l.author === author)),
     [q, author],
   );
+  const { sorted: rows, sort, toggle } = useSort(filtered, {
+    learners: (l) => l.learners,
+    pct: (l) => (l.learners ? l.done / l.learners : 0),
+  });
   const totals = useMemo(() => {
     const learners = rows.reduce((s, l) => s + l.learners, 0);
     const done = rows.reduce((s, l) => s + l.done, 0);
@@ -330,26 +334,22 @@ export function LectureReport() {
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-indigo-700">Thống kê bài giảng</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <UnitFilter value={unit} onChange={setUnit} />
-          <DateRangeFilter value={range} onChange={setRange} />
-          <Select value={author} onValueChange={setAuthor}>
-
-            <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Tác giả" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả tác giả</SelectItem>
-              {L_AUTHORS.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm bài giảng..." className="h-9 w-56" />
-          <ExportButtons
-            onExcel={() => downloadCsv("bao-cao-dti-bai-giang.csv", header, data)}
-            onPdf={() => printPdf("Báo cáo DTI – Bài giảng", header, data)}
-          />
-        </div>
-      </div>
+      <ReportHeader title="Thống kê bài giảng">
+        <UnitFilter value={unit} onChange={setUnit} />
+        <DateRangeFilter value={range} onChange={setRange} />
+        <Select value={author} onValueChange={setAuthor}>
+          <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Tác giả" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả tác giả</SelectItem>
+            {L_AUTHORS.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm bài giảng..." className="h-9 w-56" />
+        <ExportButtons
+          onExcel={() => downloadCsv("bao-cao-dti-bai-giang.csv", header, data)}
+          onPdf={() => printPdf("Báo cáo DTI – Bài giảng", header, data)}
+        />
+      </ReportHeader>
 
       <div className={tableScrollWrap}>
         <table className="w-full text-sm">
@@ -362,8 +362,9 @@ export function LectureReport() {
               <th className="text-center font-semibold py-2.5 px-3">Tác giả</th>
               <th className="text-center font-semibold py-2.5 px-3">Ngày PH</th>
               <th className="text-center font-semibold py-2.5 px-3">Lớp đã giao</th>
-              <th className="text-center font-semibold py-2.5 px-3">Học sinh tham gia học</th>
-              <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ hoàn thành</th>
+              <SortTh label="Học sinh tham gia học" sortKey="learners" sort={sort} toggle={toggle} />
+              <SortTh label="Tỷ lệ hoàn thành" sortKey="pct" sort={sort} toggle={toggle} />
+
             </tr>
           </thead>
           <tbody>
