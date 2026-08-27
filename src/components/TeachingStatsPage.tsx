@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
-import { DateRangeFilter, EnetPoint } from "@/components/ReportFilters";
+import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow } from "@/components/ReportFilters";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
@@ -256,10 +256,10 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
             <MiniStat label="Điểm Kiểm tra TB" value={String(summary.testAvg)} />
           </div>
 
-          <div className="overflow-x-auto">
+          <div className={tableScrollWrap}>
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-500 border-b bg-slate-50/60">
+                <tr className={`text-slate-500 ${stickyHeadRow}`}>
                   <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
                   <th className="text-left font-semibold py-2.5 px-3">Họ và tên</th>
                   <th className="text-center font-semibold py-2.5 px-3">BG/HL đã xem</th>
