@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
-import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow } from "@/components/ReportFilters";
+import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow, SortTh, useSort } from "@/components/ReportFilters";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
@@ -273,13 +273,14 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
                 <tr className={`text-slate-500 ${stickyHeadRow}`}>
                   <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
                   <th className="text-left font-semibold py-2.5 px-3">Họ và tên</th>
-                  <th className="text-center font-semibold py-2.5 px-3">BG/HL đã xem</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Số phút đã học</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Bài tập hoàn thành</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Điểm TB bài tập</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã làm</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Điểm TB bài kiểm tra</th>
-                  <th className="text-center font-semibold py-2.5 px-3">Enetpoint</th>
+                  <SortTh label="BG/HL đã xem" sortKey="viewed" sort={sort} toggle={toggle} />
+                  <SortTh label="Số phút đã học" sortKey="minutes" sort={sort} toggle={toggle} />
+                  <SortTh label="Bài tập hoàn thành" sortKey="done" sort={sort} toggle={toggle} />
+                  <SortTh label="Điểm TB bài tập" sortKey="avg" sort={sort} toggle={toggle} />
+                  <SortTh label="Bài kiểm tra đã làm" sortKey="testDone" sort={sort} toggle={toggle} />
+                  <SortTh label="Điểm TB bài kiểm tra" sortKey="testAvg" sort={sort} toggle={toggle} />
+                  <SortTh label="Enetpoint" sortKey="enet" sort={sort} toggle={toggle} />
+
                 </tr>
               </thead>
               <tbody>
