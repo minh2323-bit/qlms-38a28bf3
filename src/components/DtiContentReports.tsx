@@ -79,7 +79,10 @@ export function MaterialReport() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê học liệu</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={kind} onValueChange={setKind}>
+
             <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Thể loại" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả thể loại</SelectItem>
