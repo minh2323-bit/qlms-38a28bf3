@@ -209,7 +209,10 @@ export function QuestionBankReport() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê ngân hàng câu hỏi</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={type} onValueChange={setType}>
+
             <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Loại câu hỏi" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả loại câu hỏi</SelectItem>
