@@ -190,11 +190,14 @@ export function QuestionBankReport() {
   const [type, setType] = useState("all");
   const [unit, setUnit] = useState("all");
   const [range, setRange] = useState<DateRange | undefined>();
-  const rows = useMemo(
+  const filtered = useMemo(
     () => QUESTIONS.filter((x) =>
       x.text.toLowerCase().includes(q.trim().toLowerCase()) && (type === "all" || x.type === type)),
     [q, type],
   );
+  const { sorted: rows, sort, toggle } = useSort(filtered, {
+    used: (x) => x.usedExamPapers + x.usedTests + x.usedHomework + x.usedLessons,
+  });
   const totals = useMemo(() => ({
     exam: rows.reduce((s, x) => s + x.usedExamPapers, 0),
     tests: rows.reduce((s, x) => s + x.usedTests, 0),
@@ -208,26 +211,22 @@ export function QuestionBankReport() {
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-indigo-700">Thống kê ngân hàng câu hỏi</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <UnitFilter value={unit} onChange={setUnit} />
-          <DateRangeFilter value={range} onChange={setRange} />
-          <Select value={type} onValueChange={setType}>
-
-            <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Loại câu hỏi" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả loại câu hỏi</SelectItem>
-              {Q_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm câu hỏi..." className="h-9 w-56" />
-          <ExportButtons
-            onExcel={() => downloadCsv("bao-cao-dti-ngan-hang-cau-hoi.csv", header, data)}
-            onPdf={() => printPdf("Báo cáo DTI – Ngân hàng câu hỏi", header, data)}
-          />
-        </div>
-      </div>
+      <ReportHeader title="Thống kê ngân hàng câu hỏi">
+        <UnitFilter value={unit} onChange={setUnit} />
+        <DateRangeFilter value={range} onChange={setRange} />
+        <Select value={type} onValueChange={setType}>
+          <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Loại câu hỏi" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả loại câu hỏi</SelectItem>
+            {Q_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm câu hỏi..." className="h-9 w-56" />
+        <ExportButtons
+          onExcel={() => downloadCsv("bao-cao-dti-ngan-hang-cau-hoi.csv", header, data)}
+          onPdf={() => printPdf("Báo cáo DTI – Ngân hàng câu hỏi", header, data)}
+        />
+      </ReportHeader>
 
       <div className={tableScrollWrap}>
         <table className="w-full text-sm">
@@ -240,8 +239,9 @@ export function QuestionBankReport() {
               <th className="text-center font-semibold py-2.5 px-3">Loại câu hỏi</th>
               <th className="text-center font-semibold py-2.5 px-3">Mức độ nhận thức</th>
               <th className="text-center font-semibold py-2.5 px-3">Tác giả</th>
-              <th className="text-left font-semibold py-2.5 px-3">Sử dụng</th>
+              <SortTh label="Sử dụng" sortKey="used" sort={sort} toggle={toggle} className="text-left" />
             </tr>
+
           </thead>
           <tbody>
             {rows.map((x, i) => (
