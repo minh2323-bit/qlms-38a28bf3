@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { DateRangeFilter, EnetPoint } from "@/components/ReportFilters";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
@@ -53,7 +55,7 @@ const PIE_COLORS = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e"];
 
 type Row = {
   name: string; viewed: number; minutes: number; done: number; total: number;
-  avg: number; testDone: number; testTotal: number; testAvg: number; subject: string;
+  avg: number; testDone: number; testTotal: number; testAvg: number; subject: string; enet: number;
 };
 
 const SUBJECTS = ["Toán", "Tiếng Việt", "Tiếng Anh", "Khoa học"];
@@ -72,6 +74,7 @@ function seedRows(names: string[], seed: number): Row[] {
       testTotal: 9,
       testAvg: Math.round((6.5 + (k % 4) + (k % 2) * 0.5) * 10) / 10,
       subject: SUBJECTS[(i + seed) % SUBJECTS.length],
+      enet: 180 + k * 97 + seed * 31,
     };
   });
 }
@@ -114,6 +117,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
   const [cls, setCls] = useState(CLASS_ORDER[0]);
   const [q, setQ] = useState("");
   const [subject, setSubject] = useState(SUBJECTS[0]);
+  const [range, setRange] = useState<DateRange | undefined>();
 
   const rows = useMemo(() => {
     const list = CLASS_STUDENTS[cls] ?? [];
@@ -228,6 +232,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
               </button>
             ))}
             <div className="ml-auto flex items-center gap-2">
+              <DateRangeFilter value={range} onChange={setRange} />
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -263,6 +268,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
                   <th className="text-center font-semibold py-2.5 px-3">Điểm TB bài tập</th>
                   <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã làm</th>
                   <th className="text-center font-semibold py-2.5 px-3">Điểm TB bài kiểm tra</th>
+                  <th className="text-center font-semibold py-2.5 px-3">Enetpoint</th>
                 </tr>
               </thead>
               <tbody>
@@ -276,10 +282,11 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
                     <td className="text-center py-2.5 px-3 font-bold text-indigo-700">{r.avg}</td>
                     <td className="text-center py-2.5 px-3">{r.testDone}/{r.testTotal}</td>
                     <td className="text-center py-2.5 px-3 font-bold text-emerald-700">{r.testAvg}</td>
+                    <td className="text-center py-2.5 px-3"><EnetPoint value={r.enet} /></td>
                   </tr>
                 ))}
                 {rows.length === 0 && (
-                  <tr><td colSpan={8} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
+                  <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
                 )}
               </tbody>
             </table>
