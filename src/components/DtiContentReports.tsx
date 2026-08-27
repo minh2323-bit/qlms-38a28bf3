@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { downloadCsv, printPdf } from "@/lib/report-export";
-import { UnitFilter, DateRangeFilter, totalCell, tableScrollWrap, stickyHeadRow } from "@/components/ReportFilters";
+import { UnitFilter, DateRangeFilter, totalCell, tableScrollWrap, stickyHeadRow, ReportHeader, SortTh, useSort } from "@/components/ReportFilters";
 
 
 function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => void }) {
