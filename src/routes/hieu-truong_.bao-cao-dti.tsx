@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
+import type { DateRange } from "react-day-picker";
+import { UnitFilter, DateRangeFilter, EnetPoint, totalCell } from "@/components/ReportFilters";
+
 
 
 export const Route = createFileRoute("/hieu-truong_/bao-cao-dti")({
@@ -38,22 +41,22 @@ function formatLastSeen(lastSeen: string, minsAgo?: number) {
 type TRow = {
   name: string; team: string; classes: string;
   lectures: number; shared: number; materials: number;
-  questions: number; homework: number; gradedHomework: number;
+  questions: number; copyrightUses: number; homework: number; gradedHomework: number;
   tests: number; gradedTests: number; contentRate: number;
   lastSeen: string; minsAgo?: number;
 };
 
 const TEACHERS: TRow[] = [
-  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, questions: 395, homework: 88, gradedHomework: 72, tests: 34, gradedTests: 30, contentRate: 92, lastSeen: "25/8/2026 08:12", minsAgo: 5 },
-  { name: "Phùng Thuý Hằng", team: "Tổ Tiểu học 1", classes: "3A, 3B", lectures: 36, shared: 12, materials: 98, questions: 311, homework: 74, gradedHomework: 60, tests: 28, gradedTests: 24, contentRate: 85, lastSeen: "24/8/2026 16:40" },
-  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, questions: 209, homework: 52, gradedHomework: 41, tests: 19, gradedTests: 15, contentRate: 78, lastSeen: "25/8/2026 07:55", minsAgo: 62 },
-  { name: "Trần Minh Quân", team: "Tổ Tiểu học 1", classes: "3C, 4A", lectures: 29, shared: 9, materials: 81, questions: 260, homework: 63, gradedHomework: 50, tests: 22, gradedTests: 18, contentRate: 88, lastSeen: "23/8/2026 14:05" },
-  { name: "Đỗ Văn Nam", team: "Tổ Tiểu học 2", classes: "5A", lectures: 18, shared: 4, materials: 47, questions: 158, homework: 41, gradedHomework: 33, tests: 12, gradedTests: 9, contentRate: 71, lastSeen: "22/8/2026 09:30" },
-  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, questions: 293, homework: 70, gradedHomework: 58, tests: 26, gradedTests: 22, contentRate: 90, lastSeen: "25/8/2026 06:48", minsAgo: 180 },
-  { name: "Phạm Quốc Anh", team: "Tổ Tiểu học 2", classes: "2A", lectures: 12, shared: 2, materials: 38, questions: 131, homework: 25, gradedHomework: 19, tests: 8, gradedTests: 5, contentRate: 64, lastSeen: "18/8/2026 15:20" },
-  { name: "Vũ Bích Ngọc", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 9, shared: 3, materials: 44, questions: 149, homework: 16, gradedHomework: 11, tests: 5, gradedTests: 3, contentRate: 58, lastSeen: "21/8/2026 10:02" },
-  { name: "Trần Thanh Thảo", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 7, shared: 1, materials: 31, questions: 110, homework: 11, gradedHomework: 7, tests: 3, gradedTests: 2, contentRate: 52, lastSeen: "19/8/2026 13:44" },
-  { name: "Hoàng Văn Nam", team: "Tổ Toán", classes: "2B, 2C", lectures: 24, shared: 8, materials: 69, questions: 224, homework: 57, gradedHomework: 45, tests: 17, gradedTests: 14, contentRate: 83, lastSeen: "24/8/2026 11:15" },
+  { name: "Nguyễn Thị Hoa", team: "Tổ Tiểu học 1", classes: "4A, 4B", lectures: 42, shared: 18, materials: 126, questions: 395, copyrightUses: 102, homework: 88, gradedHomework: 72, tests: 34, gradedTests: 30, contentRate: 92, lastSeen: "25/8/2026 08:12", minsAgo: 5 },
+  { name: "Phùng Thuý Hằng", team: "Tổ Tiểu học 1", classes: "3A, 3B", lectures: 36, shared: 12, materials: 98, questions: 311, copyrightUses: 58, homework: 74, gradedHomework: 60, tests: 28, gradedTests: 24, contentRate: 85, lastSeen: "24/8/2026 16:40" },
+  { name: "Lê Thị Mai", team: "Tổ Tiểu học 1", classes: "4C", lectures: 21, shared: 6, materials: 64, questions: 209, copyrightUses: 121, homework: 52, gradedHomework: 41, tests: 19, gradedTests: 15, contentRate: 78, lastSeen: "25/8/2026 07:55", minsAgo: 62 },
+  { name: "Trần Minh Quân", team: "Tổ Tiểu học 1", classes: "3C, 4A", lectures: 29, shared: 9, materials: 81, questions: 260, copyrightUses: 32, homework: 63, gradedHomework: 50, tests: 22, gradedTests: 18, contentRate: 88, lastSeen: "23/8/2026 14:05" },
+  { name: "Đỗ Văn Nam", team: "Tổ Tiểu học 2", classes: "5A", lectures: 18, shared: 4, materials: 47, questions: 158, copyrightUses: 38, homework: 41, gradedHomework: 33, tests: 12, gradedTests: 9, contentRate: 71, lastSeen: "22/8/2026 09:30" },
+  { name: "Bùi Thị Hạnh", team: "Tổ Tiểu học 2", classes: "5B, 5C", lectures: 33, shared: 15, materials: 92, questions: 293, copyrightUses: 157, homework: 70, gradedHomework: 58, tests: 26, gradedTests: 22, contentRate: 90, lastSeen: "25/8/2026 06:48", minsAgo: 180 },
+  { name: "Phạm Quốc Anh", team: "Tổ Tiểu học 2", classes: "2A", lectures: 12, shared: 2, materials: 38, questions: 131, copyrightUses: 44, homework: 25, gradedHomework: 19, tests: 8, gradedTests: 5, contentRate: 64, lastSeen: "18/8/2026 15:20" },
+  { name: "Vũ Bích Ngọc", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 9, shared: 3, materials: 44, questions: 149, copyrightUses: 113, homework: 16, gradedHomework: 11, tests: 5, gradedTests: 3, contentRate: 58, lastSeen: "21/8/2026 10:02" },
+  { name: "Trần Thanh Thảo", team: "Tổ Năng khiếu", classes: "Khối 1-5", lectures: 7, shared: 1, materials: 31, questions: 110, copyrightUses: 169, homework: 11, gradedHomework: 7, tests: 3, gradedTests: 2, contentRate: 52, lastSeen: "19/8/2026 13:44" },
+  { name: "Hoàng Văn Nam", team: "Tổ Toán", classes: "2B, 2C", lectures: 24, shared: 8, materials: 69, questions: 224, copyrightUses: 34, homework: 57, gradedHomework: 45, tests: 17, gradedTests: 14, contentRate: 83, lastSeen: "24/8/2026 11:15" },
 ];
 
 const TEAMS = Array.from(new Set(TEACHERS.map((t) => t.team)));
@@ -66,20 +69,20 @@ type SRow = {
   materials: number; materialsDone: number;
   copyright: number; copyrightDone: number;
   homework: number; homeworkAvg: number; onTime: number;
-  tests: number; testAvg: number;
+  tests: number; testAvg: number; enet: number;
 };
 
 const STUDENTS: SRow[] = [
-  { code: "HS2026001", name: "Nguyễn Minh An", cls: "4A", materials: 128, materialsDone: 112, copyright: 34, copyrightDone: 28, homework: 76, homeworkAvg: 8.6, onTime: 94, tests: 28, testAvg: 8.2 },
-  { code: "HS2026002", name: "Trần Bảo Châu", cls: "4A", materials: 116, materialsDone: 98, copyright: 30, copyrightDone: 22, homework: 72, homeworkAvg: 8.1, onTime: 88, tests: 26, testAvg: 7.8 },
-  { code: "HS2026003", name: "Lê Gia Huy", cls: "4A", materials: 94, materialsDone: 70, copyright: 22, copyrightDone: 14, homework: 61, homeworkAvg: 7.2, onTime: 76, tests: 24, testAvg: 6.9 },
-  { code: "HS2026004", name: "Phạm Khánh Linh", cls: "4B", materials: 132, materialsDone: 121, copyright: 38, copyrightDone: 33, homework: 80, homeworkAvg: 9.1, onTime: 97, tests: 30, testAvg: 8.9 },
-  { code: "HS2026005", name: "Đỗ Thành Đạt", cls: "4B", materials: 88, materialsDone: 64, copyright: 19, copyrightDone: 11, homework: 55, homeworkAvg: 6.8, onTime: 68, tests: 21, testAvg: 6.4 },
-  { code: "HS2026006", name: "Vũ Ngọc Mai", cls: "4B", materials: 121, materialsDone: 104, copyright: 31, copyrightDone: 25, homework: 74, homeworkAvg: 8.4, onTime: 91, tests: 27, testAvg: 8.0 },
-  { code: "HS2026007", name: "Bùi Hải Nam", cls: "4C", materials: 76, materialsDone: 52, copyright: 16, copyrightDone: 9, homework: 48, homeworkAvg: 6.2, onTime: 61, tests: 18, testAvg: 5.9 },
-  { code: "HS2026008", name: "Hoàng Thu Trang", cls: "4C", materials: 109, materialsDone: 92, copyright: 27, copyrightDone: 20, homework: 69, homeworkAvg: 7.9, onTime: 85, tests: 25, testAvg: 7.5 },
-  { code: "HS2026009", name: "Ngô Anh Khoa", cls: "3A", materials: 102, materialsDone: 86, copyright: 24, copyrightDone: 18, homework: 64, homeworkAvg: 7.6, onTime: 82, tests: 22, testAvg: 7.3 },
-  { code: "HS2026010", name: "Đinh Phương Thảo", cls: "3A", materials: 138, materialsDone: 130, copyright: 41, copyrightDone: 36, homework: 82, homeworkAvg: 9.4, onTime: 98, tests: 31, testAvg: 9.2 },
+  { code: "HS2026001", name: "Nguyễn Minh An", cls: "4A", materials: 128, materialsDone: 112, copyright: 34, copyrightDone: 28, homework: 76, homeworkAvg: 8.6, onTime: 94, tests: 28, testAvg: 8.2, enet: 1374 },
+  { code: "HS2026002", name: "Trần Bảo Châu", cls: "4A", materials: 116, materialsDone: 98, copyright: 30, copyrightDone: 22, homework: 72, homeworkAvg: 8.1, onTime: 88, tests: 26, testAvg: 7.8, enet: 2629 },
+  { code: "HS2026003", name: "Lê Gia Huy", cls: "4A", materials: 94, materialsDone: 70, copyright: 22, copyrightDone: 14, homework: 61, homeworkAvg: 7.2, onTime: 76, tests: 24, testAvg: 6.9, enet: 934 },
+  { code: "HS2026004", name: "Phạm Khánh Linh", cls: "4B", materials: 132, materialsDone: 121, copyright: 38, copyrightDone: 33, homework: 80, homeworkAvg: 9.1, onTime: 97, tests: 30, testAvg: 8.9, enet: 1915 },
+  { code: "HS2026005", name: "Đỗ Thành Đạt", cls: "4B", materials: 88, materialsDone: 64, copyright: 19, copyrightDone: 11, homework: 55, homeworkAvg: 6.8, onTime: 68, tests: 21, testAvg: 6.4, enet: 2341 },
+  { code: "HS2026006", name: "Vũ Ngọc Mai", cls: "4B", materials: 121, materialsDone: 104, copyright: 31, copyrightDone: 25, homework: 74, homeworkAvg: 8.4, onTime: 91, tests: 27, testAvg: 8.0, enet: 2779 },
+  { code: "HS2026007", name: "Bùi Hải Nam", cls: "4C", materials: 76, materialsDone: 52, copyright: 16, copyrightDone: 9, homework: 48, homeworkAvg: 6.2, onTime: 61, tests: 18, testAvg: 5.9, enet: 668 },
+  { code: "HS2026008", name: "Hoàng Thu Trang", cls: "4C", materials: 109, materialsDone: 92, copyright: 27, copyrightDone: 20, homework: 69, homeworkAvg: 7.9, onTime: 85, tests: 25, testAvg: 7.5, enet: 453 },
+  { code: "HS2026009", name: "Ngô Anh Khoa", cls: "3A", materials: 102, materialsDone: 86, copyright: 24, copyrightDone: 18, homework: 64, homeworkAvg: 7.6, onTime: 82, tests: 22, testAvg: 7.3, enet: 2321 },
+  { code: "HS2026010", name: "Đinh Phương Thảo", cls: "3A", materials: 138, materialsDone: 130, copyright: 41, copyrightDone: 36, homework: 82, homeworkAvg: 9.4, onTime: 98, tests: 31, testAvg: 9.2, enet: 1462 },
 ];
 
 const STUDENT_CLASSES = Array.from(new Set(STUDENTS.map((s) => s.cls))).sort();
@@ -182,6 +185,8 @@ function TeacherReport() {
   const [q, setQ] = useState("");
   const [team, setTeam] = useState("all");
   const [cls, setCls] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => TEACHERS.filter((t) =>
       t.name.toLowerCase().includes(q.trim().toLowerCase()) &&
@@ -191,15 +196,28 @@ function TeacherReport() {
     [q, team, cls],
   );
 
-  const header = ["STT", "Giáo viên", "Tổ môn", "Lớp phụ trách", "Bài giảng đã tạo", "Đã chia sẻ", "Học liệu tải lên", "Ngân hàng câu hỏi", "Bài tập đã giao", "Đã chấm (bài tập)", "Bài kiểm tra đã tạo", "Đã chấm (kiểm tra)", "Tỷ lệ tiết có nội dung", "Truy cập gần nhất"];
-  const data = rows.map((t, i) => [i + 1, t.name, t.team, t.classes, t.lectures, t.shared, t.materials, t.questions, t.homework, t.gradedHomework, t.tests, t.gradedTests, `${t.contentRate}%`, formatLastSeen(t.lastSeen, t.minsAgo)]);
+  const sum = (f: (t: TRow) => number) => rows.reduce((s, t) => s + f(t), 0);
+  const totals = useMemo(() => ({
+    lectures: sum((t) => t.lectures), shared: sum((t) => t.shared),
+    materials: sum((t) => t.materials), questions: sum((t) => t.questions),
+    copyrightUses: sum((t) => t.copyrightUses),
+    homework: sum((t) => t.homework), gradedHomework: sum((t) => t.gradedHomework),
+    tests: sum((t) => t.tests), gradedTests: sum((t) => t.gradedTests),
+    contentRate: rows.length ? Math.round(sum((t) => t.contentRate) / rows.length) : 0,
+  }), [rows]);
+
+  const header = ["STT", "Giáo viên", "Tổ môn", "Lớp phụ trách", "Bài giảng đã tạo", "Đã chia sẻ", "Học liệu tải lên", "Ngân hàng câu hỏi", "Lượt sử dụng HLBQ", "Bài tập đã giao", "Đã chấm (bài tập)", "Bài kiểm tra đã tạo", "Đã chấm (kiểm tra)", "Tỷ lệ tiết có nội dung", "Truy cập gần nhất"];
+  const data = rows.map((t, i) => [i + 1, t.name, t.team, t.classes, t.lectures, t.shared, t.materials, t.questions, t.copyrightUses, t.homework, t.gradedHomework, t.tests, t.gradedTests, `${t.contentRate}%`, formatLastSeen(t.lastSeen, t.minsAgo)]);
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của giáo viên</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={team} onValueChange={setTeam}>
+
             <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Tổ môn" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả tổ môn</SelectItem>
@@ -232,6 +250,8 @@ function TeacherReport() {
               <th className="text-center font-semibold py-2.5 px-3">Bài giảng đã tạo</th>
               <th className="text-center font-semibold py-2.5 px-3">Học liệu tải lên</th>
               <th className="text-center font-semibold py-2.5 px-3">Ngân hàng câu hỏi</th>
+              <th className="text-center font-semibold py-2.5 px-3">Lượt sử dụng HLBQ</th>
+
               <th className="text-center font-semibold py-2.5 px-3">Bài tập đã giao</th>
               <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã tạo</th>
               <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ tiết có nội dung</th>
@@ -251,6 +271,8 @@ function TeacherReport() {
                 </td>
                 <td className="text-center py-2.5 px-3">{t.materials}</td>
                 <td className="text-center py-2.5 px-3">{t.questions}</td>
+                <td className="text-center py-2.5 px-3 text-violet-600 font-semibold">{t.copyrightUses}</td>
+
                 <td className="text-center py-2.5 px-3">
                   <div className="text-sky-600">{t.homework}</div>
                   <div className="text-xs text-slate-500">Đã chấm: {t.gradedHomework}</div>
@@ -270,11 +292,34 @@ function TeacherReport() {
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={11} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
+              <tr><td colSpan={12} className="text-center text-slate-400 py-8">Không tìm thấy giáo viên.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={4}>Tổng số ({rows.length} giáo viên)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.lectures}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã chia sẻ: {totals.shared}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.materials}</td>
+              <td className={`${totalCell} text-center`}>{totals.questions}</td>
+              <td className={`${totalCell} text-center`}>{totals.copyrightUses}</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.homework}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã chấm: {totals.gradedHomework}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.tests}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã chấm: {totals.gradedTests}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.contentRate}%</td>
+              <td className={`${totalCell} text-center`}>—</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
+
     </section>
   );
 }
@@ -282,6 +327,8 @@ function TeacherReport() {
 function StudentReport() {
   const [q, setQ] = useState("");
   const [cls, setCls] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => STUDENTS.filter((s) =>
       (s.name.toLowerCase().includes(q.trim().toLowerCase()) || s.code.toLowerCase().includes(q.trim().toLowerCase())) &&
@@ -290,15 +337,27 @@ function StudentReport() {
     [q, cls],
   );
 
-  const header = ["STT", "Mã HS", "Họ và tên", "Lớp", "Bài giảng/Học liệu đã học", "Đã hoàn thành (học liệu)", "Học liệu bản quyền đã học", "Đã hoàn thành (bản quyền)", "Bài tập đã nộp", "Tỷ lệ nộp đúng hạn", "Bài kiểm tra đã nộp"];
-  const data = rows.map((s, i) => [i + 1, s.code, s.name, s.cls, s.materials, s.materialsDone, s.copyright, s.copyrightDone, s.homework, `${s.onTime}%`, s.tests]);
+  const sum = (f: (s: SRow) => number) => rows.reduce((a, s) => a + f(s), 0);
+  const totals = useMemo(() => ({
+    materials: sum((s) => s.materials), materialsDone: sum((s) => s.materialsDone),
+    copyright: sum((s) => s.copyright), copyrightDone: sum((s) => s.copyrightDone),
+    homework: sum((s) => s.homework), tests: sum((s) => s.tests),
+    enet: sum((s) => s.enet),
+    onTime: rows.length ? Math.round(sum((s) => s.onTime) / rows.length) : 0,
+  }), [rows]);
+
+  const header = ["STT", "Mã HS", "Họ và tên", "Lớp", "Bài giảng/Học liệu đã học", "Đã hoàn thành (học liệu)", "Học liệu bản quyền đã học", "Đã hoàn thành (bản quyền)", "Bài tập đã nộp", "Tỷ lệ nộp đúng hạn", "Bài kiểm tra đã nộp", "Enetpoint"];
+  const data = rows.map((s, i) => [i + 1, s.code, s.name, s.cls, s.materials, s.materialsDone, s.copyright, s.copyrightDone, s.homework, `${s.onTime}%`, s.tests, s.enet]);
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của học sinh</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={cls} onValueChange={setCls}>
+
             <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Lớp" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả lớp</SelectItem>
@@ -326,6 +385,7 @@ function StudentReport() {
               <th className="text-center font-semibold py-2.5 px-3">Bài tập đã nộp</th>
               <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ nộp đúng hạn</th>
               <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã nộp</th>
+              <th className="text-center font-semibold py-2.5 px-3">Enetpoint</th>
             </tr>
           </thead>
           <tbody>
@@ -350,12 +410,31 @@ function StudentReport() {
                   </span>
                 </td>
                 <td className="text-center py-2.5 px-3 text-sky-600">{s.tests}</td>
+                <td className="text-center py-2.5 px-3"><EnetPoint value={s.enet} /></td>
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
+              <tr><td colSpan={10} className="text-center text-slate-400 py-8">Không tìm thấy học sinh.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={4}>Tổng số ({rows.length} học sinh)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.materials}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.materialsDone}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.copyright}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.copyrightDone}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.homework}</td>
+              <td className={`${totalCell} text-center`}>{totals.onTime}%</td>
+              <td className={`${totalCell} text-center`}>{totals.tests}</td>
+              <td className={`${totalCell} text-center`}>{totals.enet.toLocaleString("vi-VN")}</td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>

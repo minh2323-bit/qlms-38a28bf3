@@ -1,5 +1,6 @@
 // Ba bảng báo cáo nội dung số: Học liệu, Ngân hàng câu hỏi, Bài giảng.
 import { useMemo, useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +8,8 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { downloadCsv, printPdf } from "@/lib/report-export";
+import { UnitFilter, DateRangeFilter, totalCell } from "@/components/ReportFilters";
+
 
 function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => void }) {
   return (
@@ -49,11 +52,19 @@ const KINDS = Array.from(new Set(MATERIALS.map((m) => m.kind)));
 export function MaterialReport() {
   const [q, setQ] = useState("");
   const [kind, setKind] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => MATERIALS.filter((m) =>
       m.name.toLowerCase().includes(q.trim().toLowerCase()) && (kind === "all" || m.kind === kind)),
     [q, kind],
   );
+  const totals = useMemo(() => {
+    const learners = rows.reduce((s, m) => s + m.learners, 0);
+    const done = rows.reduce((s, m) => s + m.done, 0);
+    return { learners, done, pct: learners ? Math.round((done / learners) * 100) : 0 };
+  }, [rows]);
+
 
   const header = ["STT", "Tên học liệu", "Khối - Môn", "Chương - Bài học", "Thể loại", "Ngày tạo", "Tác giả", "Học sinh tham gia học", "Tỷ lệ hoàn thành"];
   const data = rows.map((m, i) => [
@@ -68,7 +79,10 @@ export function MaterialReport() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê học liệu</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={kind} onValueChange={setKind}>
+
             <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Thể loại" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả thể loại</SelectItem>
@@ -131,6 +145,17 @@ export function MaterialReport() {
               <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy học liệu.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={7}>Tổng số ({rows.length} học liệu)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.learners.toLocaleString("vi-VN")}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.done.toLocaleString("vi-VN")}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.pct}%</td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>
@@ -161,11 +186,20 @@ const Q_TYPES = Array.from(new Set(QUESTIONS.map((x) => x.type)));
 export function QuestionBankReport() {
   const [q, setQ] = useState("");
   const [type, setType] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => QUESTIONS.filter((x) =>
       x.text.toLowerCase().includes(q.trim().toLowerCase()) && (type === "all" || x.type === type)),
     [q, type],
   );
+  const totals = useMemo(() => ({
+    exam: rows.reduce((s, x) => s + x.usedExamPapers, 0),
+    tests: rows.reduce((s, x) => s + x.usedTests, 0),
+    homework: rows.reduce((s, x) => s + x.usedHomework, 0),
+    lessons: rows.reduce((s, x) => s + x.usedLessons, 0),
+  }), [rows]);
+
 
   const header = ["STT", "Câu hỏi", "Khối", "Môn", "Loại câu hỏi", "Mức độ nhận thức", "Tác giả", "Đề kiểm tra", "Bài kiểm tra", "Bài tập về nhà", "Bài giảng/Học liệu"];
   const data = rows.map((x, i) => [i + 1, x.text, x.grade, x.subject, x.type, x.level, x.author, x.usedExamPapers, x.usedTests, x.usedHomework, x.usedLessons]);
@@ -175,7 +209,10 @@ export function QuestionBankReport() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê ngân hàng câu hỏi</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={type} onValueChange={setType}>
+
             <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Loại câu hỏi" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả loại câu hỏi</SelectItem>
@@ -228,6 +265,18 @@ export function QuestionBankReport() {
               <tr><td colSpan={8} className="text-center text-slate-400 py-8">Không tìm thấy câu hỏi.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={7}>Tổng số ({rows.length} câu hỏi)</td>
+              <td className={`${totalCell} text-xs`}>
+                <div>Đề kiểm tra: {totals.exam}</div>
+                <div>Bài kiểm tra: {totals.tests}</div>
+                <div>Bài tập về nhà: {totals.homework}</div>
+                <div>Bài giảng/Học liệu: {totals.lessons}</div>
+              </td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>
@@ -256,11 +305,19 @@ const L_AUTHORS = Array.from(new Set(LECTURES.map((l) => l.author)));
 export function LectureReport() {
   const [q, setQ] = useState("");
   const [author, setAuthor] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => LECTURES.filter((l) =>
       l.name.toLowerCase().includes(q.trim().toLowerCase()) && (author === "all" || l.author === author)),
     [q, author],
   );
+  const totals = useMemo(() => {
+    const learners = rows.reduce((s, l) => s + l.learners, 0);
+    const done = rows.reduce((s, l) => s + l.done, 0);
+    return { learners, done, pct: learners ? Math.round((done / learners) * 100) : 0 };
+  }, [rows]);
+
 
   const header = ["STT", "Tên bài giảng", "Khối", "Môn", "Tác giả", "Ngày PH", "Lớp đã giao", "Học sinh tham gia học", "Tỷ lệ hoàn thành"];
   const data = rows.map((l, i) => [
@@ -274,7 +331,10 @@ export function LectureReport() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê bài giảng</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={author} onValueChange={setAuthor}>
+
             <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Tác giả" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả tác giả</SelectItem>
@@ -345,6 +405,17 @@ export function LectureReport() {
               <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy bài giảng.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={7}>Tổng số ({rows.length} bài giảng)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.learners.toLocaleString("vi-VN")}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.done.toLocaleString("vi-VN")}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.pct}%</td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>
