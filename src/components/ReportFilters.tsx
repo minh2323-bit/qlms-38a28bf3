@@ -1,9 +1,9 @@
 // Bộ lọc dùng chung cho các báo cáo: Đơn vị (trường/phân hiệu) + Khoảng thời gian.
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
-import { CalendarIcon, Sparkles } from "lucide-react";
+import { CalendarIcon, Sparkles, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+
 
 export const UNITS = [
   "TH Tô Hiệu - Trường chính",
@@ -89,3 +90,59 @@ export const tableScrollWrap = "overflow-auto max-h-[460px] rounded-b-xl";
 
 /** Dòng tiêu đề bảng dính phía trên khi cuộn dọc. */
 export const stickyHeadRow = "sticky top-0 z-10 bg-slate-50 shadow-[0_1px_0_0_#e2e8f0]";
+
+/** Bố cục header của bảng báo cáo: title 1 hàng riêng, filter xuống hàng dưới. */
+export function ReportHeader({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-bold text-indigo-700">{title}</h2>
+      <div className="flex flex-wrap items-center gap-2">{children}</div>
+    </div>
+  );
+}
+
+/* ---------------- Sắp xếp cột số liệu ---------------- */
+export type SortState = { key: string; dir: "asc" | "desc" } | null;
+
+/** Sắp xếp ít→nhiều / nhiều→ít cho các cột có số liệu. */
+export function useSort<T>(rows: T[], accessors: Record<string, (r: T) => number>) {
+  const [sort, setSort] = useState<SortState>(null);
+  const sorted = useMemo(() => {
+    if (!sort) return rows;
+    const f = accessors[sort.key];
+    if (!f) return rows;
+    return [...rows].sort((a, b) => (sort.dir === "asc" ? f(a) - f(b) : f(b) - f(a)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, sort]);
+  const toggle = (key: string) =>
+    setSort((s) => (s?.key !== key ? { key, dir: "desc" } : s.dir === "desc" ? { key, dir: "asc" } : null));
+  return { sorted, sort, toggle };
+}
+
+/** Ô tiêu đề cột cho phép sắp xếp. */
+export function SortTh({
+  label, sortKey, sort, toggle, className,
+}: {
+  label: React.ReactNode; sortKey: string; sort: SortState;
+  toggle: (k: string) => void; className?: string;
+}) {
+  const active = sort?.key === sortKey;
+  const Icon = !active ? ArrowUpDown : sort!.dir === "desc" ? ArrowDown : ArrowUp;
+  return (
+    <th className={cn("text-center font-semibold py-2.5 px-3", className)}>
+      <button
+        type="button"
+        onClick={() => toggle(sortKey)}
+        title="Sắp xếp ít → nhiều / nhiều → ít"
+        className={cn(
+          "inline-flex items-center justify-center gap-1 hover:text-indigo-600 transition",
+          active && "text-indigo-700",
+        )}
+      >
+        <span>{label}</span>
+        <Icon className={cn("h-3.5 w-3.5 shrink-0", !active && "opacity-40")} />
+      </button>
+    </th>
+  );
+}
+
