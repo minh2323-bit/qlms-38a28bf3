@@ -265,6 +265,18 @@ export function QuestionBankReport() {
               <tr><td colSpan={8} className="text-center text-slate-400 py-8">Không tìm thấy câu hỏi.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={7}>Tổng số ({rows.length} câu hỏi)</td>
+              <td className={`${totalCell} text-xs`}>
+                <div>Đề kiểm tra: {totals.exam}</div>
+                <div>Bài kiểm tra: {totals.tests}</div>
+                <div>Bài tập về nhà: {totals.homework}</div>
+                <div>Bài giảng/Học liệu: {totals.lessons}</div>
+              </td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>
