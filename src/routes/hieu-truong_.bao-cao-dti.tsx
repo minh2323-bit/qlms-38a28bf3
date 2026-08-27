@@ -73,16 +73,16 @@ type SRow = {
 };
 
 const STUDENTS: SRow[] = [
-  { code: "HS2026001", name: "Nguyễn Minh An", cls: "4A", materials: 128, materialsDone: 112, copyright: 34, copyrightDone: 28, homework: 76, homeworkAvg: 8.6, onTime: 94, tests: 28, testAvg: 8.2 },
-  { code: "HS2026002", name: "Trần Bảo Châu", cls: "4A", materials: 116, materialsDone: 98, copyright: 30, copyrightDone: 22, homework: 72, homeworkAvg: 8.1, onTime: 88, tests: 26, testAvg: 7.8 },
-  { code: "HS2026003", name: "Lê Gia Huy", cls: "4A", materials: 94, materialsDone: 70, copyright: 22, copyrightDone: 14, homework: 61, homeworkAvg: 7.2, onTime: 76, tests: 24, testAvg: 6.9 },
-  { code: "HS2026004", name: "Phạm Khánh Linh", cls: "4B", materials: 132, materialsDone: 121, copyright: 38, copyrightDone: 33, homework: 80, homeworkAvg: 9.1, onTime: 97, tests: 30, testAvg: 8.9 },
-  { code: "HS2026005", name: "Đỗ Thành Đạt", cls: "4B", materials: 88, materialsDone: 64, copyright: 19, copyrightDone: 11, homework: 55, homeworkAvg: 6.8, onTime: 68, tests: 21, testAvg: 6.4 },
-  { code: "HS2026006", name: "Vũ Ngọc Mai", cls: "4B", materials: 121, materialsDone: 104, copyright: 31, copyrightDone: 25, homework: 74, homeworkAvg: 8.4, onTime: 91, tests: 27, testAvg: 8.0 },
-  { code: "HS2026007", name: "Bùi Hải Nam", cls: "4C", materials: 76, materialsDone: 52, copyright: 16, copyrightDone: 9, homework: 48, homeworkAvg: 6.2, onTime: 61, tests: 18, testAvg: 5.9 },
-  { code: "HS2026008", name: "Hoàng Thu Trang", cls: "4C", materials: 109, materialsDone: 92, copyright: 27, copyrightDone: 20, homework: 69, homeworkAvg: 7.9, onTime: 85, tests: 25, testAvg: 7.5 },
-  { code: "HS2026009", name: "Ngô Anh Khoa", cls: "3A", materials: 102, materialsDone: 86, copyright: 24, copyrightDone: 18, homework: 64, homeworkAvg: 7.6, onTime: 82, tests: 22, testAvg: 7.3 },
-  { code: "HS2026010", name: "Đinh Phương Thảo", cls: "3A", materials: 138, materialsDone: 130, copyright: 41, copyrightDone: 36, homework: 82, homeworkAvg: 9.4, onTime: 98, tests: 31, testAvg: 9.2 },
+  { code: "HS2026001", name: "Nguyễn Minh An", cls: "4A", materials: 128, materialsDone: 112, copyright: 34, copyrightDone: 28, homework: 76, homeworkAvg: 8.6, onTime: 94, tests: 28, testAvg: 8.2, enet: 1374 },
+  { code: "HS2026002", name: "Trần Bảo Châu", cls: "4A", materials: 116, materialsDone: 98, copyright: 30, copyrightDone: 22, homework: 72, homeworkAvg: 8.1, onTime: 88, tests: 26, testAvg: 7.8, enet: 2629 },
+  { code: "HS2026003", name: "Lê Gia Huy", cls: "4A", materials: 94, materialsDone: 70, copyright: 22, copyrightDone: 14, homework: 61, homeworkAvg: 7.2, onTime: 76, tests: 24, testAvg: 6.9, enet: 934 },
+  { code: "HS2026004", name: "Phạm Khánh Linh", cls: "4B", materials: 132, materialsDone: 121, copyright: 38, copyrightDone: 33, homework: 80, homeworkAvg: 9.1, onTime: 97, tests: 30, testAvg: 8.9, enet: 1915 },
+  { code: "HS2026005", name: "Đỗ Thành Đạt", cls: "4B", materials: 88, materialsDone: 64, copyright: 19, copyrightDone: 11, homework: 55, homeworkAvg: 6.8, onTime: 68, tests: 21, testAvg: 6.4, enet: 2341 },
+  { code: "HS2026006", name: "Vũ Ngọc Mai", cls: "4B", materials: 121, materialsDone: 104, copyright: 31, copyrightDone: 25, homework: 74, homeworkAvg: 8.4, onTime: 91, tests: 27, testAvg: 8.0, enet: 2779 },
+  { code: "HS2026007", name: "Bùi Hải Nam", cls: "4C", materials: 76, materialsDone: 52, copyright: 16, copyrightDone: 9, homework: 48, homeworkAvg: 6.2, onTime: 61, tests: 18, testAvg: 5.9, enet: 668 },
+  { code: "HS2026008", name: "Hoàng Thu Trang", cls: "4C", materials: 109, materialsDone: 92, copyright: 27, copyrightDone: 20, homework: 69, homeworkAvg: 7.9, onTime: 85, tests: 25, testAvg: 7.5, enet: 453 },
+  { code: "HS2026009", name: "Ngô Anh Khoa", cls: "3A", materials: 102, materialsDone: 86, copyright: 24, copyrightDone: 18, homework: 64, homeworkAvg: 7.6, onTime: 82, tests: 22, testAvg: 7.3, enet: 2321 },
+  { code: "HS2026010", name: "Đinh Phương Thảo", cls: "3A", materials: 138, materialsDone: 130, copyright: 41, copyrightDone: 36, homework: 82, homeworkAvg: 9.4, onTime: 98, tests: 31, testAvg: 9.2, enet: 1462 },
 ];
 
 const STUDENT_CLASSES = Array.from(new Set(STUDENTS.map((s) => s.cls))).sort();
