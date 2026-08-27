@@ -247,6 +247,8 @@ function TeacherReport() {
               <th className="text-center font-semibold py-2.5 px-3">Bài giảng đã tạo</th>
               <th className="text-center font-semibold py-2.5 px-3">Học liệu tải lên</th>
               <th className="text-center font-semibold py-2.5 px-3">Ngân hàng câu hỏi</th>
+              <th className="text-center font-semibold py-2.5 px-3">Lượt sử dụng HLBQ</th>
+
               <th className="text-center font-semibold py-2.5 px-3">Bài tập đã giao</th>
               <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã tạo</th>
               <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ tiết có nội dung</th>
