@@ -334,13 +334,21 @@ function StudentReport() {
   const [cls, setCls] = useState("all");
   const [unit, setUnit] = useState("all");
   const [range, setRange] = useState<DateRange | undefined>();
-  const rows = useMemo(
+  const filtered = useMemo(
     () => STUDENTS.filter((s) =>
       (s.name.toLowerCase().includes(q.trim().toLowerCase()) || s.code.toLowerCase().includes(q.trim().toLowerCase())) &&
       (cls === "all" || s.cls === cls),
     ),
     [q, cls],
   );
+  const { sorted: rows, sort, toggle } = useSort(filtered, {
+    materials: (s) => s.materials,
+    copyright: (s) => s.copyright,
+    homework: (s) => s.homework,
+    onTime: (s) => s.onTime,
+    tests: (s) => s.tests,
+    enet: (s) => s.enet,
+  });
 
   const sum = (f: (s: SRow) => number) => rows.reduce((a, s) => a + f(s), 0);
   const totals = useMemo(() => ({
@@ -356,26 +364,22 @@ function StudentReport() {
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của học sinh</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <UnitFilter value={unit} onChange={setUnit} />
-          <DateRangeFilter value={range} onChange={setRange} />
-          <Select value={cls} onValueChange={setCls}>
-
-            <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Lớp" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả lớp</SelectItem>
-              {STUDENT_CLASSES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm học sinh / mã HS..." className="h-9 w-56" />
-          <ExportButtons
-            onExcel={() => downloadCsv("bao-cao-dti-hoc-sinh.csv", header, data)}
-            onPdf={() => printPdf("Báo cáo DTI – Học sinh", header, data)}
-          />
-        </div>
-      </div>
+      <ReportHeader title="Thống kê hoạt động của học sinh">
+        <UnitFilter value={unit} onChange={setUnit} />
+        <DateRangeFilter value={range} onChange={setRange} />
+        <Select value={cls} onValueChange={setCls}>
+          <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Lớp" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả lớp</SelectItem>
+            {STUDENT_CLASSES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm học sinh / mã HS..." className="h-9 w-56" />
+        <ExportButtons
+          onExcel={() => downloadCsv("bao-cao-dti-hoc-sinh.csv", header, data)}
+          onPdf={() => printPdf("Báo cáo DTI – Học sinh", header, data)}
+        />
+      </ReportHeader>
 
       <div className={tableScrollWrap}>
         <table className="w-full text-sm">
@@ -385,12 +389,13 @@ function StudentReport() {
               <th className="text-left font-semibold py-2.5 px-3">Mã HS</th>
               <th className="text-left font-semibold py-2.5 px-3">Họ và tên</th>
               <th className="text-center font-semibold py-2.5 px-3">Lớp</th>
-              <th className="text-center font-semibold py-2.5 px-3">Bài giảng / Học liệu đã học</th>
-              <th className="text-center font-semibold py-2.5 px-3">Học liệu bản quyền đã học</th>
-              <th className="text-center font-semibold py-2.5 px-3">Bài tập đã nộp</th>
-              <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ nộp đúng hạn</th>
-              <th className="text-center font-semibold py-2.5 px-3">Bài kiểm tra đã nộp</th>
-              <th className="text-center font-semibold py-2.5 px-3">Enetpoint</th>
+              <SortTh label="Bài giảng / Học liệu đã học" sortKey="materials" sort={sort} toggle={toggle} />
+              <SortTh label="Học liệu bản quyền đã học" sortKey="copyright" sort={sort} toggle={toggle} />
+              <SortTh label="Bài tập đã nộp" sortKey="homework" sort={sort} toggle={toggle} />
+              <SortTh label="Tỷ lệ nộp đúng hạn" sortKey="onTime" sort={sort} toggle={toggle} />
+              <SortTh label="Bài kiểm tra đã nộp" sortKey="tests" sort={sort} toggle={toggle} />
+              <SortTh label="Enetpoint" sortKey="enet" sort={sort} toggle={toggle} />
+
             </tr>
           </thead>
           <tbody>
