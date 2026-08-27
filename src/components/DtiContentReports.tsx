@@ -331,7 +331,10 @@ export function LectureReport() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê bài giảng</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={author} onValueChange={setAuthor}>
+
             <SelectTrigger className="h-9 w-52"><SelectValue placeholder="Tác giả" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả tác giả</SelectItem>
