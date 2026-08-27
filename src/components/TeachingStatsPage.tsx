@@ -119,7 +119,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
   const [subject, setSubject] = useState(SUBJECTS[0]);
   const [range, setRange] = useState<DateRange | undefined>();
 
-  const rows = useMemo(() => {
+  const filtered = useMemo(() => {
     const list = CLASS_STUDENTS[cls] ?? [];
     return list.filter(
       (r) =>
@@ -127,6 +127,17 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
         r.subject === subject,
     );
   }, [cls, q, subject]);
+
+  const { sorted: rows, sort, toggle } = useSort(filtered, {
+    viewed: (r) => r.viewed,
+    minutes: (r) => r.minutes,
+    done: (r) => r.done,
+    avg: (r) => r.avg,
+    testDone: (r) => r.testDone,
+    testAvg: (r) => r.testAvg,
+    enet: (r) => r.enet,
+  });
+
 
   const summary = useMemo(() => {
     const list = CLASS_STUDENTS[cls] ?? [];
