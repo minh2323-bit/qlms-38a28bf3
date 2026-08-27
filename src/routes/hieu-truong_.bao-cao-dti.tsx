@@ -324,6 +324,8 @@ function TeacherReport() {
 function StudentReport() {
   const [q, setQ] = useState("");
   const [cls, setCls] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => STUDENTS.filter((s) =>
       (s.name.toLowerCase().includes(q.trim().toLowerCase()) || s.code.toLowerCase().includes(q.trim().toLowerCase())) &&
@@ -332,15 +334,27 @@ function StudentReport() {
     [q, cls],
   );
 
-  const header = ["STT", "Mã HS", "Họ và tên", "Lớp", "Bài giảng/Học liệu đã học", "Đã hoàn thành (học liệu)", "Học liệu bản quyền đã học", "Đã hoàn thành (bản quyền)", "Bài tập đã nộp", "Tỷ lệ nộp đúng hạn", "Bài kiểm tra đã nộp"];
-  const data = rows.map((s, i) => [i + 1, s.code, s.name, s.cls, s.materials, s.materialsDone, s.copyright, s.copyrightDone, s.homework, `${s.onTime}%`, s.tests]);
+  const sum = (f: (s: SRow) => number) => rows.reduce((a, s) => a + f(s), 0);
+  const totals = useMemo(() => ({
+    materials: sum((s) => s.materials), materialsDone: sum((s) => s.materialsDone),
+    copyright: sum((s) => s.copyright), copyrightDone: sum((s) => s.copyrightDone),
+    homework: sum((s) => s.homework), tests: sum((s) => s.tests),
+    enet: sum((s) => s.enet),
+    onTime: rows.length ? Math.round(sum((s) => s.onTime) / rows.length) : 0,
+  }), [rows]);
+
+  const header = ["STT", "Mã HS", "Họ và tên", "Lớp", "Bài giảng/Học liệu đã học", "Đã hoàn thành (học liệu)", "Học liệu bản quyền đã học", "Đã hoàn thành (bản quyền)", "Bài tập đã nộp", "Tỷ lệ nộp đúng hạn", "Bài kiểm tra đã nộp", "Enetpoint"];
+  const data = rows.map((s, i) => [i + 1, s.code, s.name, s.cls, s.materials, s.materialsDone, s.copyright, s.copyrightDone, s.homework, `${s.onTime}%`, s.tests, s.enet]);
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-indigo-700">Thống kê hoạt động của học sinh</h2>
         <div className="flex flex-wrap items-center gap-2">
+          <UnitFilter value={unit} onChange={setUnit} />
+          <DateRangeFilter value={range} onChange={setRange} />
           <Select value={cls} onValueChange={setCls}>
+
             <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Lớp" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả lớp</SelectItem>
