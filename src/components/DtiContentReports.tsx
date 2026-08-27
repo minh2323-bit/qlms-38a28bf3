@@ -405,6 +405,17 @@ export function LectureReport() {
               <tr><td colSpan={9} className="text-center text-slate-400 py-8">Không tìm thấy bài giảng.</td></tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className={`${totalCell} text-center`} colSpan={7}>Tổng số ({rows.length} bài giảng)</td>
+              <td className={`${totalCell} text-center`}>
+                <div>{totals.learners.toLocaleString("vi-VN")}</div>
+                <div className="text-xs font-semibold text-indigo-600">Đã hoàn thành: {totals.done.toLocaleString("vi-VN")}</div>
+              </td>
+              <td className={`${totalCell} text-center`}>{totals.pct}%</td>
+            </tr>
+          </tfoot>
+
         </table>
       </div>
     </section>
