@@ -52,11 +52,19 @@ const KINDS = Array.from(new Set(MATERIALS.map((m) => m.kind)));
 export function MaterialReport() {
   const [q, setQ] = useState("");
   const [kind, setKind] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => MATERIALS.filter((m) =>
       m.name.toLowerCase().includes(q.trim().toLowerCase()) && (kind === "all" || m.kind === kind)),
     [q, kind],
   );
+  const totals = useMemo(() => {
+    const learners = rows.reduce((s, m) => s + m.learners, 0);
+    const done = rows.reduce((s, m) => s + m.done, 0);
+    return { learners, done, pct: learners ? Math.round((done / learners) * 100) : 0 };
+  }, [rows]);
+
 
   const header = ["STT", "Tên học liệu", "Khối - Môn", "Chương - Bài học", "Thể loại", "Ngày tạo", "Tác giả", "Học sinh tham gia học", "Tỷ lệ hoàn thành"];
   const data = rows.map((m, i) => [
