@@ -109,8 +109,9 @@ export function MaterialReport() {
               <th className="text-center font-semibold py-2.5 px-3">Thể loại</th>
               <th className="text-center font-semibold py-2.5 px-3">Ngày tạo</th>
               <th className="text-center font-semibold py-2.5 px-3">Tác giả</th>
-              <th className="text-center font-semibold py-2.5 px-3">Học sinh tham gia học</th>
-              <th className="text-center font-semibold py-2.5 px-3">Tỷ lệ hoàn thành</th>
+              <SortTh label="Học sinh tham gia học" sortKey="learners" sort={sort} toggle={toggle} />
+              <SortTh label="Tỷ lệ hoàn thành" sortKey="pct" sort={sort} toggle={toggle} />
+
             </tr>
           </thead>
           <tbody>
