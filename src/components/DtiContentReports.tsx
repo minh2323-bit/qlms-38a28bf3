@@ -54,11 +54,15 @@ export function MaterialReport() {
   const [kind, setKind] = useState("all");
   const [unit, setUnit] = useState("all");
   const [range, setRange] = useState<DateRange | undefined>();
-  const rows = useMemo(
+  const filtered = useMemo(
     () => MATERIALS.filter((m) =>
       m.name.toLowerCase().includes(q.trim().toLowerCase()) && (kind === "all" || m.kind === kind)),
     [q, kind],
   );
+  const { sorted: rows, sort, toggle } = useSort(filtered, {
+    learners: (m) => m.learners,
+    pct: (m) => (m.learners ? m.done / m.learners : 0),
+  });
   const totals = useMemo(() => {
     const learners = rows.reduce((s, m) => s + m.learners, 0);
     const done = rows.reduce((s, m) => s + m.done, 0);
@@ -76,26 +80,23 @@ export function MaterialReport() {
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-indigo-700">Thống kê học liệu</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <UnitFilter value={unit} onChange={setUnit} />
-          <DateRangeFilter value={range} onChange={setRange} />
-          <Select value={kind} onValueChange={setKind}>
+      <ReportHeader title="Thống kê học liệu">
+        <UnitFilter value={unit} onChange={setUnit} />
+        <DateRangeFilter value={range} onChange={setRange} />
+        <Select value={kind} onValueChange={setKind}>
+          <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Thể loại" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả thể loại</SelectItem>
+            {KINDS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm học liệu..." className="h-9 w-56" />
+        <ExportButtons
+          onExcel={() => downloadCsv("bao-cao-dti-hoc-lieu.csv", header, data)}
+          onPdf={() => printPdf("Báo cáo DTI – Học liệu", header, data)}
+        />
+      </ReportHeader>
 
-            <SelectTrigger className="h-9 w-44"><SelectValue placeholder="Thể loại" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả thể loại</SelectItem>
-              {KINDS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm học liệu..." className="h-9 w-56" />
-          <ExportButtons
-            onExcel={() => downloadCsv("bao-cao-dti-hoc-lieu.csv", header, data)}
-            onPdf={() => printPdf("Báo cáo DTI – Học liệu", header, data)}
-          />
-        </div>
-      </div>
 
       <div className={tableScrollWrap}>
         <table className="w-full text-sm">
