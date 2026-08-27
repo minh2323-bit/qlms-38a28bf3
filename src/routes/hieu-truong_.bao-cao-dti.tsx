@@ -38,7 +38,7 @@ function formatLastSeen(lastSeen: string, minsAgo?: number) {
 type TRow = {
   name: string; team: string; classes: string;
   lectures: number; shared: number; materials: number;
-  questions: number; homework: number; gradedHomework: number;
+  questions: number; copyrightUses: number; homework: number; gradedHomework: number;
   tests: number; gradedTests: number; contentRate: number;
   lastSeen: string; minsAgo?: number;
 };
@@ -66,7 +66,7 @@ type SRow = {
   materials: number; materialsDone: number;
   copyright: number; copyrightDone: number;
   homework: number; homeworkAvg: number; onTime: number;
-  tests: number; testAvg: number;
+  tests: number; testAvg: number; enet: number;
 };
 
 const STUDENTS: SRow[] = [
