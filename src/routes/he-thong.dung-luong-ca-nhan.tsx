@@ -316,8 +316,7 @@ function PersonalStoragePage() {
               Xóa
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+        </AlertDialogContent>
       </AlertDialog>
     </AppShell>
   );
