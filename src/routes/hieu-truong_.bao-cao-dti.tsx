@@ -239,10 +239,10 @@ function TeacherReport() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className={tableScrollWrap}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-slate-500 border-b bg-slate-50/60">
+            <tr className={`text-slate-500 ${stickyHeadRow}`}>
               <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
               <th className="text-left font-semibold py-2.5 px-3">Giáo viên</th>
               <th className="text-left font-semibold py-2.5 px-3">Tổ môn</th>
@@ -372,10 +372,10 @@ function StudentReport() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className={tableScrollWrap}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-slate-500 border-b bg-slate-50/60">
+            <tr className={`text-slate-500 ${stickyHeadRow}`}>
               <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
               <th className="text-left font-semibold py-2.5 px-3">Mã HS</th>
               <th className="text-left font-semibold py-2.5 px-3">Họ và tên</th>
