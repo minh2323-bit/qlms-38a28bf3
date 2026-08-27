@@ -76,7 +76,6 @@ const TEACHER_NAV: NavItem[] = [
     submenu: [
       { icon: BookOpen, label: "Danh mục", to: "/he-thong/danh-muc" },
       { icon: HardDrive, label: "Quản lý dung lượng", to: "/he-thong/quan-ly-dung-luong" },
-      { icon: HardDrive, label: "Dung lượng bộ nhớ cá nhân", to: "/he-thong/dung-luong-ca-nhan" },
     ],
   },
 ];
@@ -173,7 +172,6 @@ const PRINCIPAL_NAV: NavItem[] = [
       { icon: UserCog, label: "Tài khoản nhân sự" },
       { icon: Database, label: "Đồng bộ dữ liệu CSDL" },
       { icon: HardDrive, label: "Quản lý dung lượng", to: "/he-thong/quan-ly-dung-luong", search: { role: "principal" } },
-      { icon: HardDrive, label: "Dung lượng bộ nhớ cá nhân", to: "/he-thong/dung-luong-ca-nhan", search: { role: "principal" } },
     ],
   },
 ];
