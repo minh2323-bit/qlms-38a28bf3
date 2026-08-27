@@ -186,11 +186,20 @@ const Q_TYPES = Array.from(new Set(QUESTIONS.map((x) => x.type)));
 export function QuestionBankReport() {
   const [q, setQ] = useState("");
   const [type, setType] = useState("all");
+  const [unit, setUnit] = useState("all");
+  const [range, setRange] = useState<DateRange | undefined>();
   const rows = useMemo(
     () => QUESTIONS.filter((x) =>
       x.text.toLowerCase().includes(q.trim().toLowerCase()) && (type === "all" || x.type === type)),
     [q, type],
   );
+  const totals = useMemo(() => ({
+    exam: rows.reduce((s, x) => s + x.usedExamPapers, 0),
+    tests: rows.reduce((s, x) => s + x.usedTests, 0),
+    homework: rows.reduce((s, x) => s + x.usedHomework, 0),
+    lessons: rows.reduce((s, x) => s + x.usedLessons, 0),
+  }), [rows]);
+
 
   const header = ["STT", "Câu hỏi", "Khối", "Môn", "Loại câu hỏi", "Mức độ nhận thức", "Tác giả", "Đề kiểm tra", "Bài kiểm tra", "Bài tập về nhà", "Bài giảng/Học liệu"];
   const data = rows.map((x, i) => [i + 1, x.text, x.grade, x.subject, x.type, x.level, x.author, x.usedExamPapers, x.usedTests, x.usedHomework, x.usedLessons]);
