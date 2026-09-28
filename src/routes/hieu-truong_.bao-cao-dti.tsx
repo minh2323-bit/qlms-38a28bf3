@@ -191,9 +191,10 @@ function TeacherReport() {
     () => TEACHERS.filter((t) =>
       t.name.toLowerCase().includes(q.trim().toLowerCase()) &&
       (team === "all" || t.team === team) &&
-      (cls === "all" || t.classes.split(",").map((c) => c.trim()).includes(cls)),
+      (cls === "all" || t.classes.split(",").map((c) => c.trim()).includes(cls)) &&
+      matchUnitRange(t.name, unit, range),
     ),
-    [q, team, cls],
+    [q, team, cls, unit, range],
   );
   const { sorted: rows, sort, toggle } = useSort(filtered, {
     lectures: (t) => t.lectures,
@@ -337,9 +338,10 @@ function StudentReport() {
   const filtered = useMemo(
     () => STUDENTS.filter((s) =>
       (s.name.toLowerCase().includes(q.trim().toLowerCase()) || s.code.toLowerCase().includes(q.trim().toLowerCase())) &&
-      (cls === "all" || s.cls === cls),
+      (cls === "all" || s.cls === cls) &&
+      matchUnitRange(s.code, unit, range),
     ),
-    [q, cls],
+    [q, cls, unit, range],
   );
   const { sorted: rows, sort, toggle } = useSort(filtered, {
     materials: (s) => s.materials,

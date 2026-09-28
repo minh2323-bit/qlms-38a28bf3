@@ -146,3 +146,24 @@ export function SortTh({
   );
 }
 
+
+/* ---------------- Lọc theo Đơn vị + Khoảng thời gian (dữ liệu mẫu) ---------------- */
+function hashKey(s: string) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+/** Gán ổn định đơn vị + ngày hoạt động cho mỗi dòng dữ liệu mẫu, rồi so với bộ lọc. */
+export function matchUnitRange(key: string, unit: string, range?: DateRange) {
+  const h = hashKey(key);
+  if (unit !== "all" && UNITS[h % UNITS.length] !== unit) return false;
+  if (range?.from) {
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() - (h % 180));
+    const from = new Date(range.from); from.setHours(0, 0, 0, 0);
+    const to = new Date(range.to ?? range.from); to.setHours(23, 59, 59, 999);
+    if (d < from || d > to) return false;
+  }
+  return true;
+}

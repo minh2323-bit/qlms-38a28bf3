@@ -56,8 +56,8 @@ export function MaterialReport() {
   const [range, setRange] = useState<DateRange | undefined>();
   const filtered = useMemo(
     () => MATERIALS.filter((m) =>
-      m.name.toLowerCase().includes(q.trim().toLowerCase()) && (kind === "all" || m.kind === kind)),
-    [q, kind],
+      m.name.toLowerCase().includes(q.trim().toLowerCase()) && (kind === "all" || m.kind === kind) && matchUnitRange(m.name, unit, range)),
+    [q, kind, unit, range],
   );
   const { sorted: rows, sort, toggle } = useSort(filtered, {
     learners: (m) => m.learners,
@@ -192,8 +192,8 @@ export function QuestionBankReport() {
   const [range, setRange] = useState<DateRange | undefined>();
   const filtered = useMemo(
     () => QUESTIONS.filter((x) =>
-      x.text.toLowerCase().includes(q.trim().toLowerCase()) && (type === "all" || x.type === type)),
-    [q, type],
+      x.text.toLowerCase().includes(q.trim().toLowerCase()) && (type === "all" || x.type === type) && matchUnitRange(x.text, unit, range)),
+    [q, type, unit, range],
   );
   const { sorted: rows, sort, toggle } = useSort(filtered, {
     used: (x) => x.usedExamPapers + x.usedTests + x.usedHomework + x.usedLessons,
@@ -311,8 +311,8 @@ export function LectureReport() {
   const [range, setRange] = useState<DateRange | undefined>();
   const filtered = useMemo(
     () => LECTURES.filter((l) =>
-      l.name.toLowerCase().includes(q.trim().toLowerCase()) && (author === "all" || l.author === author)),
-    [q, author],
+      l.name.toLowerCase().includes(q.trim().toLowerCase()) && (author === "all" || l.author === author) && matchUnitRange(l.name, unit, range)),
+    [q, author, unit, range],
   );
   const { sorted: rows, sort, toggle } = useSort(filtered, {
     learners: (l) => l.learners,
