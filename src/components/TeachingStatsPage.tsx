@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
-import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow, SortTh, useSort } from "@/components/ReportFilters";
+import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
@@ -124,9 +124,10 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
     return list.filter(
       (r) =>
         r.name.toLowerCase().includes(q.trim().toLowerCase()) &&
-        r.subject === subject,
+        r.subject === subject &&
+        matchUnitRange(r.name, "all", range),
     );
-  }, [cls, q, subject]);
+  }, [cls, q, subject, range]);
 
   const { sorted: rows, sort, toggle } = useSort(filtered, {
     viewed: (r) => r.viewed,
