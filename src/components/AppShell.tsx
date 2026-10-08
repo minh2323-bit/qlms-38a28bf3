@@ -118,7 +118,7 @@ const PRINCIPAL_NAV: NavItem[] = [
     label: "Hoạt động\ngiảng dạy",
     submenu: [
       { icon: CalendarDays, label: "Lịch báo giảng", to: "/hieu-truong/lich-bao-giang" },
-      { icon: School, label: "Lớp học của tôi", to: "/lop-hoc-so" },
+      { icon: School, label: "Lớp học", to: "/hieu-truong/lop-hoc" },
       { icon: BookMarked, label: "Bài giảng", to: "/hoc-lieu/bai-giang" },
       { icon: Library, label: "Kho học liệu của tôi", to: "/hoc-lieu/kho-hoc-lieu" },
       { icon: ClipboardList, label: "Nhiệm vụ, bài tập", to: "/giao-bai-tap" },
