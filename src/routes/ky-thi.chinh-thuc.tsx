@@ -1,6 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Outlet } from "@tanstack/react-router";
-import { OfficialExamsPage } from "@/components/exams/OfficialExamsPage";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/ky-thi/chinh-thuc")({
   head: () => ({
