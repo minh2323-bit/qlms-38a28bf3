@@ -1,0 +1,57 @@
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Download, FileText, Eye, Shield, Users, Pencil, Check } from "lucide-react";
+import { toast } from "sonner";
+import { DEMO_NAMES, useDemoAccount } from "@/lib/demo-account";
+import { canSeeOfficial, canManageOfficial, canActOnShift, examPhase, updateAttempt, useOfficialExams, type ExamPaper } from "@/lib/official-exams";
+import { downloadCsv } from "@/lib/report-export";
+import { ExamSelect, examDate, examTableClass } from "./ExamControls";
+
+export function OfficialExamDetail({ examId, initialTab = "info" }: { examId: string; initialTab?: string }) {
+  const exams = useOfficialExams(), role = useDemoAccount();
+  const exam = exams.find((e) => e.id === examId);
+  const [tab, setTab] = useState(initialTab), [shiftId, setShiftId] = useState("all"), [query, setQuery] = useState("");
+  const [preview, setPreview] = useState<ExamPaper | null>(null);
+  const [action, setAction] = useState<{ studentId: string; shiftId: string; kind: "grade" | "violation" | "retake" } | null>(null), [value, setValue] = useState("");
+  const [scoreError, setScoreError] = useState("");
+  if (!exam || !canSeeOfficial(exam, role)) return <div className="py-16 text-center space-y-4"><h1 className="font-semibold">Kỳ thi không tồn tại hoặc chưa được duyệt.</h1><Button asChild><Link to="/ky-thi/chinh-thuc">Quay lại kỳ thi</Link></Button></div>;
+  const phase = examPhase(exam), name = DEMO_NAMES[role];
+  const rows = exam.students.filter((s) => `${s.name} ${s.cccd}`.toLowerCase().includes(query.toLowerCase()) && (shiftId === "all" || exam.shifts.find((v) => v.id === shiftId)?.studentIds.includes(s.id)));
+  const headers = ["STT", "Số CCCD", "Họ tên", "Lớp", "Ca thi", "Trạng thái", "Điểm", "Vi phạm"];
+  const exports = rows.map((s, i) => [i + 1, s.cccd, s.name, s.klass, exam.shifts.find((v) => v.studentIds.includes(s.id))?.name ?? "Chưa xếp ca", exam.attempts[s.id]?.submitted ? "Đã nộp" : "Chưa vào thi", exam.attempts[s.id]?.score ?? "", exam.attempts[s.id]?.violations.length ?? 0]);
+  function printResults() {
+    const win = window.open("", "_blank"); if (!win) return;
+    const doc = win.document, heading = doc.createElement("h1"), table = doc.createElement("table");
+    heading.textContent = exam?.name ?? "Kết quả kỳ thi";
+    for (const row of [headers, ...exports]) {
+      const tr = doc.createElement("tr");
+      for (const v of row) { const td = doc.createElement("td"); td.textContent = String(v); tr.appendChild(td); }
+      table.appendChild(tr);
+    }
+    table.setAttribute("border", "1"); table.setAttribute("cellpadding", "8");
+    doc.body.append(heading, table); win.print();
+  }
+  function runAction() {
+    if (!action || !exam) return;
+    if (action.kind === "violation" && !value.trim()) { setScoreError("Nhập nội dung vi phạm."); return; }
+    try { updateAttempt(exam.id, action.shiftId, action.studentId, role, name, action.kind, action.kind === "grade" ? Number(value) : value); toast.success("Đã cập nhật kết quả."); setAction(null); }
+    catch (e) { setScoreError(e instanceof Error ? e.message : "Không thể cập nhật."); }
+  }
+  return <div className="text-foreground space-y-5"><div className="flex gap-3 items-start"><Button variant="ghost" size="icon" title="Quay lại kỳ thi" asChild><Link to="/ky-thi/chinh-thuc"><ArrowLeft /></Link></Button><div className="flex-1"><h1 className="text-xl font-bold">{exam.name}</h1><p className="text-sm text-muted-foreground mt-1">Khối {exam.grade} · {exam.subject} · {exam.duration} phút · {exam.shiftMode === "multi" ? `${exam.shifts.length} ca thi` : "1 ca thi"}</p></div><span className={`text-xs px-2 py-1 rounded-full ${exam.approval === "approved" ? "bg-exam-success-tint text-exam-success" : "bg-exam-warning-tint text-exam-warning"}`}>{exam.approval === "approved" ? "Đã duyệt" : "Chờ duyệt"}</span>{canManageOfficial(exam, role) && phase === "upcoming" && <Button variant="outline" asChild><Link to="/ky-thi/tao-moi/$kind" params={{ kind: "chinh-thuc" }} search={{ examId: exam.id, mode: "edit" }}><Pencil />Sửa kỳ thi</Link></Button>}</div>
+    <nav className="flex flex-wrap gap-1 border-b">{[{ id: "info", label: "Thông tin kỳ thi", Icon: FileText }, { id: "papers", label: "Đề thi", Icon: FileText }, { id: "students", label: "Ca thi & Thí sinh", Icon: Users }, { id: "monitor", label: "Giám sát", Icon: Shield }, { id: "grade", label: "Chấm bài", Icon: Pencil }, { id: "results", label: "Tra cứu kết quả", Icon: Check }].map((t) => <Button key={t.id} variant="ghost" onClick={() => setTab(t.id)} className={`rounded-none border-b-2 ${tab === t.id ? "border-exam-primary text-exam-primary bg-exam-tint" : "border-transparent text-muted-foreground"}`}><t.Icon />{t.label}</Button>)}</nav>
+    {tab === "info" && <div className="grid md:grid-cols-2 gap-8"><section className="space-y-4"><h2 className="font-semibold text-exam-primary border-b pb-2">Thông tin kỳ thi</h2>{[["Tên kỳ thi", exam.name], ["Khối / Môn", `${exam.grade} / ${exam.subject}`], ["Bắt đầu", examDate(exam.start)], ["Kết thúc", examDate(exam.end)], ["Thang điểm", exam.maxScore], ["Loại điểm", exam.scoreType], ["Thí sinh", exam.limitStudents ? "Chỉ học sinh được ghi danh" : "Học sinh toàn khối tự tham gia"]].map(([label, v]) => <div key={label} className="grid grid-cols-[130px_1fr] gap-3 text-sm"><span className="text-muted-foreground">{label}</span><span className="font-medium">{v}</span></div>)}</section><section className="space-y-4"><h2 className="font-semibold text-exam-primary border-b pb-2">Phân công</h2><div className="text-sm"><p className="font-medium">Người chấm</p><p className="text-muted-foreground mt-1">{exam.graders.join(", ") || "Chưa phân công"}</p></div><div className="text-sm"><p className="font-medium">Người giám sát</p><p className="text-muted-foreground mt-1">{exam.supervisors.join(", ") || "Chưa phân công"}</p></div>{exam.shifts.map((s) => <div key={s.id} className="border-b pb-3 text-sm"><h3 className="font-semibold">{s.name} · {s.code}</h3><p className="text-muted-foreground">{examDate(s.start)} – {examDate(s.end)}</p><p className="mt-1">Chấm: {s.graders.join(", ") || "Chưa phân công"}</p><p>Giám sát: {s.supervisors.join(", ") || "Chưa phân công"}</p></div>)}</section></div>}
+    {tab === "papers" && <div className="overflow-auto border rounded-md"><table className={examTableClass}><thead><tr><th>Tên đề thi gốc</th><th>Mã đề gốc</th><th>Đề hoán vị</th><th>Xem đề</th></tr></thead><tbody>{exam.papers.map((p) => <tr key={p.id}><td>{p.name}</td><td>{p.code}</td><td className="max-w-72"><div className="flex flex-wrap">{p.variants.map((code) => <Button key={code} variant="link" size="sm" className="text-exam-primary" onClick={() => setPreview({ ...p, name: `${p.name} – ${code}` })}>{code}</Button>)}</div></td><td><Button variant="outline" size="icon" title={`Xem ${p.name}`} onClick={() => setPreview(p)}><Eye /></Button></td></tr>)}</tbody></table></div>}
+    {!["info", "papers"].includes(tab) && <><div className="flex flex-wrap gap-3 items-end"><div className="w-60"><ExamSelect label="Ca thi" value={shiftId} onChange={setShiftId} options={[{ value: "all", label: "Tất cả ca thi" }, ...exam.shifts.map((s) => ({ value: s.id, label: `${s.name} – ${s.code}` }))]} /></div><Input placeholder="Tìm họ tên, số CCCD..." aria-label="Tìm thí sinh kỳ thi" className="w-64" value={query} onChange={(e) => setQuery(e.target.value)} /><div className="flex-1" />{tab === "results" && <><Button variant="outline" onClick={() => downloadCsv("ket-qua-ky-thi.csv", headers, exports)}><Download />Xuất Excel</Button><Button variant="outline" onClick={printResults}><FileText />Xuất PDF</Button></>}</div>
+      <div className="overflow-auto max-h-[550px] border rounded-md"><table className={`${examTableClass} min-w-[950px]`}><thead><tr><th>STT</th><th>Số CCCD</th><th>Họ tên</th><th>Lớp</th><th>Ca thi</th><th>Trạng thái</th><th>Điểm</th><th>Vi phạm</th>{(tab === "monitor" || tab === "grade") && <th>Thao tác</th>}</tr></thead><tbody>{rows.map((s, i) => {
+        const shift = exam.shifts.find((v) => v.studentIds.includes(s.id)), attempt = exam.attempts[s.id];
+        const canGrade = !!shift && canActOnShift(exam, shift, role, name, "grade") && !!attempt?.submitted && exam.papers.some((p) => p.questions.some((q) => q.type === "Tự luận"));
+        const canMonitor = !!shift && canActOnShift(exam, shift, role, name, "monitor") && phase === "ongoing";
+        return <tr key={s.id}><td>{i + 1}</td><td>{s.cccd}</td><td>{tab === "grade" && !exam.showNames ? `Thí sinh ${i + 1}` : s.name}</td><td>{s.klass}</td><td>{shift?.name ?? "Chưa xếp ca"}</td><td><span className={attempt?.submitted ? "text-exam-success" : "text-muted-foreground"}>{attempt?.retake ? "Được thi lại" : attempt?.submitted ? "Đã nộp bài" : "Chưa vào thi"}</span></td><td>{attempt?.score ?? "—"}</td><td>{attempt?.violations.length ?? 0}</td>{tab === "grade" && <td><Button variant="outline" size="sm" disabled={!canGrade} onClick={() => { if (shift) { setAction({ studentId: s.id, shiftId: shift.id, kind: "grade" }); setValue(String(attempt?.score ?? "")); setScoreError(""); } }}>Chấm bài</Button></td>}{tab === "monitor" && <td><div className="flex gap-2"><Button variant="outline" size="sm" disabled={!canMonitor} onClick={() => { if (shift) { setAction({ studentId: s.id, shiftId: shift.id, kind: "violation" }); setValue(""); setScoreError(""); } }}>Ghi nhận vi phạm</Button><Button variant="outline" size="sm" disabled={!canMonitor} onClick={() => { if (shift) { setAction({ studentId: s.id, shiftId: shift.id, kind: "retake" }); setScoreError(""); } }}>Cho thi lại</Button></div></td>}</tr>;
+      })}</tbody></table>{!rows.length && <p className="text-sm text-muted-foreground py-10 text-center">Không có thí sinh phù hợp.</p>}</div></>}
+    <Dialog open={!!action} onOpenChange={(v) => !v && setAction(null)}><DialogContent><DialogHeader><DialogTitle>{action?.kind === "grade" ? "Chấm bài tự luận" : action?.kind === "violation" ? "Ghi nhận vi phạm quy chế" : "Cho phép thi lại"}</DialogTitle></DialogHeader>{action?.kind !== "retake" ? <Input aria-label={action?.kind === "grade" ? "Điểm bài thi" : "Nội dung vi phạm"} type={action?.kind === "grade" ? "number" : "text"} min={0} max={exam.maxScore} value={value} onChange={(e) => setValue(e.target.value)} placeholder={action?.kind === "grade" ? `Điểm từ 0 đến ${exam.maxScore}` : "Nội dung vi phạm"} /> : <p className="text-sm">Xác nhận cho thí sinh thi lại trong ca thi này?</p>}{scoreError && <p role="alert" className="text-sm text-destructive">{scoreError}</p>}<DialogFooter><Button variant="outline" onClick={() => setAction(null)}>Hủy</Button><Button onClick={runAction}>Xác nhận</Button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={!!preview} onOpenChange={(v) => !v && setPreview(null)}><DialogContent className="max-w-3xl max-h-[85vh] overflow-auto"><DialogHeader><DialogTitle>{preview?.name}</DialogTitle></DialogHeader>{preview?.questions.map((q, i) => <div key={i} className="border-b py-3 space-y-2"><p className="font-semibold text-sm">Câu {i + 1}. {q.text}</p><p className="text-xs text-muted-foreground">{q.type} · {q.score} điểm</p><p className="text-sm text-exam-success">Đáp án: {q.answer}</p></div>)}</DialogContent></Dialog>
+  </div>;
+}
