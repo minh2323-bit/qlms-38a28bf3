@@ -3,17 +3,11 @@ import { useMemo, useState } from "react";
 import { Users, Search, UserRound, CalendarDays, BookMarked, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
+import { SCHOOL_PCCM, SCHOOL_SELF } from "@/lib/school-classes";
 
 import thumbLop4A from "@/assets/thumb-lop-4a.jpg";
-import thumbLop3D from "@/assets/thumb-lop-3d.jpg";
 import thumbLop3A from "@/assets/thumb-lop-3a.jpg";
-import thumbLop3B from "@/assets/thumb-lop-3b.jpg";
-import thumbLop3C from "@/assets/thumb-lop-3c.jpg";
-import thumbLop4B from "@/assets/thumb-lop-4b.jpg";
 import thumbLop4BReview from "@/assets/thumb-lop-4b-review.jpg";
-import thumbLop4C from "@/assets/thumb-lop-4c.jpg";
-import thumbBoTuc from "@/assets/thumb-bo-tuc-toan.jpg";
-import thumbHsgAnh from "@/assets/thumb-on-thi-hsg-anh.jpg";
 
 export const Route = createFileRoute("/hieu-truong_/lop-hoc")({
   head: () => ({
@@ -42,17 +36,6 @@ const MY_PCCM: Cls[] = [
 ];
 const MY_SELF: Cls[] = [
   { id: "c7", name: "Ôn tập Toán khối 4 (4B, 4C, 4D)", subject: "Toán", thumb: thumbLop4BReview, baiGiang: 8, hocLieu: 11, hocSinh: 120, status: "draft" },
-];
-const SCHOOL_PCCM: Cls[] = [
-  { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", subject: "Tiếng Việt", thumb: thumbLop3D, baiGiang: 15, hocLieu: 15, hocSinh: 40, status: "deployed", teacher: "Cô Nguyễn Thu Trang", createdAt: "05/09/2025" },
-  { id: "c5", name: "Lớp 3B Năm học 2025 - 2026", subject: "Tiếng Anh", thumb: thumbLop3B, baiGiang: 14, hocLieu: 16, hocSinh: 42, status: "draft", teacher: "Thầy Trần Minh Quân", createdAt: "06/09/2025" },
-  { id: "c6", name: "Lớp 3C Năm học 2025 - 2026", subject: "Khoa học", thumb: thumbLop3C, baiGiang: 13, hocLieu: 14, hocSinh: 39, status: "deployed", teacher: "Cô Lê Thị Mai", createdAt: "06/09/2025" },
-  { id: "c8", name: "Lớp 4C Năm học 2025 - 2026", subject: "Toán", thumb: thumbLop4C, baiGiang: 15, hocLieu: 15, hocSinh: 40, status: "deployed", teacher: "Cô Phùng Thuý Hằng", createdAt: "08/09/2025" },
-  { id: "c1", name: "Lớp 4B Năm học 2025 - 2026", subject: "Tin học", thumb: thumbLop4B, baiGiang: 9, hocLieu: 12, hocSinh: 41, status: "deployed", teacher: "Thầy Phạm Quốc Anh", createdAt: "10/09/2025" },
-];
-const SCHOOL_SELF: Cls[] = [
-  { id: "c7", name: "Lớp bổ túc học sinh Toán", subject: "Toán", thumb: thumbBoTuc, baiGiang: 6, hocLieu: 9, hocSinh: 25, status: "deployed", teacher: "Cô Phùng Thuý Hằng", createdAt: "12/10/2025" },
-  { id: "c7", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", subject: "Tiếng Anh", thumb: thumbHsgAnh, baiGiang: 10, hocLieu: 14, hocSinh: 18, status: "draft", teacher: "Thầy Trần Minh Quân", createdAt: "20/10/2025" },
 ];
 
 function PrincipalClassesPage() {
@@ -106,7 +89,7 @@ function Section({ title, icon, list, showOwner }: { title: string; icon: React.
       </h2>
       {list.length ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {list.map((c, i) => <ClassCard key={`${c.name}-${i}`} c={c} showOwner={showOwner} />)}
+          {list.map((c) => <ClassCard key={c.id} c={c} showOwner={showOwner} />)}
         </div>
       ) : (
         <p className="text-sm text-slate-400 py-6 text-center">Không có lớp học.</p>

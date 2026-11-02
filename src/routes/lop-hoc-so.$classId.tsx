@@ -37,6 +37,7 @@ import { BarChart3 } from "lucide-react";
 import { useCompletion } from "@/lib/material-progress-store";
 import { ExamWizard } from "@/routes/hoc-lieu.de-kiem-tra";
 import { CURRENT_TEACHER } from "@/lib/teacher-permissions";
+import { SCHOOL_CLASS_DB } from "@/lib/school-classes";
 
 
 export const Route = createFileRoute("/lop-hoc-so/$classId")({
@@ -44,6 +45,10 @@ export const Route = createFileRoute("/lop-hoc-so/$classId")({
     meta: [
       { title: "Chi tiết lớp học – LMS Giáo viên" },
       { name: "description", content: "Quản lý nội dung lớp học số." },
+      { property: "og:title", content: "Chi tiết lớp học – LMS Giáo viên" },
+      { property: "og:description", content: "Quản lý nội dung lớp học số." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ClassDetailPage,
@@ -64,6 +69,7 @@ export type ClassInfo = {
 };
 
 export const CLASS_DB: Record<string, ClassInfo> = {
+  ...SCHOOL_CLASS_DB,
   c1: { id: "c1", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-T2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"], homeroom: true },
   c2: { id: "c2", name: "Lớp 4A Năm học 2025 - 2026", code: "LH-4A-TV2526", students: 40, teacher: "Cô Nguyễn Thị Hoa", thumb: thumbLop4A, description: "Lớp học dành riêng cho lớp 4A. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "4A", subject: "Tiếng Việt", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Khoa học", "Đạo đức"], homeroom: true },
   c3: { id: "c3", name: "Lớp 3D Năm học 2025 - 2026", code: "LH-3D-2526", students: 40, teacher: "Cô Trần Thanh Mai", thumb: thumbLop3D, description: "Lớp học dành riêng cho lớp 3D. Thầy/cô có thể tạo các học liệu trong này để dễ dàng quản lý lộ trình học của lớp.", lop: "3D", subject: "Toán", status: "deployed", subjectsTaught: ["Toán", "Tiếng Việt", "Đạo đức"] },
