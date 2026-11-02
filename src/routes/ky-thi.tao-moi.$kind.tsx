@@ -26,6 +26,8 @@ import { toast } from "sonner";
 import { GRADES, SUBJECTS } from "@/lib/shared-exam-bank";
 import { getSession, getPermutedPaper } from "@/lib/exam-sessions";
 import { getKnowledgeTree } from "@/lib/knowledge-tree";
+import { OfficialExamWizard } from "@/components/exams/OfficialExamWizard";
+import { OfficialExamDetail } from "@/components/exams/OfficialExamDetail";
 
 
 export const Route = createFileRoute("/ky-thi/tao-moi/$kind")({
@@ -43,8 +45,17 @@ export const Route = createFileRoute("/ky-thi/tao-moi/$kind")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Page,
+  component: ExamFlowPage,
 });
+
+function ExamFlowPage() {
+  const { kind } = Route.useParams();
+  const { examId, mode } = Route.useSearch();
+  if (kind !== "chinh-thuc") return <Page />;
+  return <AppShell>{mode === "view" && examId
+    ? <OfficialExamDetail key={examId} examId={examId} />
+    : <OfficialExamWizard key={examId ?? "new"} examId={examId} />}</AppShell>;
+}
 
 const SCORE_TYPES = [
   "Không lấy điểm",

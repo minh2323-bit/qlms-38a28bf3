@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { selectDemoAccount, useDemoAccount } from "@/lib/demo-account";
 import {
   Home, BookOpen, FolderKanban, BarChart3, GraduationCap, Settings,
   Bell, Library, BookOpenCheck, ListChecks, Users, Trophy, TrendingUp,
@@ -244,11 +245,13 @@ export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
 }
 
 export function TopBar({ role = "teacher" }: { role?: AppRole }) {
+  const demoAccount = useDemoAccount();
+  const isExamLeader = demoAccount === "leader" && role === "teacher";
   const isStudent = role === "student";
   const isPrincipal = role === "principal";
   const isHomeroom = role === "homeroom";
-  const name = isStudent ? "Phí Song Ngân" : isPrincipal ? "H/t Nguyễn Thị Mai Lan" : isHomeroom ? "GVCN Trần Bích Ngọc" : "G/v Phùng Thúy Hằng";
-  const subtitle = isStudent ? "Học sinh · Lớp 4A" : isPrincipal ? "Hiệu trưởng" : isHomeroom ? "Giáo viên chủ nhiệm · Lớp 4A" : "Giáo viên";
+  const name = isStudent ? "Phí Song Ngân" : isPrincipal ? "H/t Nguyễn Thị Mai Lan" : isHomeroom ? "GVCN Trần Bích Ngọc" : isExamLeader ? "Tổ trưởng Nguyễn Minh Khang" : "G/v Phùng Thúy Hằng";
+  const subtitle = isStudent ? "Học sinh · Lớp 4A" : isPrincipal ? "Hiệu trưởng" : isHomeroom ? "Giáo viên chủ nhiệm · Lớp 4A" : isExamLeader ? "Tổ trưởng/Tổ phó" : "Giáo viên";
   const greeting = isStudent ? "Chào mừng," : "Xin chào,";
   const avatar = isStudent ? studentAvatar : isPrincipal ? principalAvatar : teacherAvatar;
   const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
@@ -315,7 +318,7 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
             <DropdownMenuLabel className="text-xs text-slate-500">Chuyển tài khoản</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/" className="flex items-center gap-2 cursor-pointer">
+              <Link to="/" onClick={() => selectDemoAccount("teacher")} className="flex items-center gap-2 cursor-pointer">
                 <img src={teacherAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">Giáo viên</span>
@@ -324,7 +327,13 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/gvcn" className="flex items-center gap-2 cursor-pointer">
+              <Link to="/ky-thi/chinh-thuc" onClick={() => selectDemoAccount("leader")} className="flex items-center gap-2 cursor-pointer">
+                <UsersRound className="h-7 w-7 text-exam-primary" />
+                <div className="flex flex-col"><span className="text-sm font-medium">Tổ trưởng/Tổ phó</span><span className="text-[11px] text-muted-foreground">Nguyễn Minh Khang</span></div>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/gvcn" onClick={() => selectDemoAccount("homeroom")} className="flex items-center gap-2 cursor-pointer">
                 <img src={teacherAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">Giáo viên chủ nhiệm</span>
@@ -333,7 +342,7 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/hoc-sinh" className="flex items-center gap-2 cursor-pointer">
+              <Link to="/hoc-sinh" onClick={() => selectDemoAccount("student")} className="flex items-center gap-2 cursor-pointer">
                 <img src={studentAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">Học sinh</span>
@@ -342,7 +351,7 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/hieu-truong" className="flex items-center gap-2 cursor-pointer">
+              <Link to="/hieu-truong" onClick={() => selectDemoAccount("principal")} className="flex items-center gap-2 cursor-pointer">
                 <img src={principalAvatar} className="h-7 w-7 rounded-full object-cover" alt="" />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">Hiệu trưởng</span>
@@ -359,8 +368,15 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
 
 export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: AppRole }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const demoAccount = useDemoAccount();
+  useEffect(() => {
+    if (pathname.startsWith("/hieu-truong")) selectDemoAccount("principal");
+    else if (pathname.startsWith("/hoc-sinh")) selectDemoAccount("student");
+    else if (pathname.startsWith("/gvcn")) selectDemoAccount("homeroom");
+  }, [pathname]);
   const role: AppRole = roleProp
-    ?? (pathname.startsWith("/hoc-sinh") ? "student"
+    ?? (pathname.startsWith("/ky-thi") ? (demoAccount === "leader" ? "teacher" : demoAccount)
+      : pathname.startsWith("/hoc-sinh") ? "student"
       : pathname.startsWith("/hieu-truong") ? "principal"
       : pathname.startsWith("/gvcn") || pathname.startsWith("/thoi-khoa-bieu") ? "homeroom"
       : "teacher");

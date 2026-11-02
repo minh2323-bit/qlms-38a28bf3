@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Landmark } from "lucide-react";
-import { ExamSessionsPage } from "@/components/ExamSessionsPage";
-import { OFFICIAL_SESSIONS } from "@/lib/exam-sessions";
+import { Outlet } from "@tanstack/react-router";
+import { OfficialExamsPage } from "@/components/exams/OfficialExamsPage";
 
 export const Route = createFileRoute("/ky-thi/chinh-thuc")({
   head: () => ({
@@ -18,13 +17,5 @@ export const Route = createFileRoute("/ky-thi/chinh-thuc")({
 });
 
 function Page() {
-  return (
-    <ExamSessionsPage
-      title="Kỳ thi chính thức"
-      subtitle="Danh sách các kỳ thi chính thức được tổ chức theo cấp Trường, Xã/Phường."
-      icon={Landmark}
-      kind="chinh-thuc"
-      data={OFFICIAL_SESSIONS}
-    />
-  );
+  return <Outlet />;
 }
