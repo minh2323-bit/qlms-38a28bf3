@@ -65,6 +65,8 @@ import { Route as HocLieuMaTranTaoMoiRouteImport } from './routes/hoc-lieu.ma-tr
 import { Route as HocLieuThemHocLieuTypeRouteImport } from './routes/hoc-lieu.them-hoc-lieu.$type'
 import { Route as HocSinhBaiGiangLessonSlugRouteImport } from './routes/hoc-sinh.bai-giang.$lessonSlug'
 import { Route as HocSinhLopLopRouteImport } from './routes/hoc-sinh.lop.$lop'
+import { Route as KyThiChinhThucIndexRouteImport } from './routes/ky-thi.chinh-thuc.index'
+import { Route as KyThiChinhThucExamIdRouteImport } from './routes/ky-thi.chinh-thuc.$examId'
 import { Route as KyThiGiamSatExamIdRouteImport } from './routes/ky-thi.giam-sat.$examId'
 import { Route as KyThiTaoMoiKindRouteImport } from './routes/ky-thi.tao-moi.$kind'
 import { Route as KyThiTraCuuExamIdRouteImport } from './routes/ky-thi.tra-cuu.$examId'
@@ -362,6 +364,16 @@ const HocSinhLopLopRoute = HocSinhLopLopRouteImport.update({
   path: '/lop/$lop',
   getParentRoute: () => HocSinhRoute,
 } as any)
+const KyThiChinhThucIndexRoute = KyThiChinhThucIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KyThiChinhThucRoute,
+} as any)
+const KyThiChinhThucExamIdRoute = KyThiChinhThucExamIdRouteImport.update({
+  id: '/$examId',
+  path: '/$examId',
+  getParentRoute: () => KyThiChinhThucRoute,
+} as any)
 const KyThiGiamSatExamIdRoute = KyThiGiamSatExamIdRouteImport.update({
   id: '/ky-thi/giam-sat/$examId',
   path: '/ky-thi/giam-sat/$examId',
@@ -441,7 +453,7 @@ export interface FileRoutesByFullPath {
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
   '/hoc-sinh/nhiem-vu': typeof HocSinhNhiemVuRoute
   '/hoc-sinh/thong-ke-hoat-dong': typeof HocSinhThongKeHoatDongRoute
-  '/ky-thi/chinh-thuc': typeof KyThiChinhThucRoute
+  '/ky-thi/chinh-thuc': typeof KyThiChinhThucRouteWithChildren
   '/ky-thi/de-thi': typeof KyThiDeThiRoute
   '/ky-thi/ngan-hang-cau-hoi': typeof KyThiNganHangCauHoiRoute
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
@@ -462,12 +474,14 @@ export interface FileRoutesByFullPath {
   '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
+  '/ky-thi/chinh-thuc/$examId': typeof KyThiChinhThucExamIdRoute
   '/ky-thi/giam-sat/$examId': typeof KyThiGiamSatExamIdRoute
   '/ky-thi/tao-moi/$kind': typeof KyThiTaoMoiKindRoute
   '/ky-thi/tra-cuu/$examId': typeof KyThiTraCuuExamIdRoute
   '/lop-hoc-so/$classId/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
   '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen/': typeof HocLieuBanQuyenIndexRoute
+  '/ky-thi/chinh-thuc/': typeof KyThiChinhThucIndexRoute
   '/hoc-lieu/ban-quyen/tao-moi/$mode': typeof HocLieuBanQuyenTaoMoiModeRoute
   '/hoc-lieu/ma-tran/$matrixId/chi-tiet': typeof HocLieuMaTranMatrixIdChiTietRoute
   '/hoc-lieu/ma-tran/$matrixId/sinh-de': typeof HocLieuMaTranMatrixIdSinhDeRoute
@@ -503,7 +517,6 @@ export interface FileRoutesByTo {
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
   '/hoc-sinh/nhiem-vu': typeof HocSinhNhiemVuRoute
   '/hoc-sinh/thong-ke-hoat-dong': typeof HocSinhThongKeHoatDongRoute
-  '/ky-thi/chinh-thuc': typeof KyThiChinhThucRoute
   '/ky-thi/de-thi': typeof KyThiDeThiRoute
   '/ky-thi/ngan-hang-cau-hoi': typeof KyThiNganHangCauHoiRoute
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
@@ -524,12 +537,14 @@ export interface FileRoutesByTo {
   '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
+  '/ky-thi/chinh-thuc/$examId': typeof KyThiChinhThucExamIdRoute
   '/ky-thi/giam-sat/$examId': typeof KyThiGiamSatExamIdRoute
   '/ky-thi/tao-moi/$kind': typeof KyThiTaoMoiKindRoute
   '/ky-thi/tra-cuu/$examId': typeof KyThiTraCuuExamIdRoute
   '/lop-hoc-so/$classId/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
   '/hoc-lieu/bai-giang': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen': typeof HocLieuBanQuyenIndexRoute
+  '/ky-thi/chinh-thuc': typeof KyThiChinhThucIndexRoute
   '/hoc-lieu/ban-quyen/tao-moi/$mode': typeof HocLieuBanQuyenTaoMoiModeRoute
   '/hoc-lieu/ma-tran/$matrixId/chi-tiet': typeof HocLieuMaTranMatrixIdChiTietRoute
   '/hoc-lieu/ma-tran/$matrixId/sinh-de': typeof HocLieuMaTranMatrixIdSinhDeRoute
@@ -570,7 +585,7 @@ export interface FileRoutesById {
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
   '/hoc-sinh/nhiem-vu': typeof HocSinhNhiemVuRoute
   '/hoc-sinh/thong-ke-hoat-dong': typeof HocSinhThongKeHoatDongRoute
-  '/ky-thi/chinh-thuc': typeof KyThiChinhThucRoute
+  '/ky-thi/chinh-thuc': typeof KyThiChinhThucRouteWithChildren
   '/ky-thi/de-thi': typeof KyThiDeThiRoute
   '/ky-thi/ngan-hang-cau-hoi': typeof KyThiNganHangCauHoiRoute
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
@@ -591,12 +606,14 @@ export interface FileRoutesById {
   '/hoc-lieu/them-hoc-lieu/$type': typeof HocLieuThemHocLieuTypeRoute
   '/hoc-sinh/bai-giang/$lessonSlug': typeof HocSinhBaiGiangLessonSlugRoute
   '/hoc-sinh/lop/$lop': typeof HocSinhLopLopRoute
+  '/ky-thi/chinh-thuc/$examId': typeof KyThiChinhThucExamIdRoute
   '/ky-thi/giam-sat/$examId': typeof KyThiGiamSatExamIdRoute
   '/ky-thi/tao-moi/$kind': typeof KyThiTaoMoiKindRoute
   '/ky-thi/tra-cuu/$examId': typeof KyThiTraCuuExamIdRoute
   '/lop-hoc-so/$classId_/hoc-sinh': typeof LopHocSoClassIdHocSinhRoute
   '/hoc-lieu/bai-giang/': typeof HocLieuBaiGiangIndexRoute
   '/hoc-lieu/ban-quyen/': typeof HocLieuBanQuyenIndexRoute
+  '/ky-thi/chinh-thuc/': typeof KyThiChinhThucIndexRoute
   '/hoc-lieu/ban-quyen/tao-moi/$mode': typeof HocLieuBanQuyenTaoMoiModeRoute
   '/hoc-lieu/ma-tran/$matrixId/chi-tiet': typeof HocLieuMaTranMatrixIdChiTietRoute
   '/hoc-lieu/ma-tran/$matrixId/sinh-de': typeof HocLieuMaTranMatrixIdSinhDeRoute
@@ -659,12 +676,14 @@ export interface FileRouteTypes {
     | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
+    | '/ky-thi/chinh-thuc/$examId'
     | '/ky-thi/giam-sat/$examId'
     | '/ky-thi/tao-moi/$kind'
     | '/ky-thi/tra-cuu/$examId'
     | '/lop-hoc-so/$classId/hoc-sinh'
     | '/hoc-lieu/bai-giang/'
     | '/hoc-lieu/ban-quyen/'
+    | '/ky-thi/chinh-thuc/'
     | '/hoc-lieu/ban-quyen/tao-moi/$mode'
     | '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
     | '/hoc-lieu/ma-tran/$matrixId/sinh-de'
@@ -700,7 +719,6 @@ export interface FileRouteTypes {
     | '/hoc-sinh/lop-truc-tuyen'
     | '/hoc-sinh/nhiem-vu'
     | '/hoc-sinh/thong-ke-hoat-dong'
-    | '/ky-thi/chinh-thuc'
     | '/ky-thi/de-thi'
     | '/ky-thi/ngan-hang-cau-hoi'
     | '/ky-thi/on-tap'
@@ -721,12 +739,14 @@ export interface FileRouteTypes {
     | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
+    | '/ky-thi/chinh-thuc/$examId'
     | '/ky-thi/giam-sat/$examId'
     | '/ky-thi/tao-moi/$kind'
     | '/ky-thi/tra-cuu/$examId'
     | '/lop-hoc-so/$classId/hoc-sinh'
     | '/hoc-lieu/bai-giang'
     | '/hoc-lieu/ban-quyen'
+    | '/ky-thi/chinh-thuc'
     | '/hoc-lieu/ban-quyen/tao-moi/$mode'
     | '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
     | '/hoc-lieu/ma-tran/$matrixId/sinh-de'
@@ -787,12 +807,14 @@ export interface FileRouteTypes {
     | '/hoc-lieu/them-hoc-lieu/$type'
     | '/hoc-sinh/bai-giang/$lessonSlug'
     | '/hoc-sinh/lop/$lop'
+    | '/ky-thi/chinh-thuc/$examId'
     | '/ky-thi/giam-sat/$examId'
     | '/ky-thi/tao-moi/$kind'
     | '/ky-thi/tra-cuu/$examId'
     | '/lop-hoc-so/$classId_/hoc-sinh'
     | '/hoc-lieu/bai-giang/'
     | '/hoc-lieu/ban-quyen/'
+    | '/ky-thi/chinh-thuc/'
     | '/hoc-lieu/ban-quyen/tao-moi/$mode'
     | '/hoc-lieu/ma-tran/$matrixId/chi-tiet'
     | '/hoc-lieu/ma-tran/$matrixId/sinh-de'
@@ -823,7 +845,7 @@ export interface RootRouteChildren {
   HocLieuDeKiemTraRoute: typeof HocLieuDeKiemTraRoute
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
   HocLieuNganHangCauHoiRoute: typeof HocLieuNganHangCauHoiRoute
-  KyThiChinhThucRoute: typeof KyThiChinhThucRoute
+  KyThiChinhThucRoute: typeof KyThiChinhThucRouteWithChildren
   KyThiDeThiRoute: typeof KyThiDeThiRoute
   KyThiNganHangCauHoiRoute: typeof KyThiNganHangCauHoiRoute
   KyThiOnTapRoute: typeof KyThiOnTapRoute
@@ -1238,6 +1260,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HocSinhLopLopRouteImport
       parentRoute: typeof HocSinhRoute
     }
+    '/ky-thi/chinh-thuc/': {
+      id: '/ky-thi/chinh-thuc/'
+      path: '/'
+      fullPath: '/ky-thi/chinh-thuc/'
+      preLoaderRoute: typeof KyThiChinhThucIndexRouteImport
+      parentRoute: typeof KyThiChinhThucRoute
+    }
+    '/ky-thi/chinh-thuc/$examId': {
+      id: '/ky-thi/chinh-thuc/$examId'
+      path: '/$examId'
+      fullPath: '/ky-thi/chinh-thuc/$examId'
+      preLoaderRoute: typeof KyThiChinhThucExamIdRouteImport
+      parentRoute: typeof KyThiChinhThucRoute
+    }
     '/ky-thi/giam-sat/$examId': {
       id: '/ky-thi/giam-sat/$examId'
       path: '/ky-thi/giam-sat/$examId'
@@ -1390,6 +1426,20 @@ const LopTrucTuyenRouteWithChildren = LopTrucTuyenRoute._addFileChildren(
   LopTrucTuyenRouteChildren,
 )
 
+interface KyThiChinhThucRouteChildren {
+  KyThiChinhThucExamIdRoute: typeof KyThiChinhThucExamIdRoute
+  KyThiChinhThucIndexRoute: typeof KyThiChinhThucIndexRoute
+}
+
+const KyThiChinhThucRouteChildren: KyThiChinhThucRouteChildren = {
+  KyThiChinhThucExamIdRoute: KyThiChinhThucExamIdRoute,
+  KyThiChinhThucIndexRoute: KyThiChinhThucIndexRoute,
+}
+
+const KyThiChinhThucRouteWithChildren = KyThiChinhThucRoute._addFileChildren(
+  KyThiChinhThucRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GiaoBaiTapRoute: GiaoBaiTapRouteWithChildren,
@@ -1415,7 +1465,7 @@ const rootRouteChildren: RootRouteChildren = {
   HocLieuDeKiemTraRoute: HocLieuDeKiemTraRoute,
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
   HocLieuNganHangCauHoiRoute: HocLieuNganHangCauHoiRoute,
-  KyThiChinhThucRoute: KyThiChinhThucRoute,
+  KyThiChinhThucRoute: KyThiChinhThucRouteWithChildren,
   KyThiDeThiRoute: KyThiDeThiRoute,
   KyThiNganHangCauHoiRoute: KyThiNganHangCauHoiRoute,
   KyThiOnTapRoute: KyThiOnTapRoute,
