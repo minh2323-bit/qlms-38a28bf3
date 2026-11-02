@@ -92,7 +92,7 @@ export function canSeeOfficial(exam: OfficialExam, role: DemoAccount) {
   return exam.approval === "approved" || canCreateOfficial(role);
 }
 export function canManageOfficial(exam: OfficialExam, role: DemoAccount) {
-  return role === "principal" || (role === "leader" && exam.creator === "leader" && exam.approval === "pending" && exam.phase === "upcoming");
+  return role === "principal" || (role === "leader" && exam.creator === "leader" && exam.approval === "pending" && examPhase(exam) === "upcoming");
 }
 export function canActOnShift(exam: OfficialExam, shift: ExamShift, role: DemoAccount, name: string, action: "grade" | "monitor") {
   if (exam.approval !== "approved") return false;
@@ -129,6 +129,7 @@ export function validateOfficialExam(exam: OfficialExam): string {
 export function saveOfficialExam(exam: OfficialExam, role: DemoAccount) {
   const current = exams.find((e) => e.id === exam.id);
   if (current ? !canManageOfficial(current, role) : !canCreateOfficial(role)) throw new Error("Không có quyền quản lý kỳ thi.");
+  if (current && examPhase(current) !== "upcoming") throw new Error("Không thể thay đổi cấu hình kỳ thi đã bắt đầu.");
   const error = validateOfficialExam(exam); if (error) throw new Error(error);
   const next = { ...exam, approval: current?.approval ?? approvalForCreator(role), creator: current?.creator ?? role };
   exams = current ? exams.map((e) => e.id === next.id ? next : e) : [next, ...exams];
