@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- School class cards and details share identity metadata from `src/lib/school-classes.ts`; keep dedicated school IDs separate from existing teacher class IDs to prevent cross-class navigation.
