@@ -62,9 +62,21 @@ html { font-size: 16.75px; }
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-exam-primary: var(--exam-primary);
+  --color-exam-tint: var(--exam-tint);
+  --color-exam-success: var(--exam-success);
+  --color-exam-success-tint: var(--exam-success-tint);
+  --color-exam-warning: var(--exam-warning);
+  --color-exam-warning-tint: var(--exam-warning-tint);
 }
 
 :root {
+  --exam-primary: oklch(0.46 0.18 262);
+  --exam-tint: oklch(0.96 0.02 262);
+  --exam-success: oklch(0.46 0.12 151);
+  --exam-success-tint: oklch(0.96 0.025 151);
+  --exam-warning: oklch(0.55 0.13 60);
+  --exam-warning-tint: oklch(0.97 0.035 85);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -101,6 +113,12 @@ html { font-size: 16.75px; }
 }
 
 .dark {
+  --exam-primary: oklch(0.76 0.12 262);
+  --exam-tint: oklch(0.28 0.04 262);
+  --exam-success: oklch(0.76 0.12 151);
+  --exam-success-tint: oklch(0.28 0.04 151);
+  --exam-warning: oklch(0.8 0.12 70);
+  --exam-warning-tint: oklch(0.28 0.04 70);
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
