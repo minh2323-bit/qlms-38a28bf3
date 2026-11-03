@@ -2,13 +2,15 @@ import { useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
 import { ClassOverviewTable, type ClassOverviewRow } from "@/components/ClassOverviewReport";
+import { downloadCsv } from "@/lib/report-export";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  BookOpen, ClipboardList, FileText, Video, Clock, Award, BadgeCheck, FileCheck2,
+  BookOpen, ClipboardList, FileText, Video, Clock, Award, BadgeCheck, FileCheck2, FileSpreadsheet,
 } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -237,7 +239,21 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
 
         {/* ---------- Section 2: Tổng quan theo lớp ---------- */}
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
-          <h2 className="text-lg font-bold text-indigo-700">Thống kê tổng quan theo lớp</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-indigo-700">Thống kê tổng quan theo lớp</h2>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 gap-1.5"
+              onClick={() => {
+                const header = ["STT", "Tên lớp", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Số lượt nộp bài tập", "Bài kiểm tra đã giao", "Số lượt nộp bài kiểm tra"];
+                const data = TEACHER_CLASS_OVERVIEW.map((c, i) => [i + 1, c.name, c.baiGiang, c.hocLieu, c.baiTap, c.nopBaiTap, c.baiKiemTra, c.nopBaiKiemTra]);
+                downloadCsv("thong-ke-tong-quan-theo-lop.csv", header, data);
+              }}
+            >
+              <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất Excel
+            </Button>
+          </div>
           <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} />
         </section>
 
@@ -265,6 +281,18 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
               </button>
             ))}
             <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 gap-1.5"
+                onClick={() => {
+                  const header = ["STT", "Họ và tên", "BG/HL đã xem", "Số phút đã học", "Bài tập hoàn thành", "Điểm TB bài tập", "Bài kiểm tra đã làm", "Điểm TB bài kiểm tra", "Enetpoint"];
+                  const data = rows.map((r, i) => [i + 1, r.name, r.viewed, r.minutes, `${r.done}/${r.total}`, r.avg, `${r.testDone}/${r.testTotal}`, r.testAvg, r.enet]);
+                  downloadCsv(`thong-ke-chi-tiet-lop-${cls}.csv`, header, data);
+                }}
+              >
+                <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất Excel
+              </Button>
               <DateRangeFilter value={range} onChange={setRange} />
               <Input
                 value={q}
