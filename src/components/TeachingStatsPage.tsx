@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
+import { ClassOverviewTable, type ClassOverviewRow } from "@/components/ClassOverviewReport";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import {
@@ -112,6 +113,20 @@ const CLASS_STUDENTS: Record<string, Row[]> = {
 
 const CLASS_ORDER = ["4A", "4B", "4C", "3A", "3B", "3C", "3D"];
 
+/* ---- Tổng quan theo lớp (lớp PCCM + lớp tự tạo) ---- */
+const TEACHER_CLASS_OVERVIEW: ClassOverviewRow[] = [
+  { id: "tc-4a", name: "Lớp 4A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 24, hocLieu: 31, baiTap: 18, nopBaiTap: 612, baiKiemTra: 6, nopBaiKiemTra: 214 },
+  { id: "tc-4b", name: "Lớp 4B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 22, hocLieu: 28, baiTap: 16, nopBaiTap: 588, baiKiemTra: 5, nopBaiKiemTra: 190 },
+  { id: "tc-4c", name: "Lớp 4C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 21, hocLieu: 26, baiTap: 15, nopBaiTap: 540, baiKiemTra: 5, nopBaiKiemTra: 178 },
+  { id: "tc-3a", name: "Lớp 3A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 19, hocLieu: 24, baiTap: 14, nopBaiTap: 462, baiKiemTra: 4, nopBaiKiemTra: 132 },
+  { id: "tc-3b", name: "Lớp 3B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 18, hocLieu: 22, baiTap: 13, nopBaiTap: 402, baiKiemTra: 4, nopBaiKiemTra: 118 },
+  { id: "tc-3c", name: "Lớp 3C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 17, hocLieu: 21, baiTap: 12, nopBaiTap: 360, baiKiemTra: 3, nopBaiKiemTra: 90 },
+  { id: "tc-3d", name: "Lớp 3D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 16, hocLieu: 20, baiTap: 12, nopBaiTap: 396, baiKiemTra: 3, nopBaiKiemTra: 96 },
+  { id: "tc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 8, hocLieu: 12, baiTap: 6, nopBaiTap: 132, baiKiemTra: 2, nopBaiKiemTra: 44 },
+  { id: "tc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Tiếng Anh" }], baiGiang: 10, hocLieu: 14, baiTap: 7, nopBaiTap: 112, baiKiemTra: 3, nopBaiKiemTra: 48 },
+  { id: "tc-ontap", name: "Lớp ôn tập cuối kỳ 4B, 4C, 4D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 6, hocLieu: 9, baiTap: 5, nopBaiTap: 248, baiKiemTra: 2, nopBaiKiemTra: 86 },
+];
+
 /* ---------------- Page ---------------- */
 export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "principal" }) {
   const [cls, setCls] = useState(CLASS_ORDER[0]);
@@ -220,7 +235,13 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
           </div>
         </section>
 
-        {/* ---------- Section 2 ---------- */}
+        {/* ---------- Section 2: Tổng quan theo lớp ---------- */}
+        <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
+          <h2 className="text-lg font-bold text-indigo-700">Thống kê tổng quan theo lớp</h2>
+          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} />
+        </section>
+
+        {/* ---------- Section 3 ---------- */}
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-indigo-700">Thống kê chi tiết theo lớp</h2>
