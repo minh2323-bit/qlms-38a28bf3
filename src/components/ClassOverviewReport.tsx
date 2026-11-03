@@ -110,7 +110,7 @@ export function ClassOverviewTable({
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base">
-              {popup?.label} – {popup?.row.name}
+              Giáo viên dạy học – {popup?.name}
             </DialogTitle>
           </DialogHeader>
           <table className="w-full text-sm">
