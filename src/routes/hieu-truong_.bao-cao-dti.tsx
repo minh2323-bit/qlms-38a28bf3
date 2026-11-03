@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
+import { ClassOverviewTable, type ClassOverviewRow } from "@/components/ClassOverviewReport";
 import type { DateRange } from "react-day-picker";
 import { UnitFilter, DateRangeFilter, EnetPoint, totalCell, tableScrollWrap, stickyHeadRow, ReportHeader, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
 
@@ -133,6 +134,7 @@ function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => v
 const TABS = [
   ["teacher", "Báo cáo Giáo viên"],
   ["student", "Báo cáo Học sinh"],
+  ["class", "Báo cáo theo lớp"],
   ["material", "Báo cáo Học liệu"],
   ["question", "Báo cáo Ngân hàng câu hỏi"],
   ["lecture", "Báo cáo Bài giảng"],
@@ -172,6 +174,7 @@ function DtiReportPage() {
 
         {tab === "teacher" && <TeacherReport />}
         {tab === "student" && <StudentReport />}
+        {tab === "class" && <ClassReport />}
         {tab === "material" && <MaterialReport />}
         {tab === "question" && <QuestionBankReport />}
         {tab === "lecture" && <LectureReport />}
