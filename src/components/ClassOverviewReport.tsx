@@ -74,23 +74,19 @@ export function ClassOverviewTable({
                 <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
                 <td className="py-2.5 px-3 font-semibold text-slate-800">{r.name}</td>
                 {showTeachers && (
-                  <td className="py-2.5 px-3 text-slate-600">
-                    {r.teachers.map((t) => t.name).join(", ")}
+                  <td className="py-2.5 px-3 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setPopup(r)}
+                      className="font-semibold text-sky-600 underline decoration-sky-300 underline-offset-2 hover:text-sky-800"
+                    >
+                      {r.teachers.length}
+                    </button>
                   </td>
                 )}
                 {COLS.map((c) => (
                   <td key={c.key} className="text-center py-2.5 px-3">
-                    {linkable ? (
-                      <button
-                        type="button"
-                        onClick={() => setPopup({ row: r, label: c.label })}
-                        className="font-semibold text-sky-600 underline decoration-sky-300 underline-offset-2 hover:text-sky-800"
-                      >
-                        {r[c.key]}
-                      </button>
-                    ) : (
-                      <span className="text-slate-700">{r[c.key]}</span>
-                    )}
+                    <span className="text-slate-700">{r[c.key]}</span>
                   </td>
                 ))}
               </tr>
