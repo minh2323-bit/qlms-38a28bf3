@@ -235,7 +235,13 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
           </div>
         </section>
 
-        {/* ---------- Section 2 ---------- */}
+        {/* ---------- Section 2: Tổng quan theo lớp ---------- */}
+        <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
+          <h2 className="text-lg font-bold text-indigo-700">Thống kê tổng quan theo lớp</h2>
+          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} />
+        </section>
+
+        {/* ---------- Section 3 ---------- */}
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-indigo-700">Thống kê chi tiết theo lớp</h2>
