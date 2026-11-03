@@ -122,7 +122,7 @@ export function ClassOverviewTable({
               </tr>
             </thead>
             <tbody>
-              {popup?.row.teachers.map((t, i) => (
+              {popup?.teachers.map((t, i) => (
                 <tr key={t.name} className="border-b last:border-0">
                   <td className="text-center py-2 px-3 font-semibold text-slate-700">{i + 1}</td>
                   <td className="py-2 px-3 font-semibold text-slate-800">{t.name}</td>
