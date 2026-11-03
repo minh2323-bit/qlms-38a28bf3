@@ -28,13 +28,11 @@ const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers">; lab
 export function ClassOverviewTable({
   rows,
   showTeachers = false,
-  linkable = false,
 }: {
   rows: ClassOverviewRow[];
   showTeachers?: boolean;
-  linkable?: boolean;
 }) {
-  const [popup, setPopup] = useState<{ row: ClassOverviewRow; label: string } | null>(null);
+  const [popup, setPopup] = useState<ClassOverviewRow | null>(null);
 
   const { sorted, sort, toggle } = useSort(rows, {
     baiGiang: (r) => r.baiGiang,
@@ -76,23 +74,19 @@ export function ClassOverviewTable({
                 <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
                 <td className="py-2.5 px-3 font-semibold text-slate-800">{r.name}</td>
                 {showTeachers && (
-                  <td className="py-2.5 px-3 text-slate-600">
-                    {r.teachers.map((t) => t.name).join(", ")}
+                  <td className="py-2.5 px-3 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setPopup(r)}
+                      className="font-semibold text-sky-600 underline decoration-sky-300 underline-offset-2 hover:text-sky-800"
+                    >
+                      {r.teachers.length}
+                    </button>
                   </td>
                 )}
                 {COLS.map((c) => (
                   <td key={c.key} className="text-center py-2.5 px-3">
-                    {linkable ? (
-                      <button
-                        type="button"
-                        onClick={() => setPopup({ row: r, label: c.label })}
-                        className="font-semibold text-sky-600 underline decoration-sky-300 underline-offset-2 hover:text-sky-800"
-                      >
-                        {r[c.key]}
-                      </button>
-                    ) : (
-                      <span className="text-slate-700">{r[c.key]}</span>
-                    )}
+                    <span className="text-slate-700">{r[c.key]}</span>
                   </td>
                 ))}
               </tr>
@@ -116,7 +110,7 @@ export function ClassOverviewTable({
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base">
-              {popup?.label} – {popup?.row.name}
+              Giáo viên dạy học – {popup?.name}
             </DialogTitle>
           </DialogHeader>
           <table className="w-full text-sm">
@@ -128,7 +122,7 @@ export function ClassOverviewTable({
               </tr>
             </thead>
             <tbody>
-              {popup?.row.teachers.map((t, i) => (
+              {popup?.teachers.map((t, i) => (
                 <tr key={t.name} className="border-b last:border-0">
                   <td className="text-center py-2 px-3 font-semibold text-slate-700">{i + 1}</td>
                   <td className="py-2 px-3 font-semibold text-slate-800">{t.name}</td>

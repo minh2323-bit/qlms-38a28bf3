@@ -502,7 +502,7 @@ function ClassReport() {
         />
       </ReportHeader>
 
-      <ClassOverviewTable rows={rows} showTeachers linkable />
+      <ClassOverviewTable rows={rows} showTeachers />
     </section>
   );
 }
