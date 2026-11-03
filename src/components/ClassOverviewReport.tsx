@@ -28,13 +28,11 @@ const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers">; lab
 export function ClassOverviewTable({
   rows,
   showTeachers = false,
-  linkable = false,
 }: {
   rows: ClassOverviewRow[];
   showTeachers?: boolean;
-  linkable?: boolean;
 }) {
-  const [popup, setPopup] = useState<{ row: ClassOverviewRow; label: string } | null>(null);
+  const [popup, setPopup] = useState<ClassOverviewRow | null>(null);
 
   const { sorted, sort, toggle } = useSort(rows, {
     baiGiang: (r) => r.baiGiang,
