@@ -475,16 +475,21 @@ const SCHOOL_CLASS_OVERVIEW: ClassOverviewRow[] = [
   { id: "sc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Trần Minh Quân", subject: "Tiếng Anh" }], baiGiang: 10, hocLieu: 14, baiTap: 7, nopBaiTap: 112, baiKiemTra: 3, nopBaiKiemTra: 48 },
 ];
 
+const SELF_CREATED_CLASS_IDS = new Set(["sc-bt-toan", "sc-hsg-anh"]);
+
 function ClassReport() {
   const [q, setQ] = useState("");
   const [unit, setUnit] = useState("all");
   const [range, setRange] = useState<DateRange | undefined>();
+  const [loai, setLoai] = useState("all");
   const rows = useMemo(
     () => SCHOOL_CLASS_OVERVIEW.filter((c) =>
       c.name.toLowerCase().includes(q.trim().toLowerCase()) &&
-      matchUnitRange(c.name, unit, range),
+      matchUnitRange(c.name, unit, range) &&
+      (loai === "all" ||
+        (loai === "tutao" ? SELF_CREATED_CLASS_IDS.has(c.id) : !SELF_CREATED_CLASS_IDS.has(c.id))),
     ),
-    [q, unit, range],
+    [q, unit, range, loai],
   );
 
   const header = ["STT", "Tên lớp", "Giáo viên dạy học", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Số lượt nộp bài tập", "Bài kiểm tra đã giao", "Số lượt nộp bài kiểm tra"];
@@ -494,6 +499,14 @@ function ClassReport() {
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
       <ReportHeader title="Thống kê tổng quan theo lớp toàn trường">
         <UnitFilter value={unit} onChange={setUnit} />
+        <Select value={loai} onValueChange={setLoai}>
+          <SelectTrigger className="h-9 w-48"><SelectValue placeholder="Loại lớp" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Loại lớp: Tất cả</SelectItem>
+            <SelectItem value="pccm">Lớp theo PCCM</SelectItem>
+            <SelectItem value="tutao">Lớp tự tạo</SelectItem>
+          </SelectContent>
+        </Select>
         <DateRangeFilter value={range} onChange={setRange} />
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm lớp học..." className="h-9 w-56" />
         <ExportButtons
