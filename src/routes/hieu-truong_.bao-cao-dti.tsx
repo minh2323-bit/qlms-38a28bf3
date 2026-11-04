@@ -458,21 +458,21 @@ function StudentReport() {
 
 /* ---------------- Báo cáo theo lớp (toàn trường) ---------------- */
 const SCHOOL_CLASS_OVERVIEW: ClassOverviewRow[] = [
-  { id: "sc-4a", name: "Lớp 4A", teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], baiGiang: 46, hocLieu: 58, baiTap: 34, nopBaiTap: 1214, baiKiemTra: 11, nopBaiKiemTra: 402 },
-  { id: "sc-4b", name: "Lớp 4B", teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Phạm Quốc Anh", subject: "Tin học" }], baiGiang: 40, hocLieu: 52, baiTap: 30, nopBaiTap: 1122, baiKiemTra: 10, nopBaiKiemTra: 384 },
-  { id: "sc-4c", name: "Lớp 4C", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Lê Thị Mai", subject: "Tiếng Việt" }], baiGiang: 38, hocLieu: 47, baiTap: 28, nopBaiTap: 1004, baiKiemTra: 9, nopBaiKiemTra: 342 },
-  { id: "sc-3a", name: "Lớp 3A", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], baiGiang: 33, hocLieu: 41, baiTap: 25, nopBaiTap: 812, baiKiemTra: 8, nopBaiKiemTra: 262 },
-  { id: "sc-3b", name: "Lớp 3B", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], baiGiang: 35, hocLieu: 44, baiTap: 26, nopBaiTap: 884, baiKiemTra: 8, nopBaiKiemTra: 296 },
-  { id: "sc-3c", name: "Lớp 3C", teachers: [{ name: "Lê Thị Mai", subject: "Khoa học" }, { name: "Trần Minh Quân", subject: "Toán" }], baiGiang: 31, hocLieu: 39, baiTap: 23, nopBaiTap: 724, baiKiemTra: 7, nopBaiKiemTra: 231 },
-  { id: "sc-3d", name: "Lớp 3D", teachers: [{ name: "Nguyễn Thu Trang", subject: "Tiếng Việt" }], baiGiang: 29, hocLieu: 36, baiTap: 22, nopBaiTap: 748, baiKiemTra: 7, nopBaiKiemTra: 245 },
-  { id: "sc-2a", name: "Lớp 2A", teachers: [{ name: "Phạm Quốc Anh", subject: "Toán" }], baiGiang: 24, hocLieu: 30, baiTap: 18, nopBaiTap: 522, baiKiemTra: 5, nopBaiKiemTra: 145 },
-  { id: "sc-2b", name: "Lớp 2B", teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], baiGiang: 26, hocLieu: 33, baiTap: 20, nopBaiTap: 590, baiKiemTra: 6, nopBaiKiemTra: 178 },
-  { id: "sc-2c", name: "Lớp 2C", teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], baiGiang: 25, hocLieu: 31, baiTap: 19, nopBaiTap: 561, baiKiemTra: 6, nopBaiKiemTra: 166 },
-  { id: "sc-5a", name: "Lớp 5A", teachers: [{ name: "Đỗ Văn Nam", subject: "Toán" }], baiGiang: 28, hocLieu: 35, baiTap: 21, nopBaiTap: 672, baiKiemTra: 7, nopBaiKiemTra: 224 },
-  { id: "sc-5b", name: "Lớp 5B", teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], baiGiang: 30, hocLieu: 38, baiTap: 22, nopBaiTap: 704, baiKiemTra: 7, nopBaiKiemTra: 238 },
-  { id: "sc-5c", name: "Lớp 5C", teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], baiGiang: 29, hocLieu: 37, baiTap: 21, nopBaiTap: 688, baiKiemTra: 7, nopBaiKiemTra: 231 },
-  { id: "sc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], baiGiang: 8, hocLieu: 12, baiTap: 6, nopBaiTap: 132, baiKiemTra: 2, nopBaiKiemTra: 44 },
-  { id: "sc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Trần Minh Quân", subject: "Tiếng Anh" }], baiGiang: 10, hocLieu: 14, baiTap: 7, nopBaiTap: 112, baiKiemTra: 3, nopBaiKiemTra: 48 },
+  { id: "sc-4a", name: "Lớp 4A", teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 40, baiGiang: 46, hocLieu: 58, baiTap: 34, baiKiemTra: 11, },
+  { id: "sc-4b", name: "Lớp 4B", teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Phạm Quốc Anh", subject: "Tin học" }], siSo: 40, baiGiang: 40, hocLieu: 52, baiTap: 30, baiKiemTra: 10, },
+  { id: "sc-4c", name: "Lớp 4C", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Lê Thị Mai", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 38, hocLieu: 47, baiTap: 28, baiKiemTra: 9, },
+  { id: "sc-3a", name: "Lớp 3A", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], siSo: 38, baiGiang: 33, hocLieu: 41, baiTap: 25, baiKiemTra: 8, },
+  { id: "sc-3b", name: "Lớp 3B", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 38, baiGiang: 35, hocLieu: 44, baiTap: 26, baiKiemTra: 8, },
+  { id: "sc-3c", name: "Lớp 3C", teachers: [{ name: "Lê Thị Mai", subject: "Khoa học" }, { name: "Trần Minh Quân", subject: "Toán" }], siSo: 38, baiGiang: 31, hocLieu: 39, baiTap: 23, baiKiemTra: 7, },
+  { id: "sc-3d", name: "Lớp 3D", teachers: [{ name: "Nguyễn Thu Trang", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 29, hocLieu: 36, baiTap: 22, baiKiemTra: 7, },
+  { id: "sc-2a", name: "Lớp 2A", teachers: [{ name: "Phạm Quốc Anh", subject: "Toán" }], siSo: 38, baiGiang: 24, hocLieu: 30, baiTap: 18, baiKiemTra: 5, },
+  { id: "sc-2b", name: "Lớp 2B", teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], siSo: 40, baiGiang: 26, hocLieu: 33, baiTap: 20, baiKiemTra: 6, },
+  { id: "sc-2c", name: "Lớp 2C", teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], siSo: 38, baiGiang: 25, hocLieu: 31, baiTap: 19, baiKiemTra: 6, },
+  { id: "sc-5a", name: "Lớp 5A", teachers: [{ name: "Đỗ Văn Nam", subject: "Toán" }], siSo: 40, baiGiang: 28, hocLieu: 35, baiTap: 21, baiKiemTra: 7, },
+  { id: "sc-5b", name: "Lớp 5B", teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 30, hocLieu: 38, baiTap: 22, baiKiemTra: 7, },
+  { id: "sc-5c", name: "Lớp 5C", teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 29, hocLieu: 37, baiTap: 21, baiKiemTra: 7, },
+  { id: "sc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], siSo: 24, baiGiang: 8, hocLieu: 12, baiTap: 6, baiKiemTra: 2, },
+  { id: "sc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 18, baiGiang: 10, hocLieu: 14, baiTap: 7, baiKiemTra: 3, },
 ];
 
 const SELF_CREATED_CLASS_IDS = new Set(["sc-bt-toan", "sc-hsg-anh"]);
