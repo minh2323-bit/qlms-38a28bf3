@@ -493,7 +493,7 @@ function ClassReport() {
   );
 
   const header = ["STT", "Tên lớp", "Giáo viên dạy học", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Số lượt nộp bài tập", "Bài kiểm tra đã giao", "Số lượt nộp bài kiểm tra"];
-  const data = rows.map((c, i) => [i + 1, c.name, c.teachers.map((t) => t.name).join(", "), c.baiGiang, c.hocLieu, c.baiTap, c.nopBaiTap, c.baiKiemTra, c.nopBaiKiemTra]);
+  const data = rows.map((c, i) => [i + 1, c.name, c.siSo, c.teachers.map((t) => t.name).join(", "), c.baiGiang, c.hocLieu, c.baiTap, c.baiKiemTra]);
 
   return (
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
