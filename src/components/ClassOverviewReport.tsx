@@ -7,6 +7,7 @@ export type ClassTeacher = { name: string; subject: string };
 export type ClassOverviewRow = {
   id: string;
   name: string;
+  khoi?: number;
   siSo: number;
   teachers: ClassTeacher[];
   baiGiang: number;
