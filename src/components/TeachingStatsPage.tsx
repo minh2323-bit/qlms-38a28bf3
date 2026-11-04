@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
-import { DateRangeFilter, EnetPoint, tableScrollWrap, stickyHeadRow, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
+import { DateRangeFilter, EnetPoint, KhoiMultiFilter, tableScrollWrap, stickyHeadRow, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
 import { ClassOverviewTable, type ClassOverviewRow } from "@/components/ClassOverviewReport";
 import { downloadCsv } from "@/lib/report-export";
 import { AppShell } from "@/components/AppShell";
@@ -117,18 +117,19 @@ const CLASS_ORDER = ["4A", "4B", "4C", "3A", "3B", "3C", "3D"];
 
 /* ---- Tổng quan theo lớp (lớp PCCM + lớp tự tạo) ---- */
 const TEACHER_CLASS_OVERVIEW: ClassOverviewRow[] = [
-  { id: "tc-4a", name: "Lớp 4A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 24, hocLieu: 31, baiTap: 18, baiKiemTra: 6, },
-  { id: "tc-4b", name: "Lớp 4B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 22, hocLieu: 28, baiTap: 16, baiKiemTra: 5, },
-  { id: "tc-4c", name: "Lớp 4C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 21, hocLieu: 26, baiTap: 15, baiKiemTra: 5, },
-  { id: "tc-3a", name: "Lớp 3A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 19, hocLieu: 24, baiTap: 14, baiKiemTra: 4, },
-  { id: "tc-3b", name: "Lớp 3B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 18, hocLieu: 22, baiTap: 13, baiKiemTra: 4, },
-  { id: "tc-3c", name: "Lớp 3C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 17, hocLieu: 21, baiTap: 12, baiKiemTra: 3, },
-  { id: "tc-3d", name: "Lớp 3D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 16, hocLieu: 20, baiTap: 12, baiKiemTra: 3, },
+  { id: "tc-4a", name: "Lớp 4A", khoi: 4, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 24, hocLieu: 31, baiTap: 18, baiKiemTra: 6, },
+  { id: "tc-4b", name: "Lớp 4B", khoi: 4, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 22, hocLieu: 28, baiTap: 16, baiKiemTra: 5, },
+  { id: "tc-4c", name: "Lớp 4C", khoi: 4, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 21, hocLieu: 26, baiTap: 15, baiKiemTra: 5, },
+  { id: "tc-3a", name: "Lớp 3A", khoi: 3, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 19, hocLieu: 24, baiTap: 14, baiKiemTra: 4, },
+  { id: "tc-3b", name: "Lớp 3B", khoi: 3, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 18, hocLieu: 22, baiTap: 13, baiKiemTra: 4, },
+  { id: "tc-3c", name: "Lớp 3C", khoi: 3, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 17, hocLieu: 21, baiTap: 12, baiKiemTra: 3, },
+  { id: "tc-3d", name: "Lớp 3D", khoi: 3, teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 16, hocLieu: 20, baiTap: 12, baiKiemTra: 3, },
   { id: "tc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 24, baiGiang: 8, hocLieu: 12, baiTap: 6, baiKiemTra: 2, },
   { id: "tc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Tiếng Anh" }], siSo: 18, baiGiang: 10, hocLieu: 14, baiTap: 7, baiKiemTra: 3, },
   { id: "tc-ontap", name: "Lớp ôn tập cuối kỳ 4B, 4C, 4D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 42, baiGiang: 6, hocLieu: 9, baiTap: 5, baiKiemTra: 2, },
 ];
 const TC_SELF_CREATED_CLASS_IDS = new Set(["tc-bt-toan", "tc-hsg-anh", "tc-ontap"]);
+const TC_KHOI_OPTIONS = [...new Set(TEACHER_CLASS_OVERVIEW.map((c) => c.khoi).filter((k): k is number => k != null))].sort((a, b) => a - b);
 
 /* ---------------- Page ---------------- */
 export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "principal" }) {
@@ -136,6 +137,11 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
   const [q, setQ] = useState("");
   const [subject, setSubject] = useState(SUBJECTS[0]);
   const [range, setRange] = useState<DateRange | undefined>();
+  const [khois, setKhois] = useState<number[]>([]);
+  const overviewRows = useMemo(
+    () => TEACHER_CLASS_OVERVIEW.filter((c) => khois.length === 0 || (c.khoi !== undefined && khois.includes(c.khoi))),
+    [khois],
+  );
 
   const filtered = useMemo(() => {
     const list = CLASS_STUDENTS[cls] ?? [];
@@ -242,20 +248,23 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
         <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-indigo-700">Thống kê tổng quan theo lớp</h2>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 gap-1.5"
-              onClick={() => {
-                const header = ["STT", "Tên lớp", "Sĩ số", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Bài kiểm tra đã giao"];
-                const data = TEACHER_CLASS_OVERVIEW.map((c, i) => [i + 1, c.name, c.siSo, c.baiGiang, c.hocLieu, c.baiTap, c.baiKiemTra]);
-                downloadCsv("thong-ke-tong-quan-theo-lop.csv", header, data);
-              }}
-            >
-              <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất Excel
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <KhoiMultiFilter value={khois} onChange={setKhois} options={TC_KHOI_OPTIONS} />
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 gap-1.5"
+                onClick={() => {
+                  const header = ["STT", "Tên lớp", "Sĩ số", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Bài kiểm tra đã giao"];
+                  const data = overviewRows.map((c, i) => [i + 1, c.name, c.siSo, c.baiGiang, c.hocLieu, c.baiTap, c.baiKiemTra]);
+                  downloadCsv("thong-ke-tong-quan-theo-lop.csv", header, data);
+                }}
+              >
+                <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất Excel
+              </Button>
+            </div>
           </div>
-          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} selfCreatedIds={TC_SELF_CREATED_CLASS_IDS} />
+          <ClassOverviewTable rows={overviewRows} selfCreatedIds={TC_SELF_CREATED_CLASS_IDS} />
         </section>
 
         {/* ---------- Section 3 ---------- */}
