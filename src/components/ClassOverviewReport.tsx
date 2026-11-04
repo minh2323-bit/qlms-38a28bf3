@@ -25,9 +25,11 @@ const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers" | "si
 export function ClassOverviewTable({
   rows,
   showTeachers = false,
+  selfCreatedIds,
 }: {
   rows: ClassOverviewRow[];
   showTeachers?: boolean;
+  selfCreatedIds?: Set<string>;
 }) {
   const [popup, setPopup] = useState<ClassOverviewRow | null>(null);
 
@@ -69,7 +71,16 @@ export function ClassOverviewTable({
             {sorted.map((r, i) => (
               <tr key={r.id} className="border-b last:border-0 hover:bg-slate-50">
                 <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
-                <td className="py-2.5 px-3 font-semibold text-slate-800">{r.name}</td>
+                <td className="py-2.5 px-3 font-semibold text-slate-800">
+                  <span className="inline-flex items-center gap-2">
+                    {r.name}
+                    {selfCreatedIds?.has(r.id) && (
+                      <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                        Tự tạo
+                      </span>
+                    )}
+                  </span>
+                </td>
                 <td className="text-center py-2.5 px-3"><span className="text-slate-700">{r.siSo}</span></td>
                 {showTeachers && (
                   <td className="py-2.5 px-3 text-center">
