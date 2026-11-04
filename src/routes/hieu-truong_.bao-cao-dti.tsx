@@ -10,7 +10,7 @@ import { FileSpreadsheet, FileDown } from "lucide-react";
 import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
 import { ClassOverviewTable, type ClassOverviewRow } from "@/components/ClassOverviewReport";
 import type { DateRange } from "react-day-picker";
-import { UnitFilter, DateRangeFilter, EnetPoint, totalCell, tableScrollWrap, stickyHeadRow, ReportHeader, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
+import { UnitFilter, DateRangeFilter, KhoiMultiFilter, EnetPoint, totalCell, tableScrollWrap, stickyHeadRow, ReportHeader, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
 
 
 
@@ -458,38 +458,41 @@ function StudentReport() {
 
 /* ---------------- Báo cáo theo lớp (toàn trường) ---------------- */
 const SCHOOL_CLASS_OVERVIEW: ClassOverviewRow[] = [
-  { id: "sc-4a", name: "Lớp 4A", teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 40, baiGiang: 46, hocLieu: 58, baiTap: 34, baiKiemTra: 11, },
-  { id: "sc-4b", name: "Lớp 4B", teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Phạm Quốc Anh", subject: "Tin học" }], siSo: 40, baiGiang: 40, hocLieu: 52, baiTap: 30, baiKiemTra: 10, },
-  { id: "sc-4c", name: "Lớp 4C", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Lê Thị Mai", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 38, hocLieu: 47, baiTap: 28, baiKiemTra: 9, },
-  { id: "sc-3a", name: "Lớp 3A", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], siSo: 38, baiGiang: 33, hocLieu: 41, baiTap: 25, baiKiemTra: 8, },
-  { id: "sc-3b", name: "Lớp 3B", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 38, baiGiang: 35, hocLieu: 44, baiTap: 26, baiKiemTra: 8, },
-  { id: "sc-3c", name: "Lớp 3C", teachers: [{ name: "Lê Thị Mai", subject: "Khoa học" }, { name: "Trần Minh Quân", subject: "Toán" }], siSo: 38, baiGiang: 31, hocLieu: 39, baiTap: 23, baiKiemTra: 7, },
-  { id: "sc-3d", name: "Lớp 3D", teachers: [{ name: "Nguyễn Thu Trang", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 29, hocLieu: 36, baiTap: 22, baiKiemTra: 7, },
-  { id: "sc-2a", name: "Lớp 2A", teachers: [{ name: "Phạm Quốc Anh", subject: "Toán" }], siSo: 38, baiGiang: 24, hocLieu: 30, baiTap: 18, baiKiemTra: 5, },
-  { id: "sc-2b", name: "Lớp 2B", teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], siSo: 40, baiGiang: 26, hocLieu: 33, baiTap: 20, baiKiemTra: 6, },
-  { id: "sc-2c", name: "Lớp 2C", teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], siSo: 38, baiGiang: 25, hocLieu: 31, baiTap: 19, baiKiemTra: 6, },
-  { id: "sc-5a", name: "Lớp 5A", teachers: [{ name: "Đỗ Văn Nam", subject: "Toán" }], siSo: 40, baiGiang: 28, hocLieu: 35, baiTap: 21, baiKiemTra: 7, },
-  { id: "sc-5b", name: "Lớp 5B", teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 30, hocLieu: 38, baiTap: 22, baiKiemTra: 7, },
-  { id: "sc-5c", name: "Lớp 5C", teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 29, hocLieu: 37, baiTap: 21, baiKiemTra: 7, },
+  { id: "sc-4a", name: "Lớp 4A", khoi: 4, teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 40, baiGiang: 46, hocLieu: 58, baiTap: 34, baiKiemTra: 11, },
+  { id: "sc-4b", name: "Lớp 4B", khoi: 4, teachers: [{ name: "Nguyễn Thị Hoa", subject: "Toán" }, { name: "Phạm Quốc Anh", subject: "Tin học" }], siSo: 40, baiGiang: 40, hocLieu: 52, baiTap: 30, baiKiemTra: 10, },
+  { id: "sc-4c", name: "Lớp 4C", khoi: 4, teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Lê Thị Mai", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 38, hocLieu: 47, baiTap: 28, baiKiemTra: 9, },
+  { id: "sc-3a", name: "Lớp 3A", khoi: 3, teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], siSo: 38, baiGiang: 33, hocLieu: 41, baiTap: 25, baiKiemTra: 8, },
+  { id: "sc-3b", name: "Lớp 3B", khoi: 3, teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }, { name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 38, baiGiang: 35, hocLieu: 44, baiTap: 26, baiKiemTra: 8, },
+  { id: "sc-3c", name: "Lớp 3C", khoi: 3, teachers: [{ name: "Lê Thị Mai", subject: "Khoa học" }, { name: "Trần Minh Quân", subject: "Toán" }], siSo: 38, baiGiang: 31, hocLieu: 39, baiTap: 23, baiKiemTra: 7, },
+  { id: "sc-3d", name: "Lớp 3D", khoi: 3, teachers: [{ name: "Nguyễn Thu Trang", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 29, hocLieu: 36, baiTap: 22, baiKiemTra: 7, },
+  { id: "sc-2a", name: "Lớp 2A", khoi: 2, teachers: [{ name: "Phạm Quốc Anh", subject: "Toán" }], siSo: 38, baiGiang: 24, hocLieu: 30, baiTap: 18, baiKiemTra: 5, },
+  { id: "sc-2b", name: "Lớp 2B", khoi: 2, teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], siSo: 40, baiGiang: 26, hocLieu: 33, baiTap: 20, baiKiemTra: 6, },
+  { id: "sc-2c", name: "Lớp 2C", khoi: 2, teachers: [{ name: "Hoàng Văn Nam", subject: "Toán" }], siSo: 38, baiGiang: 25, hocLieu: 31, baiTap: 19, baiKiemTra: 6, },
+  { id: "sc-5a", name: "Lớp 5A", khoi: 5, teachers: [{ name: "Đỗ Văn Nam", subject: "Toán" }], siSo: 40, baiGiang: 28, hocLieu: 35, baiTap: 21, baiKiemTra: 7, },
+  { id: "sc-5b", name: "Lớp 5B", khoi: 5, teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 30, hocLieu: 38, baiTap: 22, baiKiemTra: 7, },
+  { id: "sc-5c", name: "Lớp 5C", khoi: 5, teachers: [{ name: "Bùi Thị Hạnh", subject: "Tiếng Việt" }], siSo: 40, baiGiang: 29, hocLieu: 37, baiTap: 21, baiKiemTra: 7, },
   { id: "sc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Phùng Thuý Hằng", subject: "Toán" }], siSo: 24, baiGiang: 8, hocLieu: 12, baiTap: 6, baiKiemTra: 2, },
   { id: "sc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Trần Minh Quân", subject: "Tiếng Anh" }], siSo: 18, baiGiang: 10, hocLieu: 14, baiTap: 7, baiKiemTra: 3, },
 ];
 
 const SELF_CREATED_CLASS_IDS = new Set(["sc-bt-toan", "sc-hsg-anh"]);
+const KHOI_OPTIONS = [...new Set(SCHOOL_CLASS_OVERVIEW.map((c) => c.khoi).filter((k): k is number => k != null))].sort((a, b) => a - b);
 
 function ClassReport() {
   const [q, setQ] = useState("");
   const [unit, setUnit] = useState("all");
   const [range, setRange] = useState<DateRange | undefined>();
   const [loai, setLoai] = useState("all");
+  const [khois, setKhois] = useState<number[]>([]);
   const rows = useMemo(
     () => SCHOOL_CLASS_OVERVIEW.filter((c) =>
       c.name.toLowerCase().includes(q.trim().toLowerCase()) &&
       matchUnitRange(c.name, unit, range) &&
       (loai === "all" ||
-        (loai === "tutao" ? SELF_CREATED_CLASS_IDS.has(c.id) : !SELF_CREATED_CLASS_IDS.has(c.id))),
+        (loai === "tutao" ? SELF_CREATED_CLASS_IDS.has(c.id) : !SELF_CREATED_CLASS_IDS.has(c.id))) &&
+      (khois.length === 0 || (c.khoi !== undefined && khois.includes(c.khoi)))
     ),
-    [q, unit, range, loai],
+    [q, unit, range, loai, khois],
   );
 
   const header = ["STT", "Tên lớp", "Sĩ số", "Giáo viên dạy học", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Bài kiểm tra đã giao"];
@@ -499,6 +502,7 @@ function ClassReport() {
     <section className="bg-white rounded-2xl border shadow-sm p-6 space-y-4">
       <ReportHeader title="Thống kê tổng quan theo lớp toàn trường">
         <UnitFilter value={unit} onChange={setUnit} />
+        <KhoiMultiFilter value={khois} onChange={setKhois} options={KHOI_OPTIONS} />
         <Select value={loai} onValueChange={setLoai}>
           <SelectTrigger className="h-9 w-48"><SelectValue placeholder="Loại lớp" /></SelectTrigger>
           <SelectContent>

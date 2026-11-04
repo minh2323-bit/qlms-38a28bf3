@@ -7,6 +7,7 @@ export type ClassTeacher = { name: string; subject: string };
 export type ClassOverviewRow = {
   id: string;
   name: string;
+  khoi?: number;
   siSo: number;
   teachers: ClassTeacher[];
   baiGiang: number;
@@ -15,7 +16,7 @@ export type ClassOverviewRow = {
   baiKiemTra: number;
 };
 
-const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers" | "siSo">; label: string }[] = [
+const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers" | "siSo" | "khoi">; label: string }[] = [
   { key: "baiGiang", label: "Bài giảng đã giao" },
   { key: "hocLieu", label: "Học liệu đã giao" },
   { key: "baiTap", label: "Bài tập đã giao" },

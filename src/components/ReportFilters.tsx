@@ -3,11 +3,12 @@ import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
-import { CalendarIcon, Sparkles, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { CalendarIcon, Sparkles, ArrowUpDown, ArrowUp, ArrowDown, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -166,4 +167,44 @@ export function matchUnitRange(key: string, unit: string, range?: DateRange) {
     if (d < from || d > to) return false;
   }
   return true;
+}
+
+/** Bộ lọc theo khối: popover với checkbox, chọn được nhiều khối cùng lúc. */
+export function KhoiMultiFilter({
+  value, onChange, options,
+}: { value: number[]; onChange: (v: number[]) => void; options: number[] }) {
+  const [open, setOpen] = useState(false);
+  const label = value.length === 0 ? "Khối: Tất cả" : `Khối: ${[...value].sort((a, b) => a - b).join(", ")}`;
+  const toggle = (k: number) => onChange(value.includes(k) ? value.filter((x) => x !== k) : [...value, k]);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn("h-9 gap-1.5 font-normal", value.length === 0 && "text-muted-foreground")}
+        >
+          <Filter className="h-4 w-4" />
+          {label}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-44 p-2" align="start">
+        <div className="space-y-0.5">
+          {options.map((k) => (
+            <label
+              key={k}
+              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-slate-50"
+            >
+              <Checkbox checked={value.includes(k)} onCheckedChange={() => toggle(k)} />
+              <span className="font-medium text-slate-700">Khối {k}</span>
+            </label>
+          ))}
+        </div>
+        <div className="mt-2 flex justify-end gap-2 border-t pt-2">
+          <Button variant="ghost" size="sm" onClick={() => onChange([])}>Tất cả</Button>
+          <Button size="sm" onClick={() => setOpen(false)}>Áp dụng</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 }
