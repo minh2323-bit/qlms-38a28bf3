@@ -515,7 +515,7 @@ function ClassReport() {
         />
       </ReportHeader>
 
-      <ClassOverviewTable rows={rows} showTeachers />
+      <ClassOverviewTable rows={rows} showTeachers selfCreatedIds={SELF_CREATED_CLASS_IDS} />
     </section>
   );
 }

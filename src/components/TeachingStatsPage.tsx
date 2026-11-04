@@ -128,6 +128,7 @@ const TEACHER_CLASS_OVERVIEW: ClassOverviewRow[] = [
   { id: "tc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Tiếng Anh" }], siSo: 18, baiGiang: 10, hocLieu: 14, baiTap: 7, baiKiemTra: 3, },
   { id: "tc-ontap", name: "Lớp ôn tập cuối kỳ 4B, 4C, 4D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 42, baiGiang: 6, hocLieu: 9, baiTap: 5, baiKiemTra: 2, },
 ];
+const TC_SELF_CREATED_CLASS_IDS = new Set(["tc-bt-toan", "tc-hsg-anh", "tc-ontap"]);
 
 /* ---------------- Page ---------------- */
 export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "principal" }) {
@@ -254,7 +255,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
               <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất Excel
             </Button>
           </div>
-          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} />
+          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} selfCreatedIds={TC_SELF_CREATED_CLASS_IDS} />
         </section>
 
         {/* ---------- Section 3 ---------- */}
