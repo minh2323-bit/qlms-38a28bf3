@@ -246,7 +246,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
               size="sm"
               className="h-9 gap-1.5"
               onClick={() => {
-                const header = ["STT", "Tên lớp", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Số lượt nộp bài tập", "Bài kiểm tra đã giao", "Số lượt nộp bài kiểm tra"];
+                const header = ["STT", "Tên lớp", "Sĩ số", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Bài kiểm tra đã giao"];
                 const data = TEACHER_CLASS_OVERVIEW.map((c, i) => [i + 1, c.name, c.siSo, c.baiGiang, c.hocLieu, c.baiTap, c.baiKiemTra]);
                 downloadCsv("thong-ke-tong-quan-theo-lop.csv", header, data);
               }}

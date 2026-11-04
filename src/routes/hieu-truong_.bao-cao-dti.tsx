@@ -492,7 +492,7 @@ function ClassReport() {
     [q, unit, range, loai],
   );
 
-  const header = ["STT", "Tên lớp", "Giáo viên dạy học", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Số lượt nộp bài tập", "Bài kiểm tra đã giao", "Số lượt nộp bài kiểm tra"];
+  const header = ["STT", "Tên lớp", "Sĩ số", "Giáo viên dạy học", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Bài kiểm tra đã giao"];
   const data = rows.map((c, i) => [i + 1, c.name, c.siSo, c.teachers.map((t) => t.name).join(", "), c.baiGiang, c.hocLieu, c.baiTap, c.baiKiemTra]);
 
   return (
