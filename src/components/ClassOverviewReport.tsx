@@ -7,22 +7,19 @@ export type ClassTeacher = { name: string; subject: string };
 export type ClassOverviewRow = {
   id: string;
   name: string;
+  siSo: number;
   teachers: ClassTeacher[];
   baiGiang: number;
   hocLieu: number;
   baiTap: number;
-  nopBaiTap: number;
   baiKiemTra: number;
-  nopBaiKiemTra: number;
 };
 
-const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers">; label: string }[] = [
+const COLS: { key: keyof Omit<ClassOverviewRow, "id" | "name" | "teachers" | "siSo">; label: string }[] = [
   { key: "baiGiang", label: "Bài giảng đã giao" },
   { key: "hocLieu", label: "Học liệu đã giao" },
   { key: "baiTap", label: "Bài tập đã giao" },
-  { key: "nopBaiTap", label: "Số lượt nộp bài tập" },
   { key: "baiKiemTra", label: "Bài kiểm tra đã giao" },
-  { key: "nopBaiKiemTra", label: "Số lượt nộp bài kiểm tra" },
 ];
 
 export function ClassOverviewTable({
@@ -38,17 +35,16 @@ export function ClassOverviewTable({
     baiGiang: (r) => r.baiGiang,
     hocLieu: (r) => r.hocLieu,
     baiTap: (r) => r.baiTap,
-    nopBaiTap: (r) => r.nopBaiTap,
     baiKiemTra: (r) => r.baiKiemTra,
-    nopBaiKiemTra: (r) => r.nopBaiKiemTra,
   });
 
   const totals = useMemo(() => {
     const sum = (f: (r: ClassOverviewRow) => number) => sorted.reduce((s, r) => s + f(r), 0);
     return {
+      siSo: sum((r) => r.siSo),
       baiGiang: sum((r) => r.baiGiang), hocLieu: sum((r) => r.hocLieu),
-      baiTap: sum((r) => r.baiTap), nopBaiTap: sum((r) => r.nopBaiTap),
-      baiKiemTra: sum((r) => r.baiKiemTra), nopBaiKiemTra: sum((r) => r.nopBaiKiemTra),
+      baiTap: sum((r) => r.baiTap),
+      baiKiemTra: sum((r) => r.baiKiemTra),
     };
   }, [sorted]);
 
@@ -62,6 +58,7 @@ export function ClassOverviewTable({
             <tr className={`text-slate-500 ${stickyHeadRow}`}>
               <th className="text-center font-semibold py-2.5 px-3 w-14">STT</th>
               <th className="text-left font-semibold py-2.5 px-3">Tên lớp</th>
+              <th className="text-center font-semibold py-2.5 px-3 w-20">Sĩ số</th>
               {showTeachers && <th className="text-left font-semibold py-2.5 px-3">Giáo viên dạy học</th>}
               {COLS.map((c) => (
                 <SortTh key={c.key} label={c.label} sortKey={c.key} sort={sort} toggle={toggle} />
@@ -73,6 +70,7 @@ export function ClassOverviewTable({
               <tr key={r.id} className="border-b last:border-0 hover:bg-slate-50">
                 <td className="text-center py-2.5 px-3 font-semibold text-slate-700">{i + 1}</td>
                 <td className="py-2.5 px-3 font-semibold text-slate-800">{r.name}</td>
+                <td className="text-center py-2.5 px-3"><span className="text-slate-700">{r.siSo}</span></td>
                 {showTeachers && (
                   <td className="py-2.5 px-3 text-center">
                     <button
@@ -92,12 +90,13 @@ export function ClassOverviewTable({
               </tr>
             ))}
             {sorted.length === 0 && (
-              <tr><td colSpan={colSpan + COLS.length} className="text-center text-slate-400 py-8">Không có lớp học nào.</td></tr>
+              <tr><td colSpan={colSpan + COLS.length + 1} className="text-center text-slate-400 py-8">Không có lớp học nào.</td></tr>
             )}
           </tbody>
           <tfoot>
             <tr>
               <td className={`${totalCell} text-center`} colSpan={colSpan}>Tổng số ({sorted.length} lớp)</td>
+              <td className={`${totalCell} text-center`}>{totals.siSo}</td>
               {COLS.map((c) => (
                 <td key={c.key} className={`${totalCell} text-center`}>{totals[c.key]}</td>
               ))}

@@ -117,16 +117,16 @@ const CLASS_ORDER = ["4A", "4B", "4C", "3A", "3B", "3C", "3D"];
 
 /* ---- Tổng quan theo lớp (lớp PCCM + lớp tự tạo) ---- */
 const TEACHER_CLASS_OVERVIEW: ClassOverviewRow[] = [
-  { id: "tc-4a", name: "Lớp 4A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 24, hocLieu: 31, baiTap: 18, nopBaiTap: 612, baiKiemTra: 6, nopBaiKiemTra: 214 },
-  { id: "tc-4b", name: "Lớp 4B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 22, hocLieu: 28, baiTap: 16, nopBaiTap: 588, baiKiemTra: 5, nopBaiKiemTra: 190 },
-  { id: "tc-4c", name: "Lớp 4C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 21, hocLieu: 26, baiTap: 15, nopBaiTap: 540, baiKiemTra: 5, nopBaiKiemTra: 178 },
-  { id: "tc-3a", name: "Lớp 3A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 19, hocLieu: 24, baiTap: 14, nopBaiTap: 462, baiKiemTra: 4, nopBaiKiemTra: 132 },
-  { id: "tc-3b", name: "Lớp 3B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 18, hocLieu: 22, baiTap: 13, nopBaiTap: 402, baiKiemTra: 4, nopBaiKiemTra: 118 },
-  { id: "tc-3c", name: "Lớp 3C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 17, hocLieu: 21, baiTap: 12, nopBaiTap: 360, baiKiemTra: 3, nopBaiKiemTra: 90 },
-  { id: "tc-3d", name: "Lớp 3D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 16, hocLieu: 20, baiTap: 12, nopBaiTap: 396, baiKiemTra: 3, nopBaiKiemTra: 96 },
-  { id: "tc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 8, hocLieu: 12, baiTap: 6, nopBaiTap: 132, baiKiemTra: 2, nopBaiKiemTra: 44 },
-  { id: "tc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Tiếng Anh" }], baiGiang: 10, hocLieu: 14, baiTap: 7, nopBaiTap: 112, baiKiemTra: 3, nopBaiKiemTra: 48 },
-  { id: "tc-ontap", name: "Lớp ôn tập cuối kỳ 4B, 4C, 4D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], baiGiang: 6, hocLieu: 9, baiTap: 5, nopBaiTap: 248, baiKiemTra: 2, nopBaiKiemTra: 86 },
+  { id: "tc-4a", name: "Lớp 4A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 24, hocLieu: 31, baiTap: 18, baiKiemTra: 6, },
+  { id: "tc-4b", name: "Lớp 4B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 22, hocLieu: 28, baiTap: 16, baiKiemTra: 5, },
+  { id: "tc-4c", name: "Lớp 4C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 21, hocLieu: 26, baiTap: 15, baiKiemTra: 5, },
+  { id: "tc-3a", name: "Lớp 3A", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 19, hocLieu: 24, baiTap: 14, baiKiemTra: 4, },
+  { id: "tc-3b", name: "Lớp 3B", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 18, hocLieu: 22, baiTap: 13, baiKiemTra: 4, },
+  { id: "tc-3c", name: "Lớp 3C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 17, hocLieu: 21, baiTap: 12, baiKiemTra: 3, },
+  { id: "tc-3d", name: "Lớp 3D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 16, hocLieu: 20, baiTap: 12, baiKiemTra: 3, },
+  { id: "tc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 24, baiGiang: 8, hocLieu: 12, baiTap: 6, baiKiemTra: 2, },
+  { id: "tc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Tiếng Anh" }], siSo: 18, baiGiang: 10, hocLieu: 14, baiTap: 7, baiKiemTra: 3, },
+  { id: "tc-ontap", name: "Lớp ôn tập cuối kỳ 4B, 4C, 4D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 42, baiGiang: 6, hocLieu: 9, baiTap: 5, baiKiemTra: 2, },
 ];
 
 /* ---------------- Page ---------------- */
@@ -246,8 +246,8 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
               size="sm"
               className="h-9 gap-1.5"
               onClick={() => {
-                const header = ["STT", "Tên lớp", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Số lượt nộp bài tập", "Bài kiểm tra đã giao", "Số lượt nộp bài kiểm tra"];
-                const data = TEACHER_CLASS_OVERVIEW.map((c, i) => [i + 1, c.name, c.baiGiang, c.hocLieu, c.baiTap, c.nopBaiTap, c.baiKiemTra, c.nopBaiKiemTra]);
+                const header = ["STT", "Tên lớp", "Sĩ số", "Bài giảng đã giao", "Học liệu đã giao", "Bài tập đã giao", "Bài kiểm tra đã giao"];
+                const data = TEACHER_CLASS_OVERVIEW.map((c, i) => [i + 1, c.name, c.siSo, c.baiGiang, c.hocLieu, c.baiTap, c.baiKiemTra]);
                 downloadCsv("thong-ke-tong-quan-theo-lop.csv", header, data);
               }}
             >
