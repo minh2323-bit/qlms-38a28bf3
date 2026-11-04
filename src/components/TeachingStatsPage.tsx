@@ -125,6 +125,7 @@ const TEACHER_CLASS_OVERVIEW: ClassOverviewRow[] = [
   { id: "tc-3c", name: "Lớp 3C", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 38, baiGiang: 17, hocLieu: 21, baiTap: 12, baiKiemTra: 3, },
   { id: "tc-3d", name: "Lớp 3D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 40, baiGiang: 16, hocLieu: 20, baiTap: 12, baiKiemTra: 3, },
   { id: "tc-bt-toan", name: "Lớp bổ túc học sinh Toán", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 24, baiGiang: 8, hocLieu: 12, baiTap: 6, baiKiemTra: 2, },
+const TC_SELF_CREATED_CLASS_IDS = new Set(["tc-bt-toan", "tc-hsg-anh", "tc-ontap"]);
   { id: "tc-hsg-anh", name: "Lớp ôn thi học sinh giỏi Tiếng Anh", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Tiếng Anh" }], siSo: 18, baiGiang: 10, hocLieu: 14, baiTap: 7, baiKiemTra: 3, },
   { id: "tc-ontap", name: "Lớp ôn tập cuối kỳ 4B, 4C, 4D", teachers: [{ name: "Cô Nguyễn Thu Trang", subject: "Toán" }], siSo: 42, baiGiang: 6, hocLieu: 9, baiTap: 5, baiKiemTra: 2, },
 ];
@@ -254,7 +255,7 @@ export function TeachingStatsPage({ role = "teacher" }: { role?: "teacher" | "pr
               <FileSpreadsheet className="h-4 w-4 text-emerald-600" /> Xuất Excel
             </Button>
           </div>
-          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} />
+          <ClassOverviewTable rows={TEACHER_CLASS_OVERVIEW} selfCreatedIds={TC_SELF_CREATED_CLASS_IDS} />
         </section>
 
         {/* ---------- Section 3 ---------- */}
