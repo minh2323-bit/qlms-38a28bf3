@@ -12,6 +12,7 @@ import {
 import teacherAvatar from "@/assets/teacher-avatar.jpg";
 import studentAvatar from "@/assets/student-avatar.jpg";
 import principalAvatar from "@/assets/principal-avatar.jpg";
+import { DatabaseZap } from "lucide-react";
 import qlmsLogo from "@/assets/qlms-logo.png";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
@@ -59,6 +60,7 @@ const TEACHER_NAV: NavItem[] = [
 
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi kỳ thi", to: "/ky-thi/ngan-hang-cau-hoi" },
       { icon: FileCheck2, label: "Đề thi kỳ thi", to: "/ky-thi/de-thi" },
+      { icon: DatabaseZap, label: "Chuyển điểm thi sang CSDL", to: "/ky-thi/chuyen-diem" },
 
 
     ],
@@ -152,6 +154,7 @@ const PRINCIPAL_NAV: NavItem[] = [
       { icon: School, label: "Kỳ thi ôn tập", to: "/ky-thi/on-tap" },
       { icon: BookOpenCheck, label: "Ngân hàng câu hỏi", to: "/ky-thi/ngan-hang-cau-hoi" },
       { icon: FileCheck2, label: "Đề thi và ma trận đề", to: "/ky-thi/de-thi" },
+      { icon: DatabaseZap, label: "Chuyển điểm thi sang CSDL", to: "/ky-thi/chuyen-diem" },
     ],
   },
   {

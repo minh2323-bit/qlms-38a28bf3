@@ -45,6 +45,7 @@ import { Route as HocSinhLopTrucTuyenRouteImport } from './routes/hoc-sinh.lop-t
 import { Route as HocSinhNhiemVuRouteImport } from './routes/hoc-sinh.nhiem-vu'
 import { Route as HocSinhThongKeHoatDongRouteImport } from './routes/hoc-sinh.thong-ke-hoat-dong'
 import { Route as KyThiChinhThucRouteImport } from './routes/ky-thi.chinh-thuc'
+import { Route as KyThiChuyenDiemRouteImport } from './routes/ky-thi.chuyen-diem'
 import { Route as KyThiDeThiRouteImport } from './routes/ky-thi.de-thi'
 import { Route as KyThiNganHangCauHoiRouteImport } from './routes/ky-thi.ngan-hang-cau-hoi'
 import { Route as KyThiOnTapRouteImport } from './routes/ky-thi.on-tap'
@@ -259,6 +260,11 @@ const KyThiChinhThucRoute = KyThiChinhThucRouteImport.update({
   path: '/ky-thi/chinh-thuc',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KyThiChuyenDiemRoute = KyThiChuyenDiemRouteImport.update({
+  id: '/ky-thi/chuyen-diem',
+  path: '/ky-thi/chuyen-diem',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KyThiDeThiRoute = KyThiDeThiRouteImport.update({
   id: '/ky-thi/de-thi',
   path: '/ky-thi/de-thi',
@@ -454,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/hoc-sinh/nhiem-vu': typeof HocSinhNhiemVuRoute
   '/hoc-sinh/thong-ke-hoat-dong': typeof HocSinhThongKeHoatDongRoute
   '/ky-thi/chinh-thuc': typeof KyThiChinhThucRouteWithChildren
+  '/ky-thi/chuyen-diem': typeof KyThiChuyenDiemRoute
   '/ky-thi/de-thi': typeof KyThiDeThiRoute
   '/ky-thi/ngan-hang-cau-hoi': typeof KyThiNganHangCauHoiRoute
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
@@ -517,6 +524,7 @@ export interface FileRoutesByTo {
   '/hoc-sinh/lop-truc-tuyen': typeof HocSinhLopTrucTuyenRoute
   '/hoc-sinh/nhiem-vu': typeof HocSinhNhiemVuRoute
   '/hoc-sinh/thong-ke-hoat-dong': typeof HocSinhThongKeHoatDongRoute
+  '/ky-thi/chuyen-diem': typeof KyThiChuyenDiemRoute
   '/ky-thi/de-thi': typeof KyThiDeThiRoute
   '/ky-thi/ngan-hang-cau-hoi': typeof KyThiNganHangCauHoiRoute
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
@@ -586,6 +594,7 @@ export interface FileRoutesById {
   '/hoc-sinh/nhiem-vu': typeof HocSinhNhiemVuRoute
   '/hoc-sinh/thong-ke-hoat-dong': typeof HocSinhThongKeHoatDongRoute
   '/ky-thi/chinh-thuc': typeof KyThiChinhThucRouteWithChildren
+  '/ky-thi/chuyen-diem': typeof KyThiChuyenDiemRoute
   '/ky-thi/de-thi': typeof KyThiDeThiRoute
   '/ky-thi/ngan-hang-cau-hoi': typeof KyThiNganHangCauHoiRoute
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
@@ -656,6 +665,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/nhiem-vu'
     | '/hoc-sinh/thong-ke-hoat-dong'
     | '/ky-thi/chinh-thuc'
+    | '/ky-thi/chuyen-diem'
     | '/ky-thi/de-thi'
     | '/ky-thi/ngan-hang-cau-hoi'
     | '/ky-thi/on-tap'
@@ -719,6 +729,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/lop-truc-tuyen'
     | '/hoc-sinh/nhiem-vu'
     | '/hoc-sinh/thong-ke-hoat-dong'
+    | '/ky-thi/chuyen-diem'
     | '/ky-thi/de-thi'
     | '/ky-thi/ngan-hang-cau-hoi'
     | '/ky-thi/on-tap'
@@ -787,6 +798,7 @@ export interface FileRouteTypes {
     | '/hoc-sinh/nhiem-vu'
     | '/hoc-sinh/thong-ke-hoat-dong'
     | '/ky-thi/chinh-thuc'
+    | '/ky-thi/chuyen-diem'
     | '/ky-thi/de-thi'
     | '/ky-thi/ngan-hang-cau-hoi'
     | '/ky-thi/on-tap'
@@ -846,6 +858,7 @@ export interface RootRouteChildren {
   HocLieuKhoHocLieuRoute: typeof HocLieuKhoHocLieuRoute
   HocLieuNganHangCauHoiRoute: typeof HocLieuNganHangCauHoiRoute
   KyThiChinhThucRoute: typeof KyThiChinhThucRouteWithChildren
+  KyThiChuyenDiemRoute: typeof KyThiChuyenDiemRoute
   KyThiDeThiRoute: typeof KyThiDeThiRoute
   KyThiNganHangCauHoiRoute: typeof KyThiNganHangCauHoiRoute
   KyThiOnTapRoute: typeof KyThiOnTapRoute
@@ -1118,6 +1131,13 @@ declare module '@tanstack/react-router' {
       path: '/ky-thi/chinh-thuc'
       fullPath: '/ky-thi/chinh-thuc'
       preLoaderRoute: typeof KyThiChinhThucRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ky-thi/chuyen-diem': {
+      id: '/ky-thi/chuyen-diem'
+      path: '/ky-thi/chuyen-diem'
+      fullPath: '/ky-thi/chuyen-diem'
+      preLoaderRoute: typeof KyThiChuyenDiemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ky-thi/de-thi': {
@@ -1466,6 +1486,7 @@ const rootRouteChildren: RootRouteChildren = {
   HocLieuKhoHocLieuRoute: HocLieuKhoHocLieuRoute,
   HocLieuNganHangCauHoiRoute: HocLieuNganHangCauHoiRoute,
   KyThiChinhThucRoute: KyThiChinhThucRouteWithChildren,
+  KyThiChuyenDiemRoute: KyThiChuyenDiemRoute,
   KyThiDeThiRoute: KyThiDeThiRoute,
   KyThiNganHangCauHoiRoute: KyThiNganHangCauHoiRoute,
   KyThiOnTapRoute: KyThiOnTapRoute,
