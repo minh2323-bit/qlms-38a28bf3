@@ -27,7 +27,7 @@ export const Route = createFileRoute("/ky-thi/chuyen-diem")({
 });
 
 type ScoreKey = "gk1a" | "gk1b" | "ck1" | "gk2" | "ck2";
-type Row = { id: string; name: string; dob: string; khoi: string; lop: string } & Record<ScoreKey, string>;
+type Row = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string } & Record<ScoreKey, string>;
 
 const NAMES = ["Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Khánh Chi", "Phạm Đức Duy", "Hoàng Thu Hà", "Vũ Quang Huy", "Đặng Ngọc Lan", "Bùi Hải Long", "Phí Song Ngân", "Đỗ Minh Quân", "Ngô Thảo Vy", "Lý Tuấn Kiệt"];
 const CLASSES = ["3A", "3B", "4A", "4B", "5A", "5B"];
@@ -41,7 +41,7 @@ const INITIAL: Row[] = CLASSES.flatMap((lop, ci) =>
     const both = (i + ci) % 9 === 4;
     const inB = i % 3 === 2;
     return {
-      id: `${lop}-${i}`, name: n, khoi: lop[0], lop,
+      id: `${lop}-${i}`, name: n, cccd: `0012190${String(ci * 100 + i * 37 + 10000).padStart(5, "0")}`, khoi: lop[0], lop,
       dob: `${String((i * 5 + ci) % 28 + 1).padStart(2, "0")}/${String((i + ci) % 12 + 1).padStart(2, "0")}/${year}`,
       gk1a: inB && !both ? "" : sc(0), gk1b: inB || both ? sc(4) : "",
       ck1: sc(1), gk2: sc(2), ck2: i === 5 ? "" : sc(3),
@@ -90,6 +90,10 @@ function ScoreTransferPage() {
     r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi.length === 0 || khoi.includes(r.khoi)) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop]);
   const invalid = rows.some((r) => COLS.some((c) => !isValidScore(r[c.key])));
   const conflicts = rows.filter(conflict).length;
+  // GV chỉ thấy cột điểm BGH đã xác nhận chuyển sang CSDL
+  const cols = canEdit ? COLS : COLS.filter((c) => locked.has(c.key));
+  const gk1Cols = cols.filter((c) => c.sub);
+  const otherCols = cols.filter((c) => !c.sub);
 
   const update = (id: string, key: ScoreKey, v: string) => {
     if (!/^\d{0,2}(\.\d?)?$/.test(v)) return;
@@ -102,8 +106,8 @@ function ScoreTransferPage() {
   };
 
   const exportExcel = () => downloadCsv("chuyen-diem-csdl.csv",
-    ["STT", "Họ và tên học sinh", "Ngày sinh", "Khối", "Lớp", "Điểm GKI (1)", "Điểm GKI (2)", "Điểm CKI", "Điểm GKII", "Điểm CKII"],
-    shown.map((r, i) => [i + 1, r.name, r.dob, r.khoi, r.lop, r.gk1a, r.gk1b, r.ck1, r.gk2, r.ck2]));
+    ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", ...cols.map((c) => `${c.label}${c.sub ? " " + c.sub : ""}`)],
+    shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, ...cols.map((c) => r[c.key])]));
 
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
@@ -148,18 +152,18 @@ function ScoreTransferPage() {
           <table className="w-full border-separate border-spacing-0">
             <thead className="sticky top-0 bg-muted z-10">
               <tr>
-                <th colSpan={5} className={`${th} text-center border-r`}>Thông tin học sinh</th>
-                <th colSpan={5} className={`${th} text-center`}>Điểm thi</th>
+                <th colSpan={6} className={`${th} text-center border-r`}>Thông tin học sinh</th>
+                {cols.length > 0 && <th colSpan={cols.length} className={`${th} text-center`}>Điểm thi</th>}
               </tr>
               <tr className="text-left">
-                {["STT", "Họ và tên học sinh", "Ngày sinh", "Khối", "Lớp"].map((h, i) => (
-                  <th key={h} rowSpan={2} className={`${th} ${i === 4 ? "border-r" : ""}`}>{h}</th>
+                {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp"].map((h, i) => (
+                  <th key={h} rowSpan={2} className={`${th} ${i === 5 ? "border-r" : ""}`}>{h}</th>
                 ))}
-                <th colSpan={2} className={`${th} text-center`}>Điểm GKI</th>
-                {COLS.slice(2).map((c) => <th key={c.key} rowSpan={2} className={`${th} text-center`}>{c.label}{lockBtn(c.key)}</th>)}
+                {gk1Cols.length > 0 && <th colSpan={gk1Cols.length} className={`${th} text-center`}>Điểm GKI</th>}
+                {otherCols.map((c) => <th key={c.key} rowSpan={2} className={`${th} text-center`}>{c.label}{lockBtn(c.key)}</th>)}
               </tr>
               <tr>
-                {COLS.slice(0, 2).map((c) => <th key={c.key} className={`${th} text-center`}>{c.sub}{lockBtn(c.key)}</th>)}
+                {gk1Cols.map((c) => <th key={c.key} className={`${th} text-center`}>{c.sub}{lockBtn(c.key)}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -169,10 +173,11 @@ function ScoreTransferPage() {
                   <tr key={r.id} className={clash ? "bg-destructive/10" : ""}>
                     <td className="px-3 py-1.5 border-b">{i + 1}</td>
                     <td className={`px-3 py-1.5 border-b font-medium ${clash ? "text-destructive" : ""}`}>{r.name}</td>
+                    <td className="px-3 py-1.5 border-b">{r.cccd}</td>
                     <td className="px-3 py-1.5 border-b">{r.dob}</td>
                     <td className="px-3 py-1.5 border-b">{r.khoi}</td>
                     <td className="px-3 py-1.5 border-b border-r">{r.lop}</td>
-                    {COLS.map((c) => {
+                    {cols.map((c) => {
                       const v = r[c.key];
                       const bad = !isValidScore(v) || (clash && (c.key === "gk1a" || c.key === "gk1b"));
                       const isLocked = locked.has(c.key);
@@ -189,7 +194,7 @@ function ScoreTransferPage() {
                   </tr>
                 );
               })}
-              {shown.length === 0 && <tr><td colSpan={10} className="px-3 py-6 text-center text-muted-foreground">Không có học sinh phù hợp</td></tr>}
+              {shown.length === 0 && <tr><td colSpan={6 + cols.length} className="px-3 py-6 text-center text-muted-foreground">Không có học sinh phù hợp</td></tr>}
             </tbody>
           </table>
         </div>
