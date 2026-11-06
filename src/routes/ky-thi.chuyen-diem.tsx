@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CheckCircle2, FileSpreadsheet, Search } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { useDemoAccount } from "@/lib/demo-account";
 import { downloadCsv } from "@/lib/report-export";
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/ky-thi/chuyen-diem")({
   component: ScoreTransferPage,
 });
 
-type ScoreKey = "gk1" | "ck1" | "gk2" | "ck2";
+type ScoreKey = "gk1a" | "gk1b" | "ck1" | "gk2" | "ck2";
 type Row = { id: string; name: string; dob: string; khoi: string; lop: string } & Record<ScoreKey, string>;
 
 const NAMES = ["Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Khánh Chi", "Phạm Đức Duy", "Hoàng Thu Hà", "Vũ Quang Huy", "Đặng Ngọc Lan", "Bùi Hải Long", "Phí Song Ngân", "Đỗ Minh Quân", "Ngô Thảo Vy", "Lý Tuấn Kiệt"];
@@ -36,41 +37,87 @@ const INITIAL: Row[] = CLASSES.flatMap((lop, ci) =>
     const seed = (i * 7 + ci * 3) % 10;
     const sc = (k: number) => (Math.min(10, 5 + ((seed + k) % 6) + ((seed + k) % 2) * 0.5)).toFixed(1).replace(/\.0$/, "");
     const year = 2019 - (Number(lop[0]) - 3);
-    return { id: `${lop}-${i}`, name: n, dob: `${String((i * 5 + ci) % 28 + 1).padStart(2, "0")}/${String((i + ci) % 12 + 1).padStart(2, "0")}/${year}`, khoi: lop[0], lop, gk1: sc(0), ck1: sc(1), gk2: sc(2), ck2: i === 5 ? "" : sc(3) };
+    // GKI do 2 kỳ thi cùng chọn: phần lớn ở cột (1), một số ở cột (2), vài em có cả 2 (xung đột)
+    const both = (i + ci) % 9 === 4;
+    const inB = i % 3 === 2;
+    return {
+      id: `${lop}-${i}`, name: n, khoi: lop[0], lop,
+      dob: `${String((i * 5 + ci) % 28 + 1).padStart(2, "0")}/${String((i + ci) % 12 + 1).padStart(2, "0")}/${year}`,
+      gk1a: inB && !both ? "" : sc(0), gk1b: inB || both ? sc(4) : "",
+      ck1: sc(1), gk2: sc(2), ck2: i === 5 ? "" : sc(3),
+    };
   }),
 );
-const COLS: { key: ScoreKey; label: string }[] = [
-  { key: "gk1", label: "Điểm GKI" }, { key: "ck1", label: "Điểm CKI" }, { key: "gk2", label: "Điểm GKII" }, { key: "ck2", label: "Điểm CKII" },
+const COLS: { key: ScoreKey; label: string; sub?: string }[] = [
+  { key: "gk1a", label: "Điểm GKI", sub: "(1)" }, { key: "gk1b", label: "Điểm GKI", sub: "(2)" },
+  { key: "ck1", label: "Điểm CKI" }, { key: "gk2", label: "Điểm GKII" }, { key: "ck2", label: "Điểm CKII" },
 ];
+const conflict = (r: Row) => r.gk1a.trim() !== "" && r.gk1b.trim() !== "";
+
+function MultiCheck({ label, value, options, onChange }: { label: string; value: string[]; options: { v: string; l: string }[]; onChange: (v: string[]) => void }) {
+  const toggle = (k: string) => onChange(value.includes(k) ? value.filter((x) => x !== k) : [...value, k]);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="h-9 gap-1.5 font-normal">
+          <Filter className="h-4 w-4" />{label}: {value.length === 0 ? "Tất cả" : options.filter((o) => value.includes(o.v)).map((o) => o.v).join(", ")}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-44 p-2" align="start">
+        {options.map((o) => (
+          <label key={o.v} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-muted">
+            <Checkbox checked={value.includes(o.v)} onCheckedChange={() => toggle(o.v)} />{o.l}
+          </label>
+        ))}
+        <div className="mt-2 border-t pt-2 flex justify-end"><Button variant="ghost" size="sm" onClick={() => onChange([])}>Tất cả</Button></div>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 function ScoreTransferPage() {
   const account = useDemoAccount();
   const canEdit = account === "principal";
   const [rows, setRows] = useState(INITIAL);
   const [q, setQ] = useState("");
-  const [khoi, setKhoi] = useState("all");
-  const [lop, setLop] = useState("all");
+  const [khoi, setKhoi] = useState<string[]>([]);
+  const [lop, setLop] = useState<string[]>([]);
+  const [locked, setLocked] = useState<Set<ScoreKey>>(new Set(["ck1"]));
   const [transferred, setTransferred] = useState<string | null>(null);
 
-  const lopOptions = CLASSES.filter((c) => khoi === "all" || c[0] === khoi);
+  const lopOptions = CLASSES.filter((c) => khoi.length === 0 || khoi.includes(c[0]));
   const shown = useMemo(() => rows.filter((r) =>
-    r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi === "all" || r.khoi === khoi) && (lop === "all" || r.lop === lop)), [rows, q, khoi, lop]);
+    r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi.length === 0 || khoi.includes(r.khoi)) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop]);
   const invalid = rows.some((r) => COLS.some((c) => !isValidScore(r[c.key])));
+  const conflicts = rows.filter(conflict).length;
 
   const update = (id: string, key: ScoreKey, v: string) => {
-    if (!/^\d{0,2}(\.\d?)?$/.test(v)) return; // only digits and one "." with max 1 decimal
+    if (!/^\d{0,2}(\.\d?)?$/.test(v)) return;
     setRows((rs) => rs.map((r) => (r.id === id ? { ...r, [key]: v } : r)));
+  };
+  const unlock = (k: ScoreKey) => {
+    if (!canEdit) { toast.error("Chỉ Ban giám hiệu được mở khóa cột điểm."); return; }
+    setLocked((s) => { const n = new Set(s); n.delete(k); return n; });
+    toast.success("Đã mở khóa cột điểm.");
   };
 
   const exportExcel = () => downloadCsv("chuyen-diem-csdl.csv",
-    ["STT", "Họ và tên học sinh", "Ngày sinh", "Khối", "Lớp", ...COLS.map((c) => c.label)],
-    shown.map((r, i) => [i + 1, r.name, r.dob, r.khoi, r.lop, r.gk1, r.ck1, r.gk2, r.ck2]));
+    ["STT", "Họ và tên học sinh", "Ngày sinh", "Khối", "Lớp", "Điểm GKI (1)", "Điểm GKI (2)", "Điểm CKI", "Điểm GKII", "Điểm CKII"],
+    shown.map((r, i) => [i + 1, r.name, r.dob, r.khoi, r.lop, r.gk1a, r.gk1b, r.ck1, r.gk2, r.ck2]));
 
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
+    if (conflicts) { toast.error(`Có ${conflicts} học sinh có cả 2 đầu điểm GKI. Vui lòng xóa 1 đầu điểm trước khi chuyển.`); return; }
+    setLocked(new Set(COLS.filter((c) => rows.some((r) => r[c.key].trim() !== "")).map((c) => c.key)));
     setTransferred(new Date().toLocaleString("vi-VN"));
     toast.success(`Đã chuyển điểm của ${shown.length} học sinh sang CSDL.`);
   };
+
+  const th = "px-3 py-2 font-medium whitespace-nowrap border-b";
+  const lockBtn = (k: ScoreKey) => locked.has(k) ? (
+    <button type="button" onClick={() => unlock(k)} title={canEdit ? "Đã chuyển sang CSDL – bấm để mở khóa" : "Đã chuyển sang CSDL"}
+      className="ml-1 inline-flex align-middle text-amber-600 hover:text-amber-700"><Lock className="h-3.5 w-3.5" /></button>
+  ) : null;
 
   return (
     <AppShell>
@@ -79,7 +126,7 @@ function ScoreTransferPage() {
         <div>
           <h1 className="text-lg font-semibold">Chuyển điểm thi sang CSDL</h1>
           <p className="text-muted-foreground">
-            {canEdit ? "Ban giám hiệu có thể chỉnh sửa điểm trước khi xác nhận chuyển." : "Chỉ Ban giám hiệu được sửa điểm."} Điểm thang 0–10, tối đa 1 chữ số thập phân, dùng dấu "." (VD: 8.5).
+            {canEdit ? "Ban giám hiệu có thể chỉnh sửa điểm trước khi xác nhận chuyển." : "Chỉ Ban giám hiệu được sửa điểm."} Điểm thang 0–10, tối đa 1 chữ số thập phân, dùng dấu "." (VD: 8.5). Cột có biểu tượng <Lock className="inline h-3 w-3" /> đã được chuyển; BGH bấm vào biểu tượng để mở khóa.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -87,58 +134,62 @@ function ScoreTransferPage() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input className="pl-8 h-9" placeholder="Tìm tên học sinh" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
-          <Select value={khoi} onValueChange={(v) => { setKhoi(v); setLop("all"); }}>
-            <SelectTrigger className="w-36 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả khối</SelectItem>
-              {["3", "4", "5"].map((k) => <SelectItem key={k} value={k}>Khối {k}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={lop} onValueChange={setLop}>
-            <SelectTrigger className="w-36 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả lớp</SelectItem>
-              {lopOptions.map((c) => <SelectItem key={c} value={c}>Lớp {c}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <MultiCheck label="Khối" value={khoi} options={["3", "4", "5"].map((k) => ({ v: k, l: `Khối ${k}` }))}
+            onChange={(v) => { setKhoi(v); setLop((l) => l.filter((c) => v.length === 0 || v.includes(c[0]))); }} />
+          <MultiCheck label="Lớp" value={lop} options={lopOptions.map((c) => ({ v: c, l: `Lớp ${c}` }))} onChange={setLop} />
           <div className="ml-auto flex gap-2">
             <Button variant="outline" size="sm" onClick={exportExcel}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
-            <Button size="sm" onClick={confirm} disabled={!canEdit}><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
+            <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
           </div>
         </div>
+        {conflicts > 0 && <p className="text-destructive">Có {conflicts} học sinh có cả 2 đầu điểm GKI (1) và (2) – được tô đỏ trong bảng.</p>}
         {transferred && <p className="text-emerald-700">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
         <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
-          <table className="w-full">
-            <thead className="sticky top-0 bg-muted">
+          <table className="w-full border-separate border-spacing-0">
+            <thead className="sticky top-0 bg-muted z-10">
+              <tr>
+                <th colSpan={5} className={`${th} text-center border-r`}>Thông tin học sinh</th>
+                <th colSpan={5} className={`${th} text-center`}>Điểm thi</th>
+              </tr>
               <tr className="text-left">
-                {["STT", "Họ và tên học sinh", "Ngày sinh", "Khối", "Lớp", ...COLS.map((c) => c.label)].map((h) => (
-                  <th key={h} className="px-3 py-2 font-medium whitespace-nowrap">{h}</th>
+                {["STT", "Họ và tên học sinh", "Ngày sinh", "Khối", "Lớp"].map((h, i) => (
+                  <th key={h} rowSpan={2} className={`${th} ${i === 4 ? "border-r" : ""}`}>{h}</th>
                 ))}
+                <th colSpan={2} className={`${th} text-center`}>Điểm GKI</th>
+                {COLS.slice(2).map((c) => <th key={c.key} rowSpan={2} className={`${th} text-center`}>{c.label}{lockBtn(c.key)}</th>)}
+              </tr>
+              <tr>
+                {COLS.slice(0, 2).map((c) => <th key={c.key} className={`${th} text-center`}>{c.sub}{lockBtn(c.key)}</th>)}
               </tr>
             </thead>
             <tbody>
-              {shown.map((r, i) => (
-                <tr key={r.id} className="border-t">
-                  <td className="px-3 py-1.5">{i + 1}</td>
-                  <td className="px-3 py-1.5 font-medium">{r.name}</td>
-                  <td className="px-3 py-1.5">{r.dob}</td>
-                  <td className="px-3 py-1.5">{r.khoi}</td>
-                  <td className="px-3 py-1.5">{r.lop}</td>
-                  {COLS.map((c) => {
-                    const v = r[c.key];
-                    const bad = !isValidScore(v);
-                    return (
-                      <td key={c.key} className="px-3 py-1.5">
-                        {canEdit ? (
-                          <Input inputMode="decimal" aria-label={`${c.label} ${r.name}`} value={v} onChange={(e) => update(r.id, c.key, e.target.value)}
-                            className={`h-8 w-20 text-center ${bad ? "border-destructive text-destructive" : ""}`} title={bad ? "Điểm từ 0 đến 10, tối đa 1 chữ số thập phân" : undefined} />
-                        ) : <span>{v || "–"}</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-              {shown.length === 0 && <tr><td colSpan={9} className="px-3 py-6 text-center text-muted-foreground">Không có học sinh phù hợp</td></tr>}
+              {shown.map((r, i) => {
+                const clash = conflict(r);
+                return (
+                  <tr key={r.id} className={clash ? "bg-destructive/10" : ""}>
+                    <td className="px-3 py-1.5 border-b">{i + 1}</td>
+                    <td className={`px-3 py-1.5 border-b font-medium ${clash ? "text-destructive" : ""}`}>{r.name}</td>
+                    <td className="px-3 py-1.5 border-b">{r.dob}</td>
+                    <td className="px-3 py-1.5 border-b">{r.khoi}</td>
+                    <td className="px-3 py-1.5 border-b border-r">{r.lop}</td>
+                    {COLS.map((c) => {
+                      const v = r[c.key];
+                      const bad = !isValidScore(v) || (clash && (c.key === "gk1a" || c.key === "gk1b"));
+                      const isLocked = locked.has(c.key);
+                      return (
+                        <td key={c.key} className="px-3 py-1.5 border-b text-center">
+                          {canEdit && !isLocked ? (
+                            <Input inputMode="decimal" aria-label={`${c.label} ${c.sub ?? ""} ${r.name}`} value={v} onChange={(e) => update(r.id, c.key, e.target.value)}
+                              className={`h-8 w-20 mx-auto text-center ${bad ? "border-destructive text-destructive bg-destructive/10" : ""}`}
+                              title={clash ? "Học sinh có cả 2 đầu điểm GKI" : bad ? "Điểm từ 0 đến 10, tối đa 1 chữ số thập phân" : undefined} />
+                          ) : <span className={bad ? "text-destructive font-semibold" : isLocked ? "text-muted-foreground" : ""}>{v || "–"}</span>}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+              {shown.length === 0 && <tr><td colSpan={10} className="px-3 py-6 text-center text-muted-foreground">Không có học sinh phù hợp</td></tr>}
             </tbody>
           </table>
         </div>
