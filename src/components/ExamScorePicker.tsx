@@ -16,18 +16,18 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState("all");
-  const [content, setContent] = useState("all");
+  const [content, setContent] = useState<string>(SCORE_CONTENT_KINDS[0].value);
   const [selected, setSelected] = useState("");
   const [scoreType, setScoreType] = useState<ImportScoreType | "">("");
   const sources = includeAssessments ? [...scoreSourceAssessments(), ...scoreSourceExams(exams)] : scoreSourceExams(exams);
   const shown = filterSourceExams(sources, addedIds, query, level, includeAssessments ? content : "all");
   const chosen = shown.find((e) => e.id === selected);
   const groups = includeAssessments
-    ? [...SCORE_CONTENT_KINDS.filter((k) => content === "all" || k.value === content).flatMap((k) => k.value === "ky-thi"
+    ? [...SCORE_CONTENT_KINDS.filter((k) => k.value === content).flatMap((k) => k.value === "ky-thi"
       ? LEVELS.filter((g) => level === "all" || g.value === level).map((g) => ({ key: `ky-thi-${g.value}`, label: g.label, items: shown.filter((e) => e.kind === "ky-thi" && e.level === g.value) }))
       : [{ key: k.value, label: k.label, items: shown.filter((e) => e.kind === k.value) }])]
     : LEVELS.filter((g) => level === "all" || g.value === level).map((g) => ({ key: g.value, label: g.label, items: shown.filter((e) => e.level === g.value) }));
-  const reset = () => { setQuery(""); setLevel("all"); setContent("all"); setSelected(""); setScoreType(""); };
+  const reset = () => { setQuery(""); setLevel("all"); setContent(SCORE_CONTENT_KINDS[0].value); setSelected(""); setScoreType(""); };
   return <>
     <Button variant="outline" size="icon" className="ml-2 h-6 w-6 align-middle" aria-label="Lấy điểm từ kỳ thi khác" title="Lấy điểm từ kỳ thi khác" onClick={() => { reset(); setOpen(true); }}><Plus className="h-4 w-4" /></Button>
     <Dialog open={open} onOpenChange={setOpen}>
@@ -42,7 +42,7 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
         </section>
         <div className="flex flex-wrap gap-2 border-t pt-4 shrink-0">
           <div className="relative flex-1 min-w-44"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input aria-label="Tìm tên kỳ thi" placeholder="Tìm tên kỳ thi" value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" /></div>
-          {includeAssessments && <Select value={content} onValueChange={setContent}><SelectTrigger aria-label="Nội dung" className="w-44"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả nội dung</SelectItem>{SCORE_CONTENT_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent></Select>}
+          {includeAssessments && <Select value={content} onValueChange={setContent}><SelectTrigger aria-label="Nội dung" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{SCORE_CONTENT_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent></Select>}
           <Select value={level} onValueChange={setLevel}><SelectTrigger aria-label="Loại kỳ thi" className="w-48"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả</SelectItem><SelectItem value="so">Cấp Sở</SelectItem><SelectItem value="xa">Xã/phường</SelectItem><SelectItem value="truong">Cấp trường</SelectItem></SelectContent></Select>
         </div>
         <div className="min-h-0 overflow-auto border rounded">
