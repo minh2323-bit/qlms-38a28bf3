@@ -71,6 +71,7 @@ const TEACHER_NAV: NavItem[] = [
     submenu: [
       { icon: TrendingUp, label: "Thống kê", to: "/thong-ke" },
       { icon: BarChart3, label: "Báo cáo" },
+      { icon: DatabaseZap, label: "Chuyển điểm sang CSDL", to: "/thong-ke/chuyen-diem" },
     ],
   },
   {

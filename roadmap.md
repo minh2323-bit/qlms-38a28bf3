@@ -5,3 +5,8 @@
 - [x] Verify mock creation, approval, viewing, supervision and grading flows and focused rule tests.
 
 Scope: this project remains a mockup. Exam data and account selection are in-memory; real authenticated permissions, durable storage and live student submissions are not implemented.
+
+# Teacher score transfer
+
+- [x] Add the final teacher Statistics & Reports submenu and assessment-score page.
+- [x] Verify multi-select filters, score validation, export and mock confirmation/locking.
