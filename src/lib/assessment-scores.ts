@@ -1,4 +1,4 @@
-export const ASSESSMENT_COLUMNS = [1, 2, 3, 4, 5].map((n) => ({ key: `dgtx${n}`, label: `Điểm ĐGTX ${n}` }));
+export const ASSESSMENT_COLUMNS = [1, 2, 3, 4, 5].map((n) => ({ key: `dgtx${n}`, label: n === 4 ? "Điểm GKI" : n === 5 ? "Điểm CKI" : `Điểm ĐGTX ${n}` }));
 export const ASSESSMENT_CLASSES = ["3A", "3B", "4A", "4B", "5A", "5B"];
 export type AssessmentRow = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string; scores: Record<string, string> };
 const names = ["Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Khánh Chi", "Phạm Đức Duy", "Hoàng Thu Hà", "Vũ Quang Huy"];

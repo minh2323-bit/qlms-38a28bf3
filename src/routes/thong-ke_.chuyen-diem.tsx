@@ -73,6 +73,7 @@ function AssessmentTransferPage() {
       </div>
       {invalid && <p role="alert" className="text-destructive">Điểm phải từ 0 đến 10, tối đa 1 chữ số thập phân và dùng dấu ".".</p>}
       {confirmed && <p role="status" className="text-exam-success">Đã xác nhận điểm (mô phỏng).</p>}
+      <p className="text-foreground">Sau khi nhấn "Xác nhận" các cột điểm sẽ bị khóa. Chọn mở khóa cột điểm để sửa</p>
       <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
         <table className="w-full border-separate border-spacing-0">
           <thead className="sticky top-0 z-10 bg-muted">
