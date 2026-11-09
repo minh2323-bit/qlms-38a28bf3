@@ -13,3 +13,4 @@
 - Official exams use `src/lib/official-exams.ts` as their shared mock domain store and `src/components/exams` for list, creation and detail flows; all account checks are presentation-only, not authenticated authorization.
 - The mock account selector shares in-memory context through `src/lib/demo-account.ts` so shared exam URLs retain the selected account without browser-storage authorization claims.
 - Teacher assessment transfer uses a separate mock domain from exam transfer so assessment edits and confirmation locks cannot affect exam scores; confirmation remains in-memory, not a live CSDL integration.
+- Both score-transfer pages share ScoreTypeFilter and score-column selection logic; visibility selection only narrows available columns and never changes score data or confirmation permissions.

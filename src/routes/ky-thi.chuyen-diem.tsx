@@ -5,12 +5,14 @@ import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search } from "lucide-reac
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppShell } from "@/components/AppShell";
+import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { useDemoAccount } from "@/lib/demo-account";
 import { downloadCsv } from "@/lib/report-export";
 import { isValidScore } from "@/lib/score";
+import { visibleScoreColumns } from "@/lib/score-column-filter";
 
 export const Route = createFileRoute("/ky-thi/chuyen-diem")({
   head: () => ({
@@ -82,6 +84,7 @@ function ScoreTransferPage() {
   const [q, setQ] = useState("");
   const [khoi, setKhoi] = useState<string[]>([]);
   const [lop, setLop] = useState<string[]>([]);
+  const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
   const [locked, setLocked] = useState<Set<ScoreKey>>(new Set(["ck1"]));
   const [transferred, setTransferred] = useState<string | null>(null);
 
@@ -91,7 +94,8 @@ function ScoreTransferPage() {
   const invalid = rows.some((r) => COLS.some((c) => !isValidScore(r[c.key])));
   const conflicts = rows.filter(conflict).length;
   // GV chỉ thấy cột điểm BGH đã xác nhận chuyển sang CSDL
-  const cols = canEdit ? COLS : COLS.filter((c) => locked.has(c.key));
+  const availableCols = canEdit ? COLS : COLS.filter((c) => locked.has(c.key));
+  const cols = visibleScoreColumns(availableCols, hiddenScoreKeys);
   const gk1Cols = cols.filter((c) => c.sub);
   const otherCols = cols.filter((c) => !c.sub);
 
@@ -141,6 +145,7 @@ function ScoreTransferPage() {
           <MultiCheck label="Khối" value={khoi} options={["3", "4", "5"].map((k) => ({ v: k, l: `Khối ${k}` }))}
             onChange={(v) => { setKhoi(v); setLop((l) => l.filter((c) => v.length === 0 || v.includes(c[0]))); }} />
           <MultiCheck label="Lớp" value={lop} options={lopOptions.map((c) => ({ v: c, l: `Lớp ${c}` }))} onChange={setLop} />
+          <ScoreTypeFilter columns={availableCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
           <div className="ml-auto flex gap-2">
             <Button variant="outline" size="sm" onClick={exportExcel}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
             <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>

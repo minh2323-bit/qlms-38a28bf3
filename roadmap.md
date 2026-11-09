@@ -10,3 +10,8 @@ Scope: this project remains a mockup. Exam data and account selection are in-mem
 
 - [x] Add the final teacher Statistics & Reports submenu and assessment-score page.
 - [x] Verify multi-select filters, score validation, export and mock confirmation/locking.
+
+# Score type filter
+
+- [x] Add matching checked score-type dropdowns to both score-transfer pages.
+- [x] Verify column visibility, teacher confirmed-column restrictions, and filtered exports.
