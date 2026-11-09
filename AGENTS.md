@@ -15,3 +15,4 @@
 - Teacher assessment transfer uses a separate mock domain from exam transfer so assessment edits and confirmation locks cannot affect exam scores; confirmation remains in-memory, not a live CSDL integration.
 - Both score-transfer pages share ScoreTypeFilter and score-column selection logic; visibility selection only narrows available columns and never changes score data or confirmation permissions.
 - Both score-transfer pages share SubjectFilter and score-subjects filtering so subject selections, empty selection and exports follow the same behavior without coupling the mock score stores.
+- Both transfer pages share ExamScorePicker and exam-score-import adapters; imported exams add independent in-memory score columns, match students by CCCD plus subject, and never overwrite existing scores or bypass confirmation locks.

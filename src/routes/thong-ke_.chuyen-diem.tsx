@@ -15,6 +15,8 @@ import { ASSESSMENT_CLASSES, ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessme
 import { downloadCsv } from "@/lib/report-export";
 import { isValidScore } from "@/lib/score";
 import { visibleScoreColumns } from "@/lib/score-column-filter";
+import { ExamScorePicker } from "@/components/ExamScorePicker";
+import { importExamColumn, sameScoreStudent, type ImportedScoreColumn, type ImportScoreType, type ScoreSourceExam } from "@/lib/exam-score-import";
 
 export const Route = createFileRoute("/thong-ke_/chuyen-diem")({
   head: () => ({ meta: [
@@ -44,21 +46,34 @@ function MultiFilter({ label, values, options, onChange }: { label: string; valu
 
 function AssessmentTransferPage() {
   const [rows, setRows] = useState(ASSESSMENT_ROWS);
+  const [importedCols, setImportedCols] = useState<ImportedScoreColumn[]>([]);
+  const allCols: { key: string; label: string; examName?: string }[] = [...ASSESSMENT_COLUMNS, ...importedCols];
   const [query, setQuery] = useState("");
   const [grades, setGrades] = useState<string[]>([]);
   const [classes, setClasses] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<string[]>([...SCORE_SUBJECTS]);
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
-  const cols = visibleScoreColumns(ASSESSMENT_COLUMNS, hiddenScoreKeys);
+  const cols = visibleScoreColumns(allCols, hiddenScoreKeys);
   const [locked, setLocked] = useState<Set<string>>(new Set());
   const [confirmed, setConfirmed] = useState(false);
   const shown = useMemo(() => filterAssessmentRows(rows, query, grades, classes, subjects), [rows, query, grades, classes, subjects]);
-  const invalid = shown.some((r) => ASSESSMENT_COLUMNS.some((c) => !isValidScore(r.scores[c.key])));
+  const invalid = shown.some((r) => allCols.some((c) => !isValidScore(r.scores[c.key] ?? "")));
+  const addExam = (exam: ScoreSourceExam, type: ImportScoreType) => {
+    const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
+    const next = rows.map((r) => ({ ...r, scores: { ...r.scores, [column.key]: exam.students.find((s) => sameScoreStudent(r, s))?.score ?? "" } }));
+    for (const student of exam.students) {
+      if (next.some((r) => sameScoreStudent(r, student))) continue;
+      next.push({ id: `${exam.id}-${student.cccd}-${next.length}`, name: student.name, cccd: student.cccd, dob: student.dob, khoi: student.khoi, lop: student.lop, mon: student.mon,
+        scores: { ...Object.fromEntries(allCols.map((c) => [c.key, ""])), [column.key]: student.score } });
+    }
+    setRows(next); setImportedCols((previous) => [...previous, column]); setConfirmed(false);
+    toast.success(`Đã thêm điểm kỳ thi ${exam.name} (mô phỏng).`);
+  };
   const classOptions = ASSESSMENT_CLASSES.filter((c) => !grades.length || grades.includes(c[0]));
   const header = ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"];
   const confirm = () => {
     if (invalid || !shown.length) return;
-    setLocked((previous) => new Set([...previous, ...ASSESSMENT_COLUMNS.filter((c) => shown.some((r) => r.scores[c.key] !== "")).map((c) => c.key)]));
+    setLocked((previous) => new Set([...previous, ...allCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key)]));
     setConfirmed(true);
     toast.success(`Đã xác nhận điểm của ${shown.length} học sinh (mô phỏng).`);
   };
@@ -74,7 +89,7 @@ function AssessmentTransferPage() {
         <MultiFilter label="Khối" values={grades} options={["3", "4", "5"]} onChange={(v) => { setGrades(v); setClasses((cs) => cs.filter((c) => !v.length || v.includes(c[0]))); }} />
         <MultiFilter label="Lớp" values={classes} options={classOptions} onChange={setClasses} />
         <SubjectFilter selected={subjects} onChange={setSubjects} />
-        <ScoreTypeFilter columns={ASSESSMENT_COLUMNS} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
+        <ScoreTypeFilter columns={allCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
         <div className="ml-auto flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => downloadCsv("chuyen-diem-dgtx-csdl.csv", [...header, ...cols.map((c) => c.label)], shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, r.mon, ...cols.map((c) => r.scores[c.key])]))}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
           <Button size="sm" className="bg-exam-success text-primary-foreground hover:bg-exam-success/90" disabled={invalid || !shown.length} onClick={confirm}><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
@@ -86,20 +101,20 @@ function AssessmentTransferPage() {
       <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
         <table className="w-full border-separate border-spacing-0">
           <thead className="sticky top-0 z-10 bg-muted">
-            <tr><th colSpan={7} className={`${th} border-r text-center`}>Thông tin học sinh</th>{cols.length > 0 && <th colSpan={cols.length} className={`${th} text-center`}>Điểm số</th>}</tr>
+            <tr><th colSpan={7} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={importedCols.map((c) => c.examId)} onConfirm={addExam} /></th></tr>
             <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>)}
-              {cols.map((c) => <th key={c.key} className={`${th} text-center`}>{c.label}{locked.has(c.key) && <Lock aria-label="Đã xác nhận" className="inline ml-1 h-3.5 w-3.5 text-exam-warning" />}</th>)}
+              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Lock aria-label="Đã xác nhận" className="inline ml-1 h-3.5 w-3.5 text-exam-warning" />}</th>)}
             </tr>
           </thead>
           <tbody>{shown.map((r, i) => <tr key={r.id}>
             {[i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, r.mon].map((v, index) => <td key={index} className={`px-3 py-1.5 border-b whitespace-nowrap ${index === 1 ? "font-medium" : ""} ${index === 6 ? "border-r" : ""}`}>{v}</td>)}
             {cols.map((c) => <td key={c.key} className="px-3 py-1.5 border-b text-center">
-              {locked.has(c.key) ? <span className="text-muted-foreground">{r.scores[c.key] || "–"}</span> : <Input inputMode="decimal" aria-label={`${c.label} ${r.name} ${r.lop}`} value={r.scores[c.key]} onChange={(e) => {
+              {locked.has(c.key) ? <span className="text-muted-foreground">{r.scores[c.key] || "–"}</span> : <Input inputMode="decimal" aria-label={`${c.label} ${r.name} ${r.lop}`} value={r.scores[c.key] ?? ""} onChange={(e) => {
                 const value = e.target.value;
                 if (!/^\d{0,2}(\.\d?)?$/.test(value)) return;
                 setConfirmed(false);
                 setRows((rs) => rs.map((row) => row.id === r.id ? { ...row, scores: { ...row.scores, [c.key]: value } } : row));
-              }} className={`h-8 w-20 mx-auto text-center ${!isValidScore(r.scores[c.key]) ? "border-destructive text-destructive" : ""}`} />}
+              }} className={`h-8 w-20 mx-auto text-center ${!isValidScore(r.scores[c.key] ?? "") ? "border-destructive text-destructive" : ""}`} />}
             </td>)}
           </tr>)}{!shown.length && <tr><td colSpan={7 + cols.length} className="text-center p-6 text-muted-foreground">Không có học sinh phù hợp</td></tr>}</tbody>
         </table>

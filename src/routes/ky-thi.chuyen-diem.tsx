@@ -15,6 +15,8 @@ import { useDemoAccount } from "@/lib/demo-account";
 import { downloadCsv } from "@/lib/report-export";
 import { isValidScore } from "@/lib/score";
 import { visibleScoreColumns } from "@/lib/score-column-filter";
+import { ExamScorePicker } from "@/components/ExamScorePicker";
+import { importExamColumn, sameScoreStudent, type ImportedScoreColumn, type ImportScoreType, type ScoreSourceExam } from "@/lib/exam-score-import";
 
 export const Route = createFileRoute("/ky-thi/chuyen-diem")({
   head: () => ({
@@ -30,7 +32,7 @@ export const Route = createFileRoute("/ky-thi/chuyen-diem")({
   component: ScoreTransferPage,
 });
 
-type ScoreKey = "gk1a" | "gk1b" | "ck1" | "gk2" | "ck2";
+type ScoreKey = string;
 type Row = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string; mon: string } & Record<ScoreKey, string>;
 
 const NAMES = ["Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Khánh Chi", "Phạm Đức Duy", "Hoàng Thu Hà", "Vũ Quang Huy", "Đặng Ngọc Lan", "Bùi Hải Long", "Phí Song Ngân", "Đỗ Minh Quân", "Ngô Thảo Vy", "Lý Tuấn Kiệt"];
@@ -84,6 +86,8 @@ function ScoreTransferPage() {
   const account = useDemoAccount();
   const canEdit = account === "principal";
   const [rows, setRows] = useState(INITIAL);
+  const [importedCols, setImportedCols] = useState<ImportedScoreColumn[]>([]);
+  const allCols: { key: string; label: string; sub?: string; examName?: string }[] = [...COLS, ...importedCols];
   const [q, setQ] = useState("");
   const [khoi, setKhoi] = useState<string[]>([]);
   const [lop, setLop] = useState<string[]>([]);
@@ -95,13 +99,26 @@ function ScoreTransferPage() {
   const lopOptions = CLASSES.filter((c) => khoi.length === 0 || khoi.includes(c[0]));
   const shown = useMemo(() => filterScoreSubjects(rows, subjects).filter((r) =>
     r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi.length === 0 || khoi.includes(r.khoi)) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop, subjects]);
-  const invalid = rows.some((r) => COLS.some((c) => !isValidScore(r[c.key])));
-  const conflicts = rows.filter(conflict).length;
+  const invalid = rows.some((r) => allCols.some((c) => !isValidScore(r[c.key] ?? "")));
+  const hasConflict = (r: Row) => allCols.some((c) => allCols.filter((other) => other.label === c.label && (r[other.key] ?? "").trim() !== "").length > 1);
+  const conflicts = rows.filter(hasConflict).length;
   // GV chỉ thấy cột điểm BGH đã xác nhận chuyển sang CSDL
-  const availableCols = canEdit ? COLS : COLS.filter((c) => locked.has(c.key));
-  const cols = visibleScoreColumns(availableCols, hiddenScoreKeys);
-  const gk1Cols = cols.filter((c) => c.sub);
-  const otherCols = cols.filter((c) => !c.sub);
+  const availableCols = canEdit ? allCols : allCols.filter((c) => locked.has(c.key));
+  const filteredCols = visibleScoreColumns(availableCols, hiddenScoreKeys);
+  const cols = [...new Set(filteredCols.map((c) => c.label))].flatMap((label) => filteredCols.filter((c) => c.label === label));
+  const groups = [...new Set(cols.map((c) => c.label))].map((label) => ({ label, columns: cols.filter((c) => c.label === label) }));
+  const addExam = (exam: ScoreSourceExam, type: ImportScoreType) => {
+    if (!canEdit) return;
+    const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
+    const next = rows.map((r) => ({ ...r, [column.key]: exam.students.find((s) => sameScoreStudent(r, s))?.score ?? "" }));
+    for (const student of exam.students) {
+      if (next.some((r) => sameScoreStudent(r, student))) continue;
+      next.push({ id: `${exam.id}-${student.cccd}-${next.length}`, name: student.name, cccd: student.cccd, dob: student.dob, khoi: student.khoi, lop: student.lop, mon: student.mon,
+        ...Object.fromEntries(allCols.map((c) => [c.key, ""])), [column.key]: student.score });
+    }
+    setRows(next); setImportedCols((previous) => [...previous, column]); setTransferred(null);
+    toast.success(`Đã thêm điểm kỳ thi ${exam.name} (mô phỏng).`);
+  };
 
   const update = (id: string, key: ScoreKey, v: string) => {
     if (!/^\d{0,2}(\.\d?)?$/.test(v)) return;
@@ -119,8 +136,8 @@ function ScoreTransferPage() {
 
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
-    if (conflicts) { toast.error(`Có ${conflicts} học sinh có cả 2 đầu điểm GKI. Vui lòng xóa 1 đầu điểm trước khi chuyển.`); return; }
-    setLocked(new Set(COLS.filter((c) => rows.some((r) => r[c.key].trim() !== "")).map((c) => c.key)));
+    if (conflicts) { toast.error(`Có ${conflicts} học sinh có nhiều đầu điểm cùng loại. Vui lòng giữ 1 đầu điểm trước khi chuyển.`); return; }
+    setLocked(new Set(allCols.filter((c) => rows.some((r) => (r[c.key] ?? "").trim() !== "")).map((c) => c.key)));
     setTransferred(new Date().toLocaleString("vi-VN"));
     toast.success(`Đã chuyển điểm của ${shown.length} học sinh sang CSDL.`);
   };
@@ -156,7 +173,7 @@ function ScoreTransferPage() {
             <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
           </div>
         </div>
-        {conflicts > 0 && <p role="alert" className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có cả 2 đầu điểm GKI (1) và (2) – được tô đỏ trong bảng.</span></p>}
+        {conflicts > 0 && <p role="alert" className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có nhiều đầu điểm cùng loại – được tô đỏ trong bảng.</span></p>}
         <p className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Lưu ý: kiểm tra các học sinh đã có điểm GKI/CKI bên trang <Link to="/thong-ke/chuyen-diem" className="underline underline-offset-2 hover:text-primary">Chuyển điểm sang CSDL</Link>.</span></p>
         {transferred && <p className="text-emerald-700">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
         <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
@@ -164,22 +181,21 @@ function ScoreTransferPage() {
             <thead className="sticky top-0 bg-muted z-10">
               <tr>
                 <th colSpan={7} className={`${th} text-center border-r`}>Thông tin học sinh</th>
-                {cols.length > 0 && <th colSpan={cols.length} className={`${th} text-center`}>Điểm thi</th>}
+                <th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm thi{canEdit && <ExamScorePicker addedIds={importedCols.map((c) => c.examId)} onConfirm={addExam} />}</th>
               </tr>
               <tr className="text-left">
                 {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"].map((h, i) => (
                   <th key={h} rowSpan={2} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>
                 ))}
-                {gk1Cols.length > 0 && <th colSpan={gk1Cols.length} className={`${th} text-center`}>Điểm GKI</th>}
-                {otherCols.map((c) => <th key={c.key} rowSpan={2} className={`${th} text-center`}>{c.label}{lockBtn(c.key)}</th>)}
+                {groups.map((group) => <th key={group.label} colSpan={group.columns.length} rowSpan={group.columns.length > 1 ? 1 : 2} className={`${th} text-center`} title={group.columns[0]?.examName}>{group.label}{group.columns.length === 1 && lockBtn(group.columns[0].key)}</th>)}
               </tr>
               <tr>
-                {gk1Cols.map((c) => <th key={c.key} className={`${th} text-center`}>{c.sub}{lockBtn(c.key)}</th>)}
+                {groups.filter((g) => g.columns.length > 1).flatMap((g) => g.columns.map((c, i) => <th key={c.key} className={`${th} text-center`} title={c.examName}>({i + 1}){lockBtn(c.key)}</th>))}
               </tr>
             </thead>
             <tbody>
               {shown.map((r, i) => {
-                const clash = conflict(r);
+                const clash = hasConflict(r);
                 return (
                   <tr key={r.id} className={clash ? "bg-destructive/10" : ""}>
                     <td className="px-3 py-1.5 border-b">{i + 1}</td>
@@ -190,8 +206,8 @@ function ScoreTransferPage() {
                     <td className="px-3 py-1.5 border-b">{r.lop}</td>
                     <td className="px-3 py-1.5 border-b border-r whitespace-nowrap">{r.mon}</td>
                     {cols.map((c) => {
-                      const v = r[c.key];
-                      const bad = !isValidScore(v) || (clash && (c.key === "gk1a" || c.key === "gk1b"));
+                      const v = r[c.key] ?? "";
+                      const bad = !isValidScore(v) || (clash && allCols.filter((other) => other.label === c.label && (r[other.key] ?? "").trim() !== "").length > 1);
                       const isLocked = locked.has(c.key);
                       return (
                         <td key={c.key} className="px-3 py-1.5 border-b text-center">

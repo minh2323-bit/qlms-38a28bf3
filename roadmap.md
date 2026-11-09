@@ -21,3 +21,9 @@ Scope: this project remains a mockup. Exam data and account selection are in-mem
 - [x] Add subject columns and default-all multi-checkbox subject filters on both transfer pages, including exports.
 - [x] Add the linked GKI/CKI reminder and dark warning text with red horizontal borders.
 - [x] Verify subject selection, exports and reminder navigation.
+
+# Add scores from other exams
+
+- [x] Add shared plus-button picker with score type, search, level filter, grouped single-choice exam list and confirmation on both transfer pages.
+- [x] Import selected exam scores without overwriting existing columns; exclude already-added exams and preserve existing confirmation permissions.
+- [x] Verify picker filters, single selection, added columns and exports with focused tests and browser checks.
