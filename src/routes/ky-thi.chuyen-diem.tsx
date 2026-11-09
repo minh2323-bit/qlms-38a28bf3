@@ -156,8 +156,8 @@ function ScoreTransferPage() {
             <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
           </div>
         </div>
-        {conflicts > 0 && <p role="alert" className="flex items-start gap-2 border-b border-destructive pb-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có cả 2 đầu điểm GKI (1) và (2) – được tô đỏ trong bảng.</span></p>}
-        <p className="flex items-start gap-2 border-b border-destructive pb-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Lưu ý: kiểm tra các học sinh đã có điểm GKI/CKI bên trang <Link to="/thong-ke/chuyen-diem" className="underline underline-offset-2 hover:text-primary">Chuyển điểm sang CSDL</Link>.</span></p>
+        {conflicts > 0 && <p role="alert" className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có cả 2 đầu điểm GKI (1) và (2) – được tô đỏ trong bảng.</span></p>}
+        <p className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Lưu ý: kiểm tra các học sinh đã có điểm GKI/CKI bên trang <Link to="/thong-ke/chuyen-diem" className="underline underline-offset-2 hover:text-primary">Chuyển điểm sang CSDL</Link>.</span></p>
         {transferred && <p className="text-emerald-700">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
         <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
           <table className="w-full border-separate border-spacing-0">
