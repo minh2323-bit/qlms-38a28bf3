@@ -101,7 +101,7 @@ function AssessmentTransferPage() {
       <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
         <table className="w-full border-separate border-spacing-0">
           <thead className="sticky top-0 z-10 bg-muted">
-            <tr><th colSpan={7} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={importedCols.map((c) => c.examId)} onConfirm={addExam} /></th></tr>
+            <tr><th colSpan={7} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={importedCols.map((c) => c.examId)} includeAssessments onConfirm={addExam} /></th></tr>
             <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>)}
               {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Lock aria-label="Đã xác nhận" className="inline ml-1 h-3.5 w-3.5 text-exam-warning" />}</th>)}
             </tr>

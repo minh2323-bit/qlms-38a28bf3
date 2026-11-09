@@ -1,7 +1,7 @@
 /// <reference types="bun" />
 import { expect, test } from "bun:test";
-import { filterSourceExams, importExamColumn, sameScoreStudent, type ScoreSourceExam } from "./exam-score-import";
-const exam: ScoreSourceExam = { id: "xa-1", name: "Kỳ thi cấp Xã Toán", level: "xa", date: "09/11/2026", participantCount: 1, students: [{ name: "An", cccd: "123", dob: "", khoi: "4", lop: "4A", mon: "Toán", score: "8.5" }] };
+import { filterSourceExams, importExamColumn, sameScoreStudent, scoreSourceAssessments, type ScoreSourceExam } from "./exam-score-import";
+const exam: ScoreSourceExam = { id: "xa-1", name: "Kỳ thi cấp Xã Toán", level: "xa", kind: "ky-thi", date: "09/11/2026", participantCount: 1, students: [{ name: "An", cccd: "123", dob: "", khoi: "4", lop: "4A", mon: "Toán", score: "8.5" }] };
 test("already-added exams are excluded regardless of selected score type", () => {
   expect(filterSourceExams([exam], ["xa-1"], "", "all")).toHaveLength(0);
   expect(() => importExamColumn(exam, "ck1", ["xa-1"])).toThrow();
@@ -25,4 +25,17 @@ test("score matching requires both student identity and subject", () => {
   expect(sameScoreStudent({ cccd: "123", mon: "Toán" }, exam.students[0])).toBe(true);
   expect(sameScoreStudent({ cccd: "456", mon: "Toán" }, exam.students[0])).toBe(false);
   expect(sameScoreStudent({ cccd: "123", mon: "Tiếng Anh" }, exam.students[0])).toBe(false);
+});
+test("content filter keeps only the chosen kind and level filter only narrows exams", () => {
+  const baiTap = scoreSourceAssessments().find((e) => e.kind === "bai-tap")!;
+  const sources = [exam, baiTap];
+  expect(filterSourceExams(sources, [], "", "all", "bai-tap")).toEqual([baiTap]);
+  expect(filterSourceExams(sources, [], "", "all", "ky-thi")).toEqual([exam]);
+  expect(filterSourceExams(sources, [], "", "so", "all")).toEqual([baiTap]);
+});
+test("every assessment source has importable 0–10 single-decimal scores", () => {
+  for (const source of scoreSourceAssessments()) {
+    expect(source.students.length).toBeGreaterThan(0);
+    expect(() => importExamColumn(source, "dgtx", [])).not.toThrow();
+  }
 });
