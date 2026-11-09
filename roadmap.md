@@ -15,3 +15,9 @@ Scope: this project remains a mockup. Exam data and account selection are in-mem
 
 - [x] Add matching checked score-type dropdowns to both score-transfer pages.
 - [x] Verify column visibility, teacher confirmed-column restrictions, and filtered exports.
+
+# Subject filters and transfer reminders
+
+- [x] Add subject columns and default-all multi-checkbox subject filters on both transfer pages, including exports.
+- [x] Add the linked GKI/CKI reminder and dark warning text with red horizontal borders.
+- [x] Verify subject selection, exports and reminder navigation.

@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search, TriangleAlert } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppShell } from "@/components/AppShell";
 import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
+import { SubjectFilter } from "@/components/SubjectFilter";
+import { SCORE_SUBJECTS, filterScoreSubjects } from "@/lib/score-subjects";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/ky-thi/chuyen-diem")({
 });
 
 type ScoreKey = "gk1a" | "gk1b" | "ck1" | "gk2" | "ck2";
-type Row = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string } & Record<ScoreKey, string>;
+type Row = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string; mon: string } & Record<ScoreKey, string>;
 
 const NAMES = ["Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Khánh Chi", "Phạm Đức Duy", "Hoàng Thu Hà", "Vũ Quang Huy", "Đặng Ngọc Lan", "Bùi Hải Long", "Phí Song Ngân", "Đỗ Minh Quân", "Ngô Thảo Vy", "Lý Tuấn Kiệt"];
 const CLASSES = ["3A", "3B", "4A", "4B", "5A", "5B"];
@@ -44,6 +46,7 @@ const INITIAL: Row[] = CLASSES.flatMap((lop, ci) =>
     const inB = i % 3 === 2;
     return {
       id: `${lop}-${i}`, name: n, cccd: `0012190${String(ci * 100 + i * 37 + 10000).padStart(5, "0")}`, khoi: lop[0], lop,
+      mon: SCORE_SUBJECTS[(ci + i) % SCORE_SUBJECTS.length],
       dob: `${String((i * 5 + ci) % 28 + 1).padStart(2, "0")}/${String((i + ci) % 12 + 1).padStart(2, "0")}/${year}`,
       gk1a: inB && !both ? "" : sc(0), gk1b: inB || both ? sc(4) : "",
       ck1: sc(1), gk2: sc(2), ck2: i === 5 ? "" : sc(3),
@@ -84,13 +87,14 @@ function ScoreTransferPage() {
   const [q, setQ] = useState("");
   const [khoi, setKhoi] = useState<string[]>([]);
   const [lop, setLop] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([...SCORE_SUBJECTS]);
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
   const [locked, setLocked] = useState<Set<ScoreKey>>(new Set(["ck1"]));
   const [transferred, setTransferred] = useState<string | null>(null);
 
   const lopOptions = CLASSES.filter((c) => khoi.length === 0 || khoi.includes(c[0]));
-  const shown = useMemo(() => rows.filter((r) =>
-    r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi.length === 0 || khoi.includes(r.khoi)) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop]);
+  const shown = useMemo(() => filterScoreSubjects(rows, subjects).filter((r) =>
+    r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi.length === 0 || khoi.includes(r.khoi)) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop, subjects]);
   const invalid = rows.some((r) => COLS.some((c) => !isValidScore(r[c.key])));
   const conflicts = rows.filter(conflict).length;
   // GV chỉ thấy cột điểm BGH đã xác nhận chuyển sang CSDL
@@ -110,8 +114,8 @@ function ScoreTransferPage() {
   };
 
   const exportExcel = () => downloadCsv("chuyen-diem-csdl.csv",
-    ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", ...cols.map((c) => `${c.label}${c.sub ? " " + c.sub : ""}`)],
-    shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, ...cols.map((c) => r[c.key])]));
+    ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn", ...cols.map((c) => `${c.label}${c.sub ? " " + c.sub : ""}`)],
+    shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, r.mon, ...cols.map((c) => r[c.key])]));
 
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
@@ -145,24 +149,26 @@ function ScoreTransferPage() {
           <MultiCheck label="Khối" value={khoi} options={["3", "4", "5"].map((k) => ({ v: k, l: `Khối ${k}` }))}
             onChange={(v) => { setKhoi(v); setLop((l) => l.filter((c) => v.length === 0 || v.includes(c[0]))); }} />
           <MultiCheck label="Lớp" value={lop} options={lopOptions.map((c) => ({ v: c, l: `Lớp ${c}` }))} onChange={setLop} />
+          <SubjectFilter selected={subjects} onChange={setSubjects} />
           <ScoreTypeFilter columns={availableCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
           <div className="ml-auto flex gap-2">
             <Button variant="outline" size="sm" onClick={exportExcel}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
             <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
           </div>
         </div>
-        {conflicts > 0 && <p className="text-destructive">Có {conflicts} học sinh có cả 2 đầu điểm GKI (1) và (2) – được tô đỏ trong bảng.</p>}
+        {conflicts > 0 && <p role="alert" className="flex items-start gap-2 border-b border-destructive pb-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có cả 2 đầu điểm GKI (1) và (2) – được tô đỏ trong bảng.</span></p>}
+        <p className="flex items-start gap-2 border-b border-destructive pb-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Lưu ý: kiểm tra các học sinh đã có điểm GKI/CKI bên trang <Link to="/thong-ke/chuyen-diem" className="underline underline-offset-2 hover:text-primary">Chuyển điểm sang CSDL</Link>.</span></p>
         {transferred && <p className="text-emerald-700">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
         <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
           <table className="w-full border-separate border-spacing-0">
             <thead className="sticky top-0 bg-muted z-10">
               <tr>
-                <th colSpan={6} className={`${th} text-center border-r`}>Thông tin học sinh</th>
+                <th colSpan={7} className={`${th} text-center border-r`}>Thông tin học sinh</th>
                 {cols.length > 0 && <th colSpan={cols.length} className={`${th} text-center`}>Điểm thi</th>}
               </tr>
               <tr className="text-left">
-                {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp"].map((h, i) => (
-                  <th key={h} rowSpan={2} className={`${th} ${i === 5 ? "border-r" : ""}`}>{h}</th>
+                {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"].map((h, i) => (
+                  <th key={h} rowSpan={2} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>
                 ))}
                 {gk1Cols.length > 0 && <th colSpan={gk1Cols.length} className={`${th} text-center`}>Điểm GKI</th>}
                 {otherCols.map((c) => <th key={c.key} rowSpan={2} className={`${th} text-center`}>{c.label}{lockBtn(c.key)}</th>)}
@@ -181,7 +187,8 @@ function ScoreTransferPage() {
                     <td className="px-3 py-1.5 border-b">{r.cccd}</td>
                     <td className="px-3 py-1.5 border-b">{r.dob}</td>
                     <td className="px-3 py-1.5 border-b">{r.khoi}</td>
-                    <td className="px-3 py-1.5 border-b border-r">{r.lop}</td>
+                    <td className="px-3 py-1.5 border-b">{r.lop}</td>
+                    <td className="px-3 py-1.5 border-b border-r whitespace-nowrap">{r.mon}</td>
                     {cols.map((c) => {
                       const v = r[c.key];
                       const bad = !isValidScore(v) || (clash && (c.key === "gk1a" || c.key === "gk1b"));
@@ -199,7 +206,7 @@ function ScoreTransferPage() {
                   </tr>
                 );
               })}
-              {shown.length === 0 && <tr><td colSpan={6 + cols.length} className="px-3 py-6 text-center text-muted-foreground">Không có học sinh phù hợp</td></tr>}
+              {shown.length === 0 && <tr><td colSpan={7 + cols.length} className="px-3 py-6 text-center text-muted-foreground">Không có học sinh phù hợp</td></tr>}
             </tbody>
           </table>
         </div>
