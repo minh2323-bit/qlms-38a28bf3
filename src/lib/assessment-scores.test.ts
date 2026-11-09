@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { describe, expect, test } from "bun:test";
 import { ASSESSMENT_ROWS, filterAssessmentRows } from "./assessment-scores";
 import { isValidScore } from "./score";

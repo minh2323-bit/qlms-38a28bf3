@@ -53,6 +53,7 @@ import { Route as LopHocSoIndexRouteImport } from './routes/lop-hoc-so.index'
 import { Route as LopHocSoClassIdRouteImport } from './routes/lop-hoc-so.$classId'
 import { Route as LopTrucTuyenIndexRouteImport } from './routes/lop-truc-tuyen.index'
 import { Route as LopTrucTuyenLiveIdRouteImport } from './routes/lop-truc-tuyen.$liveId'
+import { Route as ThongKeChuyenDiemRouteImport } from './routes/thong-ke_.chuyen-diem'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as GiaoBaiTapTaoMoiBaiTapDocRouteImport } from './routes/giao-bai-tap.tao-moi.bai-tap-doc'
 import { Route as GiaoBaiTapTaoMoiDeLuyenTapRouteImport } from './routes/giao-bai-tap.tao-moi.de-luyen-tap'
@@ -300,6 +301,11 @@ const LopTrucTuyenLiveIdRoute = LopTrucTuyenLiveIdRouteImport.update({
   path: '/$liveId',
   getParentRoute: () => LopTrucTuyenRoute,
 } as any)
+const ThongKeChuyenDiemRoute = ThongKeChuyenDiemRouteImport.update({
+  id: '/thong-ke_/chuyen-diem',
+  path: '/thong-ke/chuyen-diem',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -466,6 +472,7 @@ export interface FileRoutesByFullPath {
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRouteWithChildren
   '/lop-truc-tuyen/$liveId': typeof LopTrucTuyenLiveIdRoute
+  '/thong-ke/chuyen-diem': typeof ThongKeChuyenDiemRoute
   '/giao-bai-tap/': typeof GiaoBaiTapIndexRoute
   '/hoc-sinh/': typeof HocSinhIndexRoute
   '/lop-hoc-so/': typeof LopHocSoIndexRoute
@@ -530,6 +537,7 @@ export interface FileRoutesByTo {
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRouteWithChildren
   '/lop-truc-tuyen/$liveId': typeof LopTrucTuyenLiveIdRoute
+  '/thong-ke/chuyen-diem': typeof ThongKeChuyenDiemRoute
   '/giao-bai-tap': typeof GiaoBaiTapIndexRoute
   '/hoc-sinh': typeof HocSinhIndexRoute
   '/lop-hoc-so': typeof LopHocSoIndexRoute
@@ -600,6 +608,7 @@ export interface FileRoutesById {
   '/ky-thi/on-tap': typeof KyThiOnTapRoute
   '/lop-hoc-so/$classId': typeof LopHocSoClassIdRouteWithChildren
   '/lop-truc-tuyen/$liveId': typeof LopTrucTuyenLiveIdRoute
+  '/thong-ke_/chuyen-diem': typeof ThongKeChuyenDiemRoute
   '/giao-bai-tap/': typeof GiaoBaiTapIndexRoute
   '/hoc-sinh/': typeof HocSinhIndexRoute
   '/lop-hoc-so/': typeof LopHocSoIndexRoute
@@ -671,6 +680,7 @@ export interface FileRouteTypes {
     | '/ky-thi/on-tap'
     | '/lop-hoc-so/$classId'
     | '/lop-truc-tuyen/$liveId'
+    | '/thong-ke/chuyen-diem'
     | '/giao-bai-tap/'
     | '/hoc-sinh/'
     | '/lop-hoc-so/'
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/ky-thi/on-tap'
     | '/lop-hoc-so/$classId'
     | '/lop-truc-tuyen/$liveId'
+    | '/thong-ke/chuyen-diem'
     | '/giao-bai-tap'
     | '/hoc-sinh'
     | '/lop-hoc-so'
@@ -804,6 +815,7 @@ export interface FileRouteTypes {
     | '/ky-thi/on-tap'
     | '/lop-hoc-so/$classId'
     | '/lop-truc-tuyen/$liveId'
+    | '/thong-ke_/chuyen-diem'
     | '/giao-bai-tap/'
     | '/hoc-sinh/'
     | '/lop-hoc-so/'
@@ -862,6 +874,7 @@ export interface RootRouteChildren {
   KyThiDeThiRoute: typeof KyThiDeThiRoute
   KyThiNganHangCauHoiRoute: typeof KyThiNganHangCauHoiRoute
   KyThiOnTapRoute: typeof KyThiOnTapRoute
+  ThongKeChuyenDiemRoute: typeof ThongKeChuyenDiemRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   HocLieuBaiGiangLessonSlugRoute: typeof HocLieuBaiGiangLessonSlugRoute
   HocLieuBaiGiangTaoMoiRoute: typeof HocLieuBaiGiangTaoMoiRoute
@@ -1189,6 +1202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LopTrucTuyenLiveIdRouteImport
       parentRoute: typeof LopTrucTuyenRoute
     }
+    '/thong-ke_/chuyen-diem': {
+      id: '/thong-ke_/chuyen-diem'
+      path: '/thong-ke/chuyen-diem'
+      fullPath: '/thong-ke/chuyen-diem'
+      preLoaderRoute: typeof ThongKeChuyenDiemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -1490,6 +1510,7 @@ const rootRouteChildren: RootRouteChildren = {
   KyThiDeThiRoute: KyThiDeThiRoute,
   KyThiNganHangCauHoiRoute: KyThiNganHangCauHoiRoute,
   KyThiOnTapRoute: KyThiOnTapRoute,
+  ThongKeChuyenDiemRoute: ThongKeChuyenDiemRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   HocLieuBaiGiangLessonSlugRoute: HocLieuBaiGiangLessonSlugRoute,
   HocLieuBaiGiangTaoMoiRoute: HocLieuBaiGiangTaoMoiRoute,
