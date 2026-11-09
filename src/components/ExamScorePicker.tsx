@@ -32,7 +32,7 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
     <Button variant="outline" size="icon" className="ml-2 h-6 w-6 align-middle" aria-label="Lấy điểm từ kỳ thi khác" title="Lấy điểm từ kỳ thi khác" onClick={() => { reset(); setOpen(true); }}><Plus className="h-4 w-4" /></Button>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-4xl max-h-[90dvh] flex flex-col gap-4 p-4 sm:p-6 text-[13px] text-foreground">
-        <DialogHeader className="shrink-0"><DialogTitle>Lấy điểm từ kỳ thi khác</DialogTitle></DialogHeader>
+        <DialogHeader className="shrink-0"><DialogTitle>{includeAssessments ? "Lấy điểm từ nội dung khác" : "Lấy điểm từ kỳ thi khác"}</DialogTitle></DialogHeader>
         <section className="flex flex-wrap items-center gap-3 shrink-0">
           <h2 className="font-semibold shrink-0">Loại điểm</h2>
           <Select value={scoreType} onValueChange={(v) => setScoreType(v as ImportScoreType)}>
@@ -47,8 +47,8 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
         </div>
         <div className="min-h-0 overflow-auto border rounded">
           <RadioGroup aria-label="Chọn kỳ thi" value={selected} onValueChange={setSelected} className="block">
-            <table className="w-full min-w-[580px] text-left"><thead className="sticky top-0 bg-muted"><tr><th className="p-3 font-medium text-center">Tên kỳ thi</th><th className="p-3 font-medium text-center whitespace-nowrap">Ngày diễn ra</th><th className="p-3 font-medium text-center w-40">Số thí sinh dự thi của trường</th></tr></thead>
-              <tbody>{groups.map((group) => <GroupRows key={group.key} label={group.label} exams={group.items} selected={selected} />)}</tbody>
+            <table className="w-full min-w-[580px] text-left"><thead className="sticky top-0 bg-muted"><tr><th className="p-3 font-medium text-center">Tên kỳ thi</th><th className="p-3 font-medium text-center whitespace-nowrap">Ngày diễn ra</th><th className="p-3 font-medium text-center w-40">{includeAssessments ? "Số học sinh nộp" : "Số thí sinh dự thi của trường"}</th>{includeAssessments && <th className="p-3 font-medium text-center w-40">Số học sinh đã chấm</th>}</tr></thead>
+              <tbody>{groups.map((group) => <GroupRows key={group.key} label={group.label} exams={group.items} selected={selected} showGraded={includeAssessments} />)}</tbody>
             </table>
           </RadioGroup>
         </div>
@@ -58,9 +58,10 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
   </>;
 }
 
-function GroupRows({ label, exams, selected }: { label: string; exams: ScoreSourceExam[]; selected: string }) {
-  return <><tr><th colSpan={3} className="px-3 py-2 bg-muted/60 border-y font-semibold text-center">{label}</th></tr>
-    {exams.map((exam) => <tr key={exam.id} className={selected === exam.id ? "bg-accent" : "hover:bg-muted/40"}><td className="p-3 border-b"><label className="flex gap-3 items-center cursor-pointer"><RadioGroupItem value={exam.id} aria-label={exam.name} /><span>{exam.name}</span></label></td><td className="p-3 border-b whitespace-nowrap text-center">{exam.date}</td><td className="p-3 border-b text-center">{exam.participantCount}</td></tr>)}
-    {!exams.length && <tr><td colSpan={3} className="p-4 text-center text-muted-foreground">Không có kỳ thi phù hợp</td></tr>}
+function GroupRows({ label, exams, selected, showGraded = false }: { label: string; exams: ScoreSourceExam[]; selected: string; showGraded?: boolean }) {
+  const cols = showGraded ? 4 : 3;
+  return <><tr><th colSpan={cols} className="px-3 py-2 bg-muted/60 border-y font-semibold text-center">{label}</th></tr>
+    {exams.map((exam) => <tr key={exam.id} className={selected === exam.id ? "bg-accent" : "hover:bg-muted/40"}><td className="p-3 border-b"><label className="flex gap-3 items-center cursor-pointer"><RadioGroupItem value={exam.id} aria-label={exam.name} /><span>{exam.name}</span></label></td><td className="p-3 border-b whitespace-nowrap text-center">{exam.date}</td><td className="p-3 border-b text-center">{exam.participantCount}</td>{showGraded && <td className="p-3 border-b text-center">{exam.students.filter((s) => s.score !== "").length}</td>}</tr>)}
+    {!exams.length && <tr><td colSpan={cols} className="p-4 text-center text-muted-foreground">Không có kỳ thi phù hợp</td></tr>}
   </>;
 }

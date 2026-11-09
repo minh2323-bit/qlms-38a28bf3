@@ -53,7 +53,7 @@ const ASSESSMENT_CONTENTS = [
 export function scoreSourceAssessments(): ScoreSourceExam[] {
   return ASSESSMENT_CONTENTS.map((content, ci) => {
     const students = ASSESSMENT_ROWS.filter((r) => r.mon === content.mon).slice(0, 12)
-      .map((r, i) => ({ name: r.name, cccd: r.cccd, dob: r.dob, khoi: r.khoi, lop: r.lop, mon: r.mon, score: String(5 + ((i + ci) % 11) * 0.5) }));
+      .map((r, i) => ({ name: r.name, cccd: r.cccd, dob: r.dob, khoi: r.khoi, lop: r.lop, mon: r.mon, score: i >= 10 ? "" : String(5 + ((i + ci) % 11) * 0.5) }));
     return { id: content.id, name: content.name, date: content.date, level: "truong" as const, kind: content.kind, participantCount: students.length, students };
   });
 }
