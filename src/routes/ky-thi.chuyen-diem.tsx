@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search, TriangleAlert } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Filter, Lock, Unlock, MoreVertical, History, Trash2, RefreshCw, Search, TriangleAlert } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { initialExamColumnSources, replaceExamColumnSource, examColumnType } from "@/lib/exam-score-columns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppShell } from "@/components/AppShell";
@@ -87,7 +90,11 @@ function ScoreTransferPage() {
   const canEdit = account === "principal";
   const [rows, setRows] = useState(INITIAL);
   const [importedCols, setImportedCols] = useState<ImportedScoreColumn[]>([]);
-  const allCols: { key: string; label: string; sub?: string; examName?: string }[] = [...COLS, ...importedCols];
+  const [removed, setRemoved] = useState<string[]>([]);
+  const [sources, setSources] = useState(() => initialExamColumnSources(INITIAL, COLS));
+  const [trace, setTrace] = useState<{ key: string; label: string } | null>(null);
+  const [replacement, setReplacement] = useState<{ key: string; label: string; scoreType: ImportScoreType } | undefined>();
+  const allCols: { key: string; label: string; sub?: string; examName?: string }[] = [...COLS, ...importedCols].filter((c) => !removed.includes(c.key));
   const [q, setQ] = useState("");
   const [khoi, setKhoi] = useState<string[]>([]);
   const [lop, setLop] = useState<string[]>([]);
@@ -109,6 +116,13 @@ function ScoreTransferPage() {
   const groups = [...new Set(cols.map((c) => c.label))].map((label) => ({ label, columns: cols.filter((c) => c.label === label) }));
   const addExam = (exam: ScoreSourceExam, type: ImportScoreType) => {
     if (!canEdit) return;
+    if (exam.kind !== "ky-thi") throw new Error("Chỉ được lấy điểm từ kỳ thi.");
+    const entry = { source: exam, scoreDate: new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()) };
+    if (replacement) {
+      setRows(replaceExamColumnSource(rows, replacement.key, exam, locked, canEdit));
+      setSources((previous) => ({ ...previous, [replacement.key]: entry }));
+      setTransferred(null); toast.success("Đã đổi nguồn điểm kỳ thi (mô phỏng)."); return;
+    }
     const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
     const next = rows.map((r) => ({ ...r, [column.key]: exam.students.find((s) => sameScoreStudent(r, s))?.score ?? "" }));
     for (const student of exam.students) {
@@ -116,6 +130,7 @@ function ScoreTransferPage() {
       next.push({ id: `${exam.id}-${student.cccd}-${next.length}`, name: student.name, cccd: student.cccd, dob: student.dob, khoi: student.khoi, lop: student.lop, mon: student.mon,
         ...Object.fromEntries(allCols.map((c) => [c.key, ""])), [column.key]: student.score });
     }
+    setSources((previous) => ({ ...previous, [column.key]: entry }));
     setRows(next); setImportedCols((previous) => [...previous, column]); setTransferred(null);
     toast.success(`Đã thêm điểm kỳ thi ${exam.name} (mô phỏng).`);
   };
@@ -143,10 +158,14 @@ function ScoreTransferPage() {
   };
 
   const th = "px-3 py-2 font-medium whitespace-nowrap border-b";
-  const lockBtn = (k: ScoreKey) => locked.has(k) ? (
-    <button type="button" onClick={() => unlock(k)} title={canEdit ? "Đã chuyển sang CSDL – bấm để mở khóa" : "Đã chuyển sang CSDL"}
-      className="ml-1 inline-flex align-middle text-amber-600 hover:text-amber-700"><Lock className="h-3.5 w-3.5" /></button>
-  ) : null;
+  const columnMenu = (column: { key: string; label: string; sub?: string }) => (
+    <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${column.label}${column.sub ? ` ${column.sub}` : ""}`} title={`Thao tác ${column.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+      {canEdit && <DropdownMenuItem disabled={!locked.has(column.key) && (invalid || !rows.some((r) => (r[column.key] ?? "") !== ""))} onSelect={() => { if (locked.has(column.key)) unlock(column.key); else setLocked((previous) => new Set([...previous, column.key])); setTransferred(null); }}>{locked.has(column.key) ? <Unlock /> : <Lock />}{locked.has(column.key) ? "Mở khóa" : "Khóa"}</DropdownMenuItem>}
+      <DropdownMenuItem onSelect={() => setTrace(column)}><History />Truy nguồn</DropdownMenuItem>
+      {canEdit && <DropdownMenuItem disabled={locked.has(column.key)} onSelect={() => { setRemoved((previous) => [...previous, column.key]); setTransferred(null); }}><Trash2 />Gỡ cột</DropdownMenuItem>}
+      {canEdit && <DropdownMenuItem disabled={locked.has(column.key)} onSelect={() => setReplacement({ key: column.key, label: `${column.label}${column.sub ? ` ${column.sub}` : ""}`, scoreType: importedCols.find((c) => c.key === column.key)?.scoreType ?? examColumnType(column.key) })}><RefreshCw />Đổi nguồn</DropdownMenuItem>}
+    </DropdownMenuContent></DropdownMenu>
+  );
 
   return (
     <AppShell>
@@ -155,7 +174,7 @@ function ScoreTransferPage() {
         <div>
           <h1 className="text-lg font-semibold">Chuyển điểm thi sang CSDL</h1>
           <p className="text-muted-foreground">
-            {canEdit ? "Ban giám hiệu có thể chỉnh sửa điểm trước khi xác nhận chuyển." : "Chỉ Ban giám hiệu được sửa điểm."} Điểm thang 0–10, tối đa 1 chữ số thập phân, dùng dấu "." (VD: 8.5). Cột có biểu tượng <Lock className="inline h-3 w-3" /> đã được chuyển; BGH bấm vào biểu tượng để mở khóa.
+            {canEdit ? "Ban giám hiệu có thể chỉnh sửa điểm trước khi xác nhận chuyển." : "Chỉ Ban giám hiệu được sửa điểm."} Điểm thang 0–10, tối đa 1 chữ số thập phân, dùng dấu "." (VD: 8.5).
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -170,27 +189,27 @@ function ScoreTransferPage() {
           <ScoreTypeFilter columns={availableCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
           <div className="ml-auto flex gap-2">
             <Button variant="outline" size="sm" onClick={exportExcel}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
-            <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-emerald-600 hover:bg-emerald-700 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
+            <Button size="sm" onClick={confirm} disabled={!canEdit} className="bg-exam-success hover:bg-exam-success/90 text-primary-foreground"><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
           </div>
         </div>
         {conflicts > 0 && <p role="alert" className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có nhiều đầu điểm cùng loại – được tô đỏ trong bảng.</span></p>}
         <p className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Lưu ý: kiểm tra các học sinh đã có điểm GKI/CKI bên trang <Link to="/thong-ke/chuyen-diem" className="underline underline-offset-2 hover:text-primary">Chuyển điểm sang CSDL</Link>.</span></p>
-        {transferred && <p className="text-emerald-700">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
+        {transferred && <p className="text-exam-success">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
         <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
           <table className="w-full border-separate border-spacing-0">
             <thead className="sticky top-0 bg-muted z-10">
               <tr>
                 <th colSpan={7} className={`${th} text-center border-r`}>Thông tin học sinh</th>
-                <th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm thi{canEdit && <ExamScorePicker addedIds={importedCols.map((c) => c.examId)} onConfirm={addExam} />}</th>
+                <th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm thi{canEdit && <ExamScorePicker addedIds={replacement ? [] : importedCols.map((c) => c.examId)} replacement={replacement} onReplacementClose={() => setReplacement(undefined)} onConfirm={addExam} />}</th>
               </tr>
               <tr className="text-left">
                 {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"].map((h, i) => (
                   <th key={h} rowSpan={2} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>
                 ))}
-                {groups.map((group) => <th key={group.label} colSpan={group.columns.length} rowSpan={group.columns.length > 1 ? 1 : 2} className={`${th} text-center`} title={group.columns[0]?.examName}>{group.label}{group.columns.length === 1 && lockBtn(group.columns[0].key)}</th>)}
+                {groups.map((group) => <th key={group.label} colSpan={group.columns.length} rowSpan={group.columns.length > 1 ? 1 : 2} className={`${th} text-center`} title={group.columns[0]?.examName}>{group.label}{group.columns.length === 1 && columnMenu(group.columns[0])}</th>)}
               </tr>
               <tr>
-                {groups.filter((g) => g.columns.length > 1).flatMap((g) => g.columns.map((c, i) => <th key={c.key} className={`${th} text-center`} title={c.examName}>({i + 1}){lockBtn(c.key)}</th>))}
+                {groups.filter((g) => g.columns.length > 1).flatMap((g) => g.columns.map((c, i) => <th key={c.key} className={`${th} text-center`} title={c.examName}>({i + 1}){columnMenu({ ...c, sub: `(${i + 1})` })}</th>))}
               </tr>
             </thead>
             <tbody>
@@ -226,6 +245,7 @@ function ScoreTransferPage() {
             </tbody>
           </table>
         </div>
+        <Dialog open={Boolean(trace)} onOpenChange={(open) => { if (!open) setTrace(null); }}><DialogContent aria-describedby={undefined} className="max-w-3xl"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[trace.key] && <tr><td className="p-3">Kỳ thi</td><td className="p-3">{sources[trace.key].source.name}</td><td className="p-3 text-center">{sources[trace.key].source.date}</td><td className="p-3 text-center">{sources[trace.key].scoreDate}</td></tr>}</tbody></table></div></DialogContent></Dialog>
       </div>
     </AppShell>
   );

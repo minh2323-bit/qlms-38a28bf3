@@ -1,5 +1,10 @@
 # Monitoring fixes
 
+# Exam column source management
+
+- [x] Add vertical menus with lock/unlock, tracing, removal and exam-only replacement while preserving BGH permissions.
+- [x] Provide sources for all existing exam scores and verify teacher read-only and BGH management flows.
+
 # Teacher column source management
 
 - [x] Use compact vertical column menus with lock icons only inside menu options.
