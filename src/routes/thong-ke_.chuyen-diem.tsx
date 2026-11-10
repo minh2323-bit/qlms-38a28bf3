@@ -1,17 +1,19 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search, MoreHorizontal, Unlock, History, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
-import { SubjectFilter } from "@/components/SubjectFilter";
 import { SCORE_SUBJECTS } from "@/lib/score-subjects";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { defaultTeacherScope, replaceTeacherScoreSource } from "@/lib/teacher-score-columns";
+import { SCORE_CONTENT_KINDS } from "@/lib/exam-score-import";
 import { Toaster } from "@/components/ui/sonner";
-import { ASSESSMENT_CLASSES, ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
+import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
 import { downloadCsv } from "@/lib/report-export";
 import { isValidScore } from "@/lib/score";
 import { visibleScoreColumns } from "@/lib/score-column-filter";
@@ -30,18 +32,8 @@ export const Route = createFileRoute("/thong-ke_/chuyen-diem")({
   component: AssessmentTransferPage,
 });
 
-function MultiFilter({ label, values, options, onChange }: { label: string; values: string[]; options: string[]; onChange: (values: string[]) => void }) {
-  return <Popover>
-    <PopoverTrigger asChild><Button variant="outline" size="sm" className="h-9 font-normal gap-1.5 max-w-full">
-      <Filter className="h-4 w-4 shrink-0" /><span className="truncate">{label}: {values.length ? values.join(", ") : "Tất cả"}</span>
-    </Button></PopoverTrigger>
-    <PopoverContent align="start" className="w-48 p-2">
-      {options.map((option) => <label key={option} className="flex items-center gap-2 rounded px-2 py-1.5 hover:bg-muted cursor-pointer">
-        <Checkbox checked={values.includes(option)} onCheckedChange={() => onChange(values.includes(option) ? values.filter((v) => v !== option) : [...values, option])} />{label} {option}
-      </label>)}
-      <div className="border-t mt-2 pt-2 flex justify-end"><Button variant="ghost" size="sm" onClick={() => onChange([])}>Tất cả</Button></div>
-    </PopoverContent>
-  </Popover>;
+function SingleFilter({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
+  return <Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label} className="w-44 h-9"><Filter className="h-4 w-4 shrink-0" /><span>{label}: <SelectValue /></span></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select>;
 }
 
 function AssessmentTransferPage() {
@@ -49,16 +41,28 @@ function AssessmentTransferPage() {
   const [importedCols, setImportedCols] = useState<ImportedScoreColumn[]>([]);
   const allCols: { key: string; label: string; examName?: string }[] = [...ASSESSMENT_COLUMNS, ...importedCols];
   const [query, setQuery] = useState("");
-  const [grades, setGrades] = useState<string[]>([]);
-  const [classes, setClasses] = useState<string[]>([]);
-  const [subjects, setSubjects] = useState<string[]>([...SCORE_SUBJECTS]);
+  const [scope, setScope] = useState(() => defaultTeacherScope(ASSESSMENT_ROWS));
+  const scopeKey = `${scope.grade}/${scope.klass}/${scope.subject}`;
+  const [removed, setRemoved] = useState<Record<string, string[]>>({});
+  const [sources, setSources] = useState<Record<string, Record<string, { source: ScoreSourceExam; scoreDate: string }>>>({});
+  const [trace, setTrace] = useState<{ key: string; label: string } | null>(null);
+  const [replacement, setReplacement] = useState<{ key: string; label: string; scoreType: ImportScoreType } | undefined>();
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
-  const cols = visibleScoreColumns(allCols, hiddenScoreKeys);
-  const [locked, setLocked] = useState<Set<string>>(new Set());
+  const availableCols = allCols.filter((c) => !(removed[scopeKey] ?? []).includes(c.key));
+  const cols = visibleScoreColumns(availableCols, hiddenScoreKeys);
+  const [locks, setLocks] = useState<Record<string, Set<string>>>({});
+  const locked = locks[scopeKey] ?? new Set<string>();
+  const setLocked = (update: (previous: Set<string>) => Set<string>) => setLocks((previous) => ({ ...previous, [scopeKey]: update(previous[scopeKey] ?? new Set()) }));
   const [confirmed, setConfirmed] = useState(false);
-  const shown = useMemo(() => filterAssessmentRows(rows, query, grades, classes, subjects), [rows, query, grades, classes, subjects]);
-  const invalid = shown.some((r) => allCols.some((c) => !isValidScore(r.scores[c.key] ?? "")));
+  const shown = useMemo(() => filterAssessmentRows(rows, query, [scope.grade], [scope.klass], [scope.subject]), [rows, query, scope]);
+  const invalid = shown.some((r) => availableCols.some((c) => !isValidScore(r.scores[c.key] ?? "")));
+  const recordSource = (key: string, source: ScoreSourceExam) => setSources((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], [key]: { source, scoreDate: new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()) } } }));
   const addExam = (exam: ScoreSourceExam, type: ImportScoreType) => {
+    if (replacement) {
+      setRows(replaceTeacherScoreSource(rows, replacement.key, exam, scope, locked));
+      recordSource(replacement.key, exam); setConfirmed(false);
+      toast.success("Đã đổi nguồn điểm (mô phỏng)."); return;
+    }
     const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
     const next = rows.map((r) => ({ ...r, scores: { ...r.scores, [column.key]: exam.students.find((s) => sameScoreStudent(r, s))?.score ?? "" } }));
     for (const student of exam.students) {
@@ -66,11 +70,13 @@ function AssessmentTransferPage() {
       next.push({ id: `${exam.id}-${student.cccd}-${next.length}`, name: student.name, cccd: student.cccd, dob: student.dob, khoi: student.khoi, lop: student.lop, mon: student.mon,
         scores: { ...Object.fromEntries(allCols.map((c) => [c.key, ""])), [column.key]: student.score } });
     }
+    recordSource(column.key, exam);
     setRows(next); setImportedCols((previous) => [...previous, column]); setConfirmed(false);
     toast.success(`Đã thêm điểm ${exam.name} (mô phỏng).`);
   };
-  const classOptions = ASSESSMENT_CLASSES.filter((c) => !grades.length || grades.includes(c[0]));
-  const header = ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"];
+  const gradeOptions = [...new Set(rows.map((r) => r.khoi))].sort((a, b) => Number(a) - Number(b));
+  const classOptions = [...new Set(rows.filter((r) => r.khoi === scope.grade).map((r) => r.lop))].sort((a, b) => a.localeCompare(b, "vi", { numeric: true }));
+  const header = ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh"];
   const unlock = (key: string) => {
     setLocked((previous) => unlockAssessmentColumn(previous, key));
     setConfirmed(false);
@@ -78,7 +84,7 @@ function AssessmentTransferPage() {
   };
   const confirm = () => {
     if (invalid || !shown.length) return;
-    setLocked((previous) => new Set([...previous, ...allCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key)]));
+    setLocked((previous) => new Set([...previous, ...availableCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key)]));
     setConfirmed(true);
     toast.success(`Đã xác nhận điểm của ${shown.length} học sinh (mô phỏng).`);
   };
@@ -91,12 +97,12 @@ function AssessmentTransferPage() {
         <div className="relative w-64 max-w-full"><Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input aria-label="Tìm tên học sinh" placeholder="Tìm tên học sinh" value={query} onChange={(e) => setQuery(e.target.value)} className="h-9 pl-8" />
         </div>
-        <MultiFilter label="Khối" values={grades} options={["3", "4", "5"]} onChange={(v) => { setGrades(v); setClasses((cs) => cs.filter((c) => !v.length || v.includes(c[0]))); }} />
-        <MultiFilter label="Lớp" values={classes} options={classOptions} onChange={setClasses} />
-        <SubjectFilter selected={subjects} onChange={setSubjects} />
-        <ScoreTypeFilter columns={allCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
+        <SingleFilter label="Khối" value={scope.grade} options={gradeOptions} onChange={(grade) => { const klass = [...new Set(rows.filter((r) => r.khoi === grade).map((r) => r.lop))].sort((a, b) => a.localeCompare(b, "vi", { numeric: true }))[0]; if (klass) setScope({ ...scope, grade, klass }); setConfirmed(false); }} />
+        <SingleFilter label="Lớp" value={scope.klass} options={classOptions} onChange={(klass) => { setScope({ ...scope, klass }); setConfirmed(false); }} />
+        <SingleFilter label="Môn học" value={scope.subject} options={SCORE_SUBJECTS} onChange={(subject) => { setScope({ ...scope, subject }); setConfirmed(false); }} />
+        <ScoreTypeFilter columns={availableCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
         <div className="ml-auto flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => downloadCsv("chuyen-diem-dgtx-csdl.csv", [...header, ...cols.map((c) => c.label)], shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, r.mon, ...cols.map((c) => r.scores[c.key])]))}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
+          <Button variant="outline" size="sm" onClick={() => downloadCsv("chuyen-diem-dgtx-csdl.csv", [...header, ...cols.map((c) => c.label)], shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, ...cols.map((c) => r.scores[c.key])]))}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
           <Button size="sm" className="bg-exam-success text-primary-foreground hover:bg-exam-success/90" disabled={invalid || !shown.length} onClick={confirm}><CheckCircle2 className="h-4 w-4" />Xác nhận</Button>
         </div>
       </div>
@@ -106,13 +112,18 @@ function AssessmentTransferPage() {
       <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
         <table className="w-full border-separate border-spacing-0">
           <thead className="sticky top-0 z-10 bg-muted">
-            <tr><th colSpan={7} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={importedCols.map((c) => c.examId)} includeAssessments onConfirm={addExam} /></th></tr>
-            <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>)}
-              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Button type="button" variant="ghost" size="icon" aria-label={`Mở khóa ${c.label}`} title="Đã xác nhận – bấm để mở khóa" onClick={() => unlock(c.key)} className="ml-1 h-6 w-6 align-middle text-exam-warning"><Lock className="h-3.5 w-3.5" /></Button>}</th>)}
+            <tr><th colSpan={4} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={replacement ? [] : importedCols.map((c) => c.examId)} includeAssessments scope={scope} replacement={replacement} onReplacementClose={() => setReplacement(undefined)} onConfirm={addExam} /></th></tr>
+            <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 3 ? "border-r" : ""}`}>{h}</th>)}
+              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Lock className="inline ml-1 h-3.5 w-3.5 text-exam-warning" aria-label="Đã khóa" />}<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${c.label}`} title={`Thao tác ${c.label}`} className="ml-1 h-6 w-6 align-middle"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+                <DropdownMenuItem disabled={!locked.has(c.key)} onSelect={() => unlock(c.key)}><Unlock />Mở khóa</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
+                <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
+                <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>
+              </DropdownMenuContent></DropdownMenu></th>)}
             </tr>
           </thead>
           <tbody>{shown.map((r, i) => <tr key={r.id}>
-            {[i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, r.mon].map((v, index) => <td key={index} className={`px-3 py-1.5 border-b whitespace-nowrap ${index === 1 ? "font-medium" : ""} ${index === 6 ? "border-r" : ""}`}>{v}</td>)}
+            {[i + 1, r.name, r.cccd, r.dob].map((v, index) => <td key={index} className={`px-3 py-1.5 border-b whitespace-nowrap ${index === 1 ? "font-medium" : ""} ${index === 3 ? "border-r" : ""}`}>{v}</td>)}
             {cols.map((c) => <td key={c.key} className="px-3 py-1.5 border-b text-center">
               {locked.has(c.key) ? <span className="text-muted-foreground">{r.scores[c.key] || "–"}</span> : <Input inputMode="decimal" aria-label={`${c.label} ${r.name} ${r.lop}`} value={r.scores[c.key] ?? ""} onChange={(e) => {
                 const value = e.target.value;
@@ -121,9 +132,10 @@ function AssessmentTransferPage() {
                 setRows((rs) => rs.map((row) => row.id === r.id ? { ...row, scores: { ...row.scores, [c.key]: value } } : row));
               }} className={`h-8 w-20 mx-auto text-center ${!isValidScore(r.scores[c.key] ?? "") ? "border-destructive text-destructive" : ""}`} />}
             </td>)}
-          </tr>)}{!shown.length && <tr><td colSpan={7 + cols.length} className="text-center p-6 text-muted-foreground">Không có học sinh phù hợp</td></tr>}</tbody>
+          </tr>)}{!shown.length && <tr><td colSpan={4 + cols.length} className="text-center p-6 text-muted-foreground">Không có học sinh phù hợp</td></tr>}</tbody>
         </table>
       </div>
+      <Dialog open={Boolean(trace)} onOpenChange={(v) => { if (!v) setTrace(null); }}><DialogContent aria-describedby={undefined} className="max-w-3xl"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[scopeKey]?.[trace.key] ? (() => { const entry = sources[scopeKey][trace.key]; return <tr><td className="p-3">{SCORE_CONTENT_KINDS.find((k) => k.value === entry.source.kind)?.label}</td><td className="p-3">{entry.source.name}</td><td className="p-3 text-center">{entry.source.date}</td><td className="p-3 text-center">{entry.scoreDate}</td></tr>; })() : <tr><td colSpan={4} className="p-6 text-center text-muted-foreground">Điểm mẫu chưa có thông tin nguồn. Nguồn sẽ được ghi nhận khi lấy hoặc đổi nguồn điểm.</td></tr>}</tbody></table></div></DialogContent></Dialog>
     </div>
   </AppShell>;
 }

@@ -1,5 +1,11 @@
 # Monitoring fixes
 
+# Teacher column source management
+
+- [x] Require single grade, class and subject selections; remove their table/export columns.
+- [x] Add column menus, source details, scoped removal and replacement using the content picker.
+- [x] Verify default selection, source replacement and lock rules with tests and browser checks.
+
 - [x] Restore teacher assessment-column unlocking after confirmation and verify editing/reconfirmation.
 - [x] Align the principal class report's class-size total and verify the footer.
 

@@ -14,5 +14,6 @@
 - The mock account selector shares in-memory context through `src/lib/demo-account.ts` so shared exam URLs retain the selected account without browser-storage authorization claims.
 - Teacher assessment transfer uses a separate mock domain from exam transfer so assessment edits and confirmation locks cannot affect exam scores; confirmation remains in-memory, not a live CSDL integration.
 - Both score-transfer pages share ScoreTypeFilter and score-column selection logic; visibility selection only narrows available columns and never changes score data or confirmation permissions.
-- Both score-transfer pages share SubjectFilter and score-subjects filtering so subject selections, empty selection and exports follow the same behavior without coupling the mock score stores.
+- Exam transfer uses the shared multi-subject filter; teacher transfer requires a single grade/class/subject scope so each table and export contains only that teaching context.
 - Both transfer pages share ExamScorePicker and exam-score-import adapters; imported exams add independent in-memory score columns, match students by CCCD plus subject, and never overwrite existing scores or bypass confirmation locks.
+- Teacher column locks, removal and source metadata are scoped by grade/class/subject; replacement uses the shared picker and teacher-score-columns validation to preserve other contexts and reject locked edits. Source dates are recorded as the mock import date when original grading timestamps are unavailable.
