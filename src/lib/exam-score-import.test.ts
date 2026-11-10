@@ -1,6 +1,6 @@
 /// <reference types="bun" />
 import { expect, test } from "bun:test";
-import { filterSourceExams, importExamColumn, sameScoreStudent, scoreSourceAssessments, type ScoreSourceExam } from "./exam-score-import";
+import { filterSourceExams, importExamColumn, sameScoreStudent, scoreSourceAssessments, scoreSourceClasses, type ScoreSourceExam } from "./exam-score-import";
 const exam: ScoreSourceExam = { id: "xa-1", name: "Kỳ thi cấp Xã Toán", level: "xa", kind: "ky-thi", date: "09/11/2026", participantCount: 1, students: [{ name: "An", cccd: "123", dob: "", khoi: "4", lop: "4A", mon: "Toán", score: "8.5" }] };
 test("already-added exams are excluded regardless of selected score type", () => {
   expect(filterSourceExams([exam], ["xa-1"], "", "all")).toHaveLength(0);
@@ -38,4 +38,17 @@ test("every assessment source has importable 0–10 single-decimal scores", () =
     expect(source.students.length).toBeGreaterThan(0);
     expect(() => importExamColumn(source, "dgtx", [])).not.toThrow();
   }
+});
+test("class filter keeps only contents that have students in the chosen class", () => {
+  const baiTap = scoreSourceAssessments().filter((e) => e.kind === "bai-tap");
+  const lop = baiTap[0].students[0].lop;
+  expect(filterSourceExams(baiTap, [], "", "all", "bai-tap", lop)).toHaveLength(baiTap.length);
+  expect(filterSourceExams(baiTap, [], "", "all", "bai-tap", "9Z")).toHaveLength(0);
+  expect(scoreSourceClasses(baiTap, "bai-tap")).toContain(lop);
+});
+test("exam rows ignore the class filter and keep the level filter", () => {
+  const sources = [exam, ...scoreSourceAssessments()];
+  expect(filterSourceExams(sources, [], "", "all", "ky-thi", "9Z")).toEqual([exam]);
+  expect(filterSourceExams(sources, [], "", "xa", "ky-thi", "all")).toEqual([exam]);
+  expect(filterSourceExams(sources, [], "", "so", "ky-thi", "all")).toHaveLength(0);
 });

@@ -67,7 +67,7 @@ function AssessmentTransferPage() {
         scores: { ...Object.fromEntries(allCols.map((c) => [c.key, ""])), [column.key]: student.score } });
     }
     setRows(next); setImportedCols((previous) => [...previous, column]); setConfirmed(false);
-    toast.success(`Đã thêm điểm kỳ thi ${exam.name} (mô phỏng).`);
+    toast.success(`Đã thêm điểm ${exam.name} (mô phỏng).`);
   };
   const classOptions = ASSESSMENT_CLASSES.filter((c) => !grades.length || grades.includes(c[0]));
   const header = ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"];

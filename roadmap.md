@@ -32,3 +32,9 @@ Scope: this project remains a mockup. Exam data and account selection are in-mem
 - [x] Add shared plus-button picker with score type, search, level filter, grouped single-choice exam list and confirmation on both transfer pages.
 - [x] Import selected exam scores without overwriting existing columns; exclude already-added exams and preserve existing confirmation permissions.
 - [x] Verify picker filters, single selection, added columns and exports with focused tests and browser checks.
+
+# Content picker wording and class filter
+
+- [x] Rename the teacher picker search field to "Tìm tên nội dung" and drop the Bài tập / Bài kiểm tra labels above the list.
+- [x] Swap the exam-level filter for a class-name filter when Bài tập or Bài kiểm tra is selected, importing only that class's scores.
+- [x] Verify both pickers in the browser and keep the focused filter tests passing.
