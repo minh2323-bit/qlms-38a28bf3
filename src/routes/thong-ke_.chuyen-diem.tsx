@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search, MoreHorizontal, Unlock, History, Trash2, RefreshCw } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search, MoreVertical, Unlock, History, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { defaultTeacherScope, replaceTeacherScoreSource } from "@/lib/teacher-score-columns";
+import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource } from "@/lib/teacher-score-columns";
 import { SCORE_CONTENT_KINDS } from "@/lib/exam-score-import";
 import { Toaster } from "@/components/ui/sonner";
 import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
@@ -44,11 +44,11 @@ function AssessmentTransferPage() {
   const [scope, setScope] = useState(() => defaultTeacherScope(ASSESSMENT_ROWS));
   const scopeKey = `${scope.grade}/${scope.klass}/${scope.subject}`;
   const [removed, setRemoved] = useState<Record<string, string[]>>({});
-  const [sources, setSources] = useState<Record<string, Record<string, { source: ScoreSourceExam; scoreDate: string }>>>({});
+  const [sources, setSources] = useState(() => initialTeacherScoreSources(ASSESSMENT_ROWS));
   const [trace, setTrace] = useState<{ key: string; label: string } | null>(null);
   const [replacement, setReplacement] = useState<{ key: string; label: string; scoreType: ImportScoreType } | undefined>();
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
-  const availableCols = allCols.filter((c) => !(removed[scopeKey] ?? []).includes(c.key));
+  const availableCols = allCols.filter((c) => sources[scopeKey]?.[c.key] && !(removed[scopeKey] ?? []).includes(c.key));
   const cols = visibleScoreColumns(availableCols, hiddenScoreKeys);
   const [locks, setLocks] = useState<Record<string, Set<string>>>({});
   const locked = locks[scopeKey] ?? new Set<string>();
@@ -64,8 +64,9 @@ function AssessmentTransferPage() {
       toast.success("Đã đổi nguồn điểm (mô phỏng)."); return;
     }
     const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
-    const next = rows.map((r) => ({ ...r, scores: { ...r.scores, [column.key]: exam.students.find((s) => sameScoreStudent(r, s))?.score ?? "" } }));
+    const next = rows.map((r) => inTeacherScope(r, scope) ? ({ ...r, scores: { ...r.scores, [column.key]: exam.students.find((s) => sameScoreStudent(r, s))?.score ?? "" } }) : r);
     for (const student of exam.students) {
+      if (!inTeacherScope(student, scope)) continue;
       if (next.some((r) => sameScoreStudent(r, student))) continue;
       next.push({ id: `${exam.id}-${student.cccd}-${next.length}`, name: student.name, cccd: student.cccd, dob: student.dob, khoi: student.khoi, lop: student.lop, mon: student.mon,
         scores: { ...Object.fromEntries(allCols.map((c) => [c.key, ""])), [column.key]: student.score } });
@@ -114,8 +115,8 @@ function AssessmentTransferPage() {
           <thead className="sticky top-0 z-10 bg-muted">
             <tr><th colSpan={4} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={replacement ? [] : importedCols.map((c) => c.examId)} includeAssessments scope={scope} replacement={replacement} onReplacementClose={() => setReplacement(undefined)} onConfirm={addExam} /></th></tr>
             <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 3 ? "border-r" : ""}`}>{h}</th>)}
-              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Lock className="inline ml-1 h-3.5 w-3.5 text-exam-warning" aria-label="Đã khóa" />}<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${c.label}`} title={`Thao tác ${c.label}`} className="ml-1 h-6 w-6 align-middle"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
-                <DropdownMenuItem disabled={!locked.has(c.key)} onSelect={() => unlock(c.key)}><Unlock />Mở khóa</DropdownMenuItem>
+              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${c.label}`} title={`Thao tác ${c.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+                <DropdownMenuItem disabled={!locked.has(c.key) && (invalid || !shown.some((r) => (r.scores[c.key] ?? "") !== ""))} onSelect={() => { if (locked.has(c.key)) unlock(c.key); else setLocked((previous) => new Set([...previous, c.key])); }}>{locked.has(c.key) ? <Unlock /> : <Lock />}{locked.has(c.key) ? "Mở khóa" : "Khóa"}</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>

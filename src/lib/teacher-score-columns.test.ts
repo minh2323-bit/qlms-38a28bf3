@@ -1,8 +1,27 @@
 /// <reference types="bun" />
 import { expect, test } from "bun:test";
-import { ASSESSMENT_ROWS } from "./assessment-scores";
+import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS } from "./assessment-scores";
 import { scoreSourceAssessments } from "./exam-score-import";
-import { defaultTeacherScope, inTeacherScope, replaceTeacherScoreSource } from "./teacher-score-columns";
+import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource } from "./teacher-score-columns";
+
+test("100% of existing teacher scores have scoped content provenance matching their value", () => {
+  const sources = initialTeacherScoreSources(ASSESSMENT_ROWS);
+  let checked = 0;
+  for (const row of ASSESSMENT_ROWS) {
+    for (const column of ASSESSMENT_COLUMNS) {
+      if (!row.scores[column.key]) continue;
+      const entry = sources[`${row.khoi}/${row.lop}/${row.mon}`]?.[column.key];
+      expect(entry).toBeDefined();
+      expect(entry.source.name.length).toBeGreaterThan(0);
+      expect(["bai-tap", "bai-kiem-tra", "ky-thi"]).toContain(entry.source.kind);
+      expect(entry.source.date).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(entry.scoreDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(entry.source.students.find((student) => student.cccd === row.cccd && student.mon === row.mon)?.score).toBe(row.scores[column.key]);
+      checked++;
+    }
+  }
+  expect(checked).toBe(162);
+});
 
 test("teacher defaults to smallest grade and first A class with a single subject", () => {
   expect(defaultTeacherScope([...ASSESSMENT_ROWS].reverse())).toEqual({ grade: "3", klass: "3A", subject: "Tiếng Anh" });

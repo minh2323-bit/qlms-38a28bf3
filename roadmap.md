@@ -2,6 +2,9 @@
 
 # Teacher column source management
 
+- [x] Use compact vertical column menus with lock icons only inside menu options.
+- [x] Supply provenance for every existing score and verify scoped source details.
+
 - [x] Require single grade, class and subject selections; remove their table/export columns.
 - [x] Add column menus, source details, scoped removal and replacement using the content picker.
 - [x] Verify default selection, source replacement and lock rules with tests and browser checks.
