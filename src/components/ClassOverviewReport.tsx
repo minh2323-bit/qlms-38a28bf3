@@ -51,7 +51,7 @@ export function ClassOverviewTable({
     };
   }, [sorted]);
 
-  const colSpan = showTeachers ? 3 : 2;
+  const columnCount = 3 + (showTeachers ? 1 : 0) + COLS.length;
 
   return (
     <>
@@ -102,13 +102,14 @@ export function ClassOverviewTable({
               </tr>
             ))}
             {sorted.length === 0 && (
-              <tr><td colSpan={colSpan + COLS.length + 1} className="text-center text-slate-400 py-8">Không có lớp học nào.</td></tr>
+              <tr><td colSpan={columnCount} className="text-center text-slate-400 py-8">Không có lớp học nào.</td></tr>
             )}
           </tbody>
           <tfoot>
             <tr>
-              <td className={`${totalCell} text-center`} colSpan={colSpan}>Tổng số ({sorted.length} lớp)</td>
+              <td className={`${totalCell} text-center`} colSpan={2}>Tổng số ({sorted.length} lớp)</td>
               <td className={`${totalCell} text-center`}>{totals.siSo}</td>
+              {showTeachers && <td className={totalCell} />}
               {COLS.map((c) => (
                 <td key={c.key} className={`${totalCell} text-center`}>{totals[c.key]}</td>
               ))}

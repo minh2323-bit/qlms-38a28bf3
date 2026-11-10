@@ -1,3 +1,8 @@
+# Monitoring fixes
+
+- [x] Restore teacher assessment-column unlocking after confirmation and verify editing/reconfirmation.
+- [x] Align the principal class report's class-size total and verify the footer.
+
 # Official exams
 
 - [x] Match the uploaded HTML official-exam interface and complete one/multiple-session mock creation flow.

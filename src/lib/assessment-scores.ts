@@ -3,6 +3,11 @@ import { SCORE_SUBJECTS, filterScoreSubjects } from "./score-subjects";
 export const ASSESSMENT_COLUMNS = [1, 2, 3, 4, 5].map((n) => ({ key: `dgtx${n}`, label: n === 4 ? "Điểm GKI" : n === 5 ? "Điểm CKI" : `Điểm ĐGTX ${n}` }));
 export const ASSESSMENT_CLASSES = ["3A", "3B", "4A", "4B", "5A", "5B"];
 export type AssessmentRow = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string; mon: string; scores: Record<string, string> };
+export function unlockAssessmentColumn(locked: ReadonlySet<string>, key: string) {
+  const next = new Set(locked);
+  next.delete(key);
+  return next;
+}
 const names = ["Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Khánh Chi", "Phạm Đức Duy", "Hoàng Thu Hà", "Vũ Quang Huy"];
 export const ASSESSMENT_ROWS: AssessmentRow[] = ASSESSMENT_CLASSES.flatMap((lop, ci) => names.map((name, i) => ({
   id: `${lop}-${i}`, name, cccd: `0012190${String(10000 + ci * 100 + i * 37)}`,

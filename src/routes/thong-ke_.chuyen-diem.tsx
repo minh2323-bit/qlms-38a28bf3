@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Toaster } from "@/components/ui/sonner";
-import { ASSESSMENT_CLASSES, ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows } from "@/lib/assessment-scores";
+import { ASSESSMENT_CLASSES, ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
 import { downloadCsv } from "@/lib/report-export";
 import { isValidScore } from "@/lib/score";
 import { visibleScoreColumns } from "@/lib/score-column-filter";
@@ -71,6 +71,11 @@ function AssessmentTransferPage() {
   };
   const classOptions = ASSESSMENT_CLASSES.filter((c) => !grades.length || grades.includes(c[0]));
   const header = ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"];
+  const unlock = (key: string) => {
+    setLocked((previous) => unlockAssessmentColumn(previous, key));
+    setConfirmed(false);
+    toast.success("Đã mở khóa cột điểm (mô phỏng).");
+  };
   const confirm = () => {
     if (invalid || !shown.length) return;
     setLocked((previous) => new Set([...previous, ...allCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key)]));
@@ -103,7 +108,7 @@ function AssessmentTransferPage() {
           <thead className="sticky top-0 z-10 bg-muted">
             <tr><th colSpan={7} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={importedCols.map((c) => c.examId)} includeAssessments onConfirm={addExam} /></th></tr>
             <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>)}
-              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Lock aria-label="Đã xác nhận" className="inline ml-1 h-3.5 w-3.5 text-exam-warning" />}</th>)}
+              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}{locked.has(c.key) && <Button type="button" variant="ghost" size="icon" aria-label={`Mở khóa ${c.label}`} title="Đã xác nhận – bấm để mở khóa" onClick={() => unlock(c.key)} className="ml-1 h-6 w-6 align-middle text-exam-warning"><Lock className="h-3.5 w-3.5" /></Button>}</th>)}
             </tr>
           </thead>
           <tbody>{shown.map((r, i) => <tr key={r.id}>
