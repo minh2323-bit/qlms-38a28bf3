@@ -23,6 +23,11 @@ test("100% of existing teacher scores have scoped content provenance matching th
   expect(checked).toBe(162);
 });
 
+test("untransferred teacher sources have no transfer time", () => {
+  const sources = initialTeacherScoreSources(ASSESSMENT_ROWS);
+  expect(sources["3/3A/Toán"].dgtx1.transfers ?? []).toEqual([]);
+});
+
 test("teacher defaults to smallest grade and first A class with a single subject", () => {
   expect(defaultTeacherScope([...ASSESSMENT_ROWS].reverse())).toEqual({ grade: "3", klass: "3A", subject: "Tiếng Anh" });
   expect(defaultTeacherScope(ASSESSMENT_ROWS)).toEqual({ grade: "3", klass: "3A", subject: "Toán" });

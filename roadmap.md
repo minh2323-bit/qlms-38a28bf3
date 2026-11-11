@@ -1,5 +1,11 @@
 # Monitoring fixes
 
+# Transfer tags and source history
+
+- [x] Add exam transfer-count tags and rename the picker label to Loại điểm CSDL.
+- [x] Record source-specific transfer times on both pages and the exam transferer's name and position.
+- [x] Verify repeated transfers, empty history and both source dialogs.
+
 # Exam column source management
 
 - [x] Add vertical menus with lock/unlock, tracing, removal and exam-only replacement while preserving BGH permissions.

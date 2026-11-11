@@ -1,8 +1,9 @@
 import { isValidScore } from "./score";
+import type { ScoreTransferEvent } from "./score-transfer-history";
 import { sameScoreStudent, type ImportScoreType, type ScoreSourceExam } from "./exam-score-import";
 
 export type ExamScoreRow = { id: string; name: string; cccd: string; dob: string; khoi: string; lop: string; mon: string } & Record<string, string>;
-export type ExamColumnSource = { source: ScoreSourceExam; scoreDate: string };
+export type ExamColumnSource = { source: ScoreSourceExam; scoreDate: string; transfers?: ScoreTransferEvent[] };
 export function examColumnType(key: string): ImportScoreType {
   return key.startsWith("gk1") ? "gk1" : key === "ck1" ? "ck1" : key === "gk2" ? "gk2" : "ck2";
 }

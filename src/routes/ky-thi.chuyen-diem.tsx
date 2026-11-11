@@ -14,6 +14,8 @@ import { SCORE_SUBJECTS, filterScoreSubjects } from "@/lib/score-subjects";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
+import { appendScoreTransfer, examTransferProgress } from "@/lib/score-transfer-history";
+import { ScoreTransferTag, ScoreTransferHistoryCells } from "@/components/ScoreTransferReceipt";
 import { useDemoAccount } from "@/lib/demo-account";
 import { downloadCsv } from "@/lib/report-export";
 import { isValidScore } from "@/lib/score";
@@ -101,6 +103,16 @@ function ScoreTransferPage() {
   const [subjects, setSubjects] = useState<string[]>([...SCORE_SUBJECTS]);
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
   const [locked, setLocked] = useState<Set<ScoreKey>>(new Set(["ck1"]));
+  const [transferredIds, setTransferredIds] = useState<Record<string, string[]>>({});
+  const recordTransfer = (keys: string[]) => {
+    const at = new Date().toISOString();
+    setTransferredIds((previous) => ({ ...previous, ...Object.fromEntries(keys.map((key) => [key, rows.filter((row) => (row[key] ?? "").trim() !== "").map((row) => row.id)])) }));
+    setSources((previous) => ({ ...previous, ...Object.fromEntries(keys.flatMap((key) => {
+      const entry = previous[key];
+      return entry ? [[key, { ...entry, transfers: appendScoreTransfer(entry.transfers, "Nguyễn Thị Mai Lan - Hiệu trưởng", at) }]] : [];
+    })) }));
+  };
+  const transferTag = (key: string) => <ScoreTransferTag {...examTransferProgress(shown, key, transferredIds[key] ?? [])} />;
   const [transferred, setTransferred] = useState<string | null>(null);
 
   const lopOptions = CLASSES.filter((c) => khoi.length === 0 || khoi.includes(c[0]));
@@ -121,6 +133,7 @@ function ScoreTransferPage() {
     if (replacement) {
       setRows(replaceExamColumnSource(rows, replacement.key, exam, locked, canEdit));
       setSources((previous) => ({ ...previous, [replacement.key]: entry }));
+      setTransferredIds((previous) => ({ ...previous, [replacement.key]: [] }));
       setTransferred(null); toast.success("Đã đổi nguồn điểm kỳ thi (mô phỏng)."); return;
     }
     const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
@@ -152,7 +165,9 @@ function ScoreTransferPage() {
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
     if (conflicts) { toast.error(`Có ${conflicts} học sinh có nhiều đầu điểm cùng loại. Vui lòng giữ 1 đầu điểm trước khi chuyển.`); return; }
-    setLocked(new Set(allCols.filter((c) => rows.some((r) => (r[c.key] ?? "").trim() !== "")).map((c) => c.key)));
+    const keys = allCols.filter((c) => rows.some((r) => (r[c.key] ?? "").trim() !== "")).map((c) => c.key);
+    setLocked(new Set(keys));
+    recordTransfer(keys);
     setTransferred(new Date().toLocaleString("vi-VN"));
     toast.success(`Đã chuyển điểm của ${shown.length} học sinh sang CSDL.`);
   };
@@ -160,7 +175,7 @@ function ScoreTransferPage() {
   const th = "px-3 py-2 font-medium whitespace-nowrap border-b";
   const columnMenu = (column: { key: string; label: string; sub?: string }) => (
     <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${column.label}${column.sub ? ` ${column.sub}` : ""}`} title={`Thao tác ${column.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
-      {canEdit && <DropdownMenuItem disabled={!locked.has(column.key) && (invalid || !rows.some((r) => (r[column.key] ?? "") !== ""))} onSelect={() => { if (locked.has(column.key)) unlock(column.key); else setLocked((previous) => new Set([...previous, column.key])); setTransferred(null); }}>{locked.has(column.key) ? <Unlock /> : <Lock />}{locked.has(column.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>}
+      {canEdit && <DropdownMenuItem disabled={!locked.has(column.key) && (invalid || !rows.some((r) => (r[column.key] ?? "") !== ""))} onSelect={() => { if (locked.has(column.key)) unlock(column.key); else { setLocked((previous) => new Set([...previous, column.key])); recordTransfer([column.key]); } setTransferred(null); }}>{locked.has(column.key) ? <Unlock /> : <Lock />}{locked.has(column.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>}
       <DropdownMenuItem onSelect={() => setTrace(column)}><History />Truy nguồn</DropdownMenuItem>
       {canEdit && <DropdownMenuItem disabled={locked.has(column.key)} onSelect={() => { setRemoved((previous) => [...previous, column.key]); setTransferred(null); }}><Trash2 />Gỡ cột</DropdownMenuItem>}
       {canEdit && <DropdownMenuItem disabled={locked.has(column.key)} onSelect={() => setReplacement({ key: column.key, label: `${column.label}${column.sub ? ` ${column.sub}` : ""}`, scoreType: importedCols.find((c) => c.key === column.key)?.scoreType ?? examColumnType(column.key) })}><RefreshCw />Đổi nguồn</DropdownMenuItem>}
@@ -206,10 +221,10 @@ function ScoreTransferPage() {
                 {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"].map((h, i) => (
                   <th key={h} rowSpan={2} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>
                 ))}
-                {groups.map((group) => <th key={group.label} colSpan={group.columns.length} rowSpan={group.columns.length > 1 ? 1 : 2} className={`${th} text-center`} title={group.columns[0]?.examName}>{group.label}{group.columns.length === 1 && columnMenu(group.columns[0])}</th>)}
+                {groups.map((group) => <th key={group.label} colSpan={group.columns.length} rowSpan={group.columns.length > 1 ? 1 : 2} className={`${th} text-center`} title={group.columns[0]?.examName}><div className="flex flex-col items-center gap-1"><span>{group.label}{group.columns.length === 1 && columnMenu(group.columns[0])}</span>{group.columns.length === 1 && transferTag(group.columns[0].key)}</div></th>)}
               </tr>
               <tr>
-                {groups.filter((g) => g.columns.length > 1).flatMap((g) => g.columns.map((c, i) => <th key={c.key} className={`${th} text-center`} title={c.examName}>({i + 1}){columnMenu({ ...c, sub: `(${i + 1})` })}</th>))}
+                {groups.filter((g) => g.columns.length > 1).flatMap((g) => g.columns.map((c, i) => <th key={c.key} className={`${th} text-center`} title={c.examName}><div className="flex flex-col items-center gap-1"><span>({i + 1}){columnMenu({ ...c, sub: `(${i + 1})` })}</span>{transferTag(c.key)}</div></th>))}
               </tr>
             </thead>
             <tbody>
@@ -245,7 +260,7 @@ function ScoreTransferPage() {
             </tbody>
           </table>
         </div>
-        <Dialog open={Boolean(trace)} onOpenChange={(open) => { if (!open) setTrace(null); }}><DialogContent aria-describedby={undefined} className="max-w-3xl"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[trace.key] && <tr><td className="p-3">Kỳ thi</td><td className="p-3">{sources[trace.key].source.name}</td><td className="p-3 text-center">{sources[trace.key].source.date}</td><td className="p-3 text-center">{sources[trace.key].scoreDate}</td></tr>}</tbody></table></div></DialogContent></Dialog>
+        <Dialog open={Boolean(trace)} onOpenChange={(open) => { if (!open) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Người chuyển", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[trace.key] && <tr><td className="p-3">Kỳ thi</td><td className="p-3">{sources[trace.key].source.name}</td><td className="p-3 text-center">{sources[trace.key].source.date}</td><td className="p-3 text-center">{sources[trace.key].scoreDate}</td><ScoreTransferHistoryCells history={sources[trace.key].transfers} showPerson /></tr>}</tbody></table></div></DialogContent></Dialog>
       </div>
     </AppShell>
   );

@@ -10,7 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, showTransferTag, transferProgress } from "@/lib/teacher-score-columns";
+import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, transferProgress } from "@/lib/teacher-score-columns";
+import { appendScoreTransfer } from "@/lib/score-transfer-history";
+import { ScoreTransferTag, ScoreTransferHistoryCells } from "@/components/ScoreTransferReceipt";
 import { SCORE_CONTENT_KINDS } from "@/lib/exam-score-import";
 import { Toaster } from "@/components/ui/sonner";
 import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
@@ -57,12 +59,21 @@ function AssessmentTransferPage() {
   const shown = useMemo(() => filterAssessmentRows(rows, query, [scope.grade], [scope.klass], [scope.subject]), [rows, query, scope]);
   const invalid = shown.some((r) => availableCols.some((c) => !isValidScore(r.scores[c.key] ?? "")));
   const [transferred, setTransferred] = useState<Record<string, Record<string, string[]>>>({});
-  const recordTransfer = (keys: string[]) => setTransferred((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], ...Object.fromEntries(keys.map((key) => [key, shown.filter((r) => (r.scores[key] ?? "") !== "").map((r) => r.id)])) } }));
+  const recordTransfer = (keys: string[]) => {
+    const at = new Date().toISOString();
+    setTransferred((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], ...Object.fromEntries(keys.map((key) => [key, shown.filter((r) => (r.scores[key] ?? "") !== "").map((r) => r.id)])) } }));
+    setSources((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], ...Object.fromEntries(keys.flatMap((key) => {
+      const entry = previous[scopeKey]?.[key];
+      return entry ? [[key, { ...entry, transfers: appendScoreTransfer(entry.transfers, "Phùng Thúy Hằng - Giáo viên", at) }]] : [];
+    })) } }));
+  };
   const recordSource = (key: string, source: ScoreSourceExam) => setSources((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], [key]: { source, scoreDate: new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()) } } }));
   const addExam = (exam: ScoreSourceExam, type: ImportScoreType) => {
     if (replacement) {
       setRows(replaceTeacherScoreSource(rows, replacement.key, exam, scope, locked));
-      recordSource(replacement.key, exam); setConfirmed(false);
+      recordSource(replacement.key, exam);
+      setTransferred((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], [replacement.key]: [] } }));
+      setConfirmed(false);
       toast.success("Đã đổi nguồn điểm (mô phỏng)."); return;
     }
     const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
@@ -126,7 +137,7 @@ function AssessmentTransferPage() {
                 <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>
-              </DropdownMenuContent></DropdownMenu></span>{showTransferTag({ moved, withScore }) && <span className="inline-flex items-center gap-1 rounded-md border border-exam-success/40 bg-exam-success-tint px-1.5 py-0.5 font-normal text-exam-success">Đã chuyển<span className="rounded border border-exam-success/50 bg-exam-success/20 px-1.5 py-px font-medium tabular-nums">{moved}/{withScore}</span></span>}</div></th>;
+              </DropdownMenuContent></DropdownMenu></span><ScoreTransferTag moved={moved} withScore={withScore} /></div></th>;
               })}
             </tr>
           </thead>
@@ -143,7 +154,7 @@ function AssessmentTransferPage() {
           </tr>)}{!shown.length && <tr><td colSpan={4 + cols.length} className="text-center p-6 text-muted-foreground">Không có học sinh phù hợp</td></tr>}</tbody>
         </table>
       </div>
-      <Dialog open={Boolean(trace)} onOpenChange={(v) => { if (!v) setTrace(null); }}><DialogContent aria-describedby={undefined} className="max-w-3xl"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[scopeKey]?.[trace.key] ? (() => { const entry = sources[scopeKey][trace.key]; return <tr><td className="p-3">{SCORE_CONTENT_KINDS.find((k) => k.value === entry.source.kind)?.label}</td><td className="p-3">{entry.source.name}</td><td className="p-3 text-center">{entry.source.date}</td><td className="p-3 text-center">{entry.scoreDate}</td></tr>; })() : <tr><td colSpan={4} className="p-6 text-center text-muted-foreground">Điểm mẫu chưa có thông tin nguồn. Nguồn sẽ được ghi nhận khi lấy hoặc đổi nguồn điểm.</td></tr>}</tbody></table></div></DialogContent></Dialog>
+      <Dialog open={Boolean(trace)} onOpenChange={(v) => { if (!v) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[scopeKey]?.[trace.key] ? (() => { const entry = sources[scopeKey][trace.key]; return <tr><td className="p-3">{SCORE_CONTENT_KINDS.find((k) => k.value === entry.source.kind)?.label}</td><td className="p-3">{entry.source.name}</td><td className="p-3 text-center">{entry.source.date}</td><td className="p-3 text-center">{entry.scoreDate}</td><ScoreTransferHistoryCells history={entry.transfers} /></tr>; })() : <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Điểm mẫu chưa có thông tin nguồn. Nguồn sẽ được ghi nhận khi lấy hoặc đổi nguồn điểm.</td></tr>}</tbody></table></div></DialogContent></Dialog>
     </div>
   </AppShell>;
 }

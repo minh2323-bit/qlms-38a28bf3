@@ -43,9 +43,9 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
       <DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-4xl max-h-[90dvh] flex flex-col gap-4 p-4 sm:p-6 text-[13px] text-foreground">
         <DialogHeader className="shrink-0"><DialogTitle>{replacement ? `Đổi nguồn – ${replacement.label}` : includeAssessments ? "Lấy điểm từ nội dung khác" : "Lấy điểm từ kỳ thi khác"}</DialogTitle></DialogHeader>
         {!replacement && <section className="flex flex-wrap items-center gap-3 shrink-0">
-          <h2 className="font-semibold shrink-0">Loại điểm</h2>
+          <h2 className="font-semibold shrink-0">Loại điểm CSDL</h2>
           <Select value={scoreType} onValueChange={(v) => setScoreType(v as ImportScoreType)}>
-            <SelectTrigger aria-label="Loại điểm" className="w-56"><SelectValue placeholder="Chưa chọn" /></SelectTrigger>
+            <SelectTrigger aria-label="Loại điểm CSDL" className="w-56"><SelectValue placeholder="Chưa chọn" /></SelectTrigger>
             <SelectContent>{IMPORT_SCORE_TYPES.map((type) => <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>)}</SelectContent>
           </Select>
         </section>}

@@ -1,9 +1,10 @@
 import { ASSESSMENT_COLUMNS, type AssessmentRow } from "./assessment-scores";
 import { isValidScore } from "./score";
+import type { ScoreTransferEvent } from "./score-transfer-history";
 import { sameScoreStudent, type ScoreSourceExam } from "./exam-score-import";
 
 export type TeacherScoreScope = { grade: string; klass: string; subject: string };
-export type TeacherScoreSources = Record<string, Record<string, { source: ScoreSourceExam; scoreDate: string }>>;
+export type TeacherScoreSources = Record<string, Record<string, { source: ScoreSourceExam; scoreDate: string; transfers?: ScoreTransferEvent[] }>>;
 
 // Seed provenance from the same literal mock scores, not from the picker's independent content scores.
 export function initialTeacherScoreSources(rows: AssessmentRow[]): TeacherScoreSources {

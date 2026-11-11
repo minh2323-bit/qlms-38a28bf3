@@ -11,6 +11,10 @@ test("all seeded exam scores have exam-only provenance and matching values", () 
     expect(sources[key].scoreDate).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
   }
 });
+test("untransferred exam sources leave the person and time history empty", () => {
+  expect(sources.gk1a.transfers ?? []).toEqual([]);
+  expect(sources.ck1.transfers ?? []).toEqual([]);
+});
 test("exam replacement rejects exercises and tests", () => {
   for (const kind of ["bai-tap", "bai-kiem-tra"] as const) expect(() => replaceExamColumnSource(rows, "gk1a", { ...sources.gk1a.source, kind }, new Set(), true)).toThrow("Chỉ được lấy điểm từ kỳ thi");
 });
