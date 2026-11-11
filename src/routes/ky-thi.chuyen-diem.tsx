@@ -9,8 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppShell } from "@/components/AppShell";
 import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
-import { SubjectFilter } from "@/components/SubjectFilter";
-import { SCORE_SUBJECTS, filterScoreSubjects } from "@/lib/score-subjects";
+import { SCORE_SUBJECTS } from "@/lib/score-subjects";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
@@ -87,6 +87,10 @@ function MultiCheck({ label, value, options, onChange }: { label: string; value:
   );
 }
 
+function SingleFilter({ label, value, options, onChange }: { label: string; value: string; options: { v: string; l: string }[]; onChange: (value: string) => void }) {
+  return <Select value={value} onValueChange={onChange}><SelectTrigger aria-label={label} className="w-44 h-9"><Filter className="h-4 w-4 shrink-0" /><span>{label}: <SelectValue /></span></SelectTrigger><SelectContent>{options.map((o) => <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>)}</SelectContent></Select>;
+}
+
 function ScoreTransferPage() {
   const account = useDemoAccount();
   const canEdit = account === "principal";
@@ -98,9 +102,9 @@ function ScoreTransferPage() {
   const [replacement, setReplacement] = useState<{ key: string; label: string; scoreType: ImportScoreType } | undefined>();
   const allCols: { key: string; label: string; sub?: string; examName?: string }[] = [...COLS, ...importedCols].filter((c) => !removed.includes(c.key));
   const [q, setQ] = useState("");
-  const [khoi, setKhoi] = useState<string[]>([]);
+  const [khoi, setKhoi] = useState("3");
   const [lop, setLop] = useState<string[]>([]);
-  const [subjects, setSubjects] = useState<string[]>([...SCORE_SUBJECTS]);
+  const [mon, setMon] = useState(SCORE_SUBJECTS[0]);
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
   const [locked, setLocked] = useState<Set<ScoreKey>>(new Set(["ck1"]));
   const [transferredIds, setTransferredIds] = useState<Record<string, string[]>>({});
@@ -115,9 +119,10 @@ function ScoreTransferPage() {
   const transferTag = (key: string) => <ScoreTransferTag {...examTransferProgress(shown, key, transferredIds[key] ?? [])} />;
   const [transferred, setTransferred] = useState<string | null>(null);
 
-  const lopOptions = CLASSES.filter((c) => khoi.length === 0 || khoi.includes(c[0]));
-  const shown = useMemo(() => filterScoreSubjects(rows, subjects).filter((r) =>
-    r.name.toLowerCase().includes(q.trim().toLowerCase()) && (khoi.length === 0 || khoi.includes(r.khoi)) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop, subjects]);
+  const lopOptions = CLASSES.filter((c) => c[0] === khoi);
+  const shown = useMemo(() => rows.filter((r) =>
+    r.mon === mon && r.khoi === khoi &&
+    r.name.toLowerCase().includes(q.trim().toLowerCase()) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop, mon]);
   const invalid = rows.some((r) => allCols.some((c) => !isValidScore(r[c.key] ?? "")));
   const hasConflict = (r: Row) => allCols.some((c) => allCols.filter((other) => other.label === c.label && (r[other.key] ?? "").trim() !== "").length > 1);
   const conflicts = rows.filter(hasConflict).length;
@@ -197,10 +202,10 @@ function ScoreTransferPage() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input className="pl-8 h-9" placeholder="Tìm tên học sinh" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
-          <MultiCheck label="Khối" value={khoi} options={["3", "4", "5"].map((k) => ({ v: k, l: `Khối ${k}` }))}
-            onChange={(v) => { setKhoi(v); setLop((l) => l.filter((c) => v.length === 0 || v.includes(c[0]))); }} />
+          <SingleFilter label="Khối" value={khoi} options={["3", "4", "5"].map((k) => ({ v: k, l: `Khối ${k}` }))}
+            onChange={(v) => { setKhoi(v); setLop((l) => l.filter((c) => c[0] === v)); }} />
           <MultiCheck label="Lớp" value={lop} options={lopOptions.map((c) => ({ v: c, l: `Lớp ${c}` }))} onChange={setLop} />
-          <SubjectFilter selected={subjects} onChange={setSubjects} />
+          <SingleFilter label="Môn" value={mon} options={SCORE_SUBJECTS.map((s) => ({ v: s, l: s }))} onChange={setMon} />
           <ScoreTypeFilter columns={availableCols} hiddenKeys={hiddenScoreKeys} onChange={setHiddenScoreKeys} />
           <div className="ml-auto flex gap-2">
             <Button variant="outline" size="sm" onClick={exportExcel}><FileSpreadsheet className="h-4 w-4" />Xuất Excel</Button>
