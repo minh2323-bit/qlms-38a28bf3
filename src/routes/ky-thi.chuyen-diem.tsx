@@ -106,26 +106,32 @@ function ScoreTransferPage() {
   const [lop, setLop] = useState<string[]>([]);
   const [mon, setMon] = useState(SCORE_SUBJECTS[0]);
   const [hiddenScoreKeys, setHiddenScoreKeys] = useState<string[]>([]);
-  const [locked, setLocked] = useState<Set<ScoreKey>>(new Set(["ck1"]));
+  const [scopedLocks, setScopedLocks] = useState<Set<string>>(() => new Set(["3", "4", "5"].flatMap((k) => SCORE_SUBJECTS.map((m) => `${k}|${m}::ck1`))));
+  const scope = `${khoi}|${mon}`;
+  const locked = useMemo(() => new Set([...scopedLocks].filter((k) => k.startsWith(`${scope}::`)).map((k) => k.slice(scope.length + 2))), [scopedLocks, scope]);
+  const setLocked = (update: Set<ScoreKey> | ((s: Set<ScoreKey>) => Set<ScoreKey>)) => {
+    const next = typeof update === "function" ? update(locked) : update;
+    setScopedLocks((all) => new Set([...[...all].filter((k) => !k.startsWith(`${scope}::`)), ...[...next].map((k) => `${scope}::${k}`)]));
+  };
   const [transferredIds, setTransferredIds] = useState<Record<string, string[]>>({});
   const recordTransfer = (keys: string[]) => {
     const at = new Date().toISOString();
-    setTransferredIds((previous) => ({ ...previous, ...Object.fromEntries(keys.map((key) => [key, rows.filter((row) => (row[key] ?? "").trim() !== "").map((row) => row.id)])) }));
+    setTransferredIds((previous) => ({ ...previous, ...Object.fromEntries(keys.map((key) => [`${scope}::${key}`, shown.filter((row) => (row[key] ?? "").trim() !== "").map((row) => row.id)])) }));
     setSources((previous) => ({ ...previous, ...Object.fromEntries(keys.flatMap((key) => {
       const entry = previous[key];
       return entry ? [[key, { ...entry, transfers: appendScoreTransfer(entry.transfers, "Nguyễn Thị Mai Lan - Hiệu trưởng", at) }]] : [];
     })) }));
   };
-  const transferTag = (key: string) => <ScoreTransferTag {...examTransferProgress(shown, key, transferredIds[key] ?? [])} />;
+  const transferTag = (key: string) => <ScoreTransferTag {...examTransferProgress(shown, key, transferredIds[`${scope}::${key}`] ?? [])} />;
   const [transferred, setTransferred] = useState<string | null>(null);
 
   const lopOptions = CLASSES.filter((c) => c[0] === khoi);
   const shown = useMemo(() => rows.filter((r) =>
     r.mon === mon && r.khoi === khoi &&
     r.name.toLowerCase().includes(q.trim().toLowerCase()) && (lop.length === 0 || lop.includes(r.lop))), [rows, q, khoi, lop, mon]);
-  const invalid = rows.some((r) => allCols.some((c) => !isValidScore(r[c.key] ?? "")));
+  const invalid = shown.some((r) => allCols.some((c) => !isValidScore(r[c.key] ?? "")));
   const hasConflict = (r: Row) => allCols.some((c) => allCols.filter((other) => other.label === c.label && (r[other.key] ?? "").trim() !== "").length > 1);
-  const conflicts = rows.filter(hasConflict).length;
+  const conflicts = shown.filter(hasConflict).length;
   // GV chỉ thấy cột điểm BGH đã xác nhận chuyển sang CSDL
   const availableCols = canEdit ? allCols : allCols.filter((c) => locked.has(c.key));
   const filteredCols = visibleScoreColumns(availableCols, hiddenScoreKeys);
@@ -138,7 +144,7 @@ function ScoreTransferPage() {
     if (replacement) {
       setRows(replaceExamColumnSource(rows, replacement.key, exam, locked, canEdit));
       setSources((previous) => ({ ...previous, [replacement.key]: entry }));
-      setTransferredIds((previous) => ({ ...previous, [replacement.key]: [] }));
+      setTransferredIds((previous) => Object.fromEntries(Object.entries(previous).filter(([k]) => !k.endsWith(`::${replacement.key}`))));
       setTransferred(null); toast.success("Đã đổi nguồn điểm kỳ thi (mô phỏng)."); return;
     }
     const column = importExamColumn(exam, type, importedCols.map((c) => c.examId));
@@ -170,8 +176,8 @@ function ScoreTransferPage() {
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
     if (conflicts) { toast.error(`Có ${conflicts} học sinh có nhiều đầu điểm cùng loại. Vui lòng giữ 1 đầu điểm trước khi chuyển.`); return; }
-    const keys = allCols.filter((c) => rows.some((r) => (r[c.key] ?? "").trim() !== "")).map((c) => c.key);
-    setLocked(new Set(keys));
+    const keys = allCols.filter((c) => shown.some((r) => (r[c.key] ?? "").trim() !== "")).map((c) => c.key);
+    setLocked((s) => new Set([...s, ...keys]));
     recordTransfer(keys);
     setTransferred(new Date().toLocaleString("vi-VN"));
     toast.success(`Đã chuyển điểm của ${shown.length} học sinh sang CSDL.`);
@@ -180,7 +186,7 @@ function ScoreTransferPage() {
   const th = "px-3 py-2 font-medium whitespace-nowrap border-b";
   const columnMenu = (column: { key: string; label: string; sub?: string }) => (
     <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${column.label}${column.sub ? ` ${column.sub}` : ""}`} title={`Thao tác ${column.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
-      {canEdit && <DropdownMenuItem disabled={!locked.has(column.key) && (invalid || !rows.some((r) => (r[column.key] ?? "") !== ""))} onSelect={() => { if (locked.has(column.key)) unlock(column.key); else { setLocked((previous) => new Set([...previous, column.key])); recordTransfer([column.key]); } setTransferred(null); }}>{locked.has(column.key) ? <Unlock /> : <Lock />}{locked.has(column.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>}
+      {canEdit && <DropdownMenuItem disabled={!locked.has(column.key) && (invalid || !shown.some((r) => (r[column.key] ?? "") !== ""))} onSelect={() => { if (locked.has(column.key)) unlock(column.key); else { setLocked((previous) => new Set([...previous, column.key])); recordTransfer([column.key]); } setTransferred(null); }}>{locked.has(column.key) ? <Unlock /> : <Lock />}{locked.has(column.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>}
       <DropdownMenuItem onSelect={() => setTrace(column)}><History />Truy nguồn</DropdownMenuItem>
       {canEdit && <DropdownMenuItem disabled={locked.has(column.key)} onSelect={() => { setRemoved((previous) => [...previous, column.key]); setTransferred(null); }}><Trash2 />Gỡ cột</DropdownMenuItem>}
       {canEdit && <DropdownMenuItem disabled={locked.has(column.key)} onSelect={() => setReplacement({ key: column.key, label: `${column.label}${column.sub ? ` ${column.sub}` : ""}`, scoreType: importedCols.find((c) => c.key === column.key)?.scoreType ?? examColumnType(column.key) })}><RefreshCw />Đổi nguồn</DropdownMenuItem>}
