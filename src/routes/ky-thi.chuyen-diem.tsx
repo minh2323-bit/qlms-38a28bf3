@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CheckCircle2, FileSpreadsheet, Filter, Lock, Unlock, MoreVertical, History, Trash2, RefreshCw, Search, TriangleAlert } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -219,7 +219,7 @@ function ScoreTransferPage() {
           </div>
         </div>
         {conflicts > 0 && <p role="alert" className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Có {conflicts} học sinh có nhiều đầu điểm cùng loại – được tô đỏ trong bảng.</span></p>}
-        <p className="flex items-start gap-2 rounded border border-destructive bg-destructive/10 px-3 py-2 text-foreground"><TriangleAlert className="h-4 w-4 shrink-0 mt-0.5" /><span>Lưu ý: kiểm tra các học sinh đã có điểm GKI/CKI bên trang <Link to="/thong-ke/chuyen-diem" className="underline underline-offset-2 hover:text-primary">Chuyển điểm sang CSDL</Link>.</span></p>
+
         {transferred && <p className="text-exam-success">Đã chuyển điểm sang CSDL lúc {transferred}.</p>}
         <div className="rounded-lg border bg-card overflow-auto max-h-[70vh]">
           <table className="w-full border-separate border-spacing-0">

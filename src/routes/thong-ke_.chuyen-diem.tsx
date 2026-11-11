@@ -56,6 +56,7 @@ function AssessmentTransferPage() {
   const locked = locks[scopeKey] ?? new Set<string>();
   const setLocked = (update: (previous: Set<string>) => Set<string>) => setLocks((previous) => ({ ...previous, [scopeKey]: update(previous[scopeKey] ?? new Set()) }));
   const [confirmed, setConfirmed] = useState(false);
+  const [tooManyCols, setTooManyCols] = useState(false);
   const shown = useMemo(() => filterAssessmentRows(rows, query, [scope.grade], [scope.klass], [scope.subject]), [rows, query, scope]);
   const invalid = shown.some((r) => availableCols.some((c) => !isValidScore(r.scores[c.key] ?? "")));
   const [transferred, setTransferred] = useState<Record<string, Record<string, string[]>>>({});
@@ -98,6 +99,7 @@ function AssessmentTransferPage() {
   };
   const confirm = () => {
     if (invalid || !shown.length) return;
+    if (availableCols.length > ASSESSMENT_COLUMNS.length) { setTooManyCols(true); return; }
     const keys = availableCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key);
     setLocked((previous) => new Set([...previous, ...keys]));
     recordTransfer(keys);
@@ -133,7 +135,7 @@ function AssessmentTransferPage() {
               {cols.map((c) => {
                 const { moved, withScore } = transferProgress(shown, c.key, transferred[scopeKey]?.[c.key] ?? []);
                 return <th key={c.key} className={`${th} text-center`} title={c.examName}><div className="flex flex-col items-center gap-1"><span className="inline-flex items-center">{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${c.label}`} title={`Thao tác ${c.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
-                <DropdownMenuItem disabled={!locked.has(c.key) && (invalid || !shown.some((r) => (r.scores[c.key] ?? "") !== ""))} onSelect={() => { if (locked.has(c.key)) unlock(c.key); else { setLocked((previous) => new Set([...previous, c.key])); recordTransfer([c.key]); } }}>{locked.has(c.key) ? <Unlock /> : <Lock />}{locked.has(c.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>
+                <DropdownMenuItem disabled={!locked.has(c.key) && (invalid || !shown.some((r) => (r.scores[c.key] ?? "") !== ""))} onSelect={() => { if (locked.has(c.key)) unlock(c.key); else if (availableCols.length > ASSESSMENT_COLUMNS.length) setTooManyCols(true); else { setLocked((previous) => new Set([...previous, c.key])); recordTransfer([c.key]); } }}>{locked.has(c.key) ? <Unlock /> : <Lock />}{locked.has(c.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>
@@ -154,6 +156,7 @@ function AssessmentTransferPage() {
           </tr>)}{!shown.length && <tr><td colSpan={4 + cols.length} className="text-center p-6 text-muted-foreground">Không có học sinh phù hợp</td></tr>}</tbody>
         </table>
       </div>
+      <Dialog open={tooManyCols} onOpenChange={setTooManyCols}><DialogContent aria-describedby={undefined} className="max-w-md"><DialogHeader><DialogTitle>Không thể chuyển điểm</DialogTitle></DialogHeader><p className="text-foreground">Số cột điểm của bạn nhiều hơn số điểm cho phép bên CSDL. Vui lòng kiểm tra lại!</p><div className="flex justify-end"><Button onClick={() => setTooManyCols(false)}>Đã hiểu</Button></div></DialogContent></Dialog>
       <Dialog open={Boolean(trace)} onOpenChange={(v) => { if (!v) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[scopeKey]?.[trace.key] ? (() => { const entry = sources[scopeKey][trace.key]; return <tr><td className="p-3">{SCORE_CONTENT_KINDS.find((k) => k.value === entry.source.kind)?.label}</td><td className="p-3">{entry.source.name}</td><td className="p-3 text-center">{entry.source.date}</td><td className="p-3 text-center">{entry.scoreDate}</td><ScoreTransferHistoryCells history={entry.transfers} /></tr>; })() : <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Điểm mẫu chưa có thông tin nguồn. Nguồn sẽ được ghi nhận khi lấy hoặc đổi nguồn điểm.</td></tr>}</tbody></table></div></DialogContent></Dialog>
     </div>
   </AppShell>;
