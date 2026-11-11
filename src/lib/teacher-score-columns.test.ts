@@ -2,7 +2,7 @@
 import { expect, test } from "bun:test";
 import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS } from "./assessment-scores";
 import { scoreSourceAssessments } from "./exam-score-import";
-import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, transferProgress } from "./teacher-score-columns";
+import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, showTransferTag, transferProgress } from "./teacher-score-columns";
 
 test("100% of existing teacher scores have scoped content provenance matching their value", () => {
   const sources = initialTeacherScoreSources(ASSESSMENT_ROWS);
@@ -49,6 +49,11 @@ test("transfer tag counts students transferred at lock time against students wit
   expect(transferProgress(scoped, "dgtx5", transferred)).toEqual({ moved: 1, withScore: 1 });
   const filled = scoped.map((r) => ({ ...r, scores: { ...r.scores, dgtx5: r.scores.dgtx5 || "8" } }));
   expect(transferProgress(filled, "dgtx5", transferred)).toEqual({ moved: 1, withScore: 2 });
+});
+test("transfer tag only shows when at least one student was transferred", () => {
+  expect(showTransferTag({ moved: 0, withScore: 50 })).toBe(false);
+  expect(showTransferTag({ moved: 1, withScore: 50 })).toBe(true);
+  expect(showTransferTag({ moved: 50, withScore: 50 })).toBe(true);
 });
 test("locked columns cannot replace their source", () => {
   expect(() => replaceTeacherScoreSource(ASSESSMENT_ROWS, "dgtx1", scoreSourceAssessments()[0], defaultTeacherScope(ASSESSMENT_ROWS), new Set(["dgtx1"]))).toThrow("Mở khóa");

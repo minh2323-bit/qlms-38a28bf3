@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, transferProgress } from "@/lib/teacher-score-columns";
+import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, showTransferTag, transferProgress } from "@/lib/teacher-score-columns";
 import { SCORE_CONTENT_KINDS } from "@/lib/exam-score-import";
 import { Toaster } from "@/components/ui/sonner";
 import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
@@ -126,7 +126,7 @@ function AssessmentTransferPage() {
                 <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>
-              </DropdownMenuContent></DropdownMenu></span><span className="inline-flex items-center gap-1.5 rounded-md border border-exam-success/40 bg-exam-success-tint px-2 py-0.5 font-normal text-exam-success">Đã chuyển điểm<span className="rounded border border-exam-success/50 bg-exam-success/20 px-1.5 py-px font-medium tabular-nums">{moved}/{withScore}</span></span></div></th>;
+              </DropdownMenuContent></DropdownMenu></span>{showTransferTag({ moved, withScore }) && <span className="inline-flex items-center gap-1 rounded-md border border-exam-success/40 bg-exam-success-tint px-1.5 py-0.5 font-normal text-exam-success">Đã chuyển<span className="rounded border border-exam-success/50 bg-exam-success/20 px-1.5 py-px font-medium tabular-nums">{moved}/{withScore}</span></span>}</div></th>;
               })}
             </tr>
           </thead>

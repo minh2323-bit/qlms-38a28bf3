@@ -39,6 +39,9 @@ export function transferProgress(rows: AssessmentRow[], key: string, transferred
   const moved = Math.min(withScore, transferredIds.filter((id) => rows.some((r) => r.id === id)).length);
   return { moved, withScore };
 }
+export function showTransferTag(progress: { moved: number; withScore: number }) {
+  return progress.moved >= 1;
+}
 export function inTeacherScope(row: { khoi: string; lop: string; mon: string }, scope: TeacherScoreScope) {
   return Boolean(scope.grade && scope.klass && scope.subject && row.khoi === scope.grade && row.lop === scope.klass && row.mon === scope.subject);
 }
