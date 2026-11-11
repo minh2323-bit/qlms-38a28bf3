@@ -34,6 +34,11 @@ export function defaultTeacherScope(rows: AssessmentRow[]): TeacherScoreScope {
   const subject = rows.find((r) => r.lop === klass)?.mon ?? "";
   return { grade, klass, subject };
 }
+export function transferProgress(rows: AssessmentRow[], key: string, transferredIds: string[]) {
+  const withScore = rows.filter((r) => (r.scores[key] ?? "") !== "").length;
+  const moved = Math.min(withScore, transferredIds.filter((id) => rows.some((r) => r.id === id)).length);
+  return { moved, withScore };
+}
 export function inTeacherScope(row: { khoi: string; lop: string; mon: string }, scope: TeacherScoreScope) {
   return Boolean(scope.grade && scope.klass && scope.subject && row.khoi === scope.grade && row.lop === scope.klass && row.mon === scope.subject);
 }

@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
 import { SCORE_SUBJECTS } from "@/lib/score-subjects";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource } from "@/lib/teacher-score-columns";
+import { defaultTeacherScope, initialTeacherScoreSources, inTeacherScope, replaceTeacherScoreSource, transferProgress } from "@/lib/teacher-score-columns";
 import { SCORE_CONTENT_KINDS } from "@/lib/exam-score-import";
 import { Toaster } from "@/components/ui/sonner";
 import { ASSESSMENT_COLUMNS, ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from "@/lib/assessment-scores";
@@ -56,6 +57,8 @@ function AssessmentTransferPage() {
   const [confirmed, setConfirmed] = useState(false);
   const shown = useMemo(() => filterAssessmentRows(rows, query, [scope.grade], [scope.klass], [scope.subject]), [rows, query, scope]);
   const invalid = shown.some((r) => availableCols.some((c) => !isValidScore(r.scores[c.key] ?? "")));
+  const [transferred, setTransferred] = useState<Record<string, Record<string, string[]>>>({});
+  const recordTransfer = (keys: string[]) => setTransferred((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], ...Object.fromEntries(keys.map((key) => [key, shown.filter((r) => (r.scores[key] ?? "") !== "").map((r) => r.id)])) } }));
   const recordSource = (key: string, source: ScoreSourceExam) => setSources((previous) => ({ ...previous, [scopeKey]: { ...previous[scopeKey], [key]: { source, scoreDate: new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()) } } }));
   const addExam = (exam: ScoreSourceExam, type: ImportScoreType) => {
     if (replacement) {
@@ -85,7 +88,9 @@ function AssessmentTransferPage() {
   };
   const confirm = () => {
     if (invalid || !shown.length) return;
-    setLocked((previous) => new Set([...previous, ...availableCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key)]));
+    const keys = availableCols.filter((c) => shown.some((r) => (r.scores[c.key] ?? "") !== "")).map((c) => c.key);
+    setLocked((previous) => new Set([...previous, ...keys]));
+    recordTransfer(keys);
     setConfirmed(true);
     toast.success(`Đã xác nhận điểm của ${shown.length} học sinh (mô phỏng).`);
   };
@@ -115,12 +120,15 @@ function AssessmentTransferPage() {
           <thead className="sticky top-0 z-10 bg-muted">
             <tr><th colSpan={4} className={`${th} border-r text-center`}>Thông tin học sinh</th><th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm số<ExamScorePicker addedIds={replacement ? [] : importedCols.map((c) => c.examId)} includeAssessments scope={scope} replacement={replacement} onReplacementClose={() => setReplacement(undefined)} onConfirm={addExam} /></th></tr>
             <tr className="text-left">{header.map((h, i) => <th key={h} className={`${th} ${i === 3 ? "border-r" : ""}`}>{h}</th>)}
-              {cols.map((c) => <th key={c.key} className={`${th} text-center`} title={c.examName}>{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${c.label}`} title={`Thao tác ${c.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
-                <DropdownMenuItem disabled={!locked.has(c.key) && (invalid || !shown.some((r) => (r.scores[c.key] ?? "") !== ""))} onSelect={() => { if (locked.has(c.key)) unlock(c.key); else setLocked((previous) => new Set([...previous, c.key])); }}>{locked.has(c.key) ? <Unlock /> : <Lock />}{locked.has(c.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>
+              {cols.map((c) => {
+                const { moved, withScore } = transferProgress(shown, c.key, transferred[scopeKey]?.[c.key] ?? []);
+                return <th key={c.key} className={`${th} text-center`} title={c.examName}><div className="flex flex-col items-center gap-1"><span className="inline-flex items-center">{c.label}{allCols.filter((other) => other.label === c.label).length > 1 ? ` (${allCols.filter((other) => other.label === c.label).findIndex((other) => other.key === c.key) + 1})` : ""}<DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Thao tác ${c.label}`} title={`Thao tác ${c.label}`} className="ml-0.5 h-6 w-4 align-middle"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end">
+                <DropdownMenuItem disabled={!locked.has(c.key) && (invalid || !shown.some((r) => (r.scores[c.key] ?? "") !== ""))} onSelect={() => { if (locked.has(c.key)) unlock(c.key); else { setLocked((previous) => new Set([...previous, c.key])); recordTransfer([c.key]); } }}>{locked.has(c.key) ? <Unlock /> : <Lock />}{locked.has(c.key) ? "Mở khóa" : "Chuyển điểm & Khóa"}</DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>
-              </DropdownMenuContent></DropdownMenu></th>)}
+              </DropdownMenuContent></DropdownMenu></span><Badge variant="secondary" className={`font-normal ${withScore > 0 && moved === withScore ? "bg-exam-success/15 text-exam-success" : ""}`}>Đã chuyển {moved}/{withScore}</Badge></div></th>;
+              })}
             </tr>
           </thead>
           <tbody>{shown.map((r, i) => <tr key={r.id}>
