@@ -4,10 +4,10 @@ import { ASSESSMENT_ROWS, filterAssessmentRows, unlockAssessmentColumn } from ".
 import { isValidScore } from "./score";
 describe("assessment score transfer rules", () => {
   test("teachers can unlock a confirmed assessment column without unlocking other scores", () => {
-    const locked = new Set(["dgtx1", "dgtx2", "dgtx4"]);
+    const locked = new Set(["dgtx1", "dgtx2", "dgtx3"]);
     const next = unlockAssessmentColumn(locked, "dgtx1");
     expect(next.has("dgtx1")).toBe(false);
-    expect([...next]).toEqual(["dgtx2", "dgtx4"]);
+    expect([...next]).toEqual(["dgtx2", "dgtx3"]);
     expect(locked.has("dgtx1")).toBe(true);
   });
   test("scores accept 0 and 10 but reject values outside 0–10", () => {

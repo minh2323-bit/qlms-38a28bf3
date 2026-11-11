@@ -20,7 +20,7 @@ test("100% of existing teacher scores have scoped content provenance matching th
       checked++;
     }
   }
-  expect(checked).toBe(162);
+  expect(checked).toBe(90);
 });
 
 test("untransferred teacher sources have no transfer time", () => {
@@ -49,11 +49,11 @@ test("transfer tag counts students transferred at lock time against students wit
   const scope = { grade: "3", klass: "3A", subject: "Toán" };
   const scoped = ASSESSMENT_ROWS.filter((r) => inTeacherScope(r, scope));
   expect(transferProgress(scoped, "dgtx1", [])).toEqual({ moved: 0, withScore: 2 });
-  const transferred = scoped.filter((r) => r.scores.dgtx5).map((r) => r.id);
+  const transferred = scoped.filter((r) => r.scores.dgtx3).map((r) => r.id);
   expect(transferred).toHaveLength(1);
-  expect(transferProgress(scoped, "dgtx5", transferred)).toEqual({ moved: 1, withScore: 1 });
-  const filled = scoped.map((r) => ({ ...r, scores: { ...r.scores, dgtx5: r.scores.dgtx5 || "8" } }));
-  expect(transferProgress(filled, "dgtx5", transferred)).toEqual({ moved: 1, withScore: 2 });
+  expect(transferProgress(scoped, "dgtx3", transferred)).toEqual({ moved: 1, withScore: 1 });
+  const filled = scoped.map((r) => ({ ...r, scores: { ...r.scores, dgtx3: r.scores.dgtx3 || "8" } }));
+  expect(transferProgress(filled, "dgtx3", transferred)).toEqual({ moved: 1, withScore: 2 });
 });
 test("transfer tag only shows when at least one student was transferred", () => {
   expect(showTransferTag({ moved: 0, withScore: 50 })).toBe(false);
