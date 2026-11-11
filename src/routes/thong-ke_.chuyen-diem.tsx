@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ScoreTypeFilter } from "@/components/ScoreTypeFilter";
 import { SCORE_SUBJECTS } from "@/lib/score-subjects";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -127,7 +126,7 @@ function AssessmentTransferPage() {
                 <DropdownMenuItem onSelect={() => setTrace(c)}><History />Truy nguồn</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => { setRemoved((prev) => ({ ...prev, [scopeKey]: [...(prev[scopeKey] ?? []), c.key] })); setConfirmed(false); }}><Trash2 />Gỡ cột</DropdownMenuItem>
                 <DropdownMenuItem disabled={locked.has(c.key)} onSelect={() => setReplacement({ key: c.key, label: c.label, scoreType: importedCols.find((col) => col.key === c.key)?.scoreType ?? (c.key === "dgtx4" ? "gk1" : c.key === "dgtx5" ? "ck1" : "dgtx") })}><RefreshCw />Đổi nguồn</DropdownMenuItem>
-              </DropdownMenuContent></DropdownMenu></span><Badge variant="secondary" className={`font-normal ${withScore > 0 && moved === withScore ? "bg-exam-success/15 text-exam-success" : ""}`}>Đã chuyển {moved}/{withScore}</Badge></div></th>;
+              </DropdownMenuContent></DropdownMenu></span><span className="inline-flex items-center gap-1.5 rounded-md border border-exam-success/40 bg-exam-success-tint px-2 py-0.5 font-normal text-exam-success">Đã chuyển điểm<span className="rounded border border-exam-success/50 bg-exam-success/20 px-1.5 py-px font-medium tabular-nums">{moved}/{withScore}</span></span></div></th>;
               })}
             </tr>
           </thead>
@@ -139,7 +138,7 @@ function AssessmentTransferPage() {
                 if (!/^\d{0,2}(\.\d?)?$/.test(value)) return;
                 setConfirmed(false);
                 setRows((rs) => rs.map((row) => row.id === r.id ? { ...row, scores: { ...row.scores, [c.key]: value } } : row));
-              }} className={`h-8 w-20 mx-auto text-center ${!isValidScore(r.scores[c.key] ?? "") ? "border-destructive text-destructive" : ""}`} />}
+              }} className={`h-8 w-20 mx-auto text-center border-exam-warning bg-exam-warning-tint ${!isValidScore(r.scores[c.key] ?? "") ? "border-destructive text-destructive" : ""}`} />}
             </td>)}
           </tr>)}{!shown.length && <tr><td colSpan={4 + cols.length} className="text-center p-6 text-muted-foreground">Không có học sinh phù hợp</td></tr>}</tbody>
         </table>
