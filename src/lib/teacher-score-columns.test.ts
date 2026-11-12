@@ -51,7 +51,7 @@ test("transfer tag counts students transferred at lock time against students wit
   expect(transferProgress(scoped, "dgtx1", [])).toEqual({ moved: 0, withScore: 2 });
   const transferred = scoped.filter((r) => r.scores.dgtx3).map((r) => r.id);
   expect(transferred).toHaveLength(1);
-  expect(transferProgress(scoped, "dgtx3", transferred)).toEqual({ moved: 1, withScore: 1 });
+  expect(transferProgress(scoped, "dgtx3", transferred)).toEqual({ moved: 1, withScore: 2 });
   const filled = scoped.map((r) => ({ ...r, scores: { ...r.scores, dgtx3: r.scores.dgtx3 || "8" } }));
   expect(transferProgress(filled, "dgtx3", transferred)).toEqual({ moved: 1, withScore: 2 });
 });

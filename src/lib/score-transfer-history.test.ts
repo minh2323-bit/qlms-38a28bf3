@@ -18,4 +18,7 @@ test("exam tags track 45 of 50 scored students until the next transfer", () => {
   expect(examTransferProgress(rows, "ck1", [])).toEqual({ moved: 0, withScore: 50 });
   expect(examTransferProgress(rows, "ck1", rows.slice(0, 45).map((row) => row.id))).toEqual({ moved: 45, withScore: 50 });
   expect(examTransferProgress(rows, "ck1", rows.map((row) => row.id))).toEqual({ moved: 50, withScore: 50 });
+});test("tag total is the whole table even when only 40 of 50 students have scores", () => {
+  const rows = Array.from({ length: 50 }, (_, index) => ({ id: String(index), gk1: index < 40 ? "7" : "" }));
+  expect(examTransferProgress(rows, "gk1", rows.map((row) => row.id))).toEqual({ moved: 40, withScore: 50 });
 });

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +22,9 @@ import {
 
 export const Route = createFileRoute("/giao-bai-tap/")({
   head: () => ({ meta: [{ title: "Giao bài tập, nhiệm vụ" }] }),
-  validateSearch: (s: Record<string, unknown>): { highlight?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { highlight?: string; focus?: string } => ({
     highlight: typeof s.highlight === "string" ? (s.highlight as string) : undefined,
+    focus: typeof s.focus === "string" ? (s.focus as string) : undefined,
   }),
   component: Page,
 });
@@ -100,7 +101,13 @@ function isOverdue(t: Task) { return new Date(t.dueAt).getTime() < Date.now(); }
 /* ---------- Page ---------- */
 function Page() {
   const navigate = useNavigate();
-  const { highlight } = Route.useSearch();
+  const { highlight, focus } = Route.useSearch();
+  useEffect(() => {
+    if (!focus) return;
+    const el = document.querySelector(`[data-task-title="${CSS.escape(focus)}"]`);
+    if (el) el.scrollIntoView({ block: "center", behavior: "smooth" });
+    else toast.info(`Đang tìm nội dung nguồn: ${focus} (dữ liệu mô phỏng chưa có trong danh sách).`);
+  }, [focus]);
   const highlightUngraded = highlight === "ungraded";
   const [tasks, setTasks] = useState<Task[]>(SEED);
 
@@ -270,10 +277,11 @@ function Page() {
           )}
           {filtered.map((t) => {
             const overdue = isOverdue(t);
-            const isHighlighted = highlightUngraded && t.graded === 0;
+            const isHighlighted = (highlightUngraded && t.graded === 0) || (!!focus && t.title === focus);
             return (
               <li
                 key={t.id}
+                data-task-title={t.title}
                 onClick={() => navigate({ to: "/giao-bai-tap/$taskId", params: { taskId: t.id } })}
                 className={`rounded-xl border bg-white p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer ${
                   isHighlighted ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50/40 shadow-md" : ""

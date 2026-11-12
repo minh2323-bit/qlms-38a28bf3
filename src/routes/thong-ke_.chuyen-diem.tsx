@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, FileSpreadsheet, Filter, Lock, Search, MoreVertical, Unlock, History, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -146,7 +146,7 @@ function AssessmentTransferPage() {
           <tbody>{shown.map((r, i) => <tr key={r.id}>
             {[i + 1, r.name, r.cccd, r.dob].map((v, index) => <td key={index} className={`px-3 py-1.5 border-b whitespace-nowrap ${index === 1 ? "font-medium" : ""} ${index === 3 ? "border-r" : ""}`}>{v}</td>)}
             {cols.map((c) => <td key={c.key} className="px-3 py-1.5 border-b text-center">
-              {locked.has(c.key) ? <span className="text-muted-foreground">{r.scores[c.key] || "–"}</span> : <Input inputMode="decimal" aria-label={`${c.label} ${r.name} ${r.lop}`} value={r.scores[c.key] ?? ""} onChange={(e) => {
+              {locked.has(c.key) || sources[scopeKey]?.[c.key]?.source.kind === "ky-thi" ? <span className="text-muted-foreground" title={!locked.has(c.key) ? "Điểm kỳ thi chỉ xem, muốn sửa cần chấm lại" : undefined}>{r.scores[c.key] || "–"}</span> : <Input inputMode="decimal" aria-label={`${c.label} ${r.name} ${r.lop}`} value={r.scores[c.key] ?? ""} onChange={(e) => {
                 const value = e.target.value;
                 if (!/^\d{0,2}(\.\d?)?$/.test(value)) return;
                 setConfirmed(false);
@@ -157,7 +157,7 @@ function AssessmentTransferPage() {
         </table>
       </div>
       <Dialog open={tooManyCols} onOpenChange={setTooManyCols}><DialogContent aria-describedby={undefined} className="max-w-md"><DialogHeader><DialogTitle>Không thể chuyển điểm</DialogTitle></DialogHeader><p className="text-foreground">Số cột điểm của bạn nhiều hơn số điểm cho phép bên CSDL. Vui lòng kiểm tra lại!</p><div className="flex justify-end"><Button onClick={() => setTooManyCols(false)}>Đã hiểu</Button></div></DialogContent></Dialog>
-      <Dialog open={Boolean(trace)} onOpenChange={(v) => { if (!v) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[scopeKey]?.[trace.key] ? (() => { const entry = sources[scopeKey][trace.key]; return <tr><td className="p-3">{SCORE_CONTENT_KINDS.find((k) => k.value === entry.source.kind)?.label}</td><td className="p-3">{entry.source.name}</td><td className="p-3 text-center">{entry.source.date}</td><td className="p-3 text-center">{entry.scoreDate}</td><ScoreTransferHistoryCells history={entry.transfers} /></tr>; })() : <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Điểm mẫu chưa có thông tin nguồn. Nguồn sẽ được ghi nhận khi lấy hoặc đổi nguồn điểm.</td></tr>}</tbody></table></div></DialogContent></Dialog>
+      <Dialog open={Boolean(trace)} onOpenChange={(v) => { if (!v) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[scopeKey]?.[trace.key] ? (() => { const entry = sources[scopeKey][trace.key]; return <tr><td className="p-3">{SCORE_CONTENT_KINDS.find((k) => k.value === entry.source.kind)?.label}</td><td className="p-3">{entry.source.kind === "ky-thi" ? <Link to="/ky-thi/chinh-thuc" search={{ focus: entry.source.name }} className="text-exam-primary underline-offset-2 hover:underline">{entry.source.name}</Link> : <Link to="/giao-bai-tap" search={{ focus: entry.source.name }} className="text-exam-primary underline-offset-2 hover:underline">{entry.source.name}</Link>}</td><td className="p-3 text-center">{entry.source.date}</td><td className="p-3 text-center">{entry.scoreDate}</td><ScoreTransferHistoryCells history={entry.transfers} /></tr>; })() : <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Điểm mẫu chưa có thông tin nguồn. Nguồn sẽ được ghi nhận khi lấy hoặc đổi nguồn điểm.</td></tr>}</tbody></table></div></DialogContent></Dialog>
     </div>
   </AppShell>;
 }

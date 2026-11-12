@@ -15,6 +15,7 @@ export function formatScoreTransferTime(at: string) {
 }
 
 export function examTransferProgress(rows: { id: string; [key: string]: string }[], key: string, transferredIds: string[]) {
+  // Denominator is the whole table so every column shares the same total.
   const scored = rows.filter((row) => (row[key] ?? "").trim() !== "");
-  return { moved: scored.filter((row) => transferredIds.includes(row.id)).length, withScore: scored.length };
+  return { moved: scored.filter((row) => transferredIds.includes(row.id)).length, withScore: rows.length };
 }

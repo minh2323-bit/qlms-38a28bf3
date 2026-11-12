@@ -36,9 +36,9 @@ export function defaultTeacherScope(rows: AssessmentRow[]): TeacherScoreScope {
   return { grade, klass, subject };
 }
 export function transferProgress(rows: AssessmentRow[], key: string, transferredIds: string[]) {
-  const withScore = rows.filter((r) => (r.scores[key] ?? "") !== "").length;
-  const moved = Math.min(withScore, transferredIds.filter((id) => rows.some((r) => r.id === id)).length);
-  return { moved, withScore };
+  // moved = students with a score that was transferred; total = whole table (same for every column).
+  const moved = rows.filter((r) => (r.scores[key] ?? "") !== "" && transferredIds.includes(r.id)).length;
+  return { moved, withScore: rows.length };
 }
 export function showTransferTag(progress: { moved: number; withScore: number }) {
   return progress.moved >= 1;

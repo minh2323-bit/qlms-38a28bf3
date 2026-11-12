@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CheckCircle2, FileSpreadsheet, Filter, Lock, Unlock, MoreVertical, History, Trash2, RefreshCw, Search, TriangleAlert } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -269,7 +269,7 @@ function ScoreTransferPage() {
             </tbody>
           </table>
         </div>
-        <Dialog open={Boolean(trace)} onOpenChange={(open) => { if (!open) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Người chuyển", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[trace.key] && <tr><td className="p-3">Kỳ thi</td><td className="p-3">{sources[trace.key].source.name}</td><td className="p-3 text-center">{sources[trace.key].source.date}</td><td className="p-3 text-center">{sources[trace.key].scoreDate}</td><ScoreTransferHistoryCells history={sources[trace.key].transfers} showPerson /></tr>}</tbody></table></div></DialogContent></Dialog>
+        <Dialog open={Boolean(trace)} onOpenChange={(open) => { if (!open) setTrace(null); }}><DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-6xl max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>Truy nguồn điểm – {trace?.label}</DialogTitle></DialogHeader><div className="overflow-auto"><table className="w-full min-w-[880px] text-[13px]"><thead className="bg-muted"><tr>{["Loại", "Tên nội dung", "Ngày diễn ra", "Ngày có điểm", "Người chuyển", "Thời gian chuyển điểm"].map((label) => <th key={label} className="p-3 text-center font-medium">{label}</th>)}</tr></thead><tbody>{trace && sources[trace.key] && <tr><td className="p-3">Kỳ thi</td><td className="p-3"><Link to="/ky-thi/chinh-thuc" search={{ focus: sources[trace.key].source.name }} className="text-exam-primary underline-offset-2 hover:underline">{sources[trace.key].source.name}</Link></td><td className="p-3 text-center">{sources[trace.key].source.date}</td><td className="p-3 text-center">{sources[trace.key].scoreDate}</td><ScoreTransferHistoryCells history={sources[trace.key].transfers} showPerson /></tr>}</tbody></table></div></DialogContent></Dialog>
       </div>
     </AppShell>
   );
