@@ -11,7 +11,7 @@ export function initialExamColumnSources(rows: ExamScoreRow[], columns: { key: s
   return Object.fromEntries(columns.map((column, index) => {
     const date = ["20/10/2026", "23/10/2026", "25/12/2026", "19/03/2027", "20/05/2027"][index] ?? "20/10/2026";
     return [column.key, { scoreDate: date, source: {
-      id: `seed-exam-${column.key}`, kind: "ky-thi", level: "truong", name: `Kỳ thi ${column.label.replace("Điểm ", "")}${column.sub ? ` ${column.sub}` : ""} cấp trường`, date,
+      id: `seed-exam-${column.key}`, kind: "ky-thi", examType: "official", level: "truong", name: `Kỳ thi ${column.label.replace("Điểm ", "")}${column.sub ? ` ${column.sub}` : ""} cấp trường`, date,
       participantCount: rows.filter((row) => row[column.key] !== "").length,
       students: rows.map((row) => ({ ...row, score: row[column.key] ?? "" })),
     } }];

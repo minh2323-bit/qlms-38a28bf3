@@ -21,3 +21,4 @@
 - Seed teacher-score provenance from the same mock rows as the displayed values; new imports write scores only into the scope where their source is recorded, so populated cells always retain traceable content.
 - Exam-transfer column sources remain separate from teacher assessments; exam-score-columns enforces exam-only replacement and mock BGH/lock checks, while teachers may only trace confirmed columns.
 - Transfer receipts use shared formatting and tags but remain in each page's in-memory source entry; append every successful transfer and reset receipts on source replacement to avoid attributing old transfers to new content.
+- Exam provenance stores official/practice classification separately from organizer level so tracing does not infer exam type from its name or level; legacy exam sources default to official.

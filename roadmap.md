@@ -1,5 +1,10 @@
 # Monitoring fixes
 
+# Exam provenance popup
+
+- [x] Distinguish official/practice exam types and add organizer level beside the type.
+- [x] Verify the source popup and existing exam import tests.
+
 # Content assignment class selection
 
 - [x] Disable the class picker until content is selected; offer only that content's assigned classes, selected in full by default.

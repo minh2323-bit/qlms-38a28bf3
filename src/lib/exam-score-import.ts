@@ -18,7 +18,7 @@ export const SCORE_CONTENT_KINDS = [
   { value: "ky-thi", label: "Kỳ thi" },
 ] as const;
 export type ScoreContentKind = typeof SCORE_CONTENT_KINDS[number]["value"];
-export type ScoreSourceExam = { id: string; name: string; date: string; level: ExamLevel; kind: ScoreContentKind; participantCount: number; students: ImportStudent[] };
+export type ScoreSourceExam = { id: string; name: string; date: string; level: ExamLevel; kind: ScoreContentKind; examType?: "official" | "practice"; participantCount: number; students: ImportStudent[] };
 export type ImportedScoreColumn = { key: string; label: string; scoreType: ImportScoreType; examId: string; examName: string };
 
 export function scoreSourceExams(official: OfficialExam[]): ScoreSourceExam[] {
@@ -26,7 +26,7 @@ export function scoreSourceExams(official: OfficialExam[]): ScoreSourceExam[] {
     const session = OFFICIAL_SESSIONS.find((s) => `official-${s.id}` === e.id);
     const students = session?.schoolCandidates == null ? e.students : e.students.slice(0, session.schoolCandidates);
     return ({
-    id: e.id, name: e.name, date: e.start.slice(0, 10).split("-").reverse().join("/"), level: e.level, kind: "ky-thi" as const,
+    id: e.id, name: e.name, date: e.start.slice(0, 10).split("-").reverse().join("/"), level: e.level, kind: "ky-thi" as const, examType: "official" as const,
     participantCount: students.length,
     students: students.map((s) => {
       const score = e.attempts[s.id]?.score;
@@ -35,7 +35,7 @@ export function scoreSourceExams(official: OfficialExam[]): ScoreSourceExam[] {
   }); });
   const department = OFFICIAL_SESSIONS.filter((e) => e.level === "so" && e.approval === "approved").map((e) => {
     const candidates = getCandidates(e);
-    return { id: `official-${e.id}`, name: e.name, date: e.date, level: e.level, kind: "ky-thi" as const, participantCount: candidates.length,
+    return { id: `official-${e.id}`, name: e.name, date: e.date, level: e.level, kind: "ky-thi" as const, examType: "official" as const, participantCount: candidates.length,
       students: candidates.map((s) => ({ name: s.name, cccd: s.cccd, dob: "", khoi: e.grade, lop: s.klass, mon: e.subject, score: s.finalScore == null ? "" : String(s.finalScore) })) };
   });
   return [...department, ...school];
