@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { useOfficialExams } from "@/lib/official-exams";
 import { inTeacherScope, type TeacherScoreScope } from "@/lib/teacher-score-columns";
-import { filterSourceExams, IMPORT_SCORE_TYPES, SCORE_CONTENT_KINDS, scoreSourceAssessments, scoreSourceClasses, scoreSourceExams, type ImportScoreType, type ScoreSourceExam } from "@/lib/exam-score-import";
+import { assignedSourceClasses, sourceForAssignedClasses, filterSourceExams, IMPORT_SCORE_TYPES, SCORE_CONTENT_KINDS, scoreSourceAssessments, scoreSourceExams, type ImportScoreType, type ScoreSourceExam } from "@/lib/exam-score-import";
 
 const LEVELS = [{ value: "so", label: "Kỳ thi cấp Sở" }, { value: "xa", label: "Kỳ thi cấp Xã/phường" }, { value: "truong", label: "Kỳ thi cấp trường" }];
 
@@ -26,26 +26,25 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
   const [content, setContent] = useState<string>(SCORE_CONTENT_KINDS[0].value);
   const [selected, setSelected] = useState("");
   const [scoreType, setScoreType] = useState<ImportScoreType | "">("");
-  const defaultClasses = () => (scope?.klass ? [scope.klass] : []);
-  const [appliedClasses, setAppliedClasses] = useState<string[]>(defaultClasses);
+  const [appliedClasses, setAppliedClasses] = useState<string[]>([]);
   const allSources = includeAssessments ? [...scoreSourceAssessments(), ...scoreSourceExams(exams)] : scoreSourceExams(exams);
-  const sources = scope ? allSources.map((s) => ({ ...s, students: s.students.filter((st) => inTeacherScope(st, scope)) })).filter((s) => s.students.length > 0).map((s) => ({ ...s, participantCount: s.students.length })) : allSources;
+  // Outer scope controls content availability, not its assignment metadata.
+  const sources = scope ? allSources.filter((s) => s.students.some((st) => inTeacherScope(st, scope))) : allSources;
   const byClass = includeAssessments && content !== "ky-thi";
-  const classes = byClass ? scoreSourceClasses(allSources, content) : [];
-  const shown = filterSourceExams(sources, addedIds, query, byClass ? "all" : level, includeAssessments ? content : "all")
-    .filter((e) => !byClass || appliedClasses.length === 0 || e.students.some((s) => appliedClasses.includes(s.lop)));
+  const shown = filterSourceExams(sources, addedIds, query, byClass ? "all" : level, includeAssessments ? content : "all");
   const chosen = shown.find((e) => e.id === selected);
-  const picked = chosen ? (() => {
-    let students = chosen.students;
-    if (includeAssessments && appliedClasses.length > 0) students = students.filter((s) => appliedClasses.includes(s.lop));
-    return { ...chosen, students, participantCount: students.length };
-  })() : chosen;
+  const classes = byClass ? assignedSourceClasses(chosen) : [];
+  const picked = byClass ? sourceForAssignedClasses(chosen, appliedClasses) : chosen;
+  const selectSource = (id: string) => {
+    setSelected(id);
+    setAppliedClasses(assignedSourceClasses(shown.find((s) => s.id === id)));
+  };
   const groups = includeAssessments
     ? content === "ky-thi"
       ? LEVELS.filter((g) => level === "all" || g.value === level).map((g) => ({ key: `ky-thi-${g.value}`, label: g.label, items: shown.filter((e) => e.level === g.value) }))
       : [{ key: content, label: "", items: shown }]
     : LEVELS.filter((g) => level === "all" || g.value === level).map((g) => ({ key: g.value, label: g.label, items: shown.filter((e) => e.level === g.value) }));
-  const reset = () => { setQuery(""); setLevel("all"); setContent(SCORE_CONTENT_KINDS[0].value); setSelected(""); setScoreType(""); setAppliedClasses(defaultClasses()); };
+  const reset = () => { setQuery(""); setLevel("all"); setContent(SCORE_CONTENT_KINDS[0].value); setSelected(""); setScoreType(""); setAppliedClasses([]); };
   const label = includeAssessments ? "nội dung" : "kỳ thi";
   const effectiveType = replacement?.scoreType ?? scoreType;
   const scoreTypeOptions = includeAssessments ? IMPORT_SCORE_TYPES.filter((t) => t.value === "dgtx") : IMPORT_SCORE_TYPES;
@@ -64,10 +63,10 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
         </section>}
         <div className="flex flex-wrap gap-2 border-t pt-4 shrink-0">
           <div className="relative flex-1 min-w-44"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input aria-label={`Tìm tên ${label}`} placeholder={`Tìm tên ${label}`} value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" /></div>
-          {includeAssessments && <Select value={content} onValueChange={(v) => { setContent(v); setLevel("all"); setSelected(""); setAppliedClasses(defaultClasses()); }}><SelectTrigger aria-label="Nội dung" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{SCORE_CONTENT_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent></Select>}
+          {includeAssessments && <Select value={content} onValueChange={(v) => { setContent(v); setLevel("all"); setSelected(""); setAppliedClasses([]); }}><SelectTrigger aria-label="Nội dung" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{SCORE_CONTENT_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent></Select>}
           {byClass
             ? <Popover>
-              <PopoverTrigger asChild><Button variant="outline" className="w-48 justify-between font-normal" aria-label="Lớp">{appliedClasses.length ? `${appliedClasses.length} lớp đã chọn` : "Tất cả lớp"}</Button></PopoverTrigger>
+              <PopoverTrigger asChild><Button variant="outline" disabled={!chosen} className="w-48 justify-between font-normal" aria-label="Lớp">{chosen ? `${appliedClasses.length} lớp đã chọn` : "Chưa chọn lớp"}</Button></PopoverTrigger>
               <PopoverContent align="start" className="w-48 p-2">
                 <div className="flex flex-col gap-1">
                   {classes.map((c) => <label key={c} className="flex items-center gap-2 rounded px-2 py-1.5 cursor-pointer hover:bg-muted/60"><Checkbox checked={appliedClasses.includes(c)} onCheckedChange={(v) => setAppliedClasses((prev) => v ? [...prev, c] : prev.filter((x) => x !== c))} aria-label={`Lớp ${c}`} />{c}</label>)}
@@ -77,8 +76,8 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
             : <Select value={level} onValueChange={setLevel}><SelectTrigger aria-label="Loại kỳ thi" className="w-48"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả</SelectItem><SelectItem value="so">Cấp Sở</SelectItem><SelectItem value="xa">Xã/phường</SelectItem><SelectItem value="truong">Cấp trường</SelectItem></SelectContent></Select>}
         </div>
         <div className="min-h-0 overflow-auto border rounded">
-          <RadioGroup aria-label={`Chọn ${label}`} value={selected} onValueChange={setSelected} className="block">
-            <table className="w-full min-w-[580px] text-left"><thead className="sticky top-0 bg-muted"><tr><th className="p-3 font-medium text-center">Tên {label}</th><th className="p-3 font-medium text-center whitespace-nowrap">Ngày diễn ra</th>{includeAssessments && <th className="p-3 font-medium text-center w-28">Số lớp đã giao</th>}<th className="p-3 font-medium text-center w-40">{includeAssessments ? "Số học sinh nộp" : "Số thí sinh dự thi của trường"}</th>{includeAssessments ? <th className="p-3 font-medium text-center w-40">Số học sinh đã chấm</th> : <th className="p-3 font-medium text-center w-40">Bài đã chấm</th>}</tr></thead>
+          <RadioGroup aria-label={`Chọn ${label}`} value={selected} onValueChange={selectSource} className="block">
+            <table className={`w-full ${includeAssessments ? "min-w-[760px]" : "min-w-[580px]"} text-left`}><thead className="sticky top-0 bg-muted"><tr><th className="p-3 font-medium text-center">Tên {label}</th><th className="p-3 font-medium text-center whitespace-nowrap">{includeAssessments ? "Ngày giao" : "Ngày diễn ra"}</th>{includeAssessments && <><th className="p-3 font-medium text-center w-28">Số lớp đã giao</th><th className="p-3 font-medium text-center w-28">Số học sinh đã giao</th></>}<th className="p-3 font-medium text-center w-40">{includeAssessments ? "Số học sinh nộp" : "Số thí sinh dự thi của trường"}</th>{includeAssessments ? <th className="p-3 font-medium text-center w-40">Số học sinh đã chấm</th> : <th className="p-3 font-medium text-center w-40">Bài đã chấm</th>}</tr></thead>
               <tbody>{groups.map((group) => <GroupRows key={group.key} label={group.label} exams={group.items} selected={selected} showGraded={includeAssessments} />)}</tbody>
             </table>
           </RadioGroup>
@@ -90,9 +89,9 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
 }
 
 function GroupRows({ label, exams, selected, showGraded = false }: { label: string; exams: ScoreSourceExam[]; selected: string; showGraded?: boolean }) {
-  const cols = showGraded ? 5 : 4;
+  const cols = showGraded ? 6 : 4;
   return <>{label && <tr><th colSpan={cols} className="px-3 py-2 bg-muted/60 border-y font-semibold text-center">{label}</th></tr>}
-    {exams.map((exam) => <tr key={exam.id} className={selected === exam.id ? "bg-accent" : "hover:bg-muted/40"}><td className="p-3 border-b"><label className="flex gap-3 items-center cursor-pointer"><RadioGroupItem value={exam.id} aria-label={exam.name} /><span>{exam.name}</span></label></td><td className="p-3 border-b whitespace-nowrap text-center">{exam.date}</td>{showGraded && <td className="p-3 border-b text-center">{distinctClasses(exam.students).length}</td>}<td className="p-3 border-b text-center">{exam.participantCount}</td>{showGraded ? <td className="p-3 border-b text-center">{exam.students.filter((s) => s.score !== "").length}</td> : <td className="p-3 border-b text-center">{exam.students.filter((s) => s.score !== "").length}/{exam.participantCount}</td>}</tr>)}
+    {exams.map((exam) => <tr key={exam.id} className={selected === exam.id ? "bg-accent" : "hover:bg-muted/40"}><td className="p-3 border-b"><label className="flex gap-3 items-center cursor-pointer"><RadioGroupItem value={exam.id} aria-label={exam.name} /><span>{exam.name}</span></label></td><td className="p-3 border-b whitespace-nowrap text-center">{exam.date}</td>{showGraded && <><td className="p-3 border-b text-center">{distinctClasses(exam.students).length}</td><td className="p-3 border-b text-center">{exam.students.length}</td></>}<td className="p-3 border-b text-center">{exam.participantCount}</td>{showGraded ? <td className="p-3 border-b text-center">{exam.students.filter((s) => s.score !== "").length}</td> : <td className="p-3 border-b text-center">{exam.students.filter((s) => s.score !== "").length}/{exam.participantCount}</td>}</tr>)}
     {!exams.length && <tr><td colSpan={cols} className="p-4 text-center text-muted-foreground">{showGraded ? "Không có nội dung phù hợp" : "Không có kỳ thi phù hợp"}</td></tr>}
   </>;
 }

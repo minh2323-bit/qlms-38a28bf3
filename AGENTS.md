@@ -16,6 +16,7 @@
 - Both score-transfer pages share ScoreTypeFilter and score-column selection logic; visibility selection only narrows available columns and never changes score data or confirmation permissions.
 - Exam transfer uses the shared multi-subject filter; teacher transfer requires a single grade/class/subject scope so each table and export contains only that teaching context.
 - Both transfer pages share ExamScorePicker and exam-score-import adapters; imported exams add independent in-memory score columns, match students by CCCD plus subject, and never overwrite existing scores or bypass confirmation locks.
+- Content picker assignment counts and class options use the selected source's full student roster; outer scope filters content availability only, so assignment metadata stays consistent.
 - Teacher column locks, removal and source metadata are scoped by grade/class/subject; replacement uses the shared picker and teacher-score-columns validation to preserve other contexts and reject locked edits. Source dates are recorded as the mock import date when original grading timestamps are unavailable.
 - Seed teacher-score provenance from the same mock rows as the displayed values; new imports write scores only into the scope where their source is recorded, so populated cells always retain traceable content.
 - Exam-transfer column sources remain separate from teacher assessments; exam-score-columns enforces exam-only replacement and mock BGH/lock checks, while teachers may only trace confirmed columns.

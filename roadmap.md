@@ -1,5 +1,11 @@
 # Monitoring fixes
 
+# Content assignment class selection
+
+- [x] Disable the class picker until content is selected; offer only that content's assigned classes, selected in full by default.
+- [x] Show assigned student count beside assigned class count and rename the teacher picker date to Ngày giao.
+- [x] Verify selection, reset and import behavior with focused tests and the live popup.
+
 # Transfer tags and source history
 
 - [x] Add exam transfer-count tags and rename the picker label to Loại điểm CSDL.

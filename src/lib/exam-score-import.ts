@@ -62,6 +62,16 @@ export function scoreSourceClasses(sources: ScoreSourceExam[], content: string) 
   return [...new Set(sources.filter((s) => s.kind === content).flatMap((s) => s.students.map((st) => st.lop)))].sort((a, b) => a.localeCompare(b, "vi"));
 }
 
+export function assignedSourceClasses(source?: ScoreSourceExam) {
+  return source ? scoreSourceClasses([source], source.kind) : [];
+}
+
+export function sourceForAssignedClasses(source: ScoreSourceExam | undefined, classes: string[]) {
+  if (!source || !classes.length) return undefined;
+  const students = source.students.filter((student) => classes.includes(student.lop));
+  return students.length ? { ...source, students, participantCount: students.length } : undefined;
+}
+
 export function filterSourceExams(exams: ScoreSourceExam[], addedIds: string[], query: string, level: string, content = "all", klass = "all") {
   return exams.filter((e) => !addedIds.includes(e.id) && (content === "all" || e.kind === content) && (level === "all" || e.kind !== "ky-thi" || e.level === level)
     && (klass === "all" || e.kind === "ky-thi" || e.students.some((s) => s.lop === klass))

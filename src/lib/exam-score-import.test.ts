@@ -1,6 +1,6 @@
 /// <reference types="bun" />
 import { expect, test } from "bun:test";
-import { filterSourceExams, importExamColumn, sameScoreStudent, scoreSourceAssessments, scoreSourceClasses, type ScoreSourceExam } from "./exam-score-import";
+import { assignedSourceClasses, sourceForAssignedClasses, filterSourceExams, importExamColumn, sameScoreStudent, scoreSourceAssessments, scoreSourceClasses, type ScoreSourceExam } from "./exam-score-import";
 const exam: ScoreSourceExam = { id: "xa-1", name: "Kỳ thi cấp Xã Toán", level: "xa", kind: "ky-thi", date: "09/11/2026", participantCount: 1, students: [{ name: "An", cccd: "123", dob: "", khoi: "4", lop: "4A", mon: "Toán", score: "8.5" }] };
 test("already-added exams are excluded regardless of selected score type", () => {
   expect(filterSourceExams([exam], ["xa-1"], "", "all")).toHaveLength(0);
@@ -51,4 +51,30 @@ test("exam rows ignore the class filter and keep the level filter", () => {
   expect(filterSourceExams(sources, [], "", "all", "ky-thi", "9Z")).toEqual([exam]);
   expect(filterSourceExams(sources, [], "", "xa", "ky-thi", "all")).toEqual([exam]);
   expect(filterSourceExams(sources, [], "", "so", "ky-thi", "all")).toHaveLength(0);
+});
+
+test("no content selection provides no class options or import", () => {
+  expect(assignedSourceClasses()).toEqual([]);
+  expect(sourceForAssignedClasses(undefined, ["4A"])).toBeUndefined();
+});
+
+test("content assigned to one class offers only that class, selected in full", () => {
+  const assignment = { ...exam, kind: "bai-tap" as const };
+  const defaults = assignedSourceClasses(assignment);
+  expect(defaults).toEqual(["4A"]);
+  expect(sourceForAssignedClasses(assignment, defaults)?.students).toEqual(assignment.students);
+});
+
+test("switching content updates the full assigned class selection", () => {
+  const assignment = { ...exam, students: [...exam.students, { ...exam.students[0], cccd: "456", lop: "5B" }] };
+  expect(assignedSourceClasses(exam)).toEqual(["4A"]);
+  expect(assignedSourceClasses(assignment)).toEqual(["4A", "5B"]);
+  expect(sourceForAssignedClasses(assignment, assignedSourceClasses(assignment))?.participantCount).toBe(2);
+});
+
+test("unchecking all classes blocks import and selecting a class imports only its students", () => {
+  const assignment = { ...exam, students: [...exam.students, { ...exam.students[0], cccd: "456", lop: "5B" }] };
+  expect(sourceForAssignedClasses(assignment, [])).toBeUndefined();
+  expect(sourceForAssignedClasses(assignment, ["5B"])?.students.map((s) => s.cccd)).toEqual(["456"]);
+  expect(sourceForAssignedClasses(assignment, ["9Z"])).toBeUndefined();
 });
