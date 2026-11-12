@@ -170,8 +170,8 @@ function ScoreTransferPage() {
   };
 
   const exportExcel = () => downloadCsv("chuyen-diem-csdl.csv",
-    ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn", ...cols.map((c) => `${c.label}${c.sub ? " " + c.sub : ""}`)],
-    shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.khoi, r.lop, r.mon, ...cols.map((c) => r[c.key])]));
+    ["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Lớp", ...cols.map((c) => `${c.label}${c.sub ? " " + c.sub : ""}`)],
+    shown.map((r, i) => [i + 1, r.name, r.cccd, r.dob, r.lop, ...cols.map((c) => r[c.key])]));
 
   const confirm = () => {
     if (invalid) { toast.error("Có điểm không hợp lệ. Điểm phải trong thang 0–10, tối đa 1 chữ số thập phân."); return; }
@@ -225,12 +225,12 @@ function ScoreTransferPage() {
           <table className="w-full border-separate border-spacing-0">
             <thead className="sticky top-0 bg-muted z-10">
               <tr>
-                <th colSpan={7} className={`${th} text-center border-r`}>Thông tin học sinh</th>
+                <th colSpan={5} className={`${th} text-center border-r`}>Thông tin học sinh</th>
                 <th colSpan={Math.max(1, cols.length)} className={`${th} text-center`}>Điểm thi{canEdit && <ExamScorePicker addedIds={replacement ? [] : importedCols.map((c) => c.examId)} replacement={replacement} onReplacementClose={() => setReplacement(undefined)} onConfirm={addExam} />}</th>
               </tr>
               <tr className="text-left">
-                {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Khối", "Lớp", "Môn"].map((h, i) => (
-                  <th key={h} rowSpan={2} className={`${th} ${i === 6 ? "border-r" : ""}`}>{h}</th>
+                {["STT", "Họ và tên học sinh", "CCCD", "Ngày sinh", "Lớp"].map((h, i) => (
+                  <th key={h} rowSpan={2} className={`${th} ${i === 4 ? "border-r" : ""}`}>{h}</th>
                 ))}
                 {groups.map((group) => <th key={group.label} colSpan={group.columns.length} rowSpan={group.columns.length > 1 ? 1 : 2} className={`${th} text-center`} title={group.columns[0]?.examName}><div className="flex flex-col items-center gap-1"><span>{group.label}{group.columns.length === 1 && columnMenu(group.columns[0])}</span>{group.columns.length === 1 && transferTag(group.columns[0].key)}</div></th>)}
               </tr>
@@ -247,9 +247,7 @@ function ScoreTransferPage() {
                     <td className={`px-3 py-1.5 border-b font-medium ${clash ? "text-destructive" : ""}`}>{r.name}</td>
                     <td className="px-3 py-1.5 border-b">{r.cccd}</td>
                     <td className="px-3 py-1.5 border-b">{r.dob}</td>
-                    <td className="px-3 py-1.5 border-b">{r.khoi}</td>
-                    <td className="px-3 py-1.5 border-b">{r.lop}</td>
-                    <td className="px-3 py-1.5 border-b border-r whitespace-nowrap">{r.mon}</td>
+                    <td className="px-3 py-1.5 border-b border-r">{r.lop}</td>
                     {cols.map((c) => {
                       const v = r[c.key] ?? "";
                       const bad = !isValidScore(v) || (clash && allCols.filter((other) => other.label === c.label && (r[other.key] ?? "").trim() !== "").length > 1);
