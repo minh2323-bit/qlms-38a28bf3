@@ -1,5 +1,11 @@
 # Monitoring fixes
 
+# Source picker destination class
+
+- [x] Remove the internal class selector and show the outer destination class below the title.
+- [x] Limit imports to the outer destination class while preserving source assignment counts.
+- [x] Verify destination import behavior with tests and the live popup.
+
 # Exam provenance popup
 
 - [x] Distinguish official/practice exam types and add organizer level beside the type.

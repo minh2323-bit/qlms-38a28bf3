@@ -78,3 +78,10 @@ test("unchecking all classes blocks import and selecting a class imports only it
   expect(sourceForAssignedClasses(assignment, ["5B"])?.students.map((s) => s.cccd)).toEqual(["456"]);
   expect(sourceForAssignedClasses(assignment, ["9Z"])).toBeUndefined();
 });
+test("destination class from the outer filter limits imports even for multi-class sources", () => {
+  const source = { ...exam, students: [...exam.students, { ...exam.students[0], cccd: "456", lop: "5B" }] };
+  expect(sourceForAssignedClasses(source, ["4A"])?.students.map((s) => s.cccd)).toEqual(["123"]);
+  expect(sourceForAssignedClasses(source, ["5B"])?.students.map((s) => s.cccd)).toEqual(["456"]);
+  expect(sourceForAssignedClasses(source, ["3A"])).toBeUndefined();
+  expect(source.students).toHaveLength(2);
+});

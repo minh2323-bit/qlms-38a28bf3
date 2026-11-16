@@ -6,11 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useOfficialExams } from "@/lib/official-exams";
 import { inTeacherScope, type TeacherScoreScope } from "@/lib/teacher-score-columns";
-import { assignedSourceClasses, sourceForAssignedClasses, filterSourceExams, IMPORT_SCORE_TYPES, SCORE_CONTENT_KINDS, scoreSourceAssessments, scoreSourceExams, type ImportScoreType, type ScoreSourceExam } from "@/lib/exam-score-import";
+import { sourceForAssignedClasses, filterSourceExams, IMPORT_SCORE_TYPES, SCORE_CONTENT_KINDS, scoreSourceAssessments, scoreSourceExams, type ImportScoreType, type ScoreSourceExam } from "@/lib/exam-score-import";
 
 const LEVELS = [{ value: "so", label: "Kỳ thi cấp Sở" }, { value: "xa", label: "Kỳ thi cấp Xã/phường" }, { value: "truong", label: "Kỳ thi cấp trường" }];
 
@@ -26,25 +24,19 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
   const [content, setContent] = useState<string>(SCORE_CONTENT_KINDS[0].value);
   const [selected, setSelected] = useState("");
   const [scoreType, setScoreType] = useState<ImportScoreType | "">("");
-  const [appliedClasses, setAppliedClasses] = useState<string[]>([]);
   const allSources = includeAssessments ? [...scoreSourceAssessments(), ...scoreSourceExams(exams)] : scoreSourceExams(exams);
   // Outer scope controls content availability, not its assignment metadata.
   const sources = scope ? allSources.filter((s) => s.students.some((st) => inTeacherScope(st, scope))) : allSources;
   const byClass = includeAssessments && content !== "ky-thi";
   const shown = filterSourceExams(sources, addedIds, query, byClass ? "all" : level, includeAssessments ? content : "all");
   const chosen = shown.find((e) => e.id === selected);
-  const classes = byClass ? assignedSourceClasses(chosen) : [];
-  const picked = byClass ? sourceForAssignedClasses(chosen, appliedClasses) : chosen;
-  const selectSource = (id: string) => {
-    setSelected(id);
-    setAppliedClasses(assignedSourceClasses(shown.find((s) => s.id === id)));
-  };
+  const picked = includeAssessments && scope ? sourceForAssignedClasses(chosen, [scope.klass]) : chosen;
   const groups = includeAssessments
     ? content === "ky-thi"
       ? LEVELS.filter((g) => level === "all" || g.value === level).map((g) => ({ key: `ky-thi-${g.value}`, label: g.label, items: shown.filter((e) => e.level === g.value) }))
       : [{ key: content, label: "", items: shown }]
     : LEVELS.filter((g) => level === "all" || g.value === level).map((g) => ({ key: g.value, label: g.label, items: shown.filter((e) => e.level === g.value) }));
-  const reset = () => { setQuery(""); setLevel("all"); setContent(SCORE_CONTENT_KINDS[0].value); setSelected(""); setScoreType(""); setAppliedClasses([]); };
+  const reset = () => { setQuery(""); setLevel("all"); setContent(SCORE_CONTENT_KINDS[0].value); setSelected(""); setScoreType(""); };
   const label = includeAssessments ? "nội dung" : "kỳ thi";
   const effectiveType = replacement?.scoreType ?? scoreType;
   const scoreTypeOptions = includeAssessments ? IMPORT_SCORE_TYPES.filter((t) => t.value === "dgtx") : IMPORT_SCORE_TYPES;
@@ -53,7 +45,7 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
     <Button variant="outline" size="icon" className="ml-2 h-6 w-6 align-middle" aria-label={`Lấy điểm từ ${label} khác`} title={`Lấy điểm từ ${label} khác`} onClick={() => { reset(); setOpen(true); }}><Plus className="h-4 w-4" /></Button>
     <Dialog open={open || Boolean(replacement)} onOpenChange={(v) => { if (!v) close(); else setOpen(true); }}>
       <DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-4xl max-h-[90dvh] flex flex-col gap-4 p-4 sm:p-6 text-[13px] text-foreground">
-        <DialogHeader className="shrink-0"><DialogTitle>{replacement ? `Đổi nguồn – ${replacement.label}` : includeAssessments ? "Lấy điểm từ nội dung khác" : "Lấy điểm từ kỳ thi khác"}</DialogTitle></DialogHeader>
+        <DialogHeader className="shrink-0"><DialogTitle>{replacement ? `Đổi nguồn – ${replacement.label}` : includeAssessments ? "Lấy điểm từ nội dung khác" : "Lấy điểm từ kỳ thi khác"}</DialogTitle>{includeAssessments && scope && <p className="text-muted-foreground font-normal">Lớp đích: {scope.klass}</p>}</DialogHeader>
         {!replacement && <section className="flex flex-wrap items-center gap-3 shrink-0">
           <h2 className="font-semibold shrink-0">Loại điểm CSDL</h2>
           <Select value={scoreType} onValueChange={(v) => setScoreType(v as ImportScoreType)}>
@@ -63,20 +55,11 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
         </section>}
         <div className="flex flex-wrap gap-2 border-t pt-4 shrink-0">
           <div className="relative flex-1 min-w-44"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input aria-label={`Tìm tên ${label}`} placeholder={`Tìm tên ${label}`} value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9" /></div>
-          {includeAssessments && <Select value={content} onValueChange={(v) => { setContent(v); setLevel("all"); setSelected(""); setAppliedClasses([]); }}><SelectTrigger aria-label="Nội dung" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{SCORE_CONTENT_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent></Select>}
-          {byClass
-            ? <Popover>
-              <PopoverTrigger asChild><Button variant="outline" disabled={!chosen} className="w-48 justify-between font-normal" aria-label="Lớp">{chosen ? `${appliedClasses.length} lớp đã chọn` : "Chưa chọn lớp"}</Button></PopoverTrigger>
-              <PopoverContent align="start" className="w-48 p-2">
-                <div className="flex flex-col gap-1">
-                  {classes.map((c) => <label key={c} className="flex items-center gap-2 rounded px-2 py-1.5 cursor-pointer hover:bg-muted/60"><Checkbox checked={appliedClasses.includes(c)} onCheckedChange={(v) => setAppliedClasses((prev) => v ? [...prev, c] : prev.filter((x) => x !== c))} aria-label={`Lớp ${c}`} />{c}</label>)}
-                </div>
-              </PopoverContent>
-            </Popover>
-            : <Select value={level} onValueChange={setLevel}><SelectTrigger aria-label="Loại kỳ thi" className="w-48"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả</SelectItem><SelectItem value="so">Cấp Sở</SelectItem><SelectItem value="xa">Xã/phường</SelectItem><SelectItem value="truong">Cấp trường</SelectItem></SelectContent></Select>}
+          {includeAssessments && <Select value={content} onValueChange={(v) => { setContent(v); setLevel("all"); setSelected(""); }}><SelectTrigger aria-label="Nội dung" className="w-44"><SelectValue /></SelectTrigger><SelectContent>{SCORE_CONTENT_KINDS.map((k) => <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>)}</SelectContent></Select>}
+          {!byClass && <Select value={level} onValueChange={setLevel}><SelectTrigger aria-label="Loại kỳ thi" className="w-48"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả</SelectItem><SelectItem value="so">Cấp Sở</SelectItem><SelectItem value="xa">Xã/phường</SelectItem><SelectItem value="truong">Cấp trường</SelectItem></SelectContent></Select>}
         </div>
         <div className="min-h-0 overflow-auto border rounded">
-          <RadioGroup aria-label={`Chọn ${label}`} value={selected} onValueChange={selectSource} className="block">
+          <RadioGroup aria-label={`Chọn ${label}`} value={selected} onValueChange={setSelected} className="block">
             <table className={`w-full ${includeAssessments ? "min-w-[760px]" : "min-w-[580px]"} text-left`}><thead className="sticky top-0 bg-muted"><tr><th className="p-3 font-medium text-center">Tên {label}</th><th className="p-3 font-medium text-center whitespace-nowrap">{includeAssessments ? "Ngày giao" : "Ngày diễn ra"}</th>{includeAssessments && <><th className="p-3 font-medium text-center w-28">Số lớp đã giao</th><th className="p-3 font-medium text-center w-28">Số học sinh đã giao</th></>}<th className="p-3 font-medium text-center w-40">{includeAssessments ? "Số học sinh nộp" : "Số thí sinh dự thi của trường"}</th>{includeAssessments ? <th className="p-3 font-medium text-center w-40">Số học sinh đã chấm</th> : <th className="p-3 font-medium text-center w-40">Bài đã chấm</th>}</tr></thead>
               <tbody>{groups.map((group) => <GroupRows key={group.key} label={group.label} exams={group.items} selected={selected} showGraded={includeAssessments} />)}</tbody>
             </table>
