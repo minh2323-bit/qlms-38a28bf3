@@ -45,7 +45,7 @@ export function ExamScorePicker({ addedIds, includeAssessments = false, onConfir
     <Button variant="outline" size="icon" className="ml-2 h-6 w-6 align-middle" aria-label={`Lấy điểm từ ${label} khác`} title={`Lấy điểm từ ${label} khác`} onClick={() => { reset(); setOpen(true); }}><Plus className="h-4 w-4" /></Button>
     <Dialog open={open || Boolean(replacement)} onOpenChange={(v) => { if (!v) close(); else setOpen(true); }}>
       <DialogContent aria-describedby={undefined} className="w-[calc(100%-1rem)] max-w-4xl max-h-[90dvh] flex flex-col gap-4 p-4 sm:p-6 text-[13px] text-foreground">
-        <DialogHeader className="shrink-0"><DialogTitle>{replacement ? `Đổi nguồn – ${replacement.label}` : includeAssessments ? "Lấy điểm từ nội dung khác" : "Lấy điểm từ kỳ thi khác"}</DialogTitle>{includeAssessments && scope && <p className="text-muted-foreground font-normal">Lớp đích: {scope.klass}</p>}</DialogHeader>
+        <DialogHeader className="shrink-0"><DialogTitle>{replacement ? `Đổi nguồn – ${replacement.label}` : includeAssessments ? "Lấy điểm từ nội dung khác" : "Lấy điểm từ kỳ thi khác"}</DialogTitle>{includeAssessments && scope && <span className="self-start inline-flex rounded border border-exam-success/30 bg-exam-success-tint px-2.5 py-1 text-exam-success font-semibold">Lớp: {scope.klass}</span>}</DialogHeader>
         {!replacement && <section className="flex flex-wrap items-center gap-3 shrink-0">
           <h2 className="font-semibold shrink-0">Loại điểm CSDL</h2>
           <Select value={scoreType} onValueChange={(v) => setScoreType(v as ImportScoreType)}>
