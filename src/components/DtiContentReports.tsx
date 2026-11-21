@@ -34,7 +34,7 @@ type MRow = {
   kind: string; created: string; author: string; learners: number; done: number;
 };
 
-const MATERIALS: MRow[] = [
+export const MATERIALS: MRow[] = [
   { name: "Âm thanh - Hoàn thành sau time", grade: "Lớp 5", subject: "Toán", chapter: "", lesson: "", kind: "Âm thanh", created: "25/08/2026", author: "Nguyễn Tuấn Thành 01", learners: 128, done: 96 },
   { name: "Video tương tác - ver 1", grade: "Lớp 5", subject: "Toán", chapter: "", lesson: "", kind: "Video tương tác", created: "25/08/2026", author: "Nguyễn Tuấn Thành 01", learners: 142, done: 118 },
   { name: "Iframe - click hoàn thành", grade: "Lớp 5", subject: "Toán", chapter: "", lesson: "", kind: "IFrame", created: "24/08/2026", author: "Phùng Thuý Hằng", learners: 96, done: 61 },
@@ -170,7 +170,7 @@ type QRow = {
   usedExamPapers: number; usedTests: number; usedHomework: number; usedLessons: number;
 };
 
-const QUESTIONS: QRow[] = [
+export const QUESTIONS: QRow[] = [
   { text: "2 + 5 = ?", grade: "Khối 5", subject: "Toán", type: "Trắc nghiệm 1 đáp án", level: "Nhận biết", author: "Nguyễn Tuấn Thành 01", usedExamPapers: 4, usedTests: 6, usedHomework: 9, usedLessons: 3 },
   { text: "Em hãy nối mỗi phép tính ở cột A với kết quả đúng ở cột B.", grade: "Khối 5", subject: "Toán", type: "Nối", level: "Nhận biết", author: "Nguyễn Tuấn Thành 01", usedExamPapers: 2, usedTests: 3, usedHomework: 5, usedLessons: 1 },
   { text: "Đọc và trả lời đúng sai các ý dưới đây", grade: "Khối 5", subject: "Toán", type: "Đúng/Sai", level: "Nhận biết", author: "Phùng Thuý Hằng", usedExamPapers: 1, usedTests: 4, usedHomework: 2, usedLessons: 2 },
@@ -291,7 +291,7 @@ type LRow = {
   published: string; classes: string[]; learners: number; done: number;
 };
 
-const LECTURES: LRow[] = [
+export const LECTURES: LRow[] = [
   { name: "Phép cộng các số tự nhiên (all type bài giảng)", path: "Ôn tập và bổ sung về số tự nhiên, phân số. Số thập phân · Bài 1. Ôn tập...", grade: "Khối 5", subject: "Toán", author: "Nguyễn Tuấn Thành 01", published: "25/08/2026, 15:23", classes: ["5K"], learners: 38, done: 31 },
   { name: "Phép cộng các số tự nhiên - video tương tác", path: "Ôn tập và bổ sung về số tự nhiên, phân số. Số thập phân · Bài 1. Ôn tập...", grade: "Khối 5", subject: "Toán", author: "Nguyễn Tuấn Thành 01", published: "25/08/2026, 08:26", classes: ["Lớp học thêm 5K"], learners: 24, done: 15 },
   { name: "Ôn tập", path: "Chủ đề 1. Ôn tập và bổ sung · Bài 1. Ôn tập các số tự nhiên", grade: "Khối 5", subject: "Toán", author: "Nguyễn Tuấn Thành 01", published: "—", classes: [], learners: 0, done: 0 },

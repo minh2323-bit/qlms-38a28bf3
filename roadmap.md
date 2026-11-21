@@ -4,7 +4,8 @@
 
 - [x] Add the default Tổng quan tab using the existing mock report data, with indicators and links to detailed tabs.
 - [x] Verify overview, detail navigation and existing tab links; the overview stays within the mobile content width, while the existing shared header overflows on narrow screens.
-- [ ] Match the supplied Claude reference once the user provides an accessible screenshot or content; the shared link requires sign-in.
+- [x] Match the two supplied screenshots: target indicators, six summary tiles, teacher activity, grade chart, material types, question matrix and lecture participation.
+- [x] Verify the reference layout and report navigation at desktop and mobile sizes.
 
 # Source picker destination class
 

@@ -62,6 +62,10 @@ html { font-size: 16.75px; }
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-dti-met: var(--dti-met);
+  --color-dti-near: var(--dti-near);
+  --color-dti-unmet: var(--dti-unmet);
+  --color-dti-blue-soft: var(--dti-blue-soft);
   --color-exam-primary: var(--exam-primary);
   --color-exam-tint: var(--exam-tint);
   --color-exam-success: var(--exam-success);
@@ -71,6 +75,18 @@ html { font-size: 16.75px; }
 }
 
 :root {
+  --dti-blue-strong: oklch(0.49 0.21 262);
+  --dti-blue: oklch(0.57 0.23 262);
+  --dti-blue-soft: oklch(0.76 0.12 262);
+  --dti-teal: oklch(0.6 0.12 180);
+  --dti-violet: oklch(0.58 0.23 300);
+  --dti-orange: oklch(0.65 0.2 45);
+  --dti-rose: oklch(0.59 0.23 15);
+  --dti-green: oklch(0.6 0.17 150);
+  --dti-slate: oklch(0.53 0.04 258);
+  --dti-unmet: oklch(0.95 0.025 15);
+  --dti-near: oklch(0.96 0.065 95);
+  --dti-met: oklch(0.95 0.055 155);
   --exam-primary: oklch(0.46 0.18 262);
   --exam-tint: oklch(0.96 0.02 262);
   --exam-success: oklch(0.46 0.12 151);
@@ -113,6 +129,9 @@ html { font-size: 16.75px; }
 }
 
 .dark {
+  --dti-unmet: oklch(0.3 0.05 15);
+  --dti-near: oklch(0.32 0.05 95);
+  --dti-met: oklch(0.3 0.05 155);
   --exam-primary: oklch(0.76 0.12 262);
   --exam-tint: oklch(0.28 0.04 262);
   --exam-success: oklch(0.76 0.12 151);
@@ -190,3 +209,12 @@ html { font-size: 16.75px; }
     box-shadow: 0 0 0 0 transparent;
   }
 }
+
+.dti-panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.dti-summary { background: var(--card); border-left-width: 2px; justify-content: flex-start; }
+.dti-summary.dti-blue { border-left-color: var(--dti-blue); }
+.dti-summary.dti-teal { border-left-color: var(--dti-teal); }
+.dti-summary.dti-violet { border-left-color: var(--dti-violet); }
+.dti-summary.dti-orange { border-left-color: var(--dti-orange); }
+.dti-summary.dti-rose { border-left-color: var(--dti-rose); }
+.dti-summary.dti-green { border-left-color: var(--dti-green); }
