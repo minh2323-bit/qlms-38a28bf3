@@ -1,5 +1,11 @@
 # Monitoring fixes
 
+# Principal DTI overview
+
+- [x] Add the default Tổng quan tab using the existing mock report data, with indicators and links to detailed tabs.
+- [x] Verify overview, detail navigation and existing tab links; the overview stays within the mobile content width, while the existing shared header overflows on narrow screens.
+- [ ] Match the supplied Claude reference once the user provides an accessible screenshot or content; the shared link requires sign-in.
+
 # Source picker destination class
 
 - [x] Remove the internal class selector and show the outer destination class below the title.

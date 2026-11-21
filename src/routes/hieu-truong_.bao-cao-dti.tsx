@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { FileSpreadsheet, FileDown } from "lucide-react";
 import { MaterialReport, QuestionBankReport, LectureReport } from "@/components/DtiContentReports";
+import { DtiOverview } from "@/components/DtiOverview";
 import { ClassOverviewTable, type ClassOverviewRow } from "@/components/ClassOverviewReport";
 import type { DateRange } from "react-day-picker";
 import { UnitFilter, DateRangeFilter, KhoiMultiFilter, EnetPoint, totalCell, tableScrollWrap, stickyHeadRow, ReportHeader, SortTh, useSort, matchUnitRange } from "@/components/ReportFilters";
@@ -20,10 +21,10 @@ export const Route = createFileRoute("/hieu-truong_/bao-cao-dti")({
   }),
   head: () => ({
     meta: [
-      { title: "Báo cáo DTI – Giáo viên & Học sinh | QLMS" },
-      { name: "description", content: "Báo cáo chuyển đổi số (DTI) của trường: hoạt động giáo viên và kết quả học tập của học sinh, hỗ trợ xuất Excel và PDF." },
-      { property: "og:title", content: "Báo cáo DTI – Giáo viên & Học sinh" },
-      { property: "og:description", content: "Bảng báo cáo DTI theo giáo viên và học sinh, kèm chức năng xuất Excel và PDF." },
+      { title: "Báo cáo DTI – Tổng quan chuyển đổi số | QLMS" },
+      { name: "description", content: "Tổng quan chuyển đổi số của trường dành cho Hiệu trưởng, cùng báo cáo giáo viên, học sinh, lớp học và nội dung số." },
+      { property: "og:title", content: "Báo cáo DTI – Tổng quan chuyển đổi số | QLMS" },
+      { property: "og:description", content: "Theo dõi tổng quan hoạt động dạy và học, nội dung số và các báo cáo DTI của trường." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -132,6 +133,7 @@ function ExportButtons({ onExcel, onPdf }: { onExcel: () => void; onPdf: () => v
 
 /* ---------------- Page ---------------- */
 const TABS = [
+  ["overview", "Tổng quan"],
   ["teacher", "Báo cáo Giáo viên"],
   ["student", "Báo cáo Học sinh"],
   ["class", "Báo cáo theo lớp"],
@@ -145,7 +147,7 @@ type TabKey = (typeof TABS)[number][0];
 function DtiReportPage() {
   const { tab: initialTab } = Route.useSearch();
   const [tab, setTab] = useState<TabKey>(
-    TABS.some(([k]) => k === initialTab) ? (initialTab as TabKey) : "teacher",
+    TABS.some(([k]) => k === initialTab) ? (initialTab as TabKey) : "overview",
   );
 
   return (
@@ -158,20 +160,24 @@ function DtiReportPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 border-b">
+        <div role="tablist" aria-label="Báo cáo DTI" className="flex flex-wrap items-center gap-2 border-b">
           {TABS.map(([k, label]) => (
-            <button
+            <Button
               key={k}
+              role="tab"
+              aria-selected={tab === k}
+              variant="ghost"
               onClick={() => setTab(k)}
-              className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 transition ${
-                tab === k ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-700"
+              className={`h-auto rounded-none px-4 py-2 text-sm font-semibold -mb-px border-b-2 transition ${
+                tab === k ? "border-exam-primary text-exam-primary" : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
 
+        {tab === "overview" && <DtiOverview teachers={TEACHERS} students={STUDENTS} classes={SCHOOL_CLASS_OVERVIEW} onOpen={setTab} />}
         {tab === "teacher" && <TeacherReport />}
         {tab === "student" && <StudentReport />}
         {tab === "class" && <ClassReport />}

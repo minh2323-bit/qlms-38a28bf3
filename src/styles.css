@@ -164,6 +164,17 @@ html { font-size: 16.75px; }
   }
 }
 
+.dti-meter {
+  height: 0.5rem;
+  display: block;
+  border: 0;
+  background: var(--muted);
+  border-radius: 0.25rem;
+}
+.dti-meter::-webkit-meter-bar { background: var(--muted); border: 0; border-radius: 0.25rem; }
+.dti-meter::-webkit-meter-optimum-value { background: var(--exam-success); border-radius: 0.25rem; }
+.dti-meter::-moz-meter-bar { background: var(--exam-success); border-radius: 0.25rem; }
+
 /* Highlight newly created class card */
 .class-highlight {
   animation: new-class-glow 3s ease-in-out forwards;
