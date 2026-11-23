@@ -1,3 +1,9 @@
+# Merge school statistics into DTI overview
+
+- [x] Replace indexes and add five school donut charts in a two/three layout.
+- [x] Add a horizontally scrollable four-series monthly chart after teacher/grade activity.
+- [x] Replace the final three panels with copyright statistics; preserve overview filters and verify.
+
 # Monitoring fixes
 
 # Principal DTI overview

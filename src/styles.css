@@ -226,3 +226,13 @@ html { font-size: 16.75px; }
 .dti-index .dti-rose { --dti-index-accent: var(--dti-rose); }
 .dti-index .dti-green { --dti-index-accent: var(--dti-green); }
 .dti-index-icon { color: var(--dti-index-accent); }
+.dti-school-metric.dti-blue { --dti-school-accent: var(--dti-blue); }
+.dti-school-metric.dti-teal { --dti-school-accent: var(--dti-teal); }
+.dti-school-metric.dti-orange { --dti-school-accent: var(--dti-orange); }
+.dti-school-metric.dti-violet { --dti-school-accent: var(--dti-violet); }
+.dti-school-metric.dti-rose { --dti-school-accent: var(--dti-rose); }
+.dti-school-icon { color: var(--dti-school-accent); background: color-mix(in oklch, var(--dti-school-accent) 9%, var(--card)); }
+.dti-month-scroll { scrollbar-width: auto; scrollbar-color: var(--dti-blue-soft) var(--muted); }
+.dti-month-scroll::-webkit-scrollbar { height: 9px; }
+.dti-month-scroll::-webkit-scrollbar-track { background: var(--muted); border-radius: 4px; }
+.dti-month-scroll::-webkit-scrollbar-thumb { background: var(--dti-blue-soft); border-radius: 4px; }

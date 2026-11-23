@@ -62,6 +62,10 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Trang chủ – LMS Giáo viên | Tiểu học Tô Hiệu" },
       { name: "description", content: "Trang chủ giáo viên: dashboard, lịch báo giảng tương tác và biểu đồ kết quả học tập." },
+      { property: "og:title", content: "Trang chủ – LMS Giáo viên | Tiểu học Tô Hiệu" },
+      { property: "og:description", content: "Trang chủ giáo viên: dashboard, lịch báo giảng tương tác và biểu đồ kết quả học tập." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TeacherHome,
