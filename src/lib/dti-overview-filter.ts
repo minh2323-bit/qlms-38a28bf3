@@ -16,3 +16,9 @@ export function gradesInLabel(label: string): number[] {
   if (label.includes("Khối 1-5")) return [1, 2, 3, 4, 5];
   return [...new Set((label.match(/[1-5]/g) || []).map(Number))];
 }
+
+export function homeworkCompletion(rows: { homework: number; homeworkAssigned: number }[]) {
+  const completed = rows.reduce((sum, row) => sum + row.homework, 0);
+  const assigned = rows.reduce((sum, row) => sum + row.homeworkAssigned, 0);
+  return { completed, assigned, rate: assigned ? Math.round(completed / assigned * 1000) / 10 : 0 };
+}

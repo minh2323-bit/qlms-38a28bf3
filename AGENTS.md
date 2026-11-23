@@ -26,3 +26,5 @@
 - DTI activity indicators and teacher/class panels derive from detail-report rows; resource indexes, donut charts, monthly series and copyright statistics share the school-statistics mock store with the existing school page to preserve its totals and URL.
 - School resource totals use stable mock grade/activity buckets when filtering DTI; keep bucket sums equal to the original school totals and use the submitted overview filter for all imported sections.
 - DTI overview applies one submitted filter to every dataset via the existing mock report unit/activity assignments; keep draft filter edits separate until search so charts and index totals use the same scope.
+- AppShell can expose a controlled school-year selection to report pages so the header and report subtitle stay synchronized; the displayed DTI update timestamp describes the mock dataset, not page load time.
+- DTI homework completion compares submitted homework with explicit assigned-homework totals in student mock rows, never teacher grading counts or lesson-content rates.

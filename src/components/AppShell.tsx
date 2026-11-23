@@ -248,7 +248,9 @@ export function SidebarNav({ role = "teacher" }: { role?: AppRole }) {
   );
 }
 
-export function TopBar({ role = "teacher" }: { role?: AppRole }) {
+type SchoolYearProps = { schoolYear?: string; onSchoolYearChange?: (year: string) => void };
+
+export function TopBar({ role = "teacher", schoolYear, onSchoolYearChange }: { role?: AppRole } & SchoolYearProps) {
   const demoAccount = useDemoAccount();
   const isExamLeader = demoAccount === "leader" && role === "teacher";
   const isStudent = role === "student";
@@ -259,7 +261,8 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
   const greeting = isStudent ? "Chào mừng," : "Xin chào,";
   const avatar = isStudent ? studentAvatar : isPrincipal ? principalAvatar : teacherAvatar;
   const YEARS = ["2025 - 2026", "2024 - 2025", "2023 - 2024", "2022 - 2023"];
-  const [year, setYear] = useState(YEARS[0]);
+  const [localYear, setLocalYear] = useState("2025 - 2026");
+  const year = schoolYear ?? localYear;
 
   return (
     <header className="h-16 bg-white border-b flex items-center justify-between px-6 shrink-0">
@@ -285,7 +288,7 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
             {YEARS.map((y) => (
               <DropdownMenuItem
                 key={y}
-                onSelect={() => setYear(y)}
+                onSelect={() => { setLocalYear(y); onSchoolYearChange?.(y); }}
                 className={`cursor-pointer text-sm ${y === year ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}`}
               >
                 Năm học {y}
@@ -370,7 +373,7 @@ export function TopBar({ role = "teacher" }: { role?: AppRole }) {
   );
 }
 
-export function AppShell({ children, role: roleProp }: { children: React.ReactNode; role?: AppRole }) {
+export function AppShell({ children, role: roleProp, schoolYear, onSchoolYearChange }: { children: React.ReactNode; role?: AppRole } & SchoolYearProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const demoAccount = useDemoAccount();
   useEffect(() => {
@@ -388,7 +391,7 @@ export function AppShell({ children, role: roleProp }: { children: React.ReactNo
     <div className="min-h-screen bg-slate-50 flex">
       <SidebarNav role={role} />
       <div className="flex-1 min-w-0 flex flex-col">
-        <TopBar role={role} />
+        <TopBar role={role} {...(schoolYear ? { schoolYear } : {})} {...(onSchoolYearChange ? { onSchoolYearChange } : {})} />
         <main className="flex-1 p-4 space-y-4 overflow-y-auto">{children}</main>
       </div>
     </div>

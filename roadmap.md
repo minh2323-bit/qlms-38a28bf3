@@ -1,3 +1,9 @@
+# DTI overview readability and indicators
+
+- [x] Show selected school year and mock report update time in the page subtitle.
+- [x] Increase overview section text; rename the main section with an icon and matching copyright heading size.
+- [x] Remove the three lower indicators and replace lesson-content rate with homework completion; verify filters and layout.
+
 # Merge school statistics into DTI overview
 
 - [x] Replace indexes and add five school donut charts in a two/three layout.

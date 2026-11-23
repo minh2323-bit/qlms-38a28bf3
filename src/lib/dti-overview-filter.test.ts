@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { emptyDtiOverviewFilter, gradesInLabel, matchesDtiOverview } from "./dti-overview-filter";
+import { emptyDtiOverviewFilter, gradesInLabel, matchesDtiOverview, homeworkCompletion } from "./dti-overview-filter";
 import { UNITS } from "@/components/ReportFilters";
 
 describe("DTI overview scope", () => {
+  test("homework completion uses submitted assignments, not lesson-content activity", () => {
+    expect(homeworkCompletion([{ homework: 76, homeworkAssigned: 80 }, { homework: 72, homeworkAssigned: 80 }])).toEqual({ completed: 148, assigned: 160, rate: 92.5 });
+    expect(homeworkCompletion([])).toEqual({ completed: 0, assigned: 0, rate: 0 });
+  });
   test("reset includes all grades and units", () => {
     expect(matchesDtiOverview("Lớp 3A", [3], emptyDtiOverviewFilter())).toBe(true);
   });
