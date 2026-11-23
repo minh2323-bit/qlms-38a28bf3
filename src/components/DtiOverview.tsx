@@ -1,9 +1,15 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { ChevronRight, Filter, Users, GraduationCap, Presentation, Library, ClipboardList, ListChecks, RotateCcw, Search } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UNITS } from "@/components/ReportFilters";
+import { emptyDtiOverviewFilter, matchesDtiOverview, gradesInLabel } from "@/lib/dti-overview-filter";
 import { Button } from "@/components/ui/button";
 import { MATERIALS, QUESTIONS, LECTURES } from "@/components/DtiContentReports";
 
-type Teacher = { name: string; lectures: number; materials: number; homework: number; contentRate: number };
-type Student = { code: string; materials: number; materialsDone: number; onTime: number; homework: number };
+type Teacher = { name: string; classes: string; lectures: number; materials: number; homework: number; contentRate: number };
+type Student = { code: string; cls: string; materials: number; materialsDone: number; onTime: number; homework: number };
 type SchoolClass = { name: string; siSo: number; khoi?: number; baiGiang: number; hocLieu: number; baiTap: number; baiKiemTra: number };
 type ReportTab = "teacher" | "student" | "class" | "material" | "question" | "lecture";
 const number = (v: number) => v.toLocaleString("vi-VN");
@@ -19,22 +25,31 @@ const tones = ["dti-blue", "dti-teal", "dti-violet", "dti-orange", "dti-rose", "
 function Bar({ value, max = 100, color = "var(--dti-blue)" }: { value: number; max?: number; color?: string }) {
   return <svg className="h-2 w-full" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><rect width="100" height="8" rx="4" fill="var(--muted)" /><rect width={Math.min(100, max ? value / max * 100 : 0)} height="8" rx="4" fill={color} /></svg>;
 }
-function TargetBar({ value, label }: { value: number; label: string }) {
-  return <svg className="h-6 w-full" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label={`${label}: ${value}%, mục tiêu 80%`}><rect y="4" width="50" height="16" fill="var(--dti-unmet)" /><rect x="50" y="4" width="30" height="16" fill="var(--dti-near)" /><rect x="80" y="4" width="20" height="16" fill="var(--dti-met)" /><rect y="9" width={Math.min(value, 100)} height="6" rx="1" fill="var(--dti-blue-strong)" /><path d="M80 1 V23" stroke="var(--foreground)" strokeWidth="0.6" /></svg>;
+function IndicatorBar({ value, label }: { value: number; label: string }) {
+  return <svg className="h-2 w-full" viewBox="0 0 100 8" preserveAspectRatio="none" role="img" aria-label={`${label}: ${value}%`}><rect width="100" height="8" rx="4" fill="var(--muted)" /><rect width={Math.min(value, 100)} height="8" rx="4" fill="var(--dti-blue-strong)" /></svg>;
 }
 function Panel({ title, subtitle, tab, onOpen, children }: { title: string; subtitle: string; tab: ReportTab; onOpen: (tab: ReportTab) => void; children: ReactNode }) {
   return <section className="dti-panel min-w-0"><div className="mb-3 flex items-start justify-between gap-2"><div><h3 className="font-semibold">{title}</h3><p className="text-[11px] text-muted-foreground">{subtitle}</p></div><Button variant="ghost" className="h-6 shrink-0 px-0 text-[11px] font-normal text-exam-primary" onClick={() => onOpen(tab)}>Xem báo cáo</Button></div>{children}</section>;
 }
 
-export function DtiOverview({ teachers, students, classes, onOpen }: { teachers: Teacher[]; students: Student[]; classes: SchoolClass[]; onOpen: (tab: ReportTab) => void }) {
+export function DtiOverview({ teachers: allTeachers, students: allStudents, classes: allClasses, onOpen }: { teachers: Teacher[]; students: Student[]; classes: SchoolClass[]; onOpen: (tab: ReportTab) => void }) {
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [applied, setApplied] = useState(emptyDtiOverviewFilter);
+  const [draft, setDraft] = useState(emptyDtiOverviewFilter);
+  const teachers = allTeachers.filter(t => matchesDtiOverview(t.name, gradesInLabel(t.classes), applied));
+  const students = allStudents.filter(s => matchesDtiOverview(s.code, gradesInLabel(s.cls), applied));
+  const classes = allClasses.filter(c => matchesDtiOverview(c.name, c.khoi ? [c.khoi] : [], applied));
+  const materials = MATERIALS.filter(m => matchesDtiOverview(m.name, gradesInLabel(m.grade), applied));
+  const questions = QUESTIONS.filter(q => matchesDtiOverview(q.text, gradesInLabel(q.grade), applied));
+  const lectures = LECTURES.filter(l => matchesDtiOverview(l.name, gradesInLabel(l.grade), applied));
   const activeTeachers = teachers.filter(t => t.lectures + t.materials + t.homework > 0);
   const participating = students.filter(s => s.materials + s.homework > 0);
   const assignedClasses = classes.filter(c => c.baiGiang + c.hocLieu + c.baiTap + c.baiKiemTra > 0);
-  const materialLearners = MATERIALS.reduce((s, r) => s + r.learners, 0);
-  const materialDone = MATERIALS.reduce((s, r) => s + r.done, 0);
-  const lectureLearners = LECTURES.reduce((s, r) => s + r.learners, 0);
-  const lectureDone = LECTURES.reduce((s, r) => s + r.done, 0);
-  const assignedLectures = LECTURES.filter(r => r.classes.length > 0).length;
+  const materialLearners = materials.reduce((s, r) => s + r.learners, 0);
+  const materialDone = materials.reduce((s, r) => s + r.done, 0);
+  const lectureLearners = lectures.reduce((s, r) => s + r.learners, 0);
+  const lectureDone = lectures.reduce((s, r) => s + r.done, 0);
+  const assignedLectures = lectures.filter(r => r.classes.length > 0).length;
   const indicators = [
     { label: "Giáo viên có hoạt động dạy học số", value: percent(activeTeachers.length, teachers.length), detail: `${activeTeachers.length}/${teachers.length} giáo viên` },
     { label: "Tỷ lệ tiết có nội dung số", value: percent(activeTeachers.reduce((s, t) => s + t.contentRate, 0), activeTeachers.length * 100), detail: "trung bình của giáo viên đang hoạt động" },
@@ -44,12 +59,12 @@ export function DtiOverview({ teachers, students, classes, onOpen }: { teachers:
     { label: "Hoàn thành học liệu được giao", value: percent(materialDone, materialLearners), detail: `${number(materialDone)}/${number(materialLearners)} lượt học` },
   ];
   const metrics = [
-    { label: "Giáo viên", value: teachers.length, detail: `${activeTeachers.length} đang hoạt động`, tab: "teacher" },
-    { label: "Học sinh", value: students.length, detail: `${participating.length} đã tham gia học`, tab: "student" },
-    { label: "Lớp học", value: classes.length, detail: `${assignedClasses.length} lớp có nội dung`, tab: "class" },
-    { label: "Học liệu", value: MATERIALS.length, detail: `${number(materialLearners)} lượt học sinh học`, tab: "material" },
-    { label: "Câu hỏi", value: QUESTIONS.length, detail: `${new Set(QUESTIONS.map(q => q.type)).size} dạng câu hỏi`, tab: "question" },
-    { label: "Bài giảng", value: LECTURES.length, detail: `${assignedLectures} đã giao cho lớp`, tab: "lecture" },
+    { label: "Giáo viên", value: teachers.length, tab: "teacher", icon: Users },
+    { label: "Học sinh", value: students.length, tab: "student", icon: GraduationCap },
+    { label: "Bài giảng", value: lectures.length, tab: "lecture", icon: Presentation },
+    { label: "Học liệu", value: materials.length, tab: "material", icon: Library },
+    { label: "Bài tập đã giao", value: teachers.reduce((sum, t) => sum + t.homework, 0), tab: "teacher", icon: ClipboardList },
+    { label: "Ngân hàng câu hỏi", value: questions.length, tab: "question", icon: ListChecks },
   ] as const;
   const contributions = (t: Teacher) => t.lectures + t.materials + t.homework;
   const topTeachers = [...teachers].sort((a, b) => contributions(b) - contributions(a)).slice(0, 5);
@@ -61,20 +76,32 @@ export function DtiOverview({ teachers, students, classes, onOpen }: { teachers:
   ];
   const grades = [1, 2, 3, 4, 5].map(grade => ({ grade, values: series.map(s => classes.filter(c => c.khoi === grade).reduce((total, c) => total + c[s.key], 0)) }));
   const maxGrade = Math.max(1, ...grades.flatMap(g => g.values));
-  const kinds = [...new Set(MATERIALS.map(m => m.kind))].map(kind => {
-    const rows = MATERIALS.filter(m => m.kind === kind);
+  const kinds = [...new Set(materials.map(m => m.kind))].map(kind => {
+    const rows = materials.filter(m => m.kind === kind);
     return { kind, count: rows.length, rate: percent(rows.reduce((s, r) => s + r.done, 0), rows.reduce((s, r) => s + r.learners, 0)) };
   }).sort((a, b) => b.count - a.count);
   const levels = ["Nhận biết", "Thông hiểu", "Vận dụng"];
-  const topLectures = [...LECTURES].sort((a, b) => b.learners - a.learners).slice(0, 4);
+  const topLectures = [...lectures].sort((a, b) => b.learners - a.learners).slice(0, 4);
 
   return <div className="dti-overview space-y-3 text-[13px] text-foreground">
     <section className="dti-panel">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><div><h2 className="text-base font-semibold">Chỉ số chuyển đổi số so với mục tiêu</h2><p className="text-[11px] text-muted-foreground">Năm học 2026–2027 · mục tiêu mỗi chỉ số 80%</p></div><p className="text-[11px] text-muted-foreground"><strong className="text-lg text-foreground">{indicators.filter(i => i.value >= 80).length}</strong>/6 chỉ số đạt mục tiêu</p></div>
-      <div className="grid gap-3 md:grid-cols-3">{indicators.map(i => <article key={i.label} className="rounded-md border border-border p-3"><div className="flex items-center justify-between gap-2 text-[11px]"><span>{i.label}</span><span className={`shrink-0 rounded px-2 text-[10px] ${i.value >= 80 ? "bg-dti-met text-exam-success" : i.value >= 50 ? "bg-dti-near text-exam-warning" : "bg-dti-unmet text-destructive"}`}>{i.value >= 80 ? "Đạt" : i.value >= 50 ? "Gần đạt" : "Chưa đạt"}</span></div><div className="my-1 flex items-center gap-3"><strong className="w-16 shrink-0 text-xl tabular-nums">{i.value}<span className="text-[11px] font-normal">%</span></strong><TargetBar value={i.value} label={i.label} /></div><p className="text-[11px] text-muted-foreground">{i.detail}</p></article>)}</div>
-      <div className="mt-3 flex flex-wrap gap-4 text-[10px] text-muted-foreground"><span className="flex items-center gap-1"><i className="h-2 w-3 bg-dti-unmet" />Chưa đạt (dưới 50%)</span><span className="flex items-center gap-1"><i className="h-2 w-3 bg-dti-near" />Gần đạt (50–79%)</span><span className="flex items-center gap-1"><i className="h-2 w-3 bg-dti-met" />Đạt (từ 80%)</span><span className="flex items-center gap-1"><i className="h-3 border-l-2 border-foreground" />Mục tiêu</span></div>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Chỉ số chuyển đổi số</h2><Button variant="outline" className="h-8 gap-2 text-[13px]" onClick={() => { setDraft({ ...applied }); setFilterOpen(true); }}><Filter className="h-4 w-4" />Bộ lọc<ChevronRight className="h-4 w-4" /></Button></div>
+      <div className="grid gap-3 md:grid-cols-3">{indicators.map(i => <article key={i.label} className="rounded-md border border-border p-3"><div className="text-[11px]">{i.label}</div><div className="my-2 flex items-center gap-3"><strong className="w-16 shrink-0 text-xl tabular-nums">{i.value}<span className="text-[11px] font-normal">%</span></strong><IndicatorBar value={i.value} label={i.label} /></div><p className="text-[11px] text-muted-foreground">{i.detail}</p></article>)}</div>
     </section>
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">{metrics.map((m, i) => <Button key={m.label} variant="outline" className={`dti-summary ${tones[i]} h-auto min-w-0 items-start rounded-md px-3 py-2 text-left font-normal`} onClick={() => onOpen(m.tab)}><span className="flex min-w-0 flex-col"><span className="text-[11px] text-muted-foreground">{m.label}</span><strong className="text-xl leading-6">{number(m.value)}</strong><span className="whitespace-normal text-[10px] text-muted-foreground">{m.detail}</span></span></Button>)}</div>
+    <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+      <SheetContent className="flex w-full flex-col sm:max-w-md" aria-describedby={undefined}>
+        <SheetHeader><SheetTitle>Bộ lọc</SheetTitle></SheetHeader>
+        <form className="flex min-h-0 flex-1 flex-col" onSubmit={e => { e.preventDefault(); setApplied({ ...draft }); setFilterOpen(false); }}>
+          <div className="mt-6 space-y-5 overflow-y-auto">
+            <div className="space-y-2"><label className="text-[13px] font-medium" htmlFor="dti-unit">Đơn vị</label><Select value={draft.unit} onValueChange={unit => setDraft(v => ({ ...v, unit }))}><SelectTrigger id="dti-unit" className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả đơn vị</SelectItem>{UNITS.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><label className="text-[13px] font-medium" htmlFor="dti-grade">Khối</label><Select value={draft.grade} onValueChange={grade => setDraft(v => ({ ...v, grade }))}><SelectTrigger id="dti-grade" className="w-full"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả khối</SelectItem>{[1, 2, 3, 4, 5].map(g => <SelectItem key={g} value={String(g)}>Khối {g}</SelectItem>)}</SelectContent></Select></div>
+            <fieldset className="space-y-3"><legend className="text-[13px] font-medium">Khoảng thời gian</legend><div className="space-y-2"><label htmlFor="dti-from" className="text-[13px] text-muted-foreground">Từ ngày</label><Input id="dti-from" type="date" value={draft.from} max={draft.to || undefined} onChange={e => setDraft(v => ({ ...v, from: e.target.value }))} /></div><div className="space-y-2"><label htmlFor="dti-to" className="text-[13px] text-muted-foreground">Đến ngày</label><Input id="dti-to" type="date" value={draft.to} min={draft.from || undefined} onChange={e => setDraft(v => ({ ...v, to: e.target.value }))} /></div></fieldset>
+          </div>
+          <div className="mt-auto flex gap-3 border-t border-border pt-4"><Button type="button" variant="outline" className="flex-1 gap-2" onClick={() => { setDraft(emptyDtiOverviewFilter()); setApplied(emptyDtiOverviewFilter()); }}><RotateCcw className="h-4 w-4" />Đặt lại</Button><Button type="submit" className="flex-1 gap-2 bg-exam-primary text-primary-foreground hover:bg-exam-primary/90"><Search className="h-4 w-4" />Tìm kiếm</Button></div>
+        </form>
+      </SheetContent>
+    </Sheet>
+    <div className="dti-index grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">{metrics.map((m, i) => <Button key={m.label} variant="outline" className={`dti-summary ${tones[i]} h-auto min-w-0 rounded-md px-3 py-4 text-left font-normal`} onClick={() => onOpen(m.tab)}><span className="flex w-full min-w-0 flex-col gap-3"><span className="flex items-center justify-between gap-2"><m.icon className="h-5 w-5 shrink-0 dti-index-icon" /><strong className="text-2xl tabular-nums">{number(m.value)}</strong></span><span className="whitespace-normal text-[13px] font-medium leading-5">{m.label}</span></span></Button>)}</div>
     <div className="grid gap-3 lg:grid-cols-[0.8fr_1fr]">
       <Panel title="Giáo viên theo mức độ hoạt động" subtitle="Theo số bài giảng, học liệu, bài tập đã tạo" tab="teacher" onOpen={onOpen}>
         <svg className="h-5 w-full overflow-hidden rounded" viewBox="0 0 100 20" preserveAspectRatio="none" aria-label="Mức độ hoạt động giáo viên" role="img">{activity.map((a, i) => <rect key={a.label} x={percent(activity.slice(0, i).reduce((s, r) => s + r.count, 0), teachers.length)} width={percent(a.count, teachers.length)} height="20" fill={a.color} />)}</svg>
@@ -88,9 +115,9 @@ export function DtiOverview({ teachers, students, classes, onOpen }: { teachers:
       </Panel>
     </div>
     <div className="grid gap-3 lg:grid-cols-3">
-      <Panel title="Học liệu theo thể loại" subtitle={`${MATERIALS.length} học liệu · tỷ lệ hoàn thành theo lượt học`} tab="material" onOpen={onOpen}><div className="space-y-2">{kinds.map((k, i) => <div key={k.kind} className="grid grid-cols-[minmax(0,1fr)_minmax(40px,1fr)_24px_48px] items-center gap-2 text-[11px]"><span className="flex items-center gap-2"><svg width="7" height="7" className="shrink-0"><circle cx="3.5" cy="3.5" r="3" fill={`var(--${tones[i % tones.length]})`} /></svg>{k.kind}</span><Bar value={k.count} max={Math.max(1, ...kinds.map(r => r.count))} color={`var(--${tones[i % tones.length]})`} /><strong className="text-right">{k.count}</strong><span className="text-right text-[9px] text-muted-foreground">{k.rate}% HT</span></div>)}</div></Panel>
-      <Panel title="Ngân hàng câu hỏi" subtitle={`Phân bố ${QUESTIONS.length} câu theo khối và mức độ nhận thức`} tab="question" onOpen={onOpen}><table className="w-full border-separate border-spacing-1 text-center text-[11px]"><thead><tr><th /><th className="font-normal text-muted-foreground">Nhận biết</th><th className="font-normal text-muted-foreground">Thông hiểu</th><th className="font-normal text-muted-foreground">Vận dụng</th></tr></thead><tbody>{[1, 2, 3, 4, 5].map(g => <tr key={g}><th className="text-left font-normal text-muted-foreground">Khối {g}</th>{levels.map(level => { const count = QUESTIONS.filter(q => q.grade === `Khối ${g}` && q.level === level).length; return <td key={level} className={`h-8 rounded ${count ? "bg-dti-blue-soft text-foreground" : "bg-muted text-muted-foreground"}`}>{count}</td>; })}</tr>)}</tbody><tfoot><tr><th className="pt-2 text-left font-normal text-muted-foreground">Tổng</th>{levels.map(level => { const count = QUESTIONS.filter(q => q.level === level).length; return <td key={level} className="pt-2"><strong>{count}</strong> <span className="text-[9px] text-muted-foreground">({percent(count, QUESTIONS.length)}%)</span></td>; })}</tr></tfoot></table></Panel>
-      <Panel title="Bài giảng" subtitle="Mức độ đưa bài giảng vào lớp học" tab="lecture" onOpen={onOpen}><div className="mb-2 grid grid-cols-3 gap-2">{[{ value: assignedLectures, label: "đã giao lớp" }, { value: LECTURES.length - assignedLectures, label: "chưa giao" }, { value: `${percent(lectureDone, lectureLearners)}%`, label: "học sinh hoàn thành" }].map(m => <div key={m.label} className="rounded bg-muted p-2"><strong className="text-base">{m.value}</strong><p className="text-[9px] text-muted-foreground">{m.label}</p></div>)}</div><Bar value={assignedLectures} max={LECTURES.length} color="var(--dti-green)" /><h4 className="mb-1 mt-3 text-[11px] font-semibold">Nhiều học sinh tham gia nhất</h4>{topLectures.map(l => <div key={l.name} className="flex items-start justify-between gap-2 border-t border-border py-2 text-[11px]"><div className="min-w-0"><p className="line-clamp-1" title={l.name}>{l.name}</p><p className="text-[9px] text-muted-foreground">{l.classes.join(", ") || "Chưa giao lớp"}</p></div><strong className="shrink-0">{l.learners} HS</strong></div>)}</Panel>
+      <Panel title="Học liệu theo thể loại" subtitle={`${materials.length} học liệu · tỷ lệ hoàn thành theo lượt học`} tab="material" onOpen={onOpen}><div className="space-y-2">{kinds.map((k, i) => <div key={k.kind} className="grid grid-cols-[minmax(0,1fr)_minmax(40px,1fr)_24px_48px] items-center gap-2 text-[11px]"><span className="flex items-center gap-2"><svg width="7" height="7" className="shrink-0"><circle cx="3.5" cy="3.5" r="3" fill={`var(--${tones[i % tones.length]})`} /></svg>{k.kind}</span><Bar value={k.count} max={Math.max(1, ...kinds.map(r => r.count))} color={`var(--${tones[i % tones.length]})`} /><strong className="text-right">{k.count}</strong><span className="text-right text-[9px] text-muted-foreground">{k.rate}% HT</span></div>)}</div></Panel>
+      <Panel title="Ngân hàng câu hỏi" subtitle={`Phân bố ${questions.length} câu theo khối và mức độ nhận thức`} tab="question" onOpen={onOpen}><table className="w-full border-separate border-spacing-1 text-center text-[11px]"><thead><tr><th /><th className="font-normal text-muted-foreground">Nhận biết</th><th className="font-normal text-muted-foreground">Thông hiểu</th><th className="font-normal text-muted-foreground">Vận dụng</th></tr></thead><tbody>{[1, 2, 3, 4, 5].map(g => <tr key={g}><th className="text-left font-normal text-muted-foreground">Khối {g}</th>{levels.map(level => { const count = questions.filter(q => q.grade === `Khối ${g}` && q.level === level).length; return <td key={level} className={`h-8 rounded ${count ? "bg-dti-blue-soft text-foreground" : "bg-muted text-muted-foreground"}`}>{count}</td>; })}</tr>)}</tbody><tfoot><tr><th className="pt-2 text-left font-normal text-muted-foreground">Tổng</th>{levels.map(level => { const count = questions.filter(q => q.level === level).length; return <td key={level} className="pt-2"><strong>{count}</strong> <span className="text-[9px] text-muted-foreground">({percent(count, questions.length)}%)</span></td>; })}</tr></tfoot></table></Panel>
+      <Panel title="Bài giảng" subtitle="Mức độ đưa bài giảng vào lớp học" tab="lecture" onOpen={onOpen}><div className="mb-2 grid grid-cols-3 gap-2">{[{ value: assignedLectures, label: "đã giao lớp" }, { value: lectures.length - assignedLectures, label: "chưa giao" }, { value: `${percent(lectureDone, lectureLearners)}%`, label: "học sinh hoàn thành" }].map(m => <div key={m.label} className="rounded bg-muted p-2"><strong className="text-base">{m.value}</strong><p className="text-[9px] text-muted-foreground">{m.label}</p></div>)}</div><Bar value={assignedLectures} max={lectures.length} color="var(--dti-green)" /><h4 className="mb-1 mt-3 text-[11px] font-semibold">Nhiều học sinh tham gia nhất</h4>{topLectures.map(l => <div key={l.name} className="flex items-start justify-between gap-2 border-t border-border py-2 text-[11px]"><div className="min-w-0"><p className="line-clamp-1" title={l.name}>{l.name}</p><p className="text-[9px] text-muted-foreground">{l.classes.join(", ") || "Chưa giao lớp"}</p></div><strong className="shrink-0">{l.learners} HS</strong></div>)}</Panel>
     </div>
   </div>;
 }

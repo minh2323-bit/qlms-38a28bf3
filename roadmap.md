@@ -2,6 +2,9 @@
 
 # Principal DTI overview
 
+- [x] Remove target levels and add a slide-out unit/grade/date filter applied to every overview statistic.
+- [x] Reorder and redesign six index tiles without subtitles; verify filtering and reset.
+
 - [x] Add the default Tổng quan tab using the existing mock report data, with indicators and links to detailed tabs.
 - [x] Verify overview, detail navigation and existing tab links; the overview stays within the mobile content width, while the existing shared header overflows on narrow screens.
 - [x] Match the two supplied screenshots: target indicators, six summary tiles, teacher activity, grade chart, material types, question matrix and lecture participation.

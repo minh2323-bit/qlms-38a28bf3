@@ -218,3 +218,11 @@ html { font-size: 16.75px; }
 .dti-summary.dti-orange { border-left-color: var(--dti-orange); }
 .dti-summary.dti-rose { border-left-color: var(--dti-rose); }
 .dti-summary.dti-green { border-left-color: var(--dti-green); }
+.dti-index .dti-summary { border-left-width: 3px; align-items: stretch; }
+.dti-index .dti-blue { --dti-index-accent: var(--dti-blue); }
+.dti-index .dti-teal { --dti-index-accent: var(--dti-teal); }
+.dti-index .dti-violet { --dti-index-accent: var(--dti-violet); }
+.dti-index .dti-orange { --dti-index-accent: var(--dti-orange); }
+.dti-index .dti-rose { --dti-index-accent: var(--dti-rose); }
+.dti-index .dti-green { --dti-index-accent: var(--dti-green); }
+.dti-index-icon { color: var(--dti-index-accent); }

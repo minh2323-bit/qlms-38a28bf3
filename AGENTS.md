@@ -24,3 +24,4 @@
 - Transfer receipts use shared formatting and tags but remain in each page's in-memory source entry; append every successful transfer and reset receipts on source replacement to avoid attributing old transfers to new content.
 - Exam provenance stores official/practice classification separately from organizer level so tracing does not infer exam type from its name or level; legacy exam sources default to official.
 - DTI overview shares teacher, student, class and content rows with the detail reports; derive charts from those rows rather than reference-image totals so counts do not drift, and keep enrollment totals separate from unique student counts.
+- DTI overview applies one submitted filter to every dataset via the existing mock report unit/activity assignments; keep draft filter edits separate until search so charts and index totals use the same scope.
