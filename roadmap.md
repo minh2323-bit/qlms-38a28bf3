@@ -1,3 +1,9 @@
+# DTI overview number navigation
+
+- [x] Remove the teacher activity progress bar and its legend from the supplied image.
+- [x] Make indicator, resource index and teacher contribution numbers open their corresponding report tabs.
+- [x] Verify the clickable numbers and removal in the live report.
+
 # DTI overview readability and indicators
 
 - [x] Show selected school year and mock report update time in the page subtitle.

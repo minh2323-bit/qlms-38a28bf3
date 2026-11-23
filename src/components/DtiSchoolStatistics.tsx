@@ -26,11 +26,11 @@ function Donut({ title, data, unit = "" }: { title: string; data: { name: string
   </article>;
 }
 
-export function DtiSchoolIndexes({ filter }: { filter: DtiOverviewFilter }) {
+export function DtiSchoolIndexes({ filter, onOpen }: { filter: DtiOverviewFilter; onOpen: (tab: "teacher" | "material" | "lecture" | "question") => void }) {
   const { indexes } = schoolStatisticsForFilter(filter);
   return <div className="dti-school-index grid grid-cols-2 gap-3 xl:grid-cols-4">{indexes.map((row, i) => <article key={row.label} className={`dti-school-metric ${tones[i]} min-w-0 rounded-lg border border-border bg-card p-4`}>
     <span className="dti-school-icon mb-3 inline-flex h-9 w-9 items-center justify-center rounded-md"><row.icon className="h-5 w-5" /></span>
-    <strong className="block text-2xl font-bold tabular-nums">{formatNumber(row.count)}</strong>
+    <Button variant="link" className="block h-auto p-0 text-2xl font-bold tabular-nums text-exam-primary" aria-label={`Xem báo cáo: ${row.label}`} onClick={() => onOpen(i === 0 ? "material" : i === 1 ? "lecture" : i === 2 ? "question" : "teacher")}>{formatNumber(row.count)}</Button>
     <p className="mt-1 text-[13px] leading-5">{row.label}</p>
     {row.growth !== undefined && <p className={`mt-1.5 flex items-center gap-1 text-[13px] font-semibold ${row.change < 0 ? "text-destructive" : "text-exam-success"}`}>{row.change < 0 ? <TrendingDown className="h-3.5 w-3.5 shrink-0" /> : <TrendingUp className="h-3.5 w-3.5 shrink-0" />}<span>{formatNumber(Math.abs(row.change))} so với tháng trước</span></p>}
   </article>)}</div>;
