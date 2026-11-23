@@ -31,7 +31,7 @@ function Donut({ title, data, unit = "", tab, onOpen }: { title: string; data: {
     onClick={clickable ? () => onOpen(tab) : undefined}
     onKeyDown={clickable ? e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(tab); } } : undefined}
   >
-    <h3 className="min-h-10 text-base font-semibold">{title}</h3>
+    <div className="flex items-start justify-between gap-2"><h3 className="min-h-10 text-base font-semibold">{title}</h3>{clickable && <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-exam-primary">Xem chi tiết<ArrowRight className="h-3.5 w-3.5" /></span>}</div>
     <div className="h-[200px]" role="img" aria-label={title}>
       {hasData ? <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={data} dataKey="value" nameKey="name" innerRadius={48} outerRadius={76} paddingAngle={2} stroke="var(--card)" strokeWidth={2} isAnimationActive={false}>{data.map((row, i) => <Cell key={row.name} fill={colors[i % colors.length]} />)}</Pie><Tooltip contentStyle={{ background: "var(--popover)", borderColor: "var(--border)", color: "var(--popover-foreground)", borderRadius: 6, fontSize: 13 }} itemStyle={{ color: "var(--popover-foreground)" }} formatter={(value: number) => `${formatNumber(value)}${unit}`} /></PieChart></ResponsiveContainer> : <div className="flex h-full items-center justify-center text-muted-foreground">Không có dữ liệu</div>}
     </div>
@@ -45,9 +45,9 @@ export function DtiSchoolIndexes({ filter, onOpen }: { filter: DtiOverviewFilter
     if (target === "hlbq") document.getElementById("hlbq")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
     else onOpen(target);
   };
-  return <div className="dti-school-index grid grid-cols-2 gap-3 xl:grid-cols-4">{indexes.map((row, i) => <article key={row.label} className={`dti-school-metric ${tones[i]} min-w-0 rounded-lg border border-border bg-card p-4`}>
+  return <div className="dti-school-index grid grid-cols-2 gap-3 xl:grid-cols-4">{indexes.map((row, i) => <article key={row.label} className={`dti-school-metric ${tones[i]} min-w-0 cursor-pointer rounded-lg border border-border bg-card p-4 transition-colors hover:border-exam-primary/50`} role="button" tabIndex={0} aria-label={`Xem báo cáo: ${row.label}`} onClick={() => openTarget(indexTargets[i] ?? "teacher")} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openTarget(indexTargets[i] ?? "teacher"); } }}>
     <span className="dti-school-icon mb-3 inline-flex h-9 w-9 items-center justify-center rounded-md"><row.icon className="h-5 w-5" /></span>
-    <Button variant="link" className="block h-auto p-0 text-2xl font-bold tabular-nums text-exam-primary" aria-label={`Xem báo cáo: ${row.label}`} onClick={() => openTarget(indexTargets[i] ?? "teacher")}>{formatNumber(row.count)}</Button>
+    <span className="block text-2xl font-bold tabular-nums text-exam-primary underline decoration-exam-primary/40 underline-offset-4">{formatNumber(row.count)}</span>
     <p className="mt-1 text-[13px] leading-5">{row.label}</p>
     {row.growth !== undefined && <p className={`mt-1.5 flex items-center gap-1 text-[13px] font-semibold ${row.change < 0 ? "text-destructive" : "text-exam-success"}`}>{row.change < 0 ? <TrendingDown className="h-3.5 w-3.5 shrink-0" /> : <TrendingUp className="h-3.5 w-3.5 shrink-0" />}<span>{formatNumber(Math.abs(row.change))} so với tháng trước</span></p>}
   </article>)}</div>;
