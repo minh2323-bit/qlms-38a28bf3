@@ -69,7 +69,7 @@ export function DtiOverview({ teachers: allTeachers, students: allStudents, clas
       </SheetContent>
     </Sheet>
     <DtiSchoolIndexes filter={applied} onOpen={onOpen} />
-    <DtiSchoolDonuts filter={applied} />
+    <DtiSchoolDonuts filter={applied} onOpen={onOpen} />
     <div className="grid gap-3 lg:grid-cols-[0.8fr_1fr]">
       <Panel title="Giáo viên theo mức độ hoạt động" subtitle="Theo số bài giảng, học liệu, bài tập đã tạo" tab="teacher" onOpen={onOpen}>
         <h4 className="mb-2 mt-4 text-[13px] font-semibold">Giáo viên đóng góp nhiều nhất</h4>
@@ -80,7 +80,7 @@ export function DtiOverview({ teachers: allTeachers, students: allStudents, clas
         <svg className="mt-3 h-[200px] w-full" viewBox="0 0 600 200" role="img" aria-label="Biểu đồ nội dung đã giao theo khối">{grades.map((g, i) => <g key={g.grade}><line x1={i * 120 + 5} x2={i * 120 + 115} y1="177" y2="177" stroke="var(--border)" />{g.values.map((v, j) => <g key={j}><rect x={i * 120 + 12 + j * 27} y={177 - v / maxGrade * 148} width="15" height={v / maxGrade * 148} rx="2" fill={series[j]?.color} /><text x={i * 120 + 19.5 + j * 27} y={170 - v / maxGrade * 148} textAnchor="middle" fontSize="10" fill="var(--muted-foreground)">{v}</text></g>)}<text x={i * 120 + 60} y="193" textAnchor="middle" fontSize="12" fill="var(--muted-foreground)">Khối {g.grade}</text></g>)}</svg>
       </Panel>
     </div>
-    <DtiSchoolMonthly filter={applied} />
+    <DtiSchoolMonthly filter={applied} onOpen={onOpen} />
     <DtiCopyrightStatistics filter={applied} />
   </div>;
 }

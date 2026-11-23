@@ -3,6 +3,7 @@
 - [x] Remove the teacher activity progress bar and its legend from the supplied image.
 - [x] Make indicator, resource index and teacher contribution numbers open their corresponding report tabs.
 - [x] Verify the clickable numbers and removal in the live report.
+- [x] Make every index tile, donut chart and monthly bar open its matching report tab; the HLBQ index scrolls to the copyright section.
 
 # DTI overview readability and indicators
 
